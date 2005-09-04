@@ -257,4 +257,21 @@ public class ForeignAmountEntryBox extends HBox
 	public void grabFocus() {
 		_faceValueEntry.grabFocus();
 	}
+
+	/*
+	 * Getters and Setters --------------------------------
+	 */
+
+	public ForeignAmount getForeignAmount() {
+		return _foreignAmount;
+	}
+
+	public void setForeignAmount(ForeignAmount amount) {
+		this._foreignAmount = amount;
+		_faceValueEntry.setText(_foreignAmount.getForeignValue());
+		_currencySelector.setCurrency(_foreignAmount.getCurrency());
+		_rateEntry.setText(_foreignAmount.getRate());
+		_homeValueEntry.setText(_foreignAmount.getValue());
+	}
+
 }

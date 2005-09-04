@@ -75,14 +75,6 @@ public class ForeignCurrencyTest extends TestCase
 		assertEquals("13576.10", fa.getValue());
 
 		assertEquals("10,000.00", fa.toString());
-
-		/*
-		 * Not exactly certain this is how I want this to go, but it'll do. For
-		 * now, it means that toString will always give the face value,
-		 * regardless of Amount or ForeignAmount, in face currency terms.
-		 */
-		Amount a = (Amount) fa.clone();
-		assertEquals("13,576.10", a.toString());
 	}
 
 	public final void testChangeRate() {
@@ -133,6 +125,61 @@ public class ForeignCurrencyTest extends TestCase
 		 * And face value is unchanged.
 		 */
 		assertEquals("100.00", fa.getForeignValue());
-
 	}
+
+	public final void testClone() {
+		Currency eur = new Currency("EUR", "European Euro", "?");
+		Currency gbp = new Currency("GBP", "British Pound", "?");
+
+		ForeignAmount fa1 = new ForeignAmount("100.00", eur, "1.500");
+
+		ForeignAmount fa2 = (ForeignAmount) fa1.clone();
+
+		assertEquals("100.00", fa2.getForeignValue());
+		assertEquals(eur, fa2.getCurrency());
+		assertEquals("150.00", fa2.getValue());
+
+		fa1.setCurrency(gbp);
+		fa1.setForeignValue("950.00");
+
+		assertEquals(gbp, fa1.getCurrency());
+		assertNotSame(eur, fa1.getCurrency());
+		/*
+		 * And the clone had better still be the original...
+		 */
+		assertEquals(eur, fa2.getCurrency());
+		assertEquals("100.00", fa2.getForeignValue());
+		assertEquals("150.00", fa2.getValue());
+
+		/*
+		 * Not exactly certain this is how I want this to go, but it'll do. For
+		 * now, it means that toString will always give the face value,
+		 * regardless of Amount or ForeignAmount, in face currency terms.
+		 */
+		ForeignAmount fa3 = (ForeignAmount) fa2.clone();
+		assertEquals("100.00", fa3.toString());
+
+		/*
+		 * If this fails, it menas the behaviour has changed and the fully
+		 * qualified subclass's toString() isn't prevailing
+		 */
+		Amount a4 = (Amount) ((Amount) fa2).clone();
+		assertNotSame("150.00", a4.toString());
+		assertEquals("100.00", a4.toString());
+	}
+
+	public final void testAvoidDivideByZero() {
+		Currency eur = new Currency("EUR", "European Euro", "?");
+		ForeignAmount fa = new ForeignAmount("0.00", eur, "1.500");
+
+		ForeignAmount c = null;
+		try {
+			c = (ForeignAmount) fa.clone();
+		} catch (ArithmeticException ae) {
+			fail("Should be avoiding dividing by zero");
+		}
+		assertNotNull(c);
+		assertEquals("0.00", c.getValue());
+	}
+
 }

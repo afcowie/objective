@@ -14,17 +14,17 @@ public class ForeignAmount extends Amount
 	 * The decimal precision of exchange rate Strings
 	 */
 	public static final int	RATE_DECIMAL_PLACES	= 5;
-	
-	private Currency	currency;
+
+	private Currency		currency;
 	/**
 	 * The number of cents representing the foreign value we were given.
 	 */
-	private long		foreignNumber;
+	private long			foreignNumber;
 	/**
 	 * The exchange rate. Multiply by this factor to get the value in the home
 	 * currency.
 	 */
-	private String		rate;
+	private String			rate;
 
 	public ForeignAmount() {
 		super();
@@ -160,11 +160,13 @@ public class ForeignAmount extends Amount
 	 *            a BigDecimal representing the home value
 	 */
 	private void recalculateRateGivenHome(BigDecimal h) {
-
 		BigDecimal f = new BigDecimal(numberToString(foreignNumber));
+		if (foreignNumber == 0) {
+			// avoid divide by zero
+			return;
+		}
 		/*
-		 * home = foreign * rate
-		 * rate = home / foregin
+		 * home = foreign * rate ; rate = home / foregin
 		 */
 		BigDecimal r = h.divide(f, RATE_DECIMAL_PLACES, BigDecimal.ROUND_HALF_UP);
 		this.rate = r.toString();
@@ -184,5 +186,18 @@ public class ForeignAmount extends Amount
 	 */
 	public String toString() {
 		return padComma(numberToString(foreignNumber));
+	}
+
+	public Object clone() {
+		ForeignAmount obj = new ForeignAmount();
+		// Copy the long
+		obj.foreignNumber = this.foreignNumber;
+		// Copy the reference
+		obj.currency = this.currency;
+		// new String
+		obj.rate = new String(this.rate);
+		// now that we have a new object, just set it's value
+		obj.setValue(this.getValue());
+		return obj;
 	}
 }
