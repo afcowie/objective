@@ -29,12 +29,14 @@ public class ForeignAmountEntryBox extends HBox
 {
 	private ForeignAmount		_foreignAmount;
 
+	private Currency			_home;
 	private Currency			_lastCurrency;
 
 	private Entry				_faceValueEntry;
 	private Entry				_rateEntry;
 	private Entry				_homeValueEntry;
 	private CurrencySelector	_currencySelector;
+	private Label				_homeCodeLabel;
 
 	private static HashMap		_lastRates;
 
@@ -46,10 +48,10 @@ public class ForeignAmountEntryBox extends HBox
 		super(false, 3);
 
 		Books root = ObjectiveAccounts.store.getBooks();
-		Currency home = root.getHomeCurrency();
+		_home = root.getHomeCurrency();
 
 		if (_lastCurrency == null) {
-			_lastCurrency = home;
+			_lastCurrency = _home;
 		}
 
 		_foreignAmount = new ForeignAmount("0.00", _lastCurrency, "1.0");
@@ -71,9 +73,9 @@ public class ForeignAmountEntryBox extends HBox
 		_homeValueEntry.setWidth(8);
 		_homeValueEntry.setAlignment(1.0f);
 		packStart(_homeValueEntry, true, true, 0);
-		
-		Label homeCodeLabel = new Label(home.getCode());
-		packStart(homeCodeLabel, false, false, 0);
+
+		_homeCodeLabel = new Label(_home.getCode());
+		packStart(_homeCodeLabel, false, false, 0);
 
 		_faceValueEntry.addListener(new EntryListener() {
 			public void entryEvent(EntryEvent event) {
@@ -87,7 +89,20 @@ public class ForeignAmountEntryBox extends HBox
 						return;
 					}
 
-					_foreignAmount.setForeignValue(text);
+					try {
+						_foreignAmount.setForeignValue(text);
+					} catch (NumberFormatException nfe) {
+						/*
+						 * If the user's imput is garbage (ie, a second decimal
+						 * place, alpha characters) then a) that
+						 * setForeignValue() call won't have changed anything,
+						 * and b) just escape out of here. Worse case (the user
+						 * doesn't do anything smart about it), when focus
+						 * leaves or activate happens the diplayed value will be
+						 * reverted.
+						 */
+						return;
+					}
 					_rateEntry.setText(_foreignAmount.getRate());
 					_homeValueEntry.setText(_foreignAmount.getValue());
 				}
@@ -99,18 +114,17 @@ public class ForeignAmountEntryBox extends HBox
 				}
 			}
 		});
-		
+
 		_faceValueEntry.addListener(new FocusListener() {
 			public boolean focusEvent(FocusEvent event) {
 				if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
 					_faceValueEntry.setText(_foreignAmount.getForeignValue());
-					_faceValueEntry.selectRegion(0,0);
+					_faceValueEntry.selectRegion(0, 0);
 				}
 				return false;
 			};
 		});
 
-		
 		_currencySelector.addListener(new ComboBoxListener() {
 			public void comboBoxEvent(ComboBoxEvent event) {
 				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
@@ -122,9 +136,12 @@ public class ForeignAmountEntryBox extends HBox
 					if (rate == null) {
 						rate = "1.0";
 					}
+
 					_foreignAmount.setRate(rate);
 					_rateEntry.setText(_foreignAmount.getRate());
 					_homeValueEntry.setText(_foreignAmount.getValue());
+
+					grayOut();
 				}
 			}
 		});
@@ -141,7 +158,12 @@ public class ForeignAmountEntryBox extends HBox
 						return;
 					}
 
-					_foreignAmount.setRate(text);
+					try {
+						_foreignAmount.setRate(text);
+					} catch (NumberFormatException nfe) {
+						// see comment above
+						return;
+					}
 					_homeValueEntry.setText(_foreignAmount.getValue());
 					_lastRates.put(_currencySelector.getCurrency(), _foreignAmount.getRate());
 				}
@@ -163,7 +185,7 @@ public class ForeignAmountEntryBox extends HBox
 			public boolean focusEvent(FocusEvent event) {
 				if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
 					_rateEntry.setText(_foreignAmount.getRate());
-					_rateEntry.selectRegion(0,0);
+					_rateEntry.selectRegion(0, 0);
 				}
 				return false;
 			};
@@ -181,7 +203,12 @@ public class ForeignAmountEntryBox extends HBox
 						return;
 					}
 
-					_foreignAmount.setValue(text);
+					try {
+						_foreignAmount.setValue(text);
+					} catch (NumberFormatException nfe) {
+						// see comment above
+						return;
+					}
 					_rateEntry.setText(_foreignAmount.getRate());
 					_lastRates.put(_currencySelector.getCurrency(), _foreignAmount.getRate());
 				}
@@ -193,16 +220,34 @@ public class ForeignAmountEntryBox extends HBox
 				}
 			}
 		});
-		
+
 		_homeValueEntry.addListener(new FocusListener() {
 			public boolean focusEvent(FocusEvent event) {
 				if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
 					_homeValueEntry.setText(_foreignAmount.getValue());
-					_homeValueEntry.selectRegion(0,0);
+					_homeValueEntry.selectRegion(0, 0);
 				}
 				return false;
 			};
 		});
+
+		grayOut();
+	}
+
+	/*
+	 * Utility methods ------------------------------------
+	 */
+
+	private void grayOut() {
+		if (_currencySelector.getCurrency() == _home) {
+			_rateEntry.setSensitive(false);
+			_homeValueEntry.setSensitive(false);
+			_homeCodeLabel.setSensitive(false);
+		} else {
+			_rateEntry.setSensitive(true);
+			_homeValueEntry.setSensitive(true);
+			_homeCodeLabel.setSensitive(true);
+		}
 	}
 
 	/*
