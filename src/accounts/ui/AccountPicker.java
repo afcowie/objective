@@ -485,8 +485,7 @@ public class AccountPicker extends HBox
 			 * So annoying. You'd think you should be able to cast from Widget
 			 * to Window here, but it blows ClassCastException.
 			 */
-			Widget w = _entry.getToplevel();
-			Window top = new Window(w.getHandle());
+			Window top = (Window) _entry.getToplevel();
 			top.present();
 		}
 

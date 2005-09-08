@@ -401,13 +401,18 @@ if ($os eq "gentoo") {
 	check_prereq(@javagnome_jars,
 		"LibGlade Java bindings",
 		"libglade-java",
-		"$javagnome_home/share/java/glade2.10.jar",
-		"/usr/share/libglade-java-2.10/lib/glade2.10.jar");
+		"$javagnome_home/share/java/glade2.12.jar",
+		"/usr/share/libglade-java-2.12/lib/glade2.12.jar");
 	check_prereq(@javagnome_jars,
 		"GTK+ Java bindings",
 		"libgtk-java",
-		"$javagnome_home/share/java/gtk2.6.jar",
-		"/usr/share/libgtk-java-2.6/lib/gtk2.6.jar");
+		"$javagnome_home/share/java/gtk2.8.jar",
+		"/usr/share/libgtk-java-2.8/lib/gtk2.8.jar");
+	check_prereq(@javagnome_jars,
+		"glib Java bindings",
+		"libglib-java",
+		"$javagnome_home/share/java/glib0.2.jar",
+		"/usr/share/glib-java-0.2/lib/glib0.2.jar");
 
 #	check_prereq(@db4o_jars,
 #		"db4o object database",
@@ -433,33 +438,54 @@ if ($os eq "gentoo") {
 	check_prereq(@javagnome_jars,
 		"LibGlade Java bindings",
 		"libglade2-java",
-		"/usr/share/java/glade2.10.jar",
-		"/usr/share/java/glade2.8.jar");
+		"$javagnome_home/share/java/glade2.12.jar",
+		"/usr/share/java/glade2.12.jar");
 	check_prereq(@javagnome_jars,
 		"GTK+ Java bindings",
 		"libgtk2-java",
-		"/usr/share/java/gtk2.6.jar",
-		"/usr/share/java/gtk2.4.jar");
+		"$javagnome_home/share/java/gtk2.8.jar",
+		"/usr/share/java/gtk2.8.jar");
+	check_prereq(@javagnome_jars,
+		"glib Java bindings",
+		"glib-java",
+		"$javagnome_home/share/java/glib0.2.jar",
+		"/usr/share/java/glib0.2.jar");
 
 
-	$jni_path = "/usr/lib:/usr/lib/jni";
+	if ($javagnome_home) {
+		$javagnome_lib_path = "$javagnome_home/lib";
+		$jni_path = "$javagnome_lib_path:/usr/lib:/usr/lib/jni";
+	} else {
+		$javagnome_lib_path = "/usr/lib";
+		$jni_path = "/usr/lib:/usr/lib/jni";
+	}
 	
 } elsif ($os eq "fedora") {
 
 	check_prereq(@javagnome_jars,
 		"LibGlade Java bindings",
 		"libglade-java",
-		"/usr/share/java/glade2.10.jar",
-		"/usr/share/java/glade2.8.jar");
+		"$javagnome_home/share/java/glade2.12.jar",
+		"/usr/share/java/glade2.12.jar");
 	check_prereq(@javagnome_jars,
 		"GTK+ Java bindings",
 		"libgtk-java",
-		"/usr/share/java/gtk2.6.jar",
-		"/usr/share/java/gtk2.4-2.4.9.jar",
-		"/usr/share/java/gtk2.4-2.4.8.1.jar");
+		"$javagnome_home/share/java/gtk2.8.jar",
+		"/usr/share/java/gtk2.8.jar");
+	check_prereq(@javagnome_jars,
+		"glib Java bindings",
+		"glib-java",
+		"$javagnome_home/share/java/glib0.2.jar",
+		"/usr/share/java/glib0.2.jar");
 
 
-	$jni_path = "/usr/lib";
+	if ($javagnome_home) {
+		$javagnome_lib_path = "$javagnome_home/lib";
+		$jni_path = "$javagnome_lib_path:/usr/lib";
+	} else {
+		$javagnome_lib_path = "/usr/lib";
+		$jni_path = "/usr/lib";
+	}
 	
 } else {
 	bail "failed!", "This OS not configured with defaults!\nTHIS IS AN INTERNAL ERROR, PLEASE FILE A BUG.";
