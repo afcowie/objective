@@ -12,6 +12,7 @@ import org.gnu.gtk.Table;
 
 import accounts.domain.Account;
 import accounts.domain.Datestamp;
+import accounts.domain.ForeignAmount;
 
 /**
  * A window where the expenses incurred by an employee
@@ -23,19 +24,21 @@ public class ReimbusableExpensesWindow extends EditorWindow
 	/*
 	 * Cached widgets
 	 */
-	protected Table			_table;
-	
-	protected ComboBoxEntry	_who_comboboxentry;
-	protected DatePicker	_datePicker;
-	protected AccountPicker	_accountPicker;
+	protected Table					_table;
+
+	protected ComboBoxEntry			_who_comboboxentry;
+	protected DatePicker			_datePicker;
+	protected AccountPicker			_accountPicker;
 	protected ForeignAmountEntryBox	_amountEntryBox;
 
 	/*
 	 * Original state
 	 */
-	private int				_original_whoIndex;
-	private Datestamp		_original_date;
-	private Account			_original_account;
+	private int						_original_whoIndex;
+	private Datestamp				_original_date;
+	private Account					_original_account;
+
+	private ForeignAmount			_original_foreignAmount;
 
 	public ReimbusableExpensesWindow() {
 		super("expenses", "share/ReimbusableExpensesWindow.glade");
@@ -54,11 +57,11 @@ public class ReimbusableExpensesWindow extends EditorWindow
 		_who_comboboxentry.appendText("Andrew Cowie");
 		_who_comboboxentry.setActive(0);
 
-		setStateAsOriginal();
-
 		_amountEntryBox = new ForeignAmountEntryBox();
 		_table.attach(_amountEntryBox, 1, 2, 3, 4);
-		
+
+		setStateAsOriginal();
+
 		_window.showAll();
 		_window.present();
 	}
@@ -67,6 +70,7 @@ public class ReimbusableExpensesWindow extends EditorWindow
 		_original_whoIndex = _who_comboboxentry.getActive();
 		_original_date = _datePicker.getDate();
 		_original_account = _accountPicker.getAccount();
+		_original_foreignAmount = (ForeignAmount) _amountEntryBox.getForeignAmount().clone();
 
 		// System.out.println("Original who: "+_original_whoIndex);
 		// System.out.println("Original date: "+_original_date);
@@ -76,6 +80,7 @@ public class ReimbusableExpensesWindow extends EditorWindow
 		_who_comboboxentry.setActive(_original_whoIndex);
 		_datePicker.setDate(_original_date);
 		_accountPicker.setAccount(_original_account);
+		_amountEntryBox.setForeignAmount(_original_foreignAmount);
 	}
 
 	/*

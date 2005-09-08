@@ -75,6 +75,15 @@ public class ForeignCurrencyTest extends TestCase
 		assertEquals("13576.10", fa.getValue());
 
 		assertEquals("10,000.00", fa.toString());
+
+		/*
+		 * Since toString() is overridden to show the ForeignAmount's value with
+		 * commans, if you want to see the home value with commas, just quickly
+		 * construct a new Amount.with that value
+		 */
+
+		Amount a = new Amount(fa.getValue());
+		assertEquals("13,576.10", a.toString());
 	}
 
 	public final void testChangeRate() {
