@@ -195,9 +195,9 @@ test: build/unittests
 # the point is to *run* these, so we don't touch a stamp file.
 
 build/unittests: build/classes-tests
-	@echo "$(JAVA_CMD) AllObjectiveTests [JUnit]"
+	@echo "$(JAVA_CMD) AllTests [JUnit]"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes AllObjectiveTests
+	$(JAVA) -classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes AllTests
 
 
 
@@ -232,6 +232,8 @@ debug: build/classes-dist
 	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.ui.ObjectiveAccounts $(DEBUG)
 
 run: build/classes-dist
+	@echo "target disabled... use `make pop`"
+	@exit 1
 	@echo "$(JAVA_CMD) ObjectiveAccounts $(DEBUG)"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
 	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.ui.ObjectiveAccounts $(DEBUG)

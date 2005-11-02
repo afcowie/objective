@@ -22,14 +22,19 @@ import accounts.domain.Ledger;
 public class BasicCommandTest extends TestCase
 {
 	public static final String	TESTS_DATABASE	= "tmp/unittests/BasicCommandTest.yap";
+	private static boolean		initialized		= false;
 
-	static {
+	private void init() {
 		new File(TESTS_DATABASE).delete();
 		ObjectiveAccounts.store = DatafileServices.newDatafile(TESTS_DATABASE);
 		ObjectiveAccounts.store.close();
+		initialized = true;
 	}
 
 	public void setUp() {
+		if (!initialized) {
+			init();
+		}
 		try {
 			ObjectiveAccounts.store = DatafileServices.openDatafile(TESTS_DATABASE);
 		} catch (FileNotFoundException fnfe) {

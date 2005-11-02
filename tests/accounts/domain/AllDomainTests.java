@@ -1,5 +1,5 @@
 /*
- * AllObjectiveDomainTests.java
+ * AllDomainTests.java
  * 
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005 Operational Dynamics
@@ -11,7 +11,7 @@ import junit.framework.TestSuite;
 /**
  * @author Andrew Cowie
  */
-public class AllObjectiveDomainTests
+public class AllDomainTests
 {
 	public static TestSuite suite() {
 		TestSuite suite = new TestSuite("Test for accounts.domain");

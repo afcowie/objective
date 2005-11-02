@@ -1,10 +1,10 @@
 /*
- * AllObjectiveServicesTests.java
+ * AllPersistenceTests.java
  * 
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005 Operational Dynamics
  */
-package accounts.services;
+package accounts.persistence;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -12,13 +12,13 @@ import junit.framework.TestSuite;
 /**
  * @author Andrew Cowie
  */
-public class AllObjectiveServicesTests
+public class AllPersistenceTests
 {
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for accounts.services");
+		TestSuite suite = new TestSuite("Test for accounts.persistence");
 
-		suite.addTestSuite(DatafileTest.class);
-		suite.addTestSuite(BasicCommandTest.class);
+		suite.addTestSuite(BasicDb4oTest.class);
+		suite.addTestSuite(Db4oSetTest.class);
 
 		return suite;
 	}
