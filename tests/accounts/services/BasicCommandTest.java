@@ -55,7 +55,7 @@ public class BasicCommandTest extends TestCase
 		 * test readiness now that we've added home Currency selection.
 		 */
 		try {
-			ibc.commit();
+			ibc.execute();
 			fail("should have thrown CommandNotReadyException as the home Currency hasn't been set");
 		} catch (CommandNotReadyException cnre) {
 		} catch (Exception other) {
@@ -66,7 +66,7 @@ public class BasicCommandTest extends TestCase
 		ibc.setHomeCurrency(home);
 
 		try {
-			ibc.commit();
+			ibc.execute();
 		} catch (CommandNotReadyException cnre) {
 			fail("threw CommandNotReadyException");
 		}
@@ -103,7 +103,7 @@ public class BasicCommandTest extends TestCase
 		AddAccountCommand aac = new AddAccountCommand();
 		aac.setAccount(pettyCash);
 		try {
-			aac.commit();
+			aac.execute();
 		} catch (CommandNotReadyException cnre) {
 			fail("threw CommandNotReadyException");
 		}

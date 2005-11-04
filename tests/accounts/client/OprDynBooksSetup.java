@@ -63,7 +63,7 @@ public class OprDynBooksSetup
 			
 			InitBooksCommand initBooks = new InitBooksCommand();
 			initBooks.setHomeCurrency(home);
-			initBooks.commit();
+			initBooks.execute();
 
 			/*
 			 * Create a whole ton of accounts
@@ -130,7 +130,7 @@ public class OprDynBooksSetup
 
 				AddAccountCommand aac = new AddAccountCommand();
 				aac.setAccount(a);
-				aac.commit();
+				aac.execute();
 			}
 
 			/*
@@ -145,7 +145,7 @@ public class OprDynBooksSetup
 
 				AddAccountCommand aac = new AddAccountCommand();
 				aac.setAccount(a);
-				aac.commit();
+				aac.execute();
 			}
 
 			/*
@@ -168,7 +168,7 @@ public class OprDynBooksSetup
 				
 				AddCurrencyCommand acc = new AddCurrencyCommand();
 				acc.setCurrency(cur);
-				acc.commit();
+				acc.execute();
 				
 			}
 			

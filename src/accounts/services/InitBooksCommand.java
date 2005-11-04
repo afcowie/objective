@@ -53,7 +53,7 @@ public class InitBooksCommand extends Command
 		return ready;
 	}
 
-	protected void execute() {
+	protected void persist() {
 		_store.save(_root);
 //		_store.save(_root.getAccountsSet());
 	}

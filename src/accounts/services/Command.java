@@ -82,12 +82,12 @@ public abstract class Command
 	/**
 	 * Carry out the changes to the underlying datastore. You should be using
 	 * DateStore _store.save() here. DO NOT increase the visibility of this
-	 * method to public. It should only be called via Command.commit().
+	 * method to public. It should only be called via Command.execute().
 	 * 
 	 * @throws CommandNotReadyException
 	 *             if your code needs to abort the Command. TODO rollback?
 	 */
-	protected abstract void execute() throws CommandNotReadyException;
+	protected abstract void persist() throws CommandNotReadyException;
 
 	/**
 	 * Commit the Command's changes to the underlying datastore. This assumes
@@ -96,7 +96,7 @@ public abstract class Command
 	 * subclasses must implement], followed by execute() [also implemented by
 	 * subclasses]. It then calls the store specific commit().
 	 */
-	public void commit() throws CommandNotReadyException {
+	public void execute() throws CommandNotReadyException {
 		/*
 		 * First callback: ask the subclass if it is "ready".
 		 */
@@ -109,7 +109,7 @@ public abstract class Command
 		 * Command in the DataStore. Also throws CommandNotReadyException.
 		 */
 		Debug.print("command", _name + " executing");
-		execute();
+		persist();
 
 		/*
 		 * Finally, commit the results of command.

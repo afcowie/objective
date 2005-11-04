@@ -29,6 +29,10 @@ import com.db4o.config.ObjectClass;
  * database. As we build up safety and recovery routines, they will be added
  * here.
  * 
+ * Incidentally, if we were to ever want to change the underlying persistence
+ * mechanism, this could be turned into an interface as this class is the
+ * abstraction point.
+ * 
  * @author Andrew Cowie
  */
 public class DataStore

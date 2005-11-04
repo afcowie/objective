@@ -75,7 +75,7 @@ public class TransactionCommandTest extends TestCase
 
 		assertTrue(tc.isComplete());
 		try {
-			tc.commit();
+			tc.execute();
 		} catch (CommandNotReadyException cnre) {
 			fail("Threw " + cnre);
 		}

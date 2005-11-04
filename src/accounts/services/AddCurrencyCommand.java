@@ -55,7 +55,7 @@ public class AddCurrencyCommand extends Command
 		}
 	}
 
-	protected void execute() throws CommandNotReadyException {
+	protected void persist() throws CommandNotReadyException {
 		/*
 		 * Update the collection
 		 */

@@ -32,7 +32,7 @@ public class TransactionCommand extends Command
 		return _trans.isBalanced();
 	}
 
-	protected void execute() throws CommandNotReadyException {
+	protected void persist() throws CommandNotReadyException {
 		// Set entries = _trans.getEntries();
 		// FIXME also the subordinate elements?
 		_store.save(_trans);

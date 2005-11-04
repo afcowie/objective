@@ -58,7 +58,7 @@ public class AddAccountCommand extends Command
 		}
 	}
 
-	protected void execute() {
+	protected void persist() {
 		/*
 		 * Update the collection
 		 */
