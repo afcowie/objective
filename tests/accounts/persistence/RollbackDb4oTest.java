@@ -20,11 +20,14 @@ import junit.framework.TestCase;
  * 
  * @author Andrew Cowie
  */
-public class BasicDb4oTest extends TestCase
+public class RollbackDb4oTest extends TestCase
 {
-	private static String	TMPDBFILE	= "tmp/unittests/BasicDb4oTest.yap";
+	private static String	TMPDBFILE	= "tmp/unittests/RollbackDb4oTest.yap";
 	File					_target		= null;
 
+	/*
+	 * ripped from BasicDb4oTest
+	 */
 	public final void testDatabaseCreation() {
 		_target = new File(TMPDBFILE);
 		if (_target.exists()) {
@@ -42,11 +45,9 @@ public class BasicDb4oTest extends TestCase
 
 		File probe = new File(TMPDBFILE);
 		assertTrue(probe.exists());
-
-		assertTrue(container.ext().isClosed());
 	}
 
-	public final void testFetchObject() {
+	public final void testDeactivateReactivate() {
 		ObjectContainer container = Db4o.openFile(TMPDBFILE);
 		assertFalse(container.ext().isClosed());
 
@@ -57,44 +58,50 @@ public class BasicDb4oTest extends TestCase
 		DummyInts seven = (DummyInts) result.next();
 		assertEquals("7", seven.toString());
 
-		container.close();
-	}
+		synchronized (seven) {
+			container.deactivate(seven, 2);
+			assertEquals("0", seven.toString());
 
-	public final void testFetchAllObjects() {
-		ObjectContainer container = Db4o.openFile(TMPDBFILE);
-
-		ObjectSet result = container.get(null);
-
-		int i = 0;
-		while (result.hasNext()) {
-			DummyInts obj = (DummyInts) result.next();
-			assertNotNull(obj);
-			i++;
-			// System.out.println(obj.toString());
+			container.activate(seven, 2);
+			assertEquals("7", seven.toString());
 		}
-		assertEquals(10, i);
-
+		assertEquals("7", seven.toString());
 		container.close();
 	}
+
+	public final void testRollback() {
+		ObjectContainer container = Db4o.openFile(TMPDBFILE);
+		assertFalse(container.ext().isClosed());
+
+		ObjectSet result = container.get(new DummyInts(7));
+		assertNotNull(result);
+		assertEquals(1, result.size());
+
+		DummyInts seven = (DummyInts) result.next();
+		assertEquals("7", seven.toString());
+
+		seven.setNum(8);
+		assertEquals("8", seven.toString());
+
+		container.set(seven);
+		assertEquals("8", seven.toString());
+
+		synchronized (seven) {
+			container.rollback();
+			assertEquals("8", seven.toString());
+
+			container.deactivate(seven, 2);
+			assertEquals("0", seven.toString());
+
+			container.activate(seven, 2);
+			assertEquals("7", seven.toString());
+		}
+		assertEquals("7", seven.toString());
+		container.close();
+	}
+
 }
 
-class DummyInts
-{
-	int	_num;
-
-	DummyInts(int i) {
-		this._num = i;
-	}
-
-	int getNum() {
-		return _num;
-	}
-
-	void setNum(int num) {
-		this._num = num;
-	}
-
-	public String toString() {
-		return Integer.toString(_num);
-	}
-}
+/*
+ * Uses class DummyInts from BasicDb4oTest
+ */
