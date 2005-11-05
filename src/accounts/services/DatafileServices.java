@@ -29,14 +29,15 @@ public class DatafileServices
 	 * probably get called exactly once. :)
 	 * 
 	 * @param filename
-	 * @return a new DataStore open on a new (db4o format) database file. 
+	 * @return a new DataStore open on a new (db4o format) database file.
 	 * @throws IllegalArgumentException
 	 *             if the given filename already exists (no blotto!)
 	 */
 	public static DataStore newDatafile(String filename) {
 		File probe = new File(filename);
 		if (probe.exists()) {
-			throw new IllegalArgumentException("Proposed datafile already exists (or at least, a file by that name does)");
+			throw new IllegalArgumentException(
+					"Proposed datafile already exists (or at least, a file by that name does)");
 		}
 
 		DataStore store = new DataStore(filename);
