@@ -108,6 +108,27 @@ public class DataStore
 	}
 
 	/**
+	 * Rollback the current transaction (and implicitly, start a new one as per
+	 * db4o's practice of there always being an open transaction).
+	 */
+	public void rollback() {
+		_container.rollback();
+	}
+
+	/**
+	 * Reload (refresh) an individual object from the database, typically after
+	 * a rollback. Per db4o's JavaDoc, after a rollback changed objects should
+	 * be restored with a deactivate() call followed by an activate() call; this
+	 * method does this.
+	 */
+	public void reload(Object obj) {
+		synchronized (obj) {
+			_container.deactivate(obj, 2);
+			_container.activate(obj, 2);
+		}
+	}
+
+	/**
 	 * Close the underlying data store. Commits.
 	 */
 	public void close() {
