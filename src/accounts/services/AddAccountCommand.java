@@ -20,7 +20,6 @@ public class AddAccountCommand extends Command
 {
 	private transient Account	_account	= null;
 	private transient Set		_accounts	= null;
-	
 
 	/**
 	 * Create a new AddAccount Command.
@@ -60,13 +59,14 @@ public class AddAccountCommand extends Command
 
 	protected void persist() {
 		/*
-		 * Update the collection
-		 */
-		_store.save(_accounts);
-		/*
-		 * And store the new account itself.
+		 * Store the new account itself.
 		 */
 		_store.save(_account);
+		/*
+		 * And update the collection
+		 */
+		_store.save(_accounts);
+
 	}
 
 	public void undo() {
