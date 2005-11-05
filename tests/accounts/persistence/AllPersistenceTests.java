@@ -18,7 +18,9 @@ public class AllPersistenceTests
 		TestSuite suite = new TestSuite("Test for accounts.persistence");
 
 		suite.addTestSuite(BasicDb4oTest.class);
+		suite.addTestSuite(RollbackDb4oTest.class);
 		suite.addTestSuite(Db4oSetTest.class);
+		suite.addTestSuite(UnitOfWorkTest.class);
 
 		return suite;
 	}
