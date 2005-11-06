@@ -197,7 +197,6 @@ public class UnitOfWork
 		 */
 
 		cleanup();
-		active = false;
 	}
 
 	/**
@@ -241,7 +240,9 @@ public class UnitOfWork
 		Iterator iter = dirtyObjects.iterator();
 		while (iter.hasNext()) {
 			Object o = iter.next();
-			dirtyObjects.remove(o);
+			if (o != null) {
+				iter.remove();
+			}
 		}
 		dirtyObjects = null;
 
@@ -251,10 +252,13 @@ public class UnitOfWork
 		iter = myChangeListeners.iterator();
 		while (iter.hasNext()) {
 			Object listener = iter.next();
-			myChangeListeners.remove(listener);
+			if (listener != null) {
+				iter.remove();
+			}
 			globalChangeListeners.remove(listener);
 		}
 		myChangeListeners = null;
+		active = false;
 	}
 
 	/**
@@ -271,11 +275,13 @@ public class UnitOfWork
 			Iterator iter = dirtyObjects.iterator();
 			while (iter.hasNext()) {
 				Object dirty = iter.next();
-				dirtyObjects.remove(dirty);
-				i++;
+				if (iter != null) {
+					iter.remove();
+					i++;
+				}
 			}
 
-			Debug.print("memory", "Memory leak in <" + name + ">; " + i + " removed from dirtyObjects");
+			Debug.print("memory", "leak in <" + name + ">; " + i + " removed from dirtyObjects");
 		}
 
 		if (myChangeListeners != null) {
@@ -284,17 +290,18 @@ public class UnitOfWork
 			Iterator iter = myChangeListeners.iterator();
 			while (iter.hasNext()) {
 				Object listener = iter.next();
-				myChangeListeners.remove(listener);
-				i++;
+				if (listener != null) {
+					iter.remove();
+					i++;
+				}
 
 				if (globalChangeListeners.contains(listener)) {
 					globalChangeListeners.remove(listener);
 					j++;
 				}
-
 			}
 
-			Debug.print("memory", "Memory leak in <" + name + ">; " + i + " removed from myChangeListeners and " + j
+			Debug.print("memory", "leak in <" + name + ">; " + i + " removed from myChangeListeners and " + j
 					+ " removed from globalChangeListeners");
 		}
 

@@ -10,6 +10,7 @@ import generic.util.Debug;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ConcurrentModificationException;
 
 import junit.framework.TestCase;
 import accounts.client.ObjectiveAccounts;
@@ -130,6 +131,24 @@ public class UnitOfWorkTest extends TestCase
 		retreived = (Tofu) result.next();
 		assertEquals(3, retreived.getNum());
 
+	}
+
+	public final void testAvoidConcurrentModificationBug() {
+		Tofu first = new Tofu(21);
+		Tofu second = new Tofu(22);
+
+		UnitOfWork uow = new UnitOfWork("testAvoidConcurrentModificationBug");
+		uow.registerDirty(first);
+		uow.registerDirty(second);
+		try {
+			uow.commit();
+		} catch (ConcurrentModificationException cme) {
+			fail("ConcurrentModificationException thrown from UnitOfWork - bug [still] present");
+		}
+
+		ObjectContainer container = ObjectiveAccounts.store.getContainer();
+		ObjectSet result = container.get(Tofu.class);
+		assertEquals(3, result.size());
 	}
 
 	int	counter;
