@@ -152,6 +152,7 @@ public class UnitOfWork
 	 * @param listener
 	 */
 	public void onChange(ChangeListener listener) {
+		myChangeListeners.add(listener);
 		globalChangeListeners.add(listener);
 	}
 
@@ -253,9 +254,10 @@ public class UnitOfWork
 		while (iter.hasNext()) {
 			Object listener = iter.next();
 			if (listener != null) {
+				globalChangeListeners.remove(listener);
 				iter.remove();
 			}
-			globalChangeListeners.remove(listener);
+
 		}
 		myChangeListeners = null;
 		active = false;

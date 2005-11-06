@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ConcurrentModificationException;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import accounts.client.ObjectiveAccounts;
 import accounts.services.DatafileServices;
@@ -190,6 +191,17 @@ public class UnitOfWorkTest extends TestCase
 		 */
 		assertEquals(1, counter);
 		observer.cancel();
+	}
+
+	public final void testGlobalListenersClearingBug() {
+		UnitOfWork uow = new UnitOfWork("testGlobalListenersClearingBug");
+		Tofu gretzky = new Tofu(99);
+		uow.registerDirty(gretzky);
+		try {
+			uow.commit();
+		} catch (AssertionFailedError afe) {
+			fail("Listener from testRegisterInterest still present");
+		}
 	}
 }
 
