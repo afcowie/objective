@@ -19,8 +19,8 @@ public class AllTests
 	public static Test suite() {
 		TestSuite suite = new TestSuite("All Unit Tests for ObjectiveAccounts");
 
-		suite.addTest(AllDomainTests.suite());
 		suite.addTest(AllPersistenceTests.suite());
+		suite.addTest(AllDomainTests.suite());
 		suite.addTest(AllServicesTests.suite());
 
 		return suite;
