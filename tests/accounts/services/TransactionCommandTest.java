@@ -22,6 +22,7 @@ import accounts.domain.Debit;
 import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
 import accounts.domain.Transaction;
+import accounts.persistence.UnitOfWork;
 import junit.framework.TestCase;
 
 public class TransactionCommandTest extends TestCase
@@ -70,15 +71,17 @@ public class TransactionCommandTest extends TestCase
 
 		assertTrue(t.isBalanced());
 
+		UnitOfWork uow = new UnitOfWork("testTransactionCommandWithGeneric");
 		TransactionCommand tc = new TransactionCommand();
 		tc.setTransaction(t);
 
 		assertTrue(tc.isComplete());
 		try {
-			tc.execute();
+			tc.execute(uow);
 		} catch (CommandNotReadyException cnre) {
 			fail("Threw " + cnre);
 		}
+		uow.commit();
 	}
 
 	/*

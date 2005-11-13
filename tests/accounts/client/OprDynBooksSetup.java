@@ -23,6 +23,7 @@ import accounts.domain.LoanPayableAccount;
 import accounts.domain.OwnersEquityAccount;
 import accounts.domain.ProfessionalRevenueAccount;
 import accounts.domain.TaxPayableAccount;
+import accounts.persistence.UnitOfWork;
 import accounts.services.AddAccountCommand;
 import accounts.services.AddCurrencyCommand;
 import accounts.services.CommandNotReadyException;
@@ -57,17 +58,29 @@ public class OprDynBooksSetup
 		Debug.print("main", "Creating database " + DEMO_DATABASE);
 		ObjectiveAccounts.store = DatafileServices.newDatafile(DEMO_DATABASE);
 
+		UnitOfWork uow = null;
+
 		Debug.print("main", "Running commands...");
 		try {
+			uow = new UnitOfWork("InitBooks");
+
 			Currency home = new Currency("AUD", "Australian Dollar", "$");
-			
+
 			InitBooksCommand initBooks = new InitBooksCommand();
 			initBooks.setHomeCurrency(home);
-			initBooks.execute();
+			initBooks.execute(uow);
+
+			/*
+			 * The books needs to be committed to the database first, otherwise
+			 * DataSore.getBooks() will fail in AddAccountCommand
+			 */
+			uow.commit();
 
 			/*
 			 * Create a whole ton of accounts
 			 */
+
+			uow = new UnitOfWork("AddAccounts");
 
 			Account[] realAccounts = {
 					new CashAccount("Petty Cash", "Manly Office"),
@@ -76,24 +89,23 @@ public class OprDynBooksSetup
 					new DepreciatingAssetAccount("Computer Equipment"),
 					new DepreciatingAssetAccount("Office Equipment"),
 					new DepreciatingAssetAccount("Furniture"),
-					
+
 					new TaxPayableAccount("GST"),
-					
+
 					new LoanPayableAccount("Shareholders' Loans", new LoanLedger[] {
 						new LoanLedger("Andrew Cowie"),
 					}),
-					
+
 					new OwnersEquityAccount("Owner's Equity", "Andrew Cowie"),
 
 					new ProfessionalRevenueAccount("Strategic Planning and Board Governance", "Consulting Fees"),
 					new ProfessionalRevenueAccount("Leadership & Teamwork", "Consulting Fees"),
 					new ProfessionalRevenueAccount("Procedures", "Consulting Fees"),
 					new ProfessionalRevenueAccount("Systems Performance", "Consulting Fees"),
-					
+
 					new ProfessionalRevenueAccount("Conference Speaking and Tutorials", "Speaking Fees"),
 					new ProfessionalRevenueAccount("Publications", "Writing Fees"),
 					new ProfessionalRevenueAccount("Internet Services", "Service Fees"),
-					
 
 					new GenericExpenseAccount("General and Administrative Expenses", new Ledger[] {
 							new DebitPositiveLedger("Accounting Fees"),
@@ -114,8 +126,7 @@ public class OprDynBooksSetup
 							new DebitPositiveLedger("Meals"),
 					}),
 					new GenericExpenseAccount("Meals and Entertainment Expenses", new Ledger[] {
-							new DebitPositiveLedger("Staff Meetings"),
-							new DebitPositiveLedger("Client Meetings"),
+							new DebitPositiveLedger("Staff Meetings"), new DebitPositiveLedger("Client Meetings"),
 					}),
 					new GenericExpenseAccount("Employment Expenses", new Ledger[] {
 							new DebitPositiveLedger("Staff Ammenities"),
@@ -130,7 +141,7 @@ public class OprDynBooksSetup
 
 				AddAccountCommand aac = new AddAccountCommand();
 				aac.setAccount(a);
-				aac.execute();
+				aac.execute(uow);
 			}
 
 			/*
@@ -145,15 +156,15 @@ public class OprDynBooksSetup
 
 				AddAccountCommand aac = new AddAccountCommand();
 				aac.setAccount(a);
-				aac.execute();
+				aac.execute(uow);
 			}
 
 			/*
 			 * Now setup some other currencies
 			 */
-			
+
 			Currency[] currencies = {
-					home, 
+					home,
 					new Currency("CAD", "Canadian Dollar", "$"),
 					new Currency("USD", "United States Dollar", "$"),
 					new Currency("GBP", "British Pound", "?"),
@@ -162,22 +173,26 @@ public class OprDynBooksSetup
 					new Currency("SGD", "Singaporean Dollar", "S$"),
 					new Currency("INR", "Indian Rupee", "Rs")
 			};
-			
+
 			for (int i = 0; i < currencies.length; i++) {
 				Currency cur = currencies[i];
-				
+
 				AddCurrencyCommand acc = new AddCurrencyCommand();
 				acc.setCurrency(cur);
-				acc.execute();
-				
+				acc.execute(uow);
 			}
-			
+
+			Debug.print("main", "Committing.");
+			uow.commit();
 		} catch (CommandNotReadyException cnre) {
+			uow.cancel();
 			throw new IllegalStateException("Shouldn't have had a problem with any commands being not ready!");
 		} catch (Exception e) {
+			uow.cancel();
 			e.printStackTrace();
 		}
 
 		ObjectiveAccounts.store.close();
+		Debug.print("main", "Done.");
 	}
 }

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import accounts.domain.Account;
 import accounts.domain.Books;
+import accounts.persistence.UnitOfWork;
 
 /**
  * Add an Account to the system.
@@ -57,16 +58,15 @@ public class AddAccountCommand extends Command
 		}
 	}
 
-	protected void persist() {
+	protected void persist(UnitOfWork uow) {
 		/*
 		 * Store the new account itself.
 		 */
-		_store.save(_account);
+		uow.registerDirty(_account);
 		/*
 		 * And update the collection
 		 */
-		_store.save(_accounts);
-
+		uow.registerDirty(_accounts);
 	}
 
 	public void undo() {

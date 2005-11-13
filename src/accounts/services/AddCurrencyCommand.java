@@ -10,6 +10,7 @@ import java.util.Set;
 
 import accounts.domain.Books;
 import accounts.domain.Currency;
+import accounts.persistence.UnitOfWork;
 
 /**
  * Add a Currency object to this set of books
@@ -55,15 +56,15 @@ public class AddCurrencyCommand extends Command
 		}
 	}
 
-	protected void persist() throws CommandNotReadyException {
+	protected void persist(UnitOfWork uow) throws CommandNotReadyException {
 		/*
-		 * Update the collection
+		 * Store the new account itself.
 		 */
-		_store.save(currencies);
+		uow.registerDirty(currency);
 		/*
-		 * And store the new account itself.
+		 * And update the collection which contains it.
 		 */
-		_store.save(currency);
+		uow.registerDirty(currencies);
 	}
 
 	public void undo() {

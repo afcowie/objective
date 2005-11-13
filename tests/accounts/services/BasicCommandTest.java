@@ -18,6 +18,7 @@ import accounts.domain.Books;
 import accounts.domain.CashAccount;
 import accounts.domain.Currency;
 import accounts.domain.Ledger;
+import accounts.persistence.UnitOfWork;
 
 public class BasicCommandTest extends TestCase
 {
@@ -50,12 +51,14 @@ public class BasicCommandTest extends TestCase
 		Books one = ObjectiveAccounts.store.getBooks();
 		assertNull(one);
 
+		UnitOfWork uow = new UnitOfWork("testInitBooksCommand");
+
 		InitBooksCommand ibc = new InitBooksCommand();
 		/*
 		 * test readiness now that we've added home Currency selection.
 		 */
 		try {
-			ibc.execute();
+			ibc.execute(uow);
 			fail("should have thrown CommandNotReadyException as the home Currency hasn't been set");
 		} catch (CommandNotReadyException cnre) {
 		} catch (Exception other) {
@@ -66,10 +69,11 @@ public class BasicCommandTest extends TestCase
 		ibc.setHomeCurrency(home);
 
 		try {
-			ibc.execute();
+			ibc.execute(uow);
 		} catch (CommandNotReadyException cnre) {
 			fail("threw CommandNotReadyException");
 		}
+		uow.commit();
 
 		Books two = ObjectiveAccounts.store.getBooks();
 		assertNotNull("Should be a Books object by now", two);
@@ -100,13 +104,16 @@ public class BasicCommandTest extends TestCase
 		CashAccount pettyCash = new CashAccount("Petty Cash", "Manly Office");
 		pettyCash.setCode("1-1201");
 
+		UnitOfWork uow = new UnitOfWork("testAddAccountCommand");
 		AddAccountCommand aac = new AddAccountCommand();
 		aac.setAccount(pettyCash);
 		try {
-			aac.execute();
+			aac.execute(uow);
 		} catch (CommandNotReadyException cnre) {
 			fail("threw CommandNotReadyException");
 		}
+		uow.commit();
+
 		Set accounts = root.getAccountsSet();
 		assertNotNull("Should still be an Account Set", accounts);
 

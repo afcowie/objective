@@ -9,6 +9,7 @@ package accounts.services;
 import generic.util.Debug;
 import accounts.client.ObjectiveAccounts;
 import accounts.persistence.DataStore;
+import accounts.persistence.UnitOfWork;
 
 /**
  * The top of the command hierarchy. These classes are the distinct operations
@@ -48,7 +49,7 @@ public abstract class Command
 	 * persisting these fields by accident.
 	 */
 	protected transient DataStore	_store		= null;
-	protected transient boolean		_committed	= false;
+	protected transient boolean		_executed	= false;
 	protected transient String		_name		= null;
 
 	/**
@@ -75,7 +76,7 @@ public abstract class Command
 
 	/**
 	 * Report whether or not all the necessary aspects of the Command have been
-	 * decided, ie, if the Command is ready to commit.
+	 * decided, ie, if the Command is ready to execute.
 	 */
 	public abstract boolean isComplete();
 
@@ -87,19 +88,20 @@ public abstract class Command
 	 * @throws CommandNotReadyException
 	 *             if your code needs to abort the Command. TODO rollback?
 	 */
-	protected abstract void persist() throws CommandNotReadyException;
+	protected abstract void persist(UnitOfWork uow) throws CommandNotReadyException;
 
 	/**
-	 * Commit the Command's changes to the underlying datastore. This assumes
-	 * that whatever changes the Command is causing have been save()'d to the
-	 * DateStore, presumably in execute(). This method calls isComplete() [which
-	 * subclasses must implement], followed by execute() [also implemented by
-	 * subclasses]. It then calls the store specific commit().
+	 * Save the Command's changes to the underlying datastore. This method calls
+	 * isComplete() [which subclasses must implement], followed by persist()
+	 * [also to be implemented by subclasses]. It doesn't call the store
+	 * specific commit - that is up to the application holding the UnitOfWork to
+	 * call that UnitOfWork's .commit()
 	 */
-	public void execute() throws CommandNotReadyException {
+	public void execute(UnitOfWork uow) throws CommandNotReadyException {
 		/*
 		 * First callback: ask the subclass if it is "ready".
 		 */
+		Debug.print("command", _name + " checking isComplete()");
 		if (!(isComplete())) {
 			throw new CommandNotReadyException();
 		}
@@ -108,15 +110,10 @@ public abstract class Command
 		 * Second callback: Execute the code to actually save the results of the
 		 * Command in the DataStore. Also throws CommandNotReadyException.
 		 */
-		Debug.print("command", _name + " executing");
-		persist();
+		Debug.print("command", _name + " executing persist()");
+		persist(uow);
 
-		/*
-		 * Finally, commit the results of command.
-		 */
-		Debug.print("command", _name + " committing");
-		_store.commit();
-		_committed = true;
+		_executed = true;
 	}
 
 	/**
@@ -130,7 +127,7 @@ public abstract class Command
 	 * layer, presumably *it* takes care of that.
 	 * 
 	 * <P>
-	 * an implentation of undo() must check the _committed field; if it's true,
+	 * an implentation of undo() must check the _executed field; if it's true,
 	 * then the undo should proceed. If false, then undo should instead TODO
 	 * rollback()?
 	 */

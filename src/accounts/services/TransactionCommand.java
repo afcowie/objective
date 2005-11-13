@@ -7,6 +7,7 @@
 package accounts.services;
 
 import accounts.domain.Transaction;
+import accounts.persistence.UnitOfWork;
 
 public class TransactionCommand extends Command
 {
@@ -32,10 +33,11 @@ public class TransactionCommand extends Command
 		return _trans.isBalanced();
 	}
 
-	protected void persist() throws CommandNotReadyException {
+	protected void persist(UnitOfWork uow) throws CommandNotReadyException {
 		// Set entries = _trans.getEntries();
 		// FIXME also the subordinate elements?
-		_store.save(_trans);
+
+		uow.registerDirty(_trans);
 	}
 
 	public void undo() {
