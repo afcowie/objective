@@ -18,12 +18,23 @@ public class CreditPositiveLedger extends Ledger
 	public CreditPositiveLedger() {
 		super();
 	}
-	
+
 	public CreditPositiveLedger(String name) {
 		super();
 		super.setName(name);
 	}
-	
+
+	/*
+	 * Overrides Ledger's addToBalance(). _balance from Ledger.
+	 */
+	protected void addToBalance(Entry entry) {
+		if (entry instanceof Credit) {
+			_balance.incrementBy(entry.getAmount());
+		} else {
+			_balance.decrementBy(entry.getAmount());
+		}
+	}
+
 	public String getClassString() {
 		return "Credit Positive";
 	}

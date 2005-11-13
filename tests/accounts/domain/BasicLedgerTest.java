@@ -56,9 +56,8 @@ public class BasicLedgerTest extends TestCase
 		 */
 		try {
 			ledger.addEntry(first);
-			fail("Should have thrown an IllegalStateException");
-		} catch (IllegalStateException ise) {
-			//
+			fail("Should have thrown an UnsupportedOperationException");
+		} catch (UnsupportedOperationException uoe) {
 		}
 
 		/*
@@ -67,8 +66,8 @@ public class BasicLedgerTest extends TestCase
 		ledger = new DebitPositiveLedger();
 
 		/*
-		 * In this case, addEntry() has been not been called before, so neither has
-		 * calculateBalance. THIS should instantiate the internal Set AND
+		 * In this case, addEntry() has been not been called before, so neither
+		 * has calculateBalance. THIS should instantiate the internal Set AND
 		 * call calculateBalance()
 		 */
 		ledger.addEntry(first);
@@ -91,7 +90,7 @@ public class BasicLedgerTest extends TestCase
 
 		ledger.addEntry(oneSide);
 		assertEquals("-15.00", ledger.getBalance().getValue());
-		
+
 		ledger.addEntry(otherSide);
 		assertEquals("0.00", ledger.getBalance().getValue());
 	}

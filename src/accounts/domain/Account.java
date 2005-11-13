@@ -124,19 +124,11 @@ public class Account
 	}
 
 	public boolean isDebitPositive() {
-		if (this instanceof DebitPositiveAccount) {
-			return true;
-		} else {
-			return false;
-		}
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isCreditPositive() {
-		if (this instanceof CreditPositiveAccount) {
-			return true;
-		} else {
-			return false;
-		}
+		throw new UnsupportedOperationException();
 	}
 
 	/*

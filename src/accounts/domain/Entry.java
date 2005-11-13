@@ -70,7 +70,6 @@ public class Entry
 	// _parentTransaction = transaction;
 	// _parentAccount = account;
 	// }
-	
 	/*
 	 * Getters and Setters --------------------------------
 	 */
@@ -87,7 +86,7 @@ public class Entry
 	 */
 	public void setDate(Datestamp date) {
 		this._date = date;
-		
+
 	}
 
 	/**

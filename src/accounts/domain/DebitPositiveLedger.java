@@ -17,12 +17,23 @@ public class DebitPositiveLedger extends Ledger
 	public DebitPositiveLedger() {
 		super();
 	}
-	
+
 	public DebitPositiveLedger(String name) {
 		super();
 		super.setName(name);
 	}
-	
+
+	/*
+	 * Overrides Ledger's addToBalance(). _balance from Ledger.
+	 */
+	protected void addToBalance(Entry entry) {
+		if (entry instanceof Debit) {
+			_balance.incrementBy(entry.getAmount());
+		} else {
+			_balance.decrementBy(entry.getAmount());
+		}
+	}
+
 	public String getClassString() {
 		return "Debit Positive";
 	}

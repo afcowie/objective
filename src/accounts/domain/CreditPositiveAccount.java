@@ -27,6 +27,14 @@ public class CreditPositiveAccount extends Account
 		super(title);
 	}
 
+	public boolean isDebitPositive() {
+		return false;
+	}
+
+	public boolean isCreditPositive() {
+		return true;
+	}
+
 	public String getClassString() {
 		return "Credit Positive Account";
 	}

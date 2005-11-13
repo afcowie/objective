@@ -17,8 +17,17 @@ public class BasicAccountTest extends TestCase
 {
 	public final void testIsDebitPositive() {
 		Account acct = new Account();
-		assertFalse(acct.isDebitPositive());
-		assertFalse(acct.isCreditPositive());
+		try {
+			assertFalse(acct.isDebitPositive());
+			fail("Should have thrown UnsupportedOperationException");
+		} catch (UnsupportedOperationException uoe) {
+		}
+
+		try {
+			assertFalse(acct.isCreditPositive());
+			fail("Should have thrown UnsupportedOperationException");
+		} catch (UnsupportedOperationException uoe) {
+		}
 
 		Account drPosAcct = new DebitPositiveAccount();
 		assertTrue(drPosAcct.isDebitPositive());
@@ -75,5 +84,5 @@ public class BasicAccountTest extends TestCase
 
 	}
 
-	//	public final void
+	// public final void
 }

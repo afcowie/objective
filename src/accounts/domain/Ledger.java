@@ -27,7 +27,7 @@ public class Ledger
 	/*
 	 * Cached values --------------------------------------
 	 */
-	private transient Amount	_balance	= null;
+	protected transient Amount	_balance	= null;
 
 	/*
 	 * Constructors ---------------------------------------
@@ -105,23 +105,10 @@ public class Ledger
 	 *            The Entry whose amount we will add to the Ledger's balance. It
 	 *            will be tested for Debit/Credit-ness and added accordingly.
 	 */
-	private void addToBalance(Entry entry) {
-		if (this instanceof DebitPositiveLedger) {
-			if (entry instanceof Debit) {
-				_balance.incrementBy(entry.getAmount());
-			} else {
-				_balance.decrementBy(entry.getAmount());
-			}
-		} else if (this instanceof CreditPositiveLedger) {
-			if (entry instanceof Credit) {
-				_balance.incrementBy(entry.getAmount());
-			} else {
-				_balance.decrementBy(entry.getAmount());
-			}
-		} else {
-			throw new IllegalStateException(
-					"You're working with a raw Ledger object which is neither Debit nor Credit Postitive, so we can't get a balance for it.");
-		}
+	protected void addToBalance(Entry entry) {
+		throw new UnsupportedOperationException(
+				"You're working with a raw Ledger object which is neither Debit nor Credit Postitive, so we can't add Entries to it.");
+
 	}
 
 	/*
@@ -182,7 +169,7 @@ public class Ledger
 			}
 		}
 	}
-	
+
 	public String getClassString() {
 		return "Ledger";
 	}

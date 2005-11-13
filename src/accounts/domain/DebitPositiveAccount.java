@@ -25,7 +25,15 @@ public class DebitPositiveAccount extends Account
 	public DebitPositiveAccount(String title) {
 		super(title);
 	}
-	
+
+	public boolean isDebitPositive() {
+		return true;
+	}
+
+	public boolean isCreditPositive() {
+		return false;
+	}
+
 	public String getClassString() {
 		return "Debit Positive Account";
 	}
