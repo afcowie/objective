@@ -3,7 +3,7 @@
 
 <glade-interface>
 
-<widget class="GtkWindow" id="expenses">
+<widget class="GtkWindow" id="ReimbursableExpensesEditor_window">
   <property name="visible">True</property>
   <property name="title" translatable="yes">Enter your expenses</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>

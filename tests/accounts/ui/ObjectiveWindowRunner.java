@@ -44,9 +44,8 @@ public class ObjectiveWindowRunner
 
 		// Debug.print("main", "initializing AccountTypeSelectorDialog");
 		// AccountTypeSelectorDialog selector = new AccountTypeSelectorDialog();
-		Debug.print("main", "Initializing ReimbusableExpensesWindow");
-		ReimbusableExpensesWindow reimburse = new ReimbusableExpensesWindow();
-		reimburse.edit();
+		Debug.print("main", "Initializing ReimbursableExpensesEditorWindow");
+		ReimbursableExpensesEditorWindow reimburse = new ReimbursableExpensesEditorWindow();
 
 		Debug.print("main", "Starting Gtk main loop");
 		Gtk.main();
