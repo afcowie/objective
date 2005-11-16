@@ -7,7 +7,7 @@
 package accounts.services;
 
 /**
- * Blown when a Command.commit() is called, but the Command isn't ready yet, per Command.isComplete(). 
+ * Blown when a Command.execute() is called, but the Command isn't ready yet.
  * 
  * @author Andrew Cowie
  */

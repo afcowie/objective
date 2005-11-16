@@ -19,7 +19,7 @@ public class AllServicesTests
 
 		suite.addTestSuite(DatafileTest.class);
 		suite.addTestSuite(BasicCommandTest.class);
-		suite.addTestSuite(TransactionCommandTest.class);
+		suite.addTestSuite(PostTransactionCommandTest.class);
 
 		return suite;
 	}

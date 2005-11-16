@@ -53,20 +53,24 @@ public class BasicCommandTest extends TestCase
 
 		UnitOfWork uow = new UnitOfWork("testInitBooksCommand");
 
-		InitBooksCommand ibc = new InitBooksCommand();
+		InitBooksCommand ibc = null;
 		/*
 		 * test readiness now that we've added home Currency selection.
 		 */
 		try {
-			ibc.execute(uow);
-			fail("should have thrown CommandNotReadyException as the home Currency hasn't been set");
-		} catch (CommandNotReadyException cnre) {
+			ibc = new InitBooksCommand(null);
+			fail("should have thrown IllegalArgumentException as the home Currency hasn't been set");
+		} catch (IllegalArgumentException iae) {
 		} catch (Exception other) {
-			fail("should have thrown CommandNotReadyException, not " + other.toString());
+			fail("should have thrown IllegalArgumentException, not " + other.toString());
 		}
 
 		Currency home = new Currency("AUD", "Aussie Dollar", "$");
-		ibc.setHomeCurrency(home);
+		try {
+			ibc = new InitBooksCommand(home);
+		} catch (Exception e) {
+			fail("shouldn't have thrown an Exception from constructor");
+		}
 
 		try {
 			ibc.execute(uow);
@@ -105,8 +109,8 @@ public class BasicCommandTest extends TestCase
 		pettyCash.setCode("1-1201");
 
 		UnitOfWork uow = new UnitOfWork("testAddAccountCommand");
-		AddAccountCommand aac = new AddAccountCommand();
-		aac.setAccount(pettyCash);
+		AddAccountCommand aac = new AddAccountCommand(pettyCash);
+
 		try {
 			aac.execute(uow);
 		} catch (CommandNotReadyException cnre) {

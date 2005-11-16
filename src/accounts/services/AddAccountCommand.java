@@ -8,6 +8,7 @@ package accounts.services;
 
 import java.util.Set;
 
+import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.persistence.UnitOfWork;
@@ -19,57 +20,40 @@ import accounts.persistence.UnitOfWork;
  */
 public class AddAccountCommand extends Command
 {
-	private transient Account	_account	= null;
-	private transient Set		_accounts	= null;
+	private Account	account	= null;
 
 	/**
-	 * Create a new AddAccount Command.
+	 * Create a new AddAccountCommand, specifying:
 	 * 
-	 */
-	public AddAccountCommand() {
-		super("AddAccount");
-	}
-
-	/**
 	 * @param account
-	 *            The Account to add.
+	 *            The Account to add. Must not already be persisted in the
+	 *            DataStore.
 	 */
-	public void setAccount(Account account) {
-
-		Books root = _store.getBooks();
-		_accounts = root.getAccountsSet();
-		_accounts.add(account); // TODO should throw on dup?
-
-		/*
-		 * Mark as ready to rock.
-		 */
-		_account = account;
-	}
-
-	/*
-	 * Override inherited Command methods -------------
-	 */
-
-	public boolean isComplete() {
-		if (_account != null) {
-			return true;
-		} else {
-			return false;
+	public AddAccountCommand(Account account) {
+		if (account == null) {
+			throw new IllegalArgumentException("Can't add a null account");
 		}
+		this.account = account;
 	}
 
-	protected void persist(UnitOfWork uow) {
+	protected void action(UnitOfWork uow) {
+		Books root = ObjectiveAccounts.store.getBooks();
+		Set accounts = root.getAccountsSet();
+		if (accounts.add(account) == false) { // dup!?!
+			throw new IllegalStateException("How did you add an account that's already in the system?");
+		}
 		/*
-		 * Store the new account itself.
+		 * Store the new account itself, and update the collection
 		 */
-		uow.registerDirty(_account);
-		/*
-		 * And update the collection
-		 */
-		uow.registerDirty(_accounts);
+		uow.registerDirty(account);
+		uow.registerDirty(accounts);
 	}
 
-	public void undo() {
+	protected void reverse(UnitOfWork uow) {
 		throw new UnsupportedOperationException();
+	}
+
+	public String getClassString() {
+		return "Add Account";
 	}
 }

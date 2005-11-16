@@ -8,6 +8,7 @@ package accounts.services;
 
 import java.util.Set;
 
+import accounts.client.ObjectiveAccounts;
 import accounts.domain.Books;
 import accounts.domain.Currency;
 import accounts.persistence.UnitOfWork;
@@ -19,56 +20,50 @@ import accounts.persistence.UnitOfWork;
  */
 public class AddCurrencyCommand extends Command
 {
-	private transient Currency currency = null;
-	private transient Set currencies = null;
-	
-	public AddCurrencyCommand() {
-		super("AddCurrency");		
-	}
-	
+	private Currency	currency	= null;
+
 	/**
+	 * Create a new AddCurrencyCommand, specifying:
 	 * 
-	 * @param cur the Currency object to add
+	 * @param cur
+	 *            the Currency object to add
 	 */
-	public void setCurrency(Currency cur) {
+	public AddCurrencyCommand(Currency cur) {
 		if (cur == null) {
 			throw new IllegalArgumentException("null Currency object passed");
 		}
-	
-		/*
-		 * Add currency to Books's currency list
-		 */
-		Books root = _store.getBooks();
-		currencies = root.getCurrencySet();
-		currencies.add(cur);
-		
-		/*
-		 * Mark as ready
-		 */
 		currency = cur;
 	}
 
 	public boolean isComplete() {
 		if (currency == null) {
-			return false;	
+			return false;
 		} else {
 			return true;
 		}
 	}
 
-	protected void persist(UnitOfWork uow) throws CommandNotReadyException {
+	protected void action(UnitOfWork uow) {
 		/*
-		 * Store the new account itself.
+		 * Add currency to Books's currency list
+		 */
+		Books root = ObjectiveAccounts.store.getBooks();
+		Set currencies = root.getCurrencySet();
+		currencies.add(currency);
+
+		/*
+		 * Store the new account itself, and update the collection which
+		 * contains it.
 		 */
 		uow.registerDirty(currency);
-		/*
-		 * And update the collection which contains it.
-		 */
 		uow.registerDirty(currencies);
 	}
 
-	public void undo() {
+	public void reverse(UnitOfWork uow) {
 		throw new UnsupportedOperationException();
 	}
 
+	public String getClassString() {
+		return "Add Currency";
+	}
 }

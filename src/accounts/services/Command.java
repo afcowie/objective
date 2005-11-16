@@ -8,7 +8,6 @@ package accounts.services;
 
 import generic.util.Debug;
 import accounts.client.ObjectiveAccounts;
-import accounts.persistence.DataStore;
 import accounts.persistence.UnitOfWork;
 
 /**
@@ -38,6 +37,7 @@ import accounts.persistence.UnitOfWork;
  * what each of those touches are - frought with possibility of error.
  * 
  * @author Andrew Cowie
+ * @author Robert Collins
  */
 public abstract class Command
 {
@@ -48,92 +48,98 @@ public abstract class Command
 	 * (unlike, say, Prevayler) and b) to provide a syntax guard against
 	 * persisting these fields by accident.
 	 */
-	protected transient DataStore	_store		= null;
-	protected transient boolean		_executed	= false;
-	protected transient String		_name		= null;
+	protected transient boolean	executed	= false;
 
 	/**
 	 * Commands all have a transient reference to the system's open DataStore.
 	 * This constructor checks that it is initialized as a safety check. WARNING
 	 * this will have to change if we ever stop having one global DataStore.
-	 * 
-	 * @param name
-	 *            A debug visible name for the Command subclass.
 	 */
-	public Command(String name) {
+	public Command() {
 		if (ObjectiveAccounts.store == null) {
 			throw new IllegalStateException("Trying to setup a Command but the static DataStore is not initialized.");
-		} else {
-			_store = ObjectiveAccounts.store;
-		}
-		if ((name == null) || (name.equals(""))) {
-			throw new IllegalArgumentException(
-					"Command constructor needs to be called with a tag to be used in Debug messages to identify it.");
-		} else {
-			_name = name;
 		}
 	}
 
 	/**
-	 * Report whether or not all the necessary aspects of the Command have been
-	 * decided, ie, if the Command is ready to execute.
-	 */
-	public abstract boolean isComplete();
-
-	/**
-	 * Carry out the changes to the underlying datastore. You should be using
-	 * DateStore _store.save() here. DO NOT increase the visibility of this
-	 * method to public. It should only be called via Command.execute().
+	 * Carry out the work of the command and save the changes to the underlying
+	 * datastore. You should be using uow.registerDirty() here. DO NOT increase
+	 * the visibility of this method to public. It should only be called via
+	 * Command.execute().
 	 * 
 	 * @throws CommandNotReadyException
-	 *             if your code needs to abort the Command. TODO rollback?
+	 *             If your code needs to abort the Command because the state
+	 *             isn't correct.
 	 */
-	protected abstract void persist(UnitOfWork uow) throws CommandNotReadyException;
+	/*
+	 * TODO Rollback? Try again? If so, code to do so automatically will go in
+	 * execute()
+	 */
+	protected abstract void action(UnitOfWork uow) throws CommandNotReadyException;
 
 	/**
 	 * Save the Command's changes to the underlying datastore. This method calls
-	 * isComplete() [which subclasses must implement], followed by persist()
-	 * [also to be implemented by subclasses]. It doesn't call the store
+	 * action() [which subclasses must implement]. It does not call the store
 	 * specific commit - that is up to the application holding the UnitOfWork to
 	 * call that UnitOfWork's .commit()
 	 */
-	public void execute(UnitOfWork uow) throws CommandNotReadyException {
-		/*
-		 * First callback: ask the subclass if it is "ready".
-		 */
-		Debug.print("command", _name + " checking isComplete()");
-		if (!(isComplete())) {
-			throw new CommandNotReadyException();
+	public final void execute(UnitOfWork uow) throws CommandNotReadyException {
+		if (uow == null) {
+			throw new IllegalArgumentException("Null UnitOfWork passed!");
 		}
-
+		if (!uow.isViable()) {
+			throw new IllegalArgumentException("UnitOfWork passed is not viable!");
+		}
+		if (executed) {
+			throw new IllegalStateException("You can't execute a Command that has already been run!");
+		}
 		/*
-		 * Second callback: Execute the code to actually save the results of the
-		 * Command in the DataStore. Also throws CommandNotReadyException.
+		 * Callback: Execute the code to actually save the results of the
+		 * Command in the DataStore. Throws CommandNotReadyException.
 		 */
-		Debug.print("command", _name + " executing persist()");
-		persist(uow);
+		Debug.print("command", getClassString() + " executing action()");
+		action(uow);
 
-		_executed = true;
+		executed = true;
 	}
+
+	/**
+	 * Reverse the effects of action(). This is implemented by subclasses of
+	 * Command and is called by undo() to actually reverse the actions
+	 * previously taken by this command.
+	 */
+	protected abstract void reverse(UnitOfWork uow) throws CommandNotUndoableException;
 
 	/**
 	 * Undo the affects of this Command. Undo is not rollback. In the case of
 	 * updates, it instead reapplies the previous state (stored in this object).
-	 * In the case of new object commands, it carries out deletes.
-	 * <P>
-	 * TODO: Should undo automatically commit? Presumably.
-	 * <P>
-	 * TODO: How do we signal the UI layer? Since this is initiated by the UI
-	 * layer, presumably *it* takes care of that.
-	 * 
-	 * <P>
-	 * an implentation of undo() must check the _executed field; if it's true,
-	 * then the undo should proceed. If false, then undo should instead TODO
-	 * rollback()?
+	 * In the case of new object commands, it carries out deletes. The
+	 * UnitOfWork that is passed in is responsible to .commit() afterwards.
 	 */
-	public abstract void undo();
+	public final void undo(UnitOfWork uow) throws CommandNotUndoableException {
+		if (uow == null) {
+			throw new IllegalArgumentException("Null UnitOfWork passed!");
+		}
+		if (!uow.isViable()) {
+			throw new IllegalArgumentException("UnitOfWork passed is not viable!");
+		}
 
-	// _store.rollback();
-	// _store.getContainer().rollback();
-	// _store.close(); // ????????????????????
+		/*
+		 * Check forward/back status
+		 */
+		if (!executed) {
+			throw new IllegalStateException("Can't undo a Command that hasn't been executed");
+		}
+
+		Debug.print("command", getClassString() + " executing reverse()");
+		reverse(uow);
+
+		executed = false; // ?
+	}
+
+	/**
+	 * Return a human readable name for the Command. Each command should
+	 * override this.
+	 */
+	public abstract String getClassString();
 }

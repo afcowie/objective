@@ -66,8 +66,7 @@ public class OprDynBooksSetup
 
 			Currency home = new Currency("AUD", "Australian Dollar", "$");
 
-			InitBooksCommand initBooks = new InitBooksCommand();
-			initBooks.setHomeCurrency(home);
+			InitBooksCommand initBooks = new InitBooksCommand(home);
 			initBooks.execute(uow);
 
 			/*
@@ -139,8 +138,7 @@ public class OprDynBooksSetup
 			for (int i = 0; i < realAccounts.length; i++) {
 				Account a = realAccounts[i];
 
-				AddAccountCommand aac = new AddAccountCommand();
-				aac.setAccount(a);
+				AddAccountCommand aac = new AddAccountCommand(a);
 				aac.execute(uow);
 			}
 
@@ -154,8 +152,7 @@ public class OprDynBooksSetup
 			for (int i = 0; i < testAccounts.length; i++) {
 				Account a = testAccounts[i];
 
-				AddAccountCommand aac = new AddAccountCommand();
-				aac.setAccount(a);
+				AddAccountCommand aac = new AddAccountCommand(a);
 				aac.execute(uow);
 			}
 
@@ -177,8 +174,7 @@ public class OprDynBooksSetup
 			for (int i = 0; i < currencies.length; i++) {
 				Currency cur = currencies[i];
 
-				AddCurrencyCommand acc = new AddCurrencyCommand();
-				acc.setCurrency(cur);
+				AddCurrencyCommand acc = new AddCurrencyCommand(cur);
 				acc.execute(uow);
 			}
 

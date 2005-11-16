@@ -104,6 +104,18 @@ public class UnitOfWork
 	}
 
 	/**
+	 * Determine whether or not this UnitOfWork is still valid. This method
+	 * exists largely so that
+	 * {@link accounts.services.Command#execute(UnitOfWork)} can check before
+	 * calling it's action() or undo() methods.
+	 * 
+	 * @return the state of the internal active flag
+	 */
+	public boolean isViable() {
+		return active;
+	}
+
+	/**
 	 * Register that you are interested in an object that you've retreived from
 	 * the database and that you should be notified upon a change occuring to
 	 * one of those objects.

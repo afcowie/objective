@@ -1,5 +1,5 @@
 /*
- * TransactionCommandTest.java
+ * PostTransactionCommandTest.java
  *
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005 Operational Dynamics
@@ -25,9 +25,9 @@ import accounts.domain.Transaction;
 import accounts.persistence.UnitOfWork;
 import junit.framework.TestCase;
 
-public class TransactionCommandTest extends TestCase
+public class PostTransactionCommandTest extends TestCase
 {
-	public static final String	TESTS_DATABASE	= "tmp/unittests/TransactionCommandTest.yap";
+	public static final String	TESTS_DATABASE	= "tmp/unittests/PostTransactionCommandTest.yap";
 	private static boolean		initialized		= false;
 
 	private void init() {
@@ -53,7 +53,8 @@ public class TransactionCommandTest extends TestCase
 	}
 
 	/*
-	 * Test method for 'accounts.services.TransactionCommand.isComplete()'
+	 * Test method for the implicit completeness tests in
+	 * PostTransactionCommand.action()'
 	 */
 	public void testTransactionCommandWithGeneric() {
 		HashSet entries = new HashSet();
@@ -72,10 +73,8 @@ public class TransactionCommandTest extends TestCase
 		assertTrue(t.isBalanced());
 
 		UnitOfWork uow = new UnitOfWork("testTransactionCommandWithGeneric");
-		TransactionCommand tc = new TransactionCommand();
-		tc.setTransaction(t);
+		PostTransactionCommand tc = new PostTransactionCommand(t);
 
-		assertTrue(tc.isComplete());
 		try {
 			tc.execute(uow);
 		} catch (CommandNotReadyException cnre) {
@@ -85,7 +84,7 @@ public class TransactionCommandTest extends TestCase
 	}
 
 	/*
-	 * Test method for 'accounts.services.Command.commit()'
+	 * Test method TODO INCOMPLETE!
 	 */
 	public void testPersistence() {
 		Transaction proto = new Transaction();
@@ -130,5 +129,6 @@ public class TransactionCommandTest extends TestCase
 		assertEquals(3, i);
 		assertTrue(price && expense && gst);
 
+		// FIXME HERE!!
 	}
 }
