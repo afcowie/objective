@@ -45,6 +45,8 @@ public class InitBooksCommand extends Command
 		 * autoactivation and update features.
 		 */
 		DataStore store = ObjectiveAccounts.store;
+		store.setBooks(root);
+
 		Set accounts = store.newSet();
 		root.setAccountsSet(accounts);
 

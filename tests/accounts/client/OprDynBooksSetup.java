@@ -49,6 +49,7 @@ public class OprDynBooksSetup
 		Debug.setProgname("setup");
 		Debug.register("main");
 		Debug.register("command");
+		Debug.register("memory");
 
 		args = Debug.init(args);
 		Debug.print("main", "Starting OprDynBooksSetup");
@@ -62,7 +63,7 @@ public class OprDynBooksSetup
 
 		Debug.print("main", "Running commands...");
 		try {
-			uow = new UnitOfWork("InitBooks");
+			uow = new UnitOfWork("Demo Books Setup");
 
 			Currency home = new Currency("AUD", "Australian Dollar", "$");
 
@@ -70,16 +71,8 @@ public class OprDynBooksSetup
 			initBooks.execute(uow);
 
 			/*
-			 * The books needs to be committed to the database first, otherwise
-			 * DataSore.getBooks() will fail in AddAccountCommand
-			 */
-			uow.commit();
-
-			/*
 			 * Create a whole ton of accounts
 			 */
-
-			uow = new UnitOfWork("AddAccounts");
 
 			Account[] realAccounts = {
 					new CashAccount("Petty Cash", "Manly Office"),

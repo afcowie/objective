@@ -19,6 +19,7 @@ public class AllServicesTests
 
 		suite.addTestSuite(DatafileTest.class);
 		suite.addTestSuite(BasicCommandTest.class);
+		suite.addTestSuite(CommandsVsUnitsOfWorkTest.class);
 		suite.addTestSuite(PostTransactionCommandTest.class);
 
 		return suite;

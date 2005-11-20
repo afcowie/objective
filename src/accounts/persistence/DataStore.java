@@ -10,6 +10,7 @@ import generic.util.DebugException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import accounts.domain.Books;
@@ -37,7 +38,8 @@ import com.db4o.config.ObjectClass;
  */
 public class DataStore
 {
-	private ObjectContainer	_container	= null;
+	private transient ObjectContainer	container	= null;
+	private transient Books				books		= null;
 
 	/**
 	 * Configure the Db4o engine. Apparently this is once per VM, so here it is.
@@ -83,7 +85,7 @@ public class DataStore
 	 *            the database to open.
 	 */
 	public DataStore(String filename) {
-		_container = Db4o.openFile(filename);
+		container = Db4o.openFile(filename);
 	}
 
 	/**
@@ -93,18 +95,18 @@ public class DataStore
 	 * @return An empty Set. Actually returns a {@link Db4oSet}.
 	 */
 	public Set newSet() {
-		if (_container == null) {
-			throw new DebugException("You managed ask for a new Linked List without having the _container initialized.");
+		if (container == null) {
+			throw new DebugException("You managed ask for a new Linked List without having the container initialized.");
 		}
-		// was _container.ext().collections().newLinkedList();
-		return new Db4oSet(_container);
+		// was container.ext().collections().newLinkedList();
+		return new Db4oSet(container);
 	}
 
 	/**
 	 * Commit the current transaction (and implicitly, start a new one)
 	 */
 	public void commit() {
-		_container.commit();
+		container.commit();
 	}
 
 	/**
@@ -112,7 +114,7 @@ public class DataStore
 	 * db4o's practice of there always being an open transaction).
 	 */
 	public void rollback() {
-		_container.rollback();
+		container.rollback();
 	}
 
 	/**
@@ -123,8 +125,8 @@ public class DataStore
 	 */
 	public void reload(Object obj) {
 		synchronized (obj) {
-			_container.deactivate(obj, 2);
-			_container.activate(obj, 2);
+			container.deactivate(obj, 2);
+			container.activate(obj, 2);
 		}
 	}
 
@@ -132,8 +134,8 @@ public class DataStore
 	 * Close the underlying data store. Commits.
 	 */
 	public void close() {
-		_container.commit(); // be explicit!
-		_container.close();
+		container.commit(); // be explicit!
+		container.close();
 	}
 
 	/**
@@ -141,7 +143,7 @@ public class DataStore
 	 * Hibernate's term for this, so "save" it is.
 	 */
 	public void save(Object obj) {
-		_container.set(obj);
+		container.set(obj);
 	}
 
 	/**
@@ -166,7 +168,7 @@ public class DataStore
 		/*
 		 * This blocks, I assume, seeing as how it throws something?!?
 		 */
-		_container.ext().backup(path);
+		container.ext().backup(path);
 	}
 
 	/**
@@ -177,27 +179,50 @@ public class DataStore
 	 * @return The {@link ObjectContainer}that this class wraps.
 	 */
 	public ObjectContainer getContainer() {
-		return _container;
+		return container;
 	}
-
-	/*
-	 * Experimental ---------------------------------------
-	 */
 
 	/**
 	 * Get the root Books object. Since DataStore wraps an accounts database, we
-	 * have a few utility methods to get to that Object hierarchy.
+	 * have a few utility methods to get to that Object hierarchy. Note that
+	 * DataStore caches this lookup once performed.
 	 */
 	public Books getBooks() {
-		ObjectSet os = _container.get(Books.class);
+		if (books == null) {
+			ObjectSet os = container.get(Books.class);
 
-		if (os.size() > 1) {
-			throw new IllegalStateException(
-					"Whoa. You managed to get more than one Books object into the database. That's really bad.");
-		} else if (os.size() == 0) {
-			return null;
+			if (os.size() > 1) {
+				throw new IllegalStateException(
+						"Whoa. You managed to get more than one Books object into the database. That's really bad.");
+			} else if (os.size() == 0) {
+				throw new NoSuchElementException("No Books object in this container!");
+			} else {
+				this.books = (Books) os.next();
+			}
+		}
+		return books;
+	}
+
+	/**
+	 * Set the cached Books object. Internal use only; does not commit to
+	 * database. To be used by InitBooksCommand to allow chaining; regardless of
+	 * Command using this, a commit of the Books object to the database needs to
+	 * be done via a UnitOfWork.
+	 * 
+	 * @param root
+	 *            the Books object to be cached in this DataStore object.
+	 */
+	public void setBooks(Books root) {
+		if (books == null) {
+			if (root != null) {
+				this.books = root;
+			} else {
+				throw new IllegalArgumentException(
+						"Can't set a null Books object to DataStore's internally cached root reference.");
+			}
 		} else {
-			return (Books) os.next();
+			throw new UnsupportedOperationException(
+					"You aren't supposed to call setBooks unless initializing a DataStore via InitBooksCommand");
 		}
 	}
 }

@@ -9,6 +9,7 @@ package accounts.services;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -48,8 +49,11 @@ public class BasicCommandTest extends TestCase
 	}
 
 	public final void testInitBooksCommand() {
-		Books one = ObjectiveAccounts.store.getBooks();
-		assertNull(one);
+		try {
+			Books one = ObjectiveAccounts.store.getBooks();
+			fail("Should have thrown NoSuchElementException to point out uninitialized DataStore.");
+		} catch (NoSuchElementException nsee) {
+		}
 
 		UnitOfWork uow = new UnitOfWork("testInitBooksCommand");
 
