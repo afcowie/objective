@@ -38,7 +38,7 @@ public class BasicTransactionTest extends TestCase
 
 		/*
 		 * As we have switched to Sets throughout, trying to add the same object
-		 * should result in a false return and no change to the _entries Set.
+		 * should result in a false return and no change to the entries Set.
 		 */
 		boolean result = t.addEntry(two);
 		assertFalse("Trying to add the same Entry object again should have failed and returned false", result);

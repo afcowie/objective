@@ -22,10 +22,10 @@ public class Transaction
 	/*
 	 * Instance variables ---------------------------------
 	 */
-	protected String	_description	= null;
-	protected String	_identifier		= null;
-	protected Datestamp	_date			= null;
-	protected Set		_entries		= null;
+	protected String	description	= null;
+	protected String	identifier	= null;
+	protected Datestamp	date		= null;
+	protected Set		entries		= null;
 
 	/*
 	 * Constructors ---------------------------------------
@@ -67,14 +67,14 @@ public class Transaction
 		if (entry == null) {
 			throw new NullPointerException("attempted to add a null entry!");
 		}
-		if (_entries == null) {
-			_entries = new LinkedHashSet();
+		if (entries == null) {
+			entries = new LinkedHashSet();
 		}
 		entry.setParentTransaction(this);
-		if (_date != null) {
-			entry.setDate(_date);
+		if (date != null) {
+			entry.setDate(date);
 		}
-		return _entries.add(entry);
+		return entries.add(entry);
 	}
 
 	// public boolean addEntry(Entry[] entries) {
@@ -83,12 +83,12 @@ public class Transaction
 	// }
 
 	public boolean isBalanced() {
-		if (_entries == null) {
+		if (entries == null) {
 			return true;
 		}
 
 		Amount total = new Amount("0");
-		Iterator iter = _entries.iterator();
+		Iterator iter = entries.iterator();
 
 		while (iter.hasNext()) {
 			Entry entry = (Entry) iter.next();
@@ -110,7 +110,7 @@ public class Transaction
 	 */
 
 	public Set getEntries() {
-		return _entries;
+		return entries;
 	}
 
 	/**
@@ -122,14 +122,14 @@ public class Transaction
 	 * @param entries
 	 */
 	public void setEntries(Set entries) {
-		_entries = entries;
+		this.entries = entries;
 	}
 
 	/**
 	 * Get the description of the transaction.
 	 */
 	public String getDescription() {
-		return _description;
+		return description;
 	}
 
 	/**
@@ -143,14 +143,14 @@ public class Transaction
 		if (description == null) {
 			throw new NullPointerException("No null descriptions for transactions!");
 		}
-		_description = description;
+		this.description = description;
 	}
 
 	/**
 	 * Get the identifier for the transaction, assuming one is set.
 	 */
 	public String getIdentifier() {
-		return _identifier;
+		return identifier;
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class Transaction
 	 *            the String to set as the Transaction's identifier.
 	 */
 	public void setIdentifier(String identifier) {
-		_identifier = identifier;
+		this.identifier = identifier;
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class Transaction
 	 */
 
 	public Datestamp getDate() {
-		return _date;
+		return date;
 	}
 
 	/**
@@ -182,12 +182,12 @@ public class Transaction
 	 * {@link Transaction#addEntry(Entry)} does the same update, assuming the
 	 * date of the transaction is already available).
 	 * 
-	 * @param _date
+	 * @param date
 	 */
 
 	public void setDate(Datestamp date) {
-		this._date = date;
-		Iterator iter = _entries.iterator();
+		this.date = date;
+		Iterator iter = entries.iterator();
 		while (iter.hasNext()) {
 			Entry entry = (Entry) iter.next();
 			entry.setDate(date);

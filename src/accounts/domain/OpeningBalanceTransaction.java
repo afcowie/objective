@@ -20,7 +20,7 @@ public class OpeningBalanceTransaction extends GenericTransaction
 {
 	private final static String		LABEL				= "Opening Balance";
 
-	private transient EquityAccount	historicalBalance 	= null;
+	private transient EquityAccount	historicalBalance	= null;
 
 	public OpeningBalanceTransaction() {
 		super();
@@ -38,7 +38,7 @@ public class OpeningBalanceTransaction extends GenericTransaction
 	 */
 	public OpeningBalanceTransaction(Set entries, Datestamp date) {
 		super(LABEL, entries);
-		_date = date;
+		super.setDate(date);
 	}
 
 }
