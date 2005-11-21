@@ -62,7 +62,7 @@ public class BasicTransactionTest extends TestCase
 
 	}
 
-	public final void testDatestampSetting() {
+	public final void testDatestampSettingAfterEntriesAdded() {
 		Transaction t1 = new Transaction();
 
 		/*
@@ -99,7 +99,9 @@ public class BasicTransactionTest extends TestCase
 		assertNotNull(right.getDate());
 		assertTrue(left.getDate() == date);
 		assertTrue(right.getDate() == date);
+	}
 
+	public final void testDatestampNormalizedOnEntriesAdded() {
 		/*
 		 * Now repeat the test, opposite cycle. These Entrys, using
 		 * {Debit|Credit}'s Amount constructor, will have today's Datestamp.
@@ -109,9 +111,34 @@ public class BasicTransactionTest extends TestCase
 		Credit droit = new Credit(new Amount("9.95"));
 		assertNotNull(gauche.getDate());
 		assertNotNull(droit.getDate());
-	
+
+		Datestamp today = new Datestamp();
+		today.setAsToday();
+
+		Datestamp theOtherDay = new Datestamp("14 Oct 03");
+		droit.setDate(theOtherDay);
+
+		assertEquals(today.getInternalTimestamp(), gauche.getDate().getInternalTimestamp());
+		assertEquals(theOtherDay.toString(), droit.getDate().toString());
+
+		/*
+		 * Now, adding them to a transaction should normalize their dates.
+		 */
+		Datestamp aNewDay = new Datestamp("7 Dec 93");
+		assertEquals("07 Dec 93", aNewDay.toString());
+
 		Transaction t2 = new Transaction();
-		// TODO complete this test! 
+		t2.setDate(aNewDay);
+
+		t2.addEntry(gauche);
+		t2.addEntry(droit);
+
+		/*
+		 * so check the two Entries we added to have aNewDay as their Datestamp
+		 * value.
+		 */
+		assertEquals(aNewDay.getInternalTimestamp(), gauche.getDate().getInternalTimestamp());
+		assertEquals(aNewDay.toString(), droit.getDate().toString());
 	}
 
 }

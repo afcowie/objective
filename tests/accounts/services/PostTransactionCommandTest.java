@@ -84,7 +84,8 @@ public class PostTransactionCommandTest extends TestCase
 	}
 
 	/*
-	 * Test method TODO INCOMPLETE!
+	 * Verify that the Transaction laid down by the above PostTransactionCommand
+	 * actually persisted fully.
 	 */
 	public void testPersistence() {
 		Transaction proto = new Transaction();
@@ -128,7 +129,5 @@ public class PostTransactionCommandTest extends TestCase
 		}
 		assertEquals(3, i);
 		assertTrue(price && expense && gst);
-
-		// FIXME HERE!!
 	}
 }

@@ -187,6 +187,9 @@ public class Transaction
 
 	public void setDate(Datestamp date) {
 		this.date = date;
+		if (entries == null) {
+			return;
+		}
 		Iterator iter = entries.iterator();
 		while (iter.hasNext()) {
 			Entry entry = (Entry) iter.next();

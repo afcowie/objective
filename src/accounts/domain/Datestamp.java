@@ -6,6 +6,8 @@
  */
 package accounts.domain;
 
+import generic.util.DebugException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,6 +40,13 @@ public class Datestamp
 		// only for creating search prototypes
 	}
 
+	/**
+	 * Construct a Datestamp object with user supplied input (which will be
+	 * passed to setDate() for validation).
+	 * 
+	 * @param user
+	 *            the String to parse
+	 */
 	public Datestamp(String user) {
 		if (user == null) {
 			throw new IllegalArgumentException();
@@ -59,7 +68,11 @@ public class Datestamp
 	 * Set the date stamp to be today
 	 */
 	public void setAsToday() {
-		_timestamp = System.currentTimeMillis();
+		try {
+			setDate(System.currentTimeMillis());
+		} catch (ParseException pe) {
+			throw new DebugException("ParseException thrown when using setDate on System.currentTimeMillis()!");
+		}
 	}
 
 	public boolean isSet() {
@@ -81,15 +94,15 @@ public class Datestamp
 	/**
 	 * 
 	 * @param timestamp
-	 *            a "milliseconds since" timestamp value. Must be a day, exactly, or
-	 *            rather, it will be renderded down to one.
+	 *            a "milliseconds since" timestamp value. Must be a day,
+	 *            exactly, or rather, it will be renderded down to one.
 	 * @throws ParseException
 	 *             if the timestamp passed in does't result in a date.
 	 */
 	public void setDate(long timestamp) throws ParseException {
 		/*
-		 * To validate (ie, reduce it down to a round day + 0 milliseconds), Get a
-		 * Date, render it as in our string format (which has only day
+		 * To validate (ie, reduce it down to a round day + 0 milliseconds), Get
+		 * a Date, render it as in our string format (which has only day
 		 * precision) and then parse the result back into a Datestamp.
 		 */
 		Date roughDate = new Date(timestamp);
@@ -99,9 +112,12 @@ public class Datestamp
 	}
 
 	/**
-	 * Parse the user's input as a date
+	 * Parse the user's input as a Datestamp object. Validation is performed, as
+	 * is an attempt to guess the best competion if a properly formatted Date
+	 * isn't entered.
 	 * 
 	 * @param user
+	 *            the String to parse into a Datestamp if possible.
 	 */
 	public void setDate(String user) throws ParseException {
 		SimpleDateFormat fullsdf = new SimpleDateFormat("dd MMM yy");
