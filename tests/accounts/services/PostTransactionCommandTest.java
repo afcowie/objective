@@ -18,6 +18,7 @@ import com.db4o.ObjectSet;
 import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Credit;
+import accounts.domain.Datestamp;
 import accounts.domain.Debit;
 import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
@@ -69,6 +70,9 @@ public class PostTransactionCommandTest extends TestCase
 
 		GenericTransaction t = new GenericTransaction("Test transaction", entries);
 		t.setIdentifier("TEST01");
+		Datestamp d = new Datestamp();
+		d.setAsToday();
+		t.setDate(d);
 
 		assertTrue(t.isBalanced());
 
@@ -129,5 +133,63 @@ public class PostTransactionCommandTest extends TestCase
 		}
 		assertEquals(3, i);
 		assertTrue(price && expense && gst);
+	}
+
+	public final void testDatestampSettingByPostTransactionCommand() {
+		/*
+		 * Set up two Entries with differing dates
+		 */
+		Debit gauche = new Debit(new Amount("9.95"));
+		gauche.setDate(new Datestamp("1 Jul 95"));
+
+		Credit droit = new Credit(new Amount("9.95"));
+		droit.setDate(new Datestamp("15 Oct 03"));
+
+		/*
+		 * Make a Transaction with them, but don't set a date for the
+		 * Transaction, so addEntry can't impose a date.
+		 */
+		Transaction t3 = new Transaction();
+		t3.addEntry(gauche);
+		t3.addEntry(droit);
+
+		/*
+		 * At this point because the Transaction hasn't had a date set, the
+		 * Datestamps won't be the same (this here just to detect behaviour
+		 * change).
+		 */
+		assertFalse(gauche.getDate().toString().equals(droit.getDate().toString()));
+
+		/*
+		 * Now use a PostTransactionCommand to attempt to store the Transaction.
+		 */
+		UnitOfWork uow = new UnitOfWork("testDatestampSettingByPostTransactionCommand");
+
+		PostTransactionCommand cmd = new PostTransactionCommand(t3);
+		try {
+			cmd.execute(uow);
+			uow.cancel();
+			fail("Should have thrown CommandNotReadyException to signal that the Date hasn't been set");
+		} catch (CommandNotReadyException cnre) {
+			// correct
+		}
+
+		Datestamp someday = new Datestamp("30 Sep 04");
+		t3.setDate(someday);
+
+		/*
+		 * Now the Entries dates should have all been set to the Transaction's
+		 * date.
+		 */
+		assertTrue(gauche.getDate().toString().equals(droit.getDate().toString()));
+
+		try {
+			cmd.execute(uow);
+		} catch (CommandNotReadyException cnre) {
+			uow.cancel();
+			fail("Should NOT have thrown CommandNotReadyException " + cnre.getMessage());
+		}
+		// no reason to commit to database; we've already tested that.
+		uow.cancel();
 	}
 }

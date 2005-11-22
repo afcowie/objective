@@ -43,6 +43,11 @@ public class PostTransactionCommand extends Command
 			throw new CommandNotReadyException("Transaction not balanced!");
 		}
 
+		if (trans.getDate() == null) {
+			throw new CommandNotReadyException(
+					"Transaction doesn't have a date set, which means that the Entries may well have differing dates");
+		}
+
 		/*
 		 * Persist the Entries of the Transaction, then trans itself.
 		 */

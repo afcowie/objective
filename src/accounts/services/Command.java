@@ -48,7 +48,7 @@ public abstract class Command
 	 * (unlike, say, Prevayler) and b) to provide a syntax guard against
 	 * persisting these fields by accident.
 	 */
-	protected transient boolean	executed	= false;
+	private transient boolean	executed	= false;
 
 	/**
 	 * Commands all have a transient reference to the system's open DataStore.
