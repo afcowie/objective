@@ -8,7 +8,7 @@ package accounts.ui;
 
 import java.text.ParseException;
 
-import org.gnu.gdk.KeySymbol;
+import org.gnu.gdk.KeyValue;
 import org.gnu.gtk.Button;
 import org.gnu.gtk.Calendar;
 import org.gnu.gtk.Entry;
@@ -17,7 +17,6 @@ import org.gnu.gtk.HBox;
 import org.gnu.gtk.IconSize;
 import org.gnu.gtk.Image;
 import org.gnu.gtk.Label;
-import org.gnu.gtk.Widget;
 import org.gnu.gtk.Window;
 import org.gnu.gtk.event.ButtonEvent;
 import org.gnu.gtk.event.ButtonListener;
@@ -131,14 +130,14 @@ public class DatePicker extends HBox
 			_window.addListener(new KeyListener() {
 				public boolean keyEvent(KeyEvent event) {
 					int key = event.getKeyval();
-					if (key == KeySymbol.Escape.getValue()) {
+					if (key == KeyValue.Escape) {
 						_window.hide();
 						return true;
-					} else if (key == KeySymbol.Home.getValue() || key == KeySymbol.t.getValue()) {
+					} else if (key == KeyValue.Home || key == KeyValue.t) {
 						_date.setAsToday();
 						present();
 						return true;
-					} else if (key == KeySymbol.Return.getValue()) {
+					} else if (key == KeyValue.Return) {
 						applySelection();
 						return true;
 					} else {
@@ -181,7 +180,7 @@ public class DatePicker extends HBox
 			Window top = (Window) _entry.getToplevel();
 			top.present();
 		}
-		
+
 		/**
 		 * Only hide, don't destroy. More to the point, override the default
 		 * return of false.

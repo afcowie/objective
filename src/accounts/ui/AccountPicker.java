@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.gnu.gdk.KeySymbol;
+import org.gnu.gdk.KeyValue;
 import org.gnu.gtk.Button;
 import org.gnu.gtk.CellRendererText;
 import org.gnu.gtk.DataColumn;
@@ -35,7 +35,6 @@ import org.gnu.gtk.TreeModelSort;
 import org.gnu.gtk.TreeSelection;
 import org.gnu.gtk.TreeView;
 import org.gnu.gtk.TreeViewColumn;
-import org.gnu.gtk.Widget;
 import org.gnu.gtk.Window;
 import org.gnu.gtk.event.ButtonEvent;
 import org.gnu.gtk.event.ButtonListener;
@@ -345,7 +344,7 @@ public class AccountPicker extends HBox
 			_search.addListener(new KeyListener() {
 				public boolean keyEvent(KeyEvent event) {
 					int key = event.getKeyval();
-					if ((key == KeySymbol.Down.getValue()) || (key == KeySymbol.Up.getValue())) {
+					if ((key == KeyValue.Down) || (key == KeyValue.Up)) {
 						_view.grabFocus();
 						return true;
 					} else {
@@ -370,7 +369,7 @@ public class AccountPicker extends HBox
 			_window.addListener(new KeyListener() {
 				public boolean keyEvent(KeyEvent event) {
 					int key = event.getKeyval();
-					if (key == KeySymbol.Escape.getValue()) {
+					if (key == KeyValue.Escape) {
 						if ((_selectedAccount == null) || (_entry.getText().equals(""))) {
 							clearEntry();
 						}
@@ -393,20 +392,20 @@ public class AccountPicker extends HBox
 						String orig = _search.getText();
 						int len = orig.length();
 
-						if (key == KeySymbol.BackSpace.getValue()) {
+						if (key == KeyValue.BackSpace) {
 							_search.grabFocus();
 							if (len > 0) {
 								_search.setText(orig.substring(0, len - 1));
 								refilter();
 							}
 							return true;
-						} else if (key == KeySymbol.Left.getValue()) {
+						} else if (key == KeyValue.Left) {
 							_search.grabFocus();
 							if (len > 0) {
 								_search.setCursorPosition(len - 1);
 							}
 							return true;
-						} else if (key == KeySymbol.Right.getValue()) {
+						} else if (key == KeyValue.Right) {
 							_search.grabFocus();
 							_search.setCursorPosition(len);
 							return true;

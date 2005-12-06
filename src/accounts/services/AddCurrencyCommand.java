@@ -35,14 +35,6 @@ public class AddCurrencyCommand extends Command
 		currency = cur;
 	}
 
-	public boolean isComplete() {
-		if (currency == null) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 	protected void action(UnitOfWork uow) {
 		/*
 		 * Add currency to Books's currency list
