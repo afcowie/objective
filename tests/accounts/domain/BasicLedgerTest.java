@@ -49,7 +49,7 @@ public class BasicLedgerTest extends TestCase
 		 * Recall real Entries are either Debit or Credit, not both or neither.
 		 * So arbitrarily pick one.
 		 */
-		Debit first = new Debit(new Amount("49.95"));
+		Debit first = new Debit(new Amount("49.95"), null);
 
 		/*
 		 * Another safety check - no operations on raw ledgers!
@@ -74,7 +74,7 @@ public class BasicLedgerTest extends TestCase
 		assertNotNull(ledger.getEntries());
 		assertEquals("49.95", ledger.getBalance().getValue());
 
-		Debit second = new Debit(new Amount("20.00"));
+		Debit second = new Debit(new Amount("20.00"), null);
 		ledger.addEntry(second);
 		assertEquals("69.95", ledger.getBalance().getValue());
 
@@ -85,8 +85,8 @@ public class BasicLedgerTest extends TestCase
 
 	public final void testDebitsAndCreditEntryRecognition() {
 		Ledger ledger = new CreditPositiveLedger();
-		Debit oneSide = new Debit(new Amount("15.00"));
-		Credit otherSide = new Credit(new Amount("15.00"));
+		Debit oneSide = new Debit(new Amount("15.00"), null);
+		Credit otherSide = new Credit(new Amount("15.00"), null);
 
 		ledger.addEntry(oneSide);
 		assertEquals("-15.00", ledger.getBalance().getValue());

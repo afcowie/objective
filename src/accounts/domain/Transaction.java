@@ -43,6 +43,7 @@ public class Transaction
 	 * 
 	 * @param description
 	 * @param entries
+	 *            a Set containing entry objects.
 	 * @throws NullPointerException
 	 *             if the description passed is null.
 	 */
@@ -52,11 +53,26 @@ public class Transaction
 	}
 
 	/**
+	 * Create a new transaction prototype, setting the description field and
+	 * providing an initial set of entries. This contstructor is largely
+	 * intended for test cases.
+	 * 
+	 * @param description
+	 * @param entries
+	 *            an array of Entry objects
+	 */
+	public Transaction(String description, Entry[] entries) {
+		setDescription(description);
+		setEntries(entries);
+	}
+
+	/**
 	 * Add an Entry to this Transaction.
 	 * 
 	 * <P>
 	 * Note that this updates (sets) the date of the specified Entry to the date
-	 * of this Transaction if that date has already been set.
+	 * of this Transaction if that date has already been set. As you would
+	 * expect, it also sets the parentTransaction field of the specified Entry.
 	 * 
 	 * @param entry
 	 *            the Entry to add.
@@ -77,11 +93,10 @@ public class Transaction
 		return entries.add(entry);
 	}
 
-	// public boolean addEntry(Entry[] entries) {
-	// // TODO implement.
-	// throw new UnsupportedOperationException();
-	// }
-
+	/**
+	 * Perform checks on the Transaction object to make sure it is balanced
+	 * Debits == Credits.
+	 */
 	public boolean isBalanced() {
 		if (entries == null) {
 			return true;
@@ -118,11 +133,40 @@ public class Transaction
 	 * layer to replace an internal java.util.Set with a database backed
 	 * Db4oSet. The presumption is that the caller has used getEntries() to
 	 * fetch the Set, and re-instantiated it, and is passing it back in.
+	 * Nevertheless, validation is done here care of iterating over the Set and
+	 * calling addEntry()
 	 * 
 	 * @param entries
 	 */
 	public void setEntries(Set entries) {
+		/*
+		 * Replace the internal entries Set.
+		 */
 		this.entries = entries;
+
+		/*
+		 * But make sure it's valid
+		 */
+		Iterator iter = entries.iterator();
+		while (iter.hasNext()) {
+			Entry candidate = (Entry) iter.next();
+			candidate.setParentTransaction(this);
+			candidate.setDate(this.date);
+		}
+	}
+
+	/**
+	 * Replace the internal list of entries, iterating over the supplied array
+	 * and calling addEntry() one by one.
+	 * 
+	 * @param entries
+	 *            an array of Entry objects to add to this Transaction.
+	 */
+	public void setEntries(Entry[] entries) {
+		this.entries = null;
+		for (int i = 0; i < entries.length; i++) {
+			addEntry(entries[i]);
+		}
 	}
 
 	/**

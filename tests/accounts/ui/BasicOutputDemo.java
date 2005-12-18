@@ -48,7 +48,7 @@ public class BasicOutputDemo
 		RawBooks root = new RawBooks();
 
 		Set accounts = root.getAccountsSet();
-		
+
 		/*
 		 * Create a couple of accounts
 		 */
@@ -64,10 +64,10 @@ public class BasicOutputDemo
 		GenericTransaction capitalization = new GenericTransaction();
 		capitalization.setDescription("Initial capitalization");
 
-		Debit cash = new Debit(new Amount("1.00"));
+		Debit cash = new Debit(new Amount("1.00"), null);
 		pettyCash.addEntry(cash);
 
-		Credit share = new Credit(new Amount("1.00"));
+		Credit share = new Credit(new Amount("1.00"), null);
 		ownerEquity.addEntry(share);
 
 		capitalization.addEntry(cash);
@@ -89,24 +89,24 @@ public class BasicOutputDemo
 		LoanLedger ledger = new LoanLedger();
 		ledger.setName("Andrew Cowie");
 		shareholdersLoans.addLedger(ledger);
-		
+
 		accounts.add(shareholdersLoans);
-		
+
 		GenericTransaction loan = new GenericTransaction();
 		loan.setDescription("Loan from shareholder");
-		Debit deposit = new Debit(new Amount("1600.00"));
+		Debit deposit = new Debit(new Amount("1600.00"), null);
 		currentAccount.addEntry(deposit);
-		
-		Credit lent = new Credit(new Amount("1600.00"));
+
+		Credit lent = new Credit(new Amount("1600.00"), null);
 		ledger.addEntry(lent);
-		
+
 		loan.addEntry(deposit);
 		loan.addEntry(lent);
-		
+
 		if (!loan.isBalanced()) {
 			throw new IllegalStateException("unbalanced transaction");
-		}		
-		
+		}
+
 		/*
 		 * And...
 		 */

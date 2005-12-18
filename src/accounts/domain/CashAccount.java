@@ -17,7 +17,7 @@ public class CashAccount extends AssetAccount implements SingleLedger
 	 * This is a convenience only for use in single ledger accounts, ie, this
 	 * one.
 	 */
-	private DebitPositiveLedger	_ledger	= null;
+	private DebitPositiveLedger	ledger	= null;
 
 	public CashAccount() {
 		super();
@@ -31,17 +31,17 @@ public class CashAccount extends AssetAccount implements SingleLedger
 	 */
 	public CashAccount(String accountTitle, String ledgerName) {
 		super(accountTitle);
-		_ledger = new DebitPositiveLedger();
-		_ledger.setName(ledgerName);
-		addLedger(_ledger);
+		ledger = new DebitPositiveLedger();
+		ledger.setName(ledgerName);
+		addLedger(ledger);
 	}
 
 	/**
 	 * Add an entry to the (single) Ledger of this CashAccount.
 	 */
 	public void addEntry(Entry entry) {
-		_ledger.addEntry(entry);
-		entry.setParentAccount(this);
+		ledger.addEntry(entry);
+		entry.setParentLedger(ledger);
 		// TODO recalc account balance?
 	}
 
@@ -50,14 +50,14 @@ public class CashAccount extends AssetAccount implements SingleLedger
 	 */
 
 	public Ledger getLedger() {
-		return _ledger;
+		return ledger;
 	}
 
 	public void setLedger(Ledger ledger) {
 		if (!(ledger instanceof DebitPositiveLedger)) {
 			throw new IllegalArgumentException("You must use a DebitPositiveLedger for a CashAccount");
 		}
-		_ledger = (DebitPositiveLedger) ledger;
+		this.ledger = (DebitPositiveLedger) ledger;
 	}
 
 	public String getClassString() {

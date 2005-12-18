@@ -13,7 +13,7 @@ package accounts.domain;
  */
 public class Credit extends Entry
 {
-//	public static final String	COLOR	= "medium sea green";
+	// public static final String COLOR = "medium sea green";
 	public static final String	COLOR	= "sea green";
 
 	public Credit() {
@@ -22,8 +22,8 @@ public class Credit extends Entry
 		 * an actual null Entry...
 		 */
 	}
-	
-	public Credit(Amount amount) {
-		super(amount);
+
+	public Credit(Amount value, Ledger parent) {
+		super(value, parent);
 	}
 }

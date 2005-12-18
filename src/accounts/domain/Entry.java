@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 /**
  * An entry in an account. These are formed in balanced (total Debits = total
  * Credits) transactions. Entries form a bridge between Transactions and
- * accounts.
+ * Accounts.
  * <P>
  * Note that an Entry's datestamp is shared with a transaction, so adding an
  * entry to a transaction will cause it to adopt that transactions Datestamp
@@ -26,15 +26,24 @@ public class Entry
 	/*
 	 * Instance variables ---------------------------------
 	 */
-	private Datestamp	_date				= null;
-	private Amount		_amount				= null;
-
-	/*
-	 * Navigation references ------------------------------
+	/**
+	 * The date of the Entry. This should be set by (or, at least, will
+	 * certainly be replaced by) the Transaction to which it belongs on commit
+	 * via a PostTransactionCommand.
 	 */
-	private Account		_parentAccount		= null;
-	// TODO what about Ledger?
-	private Transaction	_parentTransaction	= null;
+	private Datestamp	date				= null;
+	/**
+	 * The value of the Entry
+	 */
+	private Amount		amount				= null;
+	/**
+	 * The ledger to which this entry [will be] added.
+	 */
+	private Ledger		parentLedger		= null;
+	/**
+	 * The Transaction which this entry is a part of.
+	 */
+	private Transaction	parentTransaction	= null;
 
 	public Entry() {
 		/*
@@ -43,33 +52,25 @@ public class Entry
 	}
 
 	/**
-	 * Quickly construct a simple entry. The entry's date will be set to today.
+	 * Construct an Entry specifiying the amount and the account to which it
+	 * will be applied. Note that the account will not have it's addEntry()
+	 * method called until a PostTransactionCommand is executed for a
+	 * transaction holding this Entry object.
 	 * 
-	 * @param amount
+	 * @param value
+	 *            The Amount (be it Debit or Credit) of this Entry.
+	 * @param ledger
+	 *            The Ledger (which, in turn is of an Account) to which this
+	 *            Entry [will be] assinged.
 	 */
-	public Entry(Amount amount) {
-		_amount = amount;
-		_date = new Datestamp();
-		_date.setAsToday();
+	public Entry(Amount value, Ledger ledger) {
+		this.amount = value;
+		this.parentLedger = ledger;
+		// this.date = new Datestamp();
+		// date.setAsToday();
 
 	}
 
-	/**
-	 * Full constructor; correctly specifying all the necessary attributes will
-	 * give you a complete Entry.
-	 * 
-	 * @param amount
-	 * @param date
-	 * @param transaction
-	 * @param account
-	 */
-	// public Entry(Amount amount, Datestamp date, Transaction transaction,
-	// Account account) {
-	// _amount = amount;
-	// _date = date;
-	// _parentTransaction = transaction;
-	// _parentAccount = account;
-	// }
 	/*
 	 * Getters and Setters --------------------------------
 	 */
@@ -78,14 +79,14 @@ public class Entry
 	 * Get the date of the entry (transaction).
 	 */
 	public Datestamp getDate() {
-		return _date;
+		return date;
 	}
 
 	/**
 	 * Set the datestamp of the entry (transaction).
 	 */
 	public void setDate(Datestamp date) {
-		this._date = date;
+		this.date = date;
 
 	}
 
@@ -93,27 +94,27 @@ public class Entry
 	 * Get the amount (value) this entry describes.
 	 */
 	public Amount getAmount() {
-		return _amount;
+		return amount;
 	}
 
 	public void setAmount(Amount value) {
-		_amount = value;
+		this.amount = value;
 	}
 
-	public Account getParentAccount() {
-		return _parentAccount;
+	public Ledger getParentLedger() {
+		return parentLedger;
 	}
 
-	public void setParentAccount(Account account) {
-		_parentAccount = account;
+	public void setParentLedger(Ledger parent) {
+		this.parentLedger = parent;
 	}
 
 	public Transaction getParentTransaction() {
-		return _parentTransaction;
+		return parentTransaction;
 	}
 
 	public void setParentTransaction(Transaction parent) {
-		_parentTransaction = parent;
+		parentTransaction = parent;
 	}
 
 	/*
@@ -127,7 +128,7 @@ public class Entry
 	public String toString() {
 		// TODO Are Entries only in native currency?
 		StringBuffer buf = new StringBuffer('$');
-		buf.append(_amount.getValue());
+		buf.append(amount.getValue());
 		buf.append(' ');
 
 		if (this instanceof Debit) {
@@ -155,32 +156,37 @@ public class Entry
 	 * 
 	 */
 	public void toOutput(PrintWriter out, boolean showTransaction) {
-		String id = null;
-		String desc = null;
+		String idText = null;
+		String descText = null;
+		String dateText = null;
 		// final int MAXDATELEN = 10;
 		final int MAXIDLEN = 10;
 		final int MAXDESCLEN = 30;
 		final int MAXAMOUNTLEN = 15;
 
 		if (showTransaction) {
-			id = _parentTransaction.getIdentifier();
-			desc = _parentTransaction.getDescription();
+			idText = parentTransaction.getIdentifier();
+			descText = parentTransaction.getDescription();
 		} else {
-			id = _parentAccount.getCode();
-			desc = _parentAccount.getTitle();
+			// id = parentAccount.getCode();
+			// desc = parentAccount.getTitle();
+			descText = "FIXME";
 		}
 
-		if (id == null) {
-			id = "";
+		if (idText == null) {
+			idText = "";
 		}
-		if (desc == null) {
-			desc = "";
+		if (descText == null) {
+			descText = "";
+		}
+		if (date == null) {
+			dateText = "No date  ";
 		}
 
-		out.print(_date.toString());
+		out.print(dateText.toString());
 
-		out.print(pad(id, MAXIDLEN, true));
-		out.print(pad(desc, MAXDESCLEN, false));
+		out.print(pad(idText, MAXIDLEN, true));
+		out.print(pad(descText, MAXDESCLEN, false));
 		/*
 		 * Debit
 		 */

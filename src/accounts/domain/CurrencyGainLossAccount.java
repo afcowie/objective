@@ -14,7 +14,7 @@ package accounts.domain;
  */
 public class CurrencyGainLossAccount extends RevenueAccount implements SingleLedger
 {
-	private CreditPositiveLedger	_ledger	= null;
+	private CreditPositiveLedger	ledger	= null;
 
 	public CurrencyGainLossAccount() {
 		super();
@@ -22,25 +22,25 @@ public class CurrencyGainLossAccount extends RevenueAccount implements SingleLed
 
 	public CurrencyGainLossAccount(String title) {
 		super(title);
-		_ledger = new CreditPositiveLedger();
-		addLedger(_ledger);
+		ledger = new CreditPositiveLedger();
+		addLedger(ledger);
 	}
 
 	public void addEntry(Entry entry) {
-		_ledger.addEntry(entry);
-		entry.setParentAccount(this);
+		ledger.addEntry(entry);
+		entry.setParentLedger(ledger);
 		// TODO recalc account balance?
 	}
 
 	public Ledger getLedger() {
-		return _ledger;
+		return ledger;
 	}
 
 	public void setLedger(Ledger ledger) {
 		if (!(ledger instanceof CreditPositiveLedger)) {
 			throw new IllegalArgumentException("You must use a CreditPositiveLedger for an CurrencyGainLossAccount");
 		}
-		_ledger = (CreditPositiveLedger) ledger;
+		ledger = (CreditPositiveLedger) ledger;
 	}
 	
 	public String getClassString() {

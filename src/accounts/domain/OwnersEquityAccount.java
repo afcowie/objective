@@ -13,7 +13,7 @@ package accounts.domain;
  */
 public class OwnersEquityAccount extends EquityAccount implements SingleLedger
 {
-	private CreditPositiveLedger _ledger = null;
+	private CreditPositiveLedger ledger = null;
 	
 	/**
 	 * 
@@ -28,29 +28,29 @@ public class OwnersEquityAccount extends EquityAccount implements SingleLedger
 	 */
 	public OwnersEquityAccount(String accountTitle, String ledgerName) {
 		super(accountTitle);
-		_ledger = new CreditPositiveLedger();
-		_ledger.setName(ledgerName);
-		addLedger(_ledger);
+		ledger = new CreditPositiveLedger();
+		ledger.setName(ledgerName);
+		addLedger(ledger);
 	}
 	
 	/**
 	 * Add an entry to the single Ledger in this Account. 
 	 */
 	public void addEntry(Entry entry) {
-		_ledger.addEntry(entry);
-		entry.setParentAccount(this);
+		ledger.addEntry(entry);
+		entry.setParentLedger(ledger);
 		// TODO recalc account balance?
 	}
 
 	public Ledger getLedger() {
-		return _ledger;
+		return ledger;
 	}
 
 	public void setLedger(Ledger ledger) {
 		if (!(ledger instanceof CreditPositiveLedger)) {
 			throw new IllegalArgumentException("You must use a CreditPositiveLedger for an OwnersEquityAccount");
 		}
-		_ledger = (CreditPositiveLedger) ledger;
+		this.ledger = (CreditPositiveLedger) ledger;
 	}
 
 	public String getClassString() {

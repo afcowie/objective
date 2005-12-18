@@ -54,7 +54,7 @@ public class BankAccount extends AssetAccount implements SingleLedger
 	 */
 	public void addEntry(Entry entry) {
 		_ledger.addEntry(entry);
-		entry.setParentAccount(this);
+		entry.setParentLedger(_ledger);
 		// TODO recalc account balance?
 	}
 

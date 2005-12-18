@@ -18,10 +18,13 @@ import com.db4o.ObjectSet;
 import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Credit;
+import accounts.domain.CreditPositiveLedger;
 import accounts.domain.Datestamp;
 import accounts.domain.Debit;
+import accounts.domain.DebitPositiveLedger;
 import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
+import accounts.domain.Ledger;
 import accounts.domain.Transaction;
 import accounts.persistence.UnitOfWork;
 import junit.framework.TestCase;
@@ -60,13 +63,13 @@ public class PostTransactionCommandTest extends TestCase
 	public void testTransactionCommandWithGeneric() {
 		HashSet entries = new HashSet();
 
-		Amount price = new Amount("1100.00");
-		Amount gst = new Amount("100.00");
-		Amount expense = new Amount("1000.00");
+		Credit price = new Credit(new Amount("1100.00"), null);
+		Debit gst = new Debit(new Amount("100.00"), null);
+		Debit expense = new Debit(new Amount("1000.00"), null);
 
-		entries.add(new Credit(price));
-		entries.add(new Debit(expense));
-		entries.add(new Debit(gst));
+		entries.add(price);
+		entries.add(gst);
+		entries.add(expense);
 
 		GenericTransaction t = new GenericTransaction("Test transaction", entries);
 		t.setIdentifier("TEST01");
@@ -81,9 +84,28 @@ public class PostTransactionCommandTest extends TestCase
 
 		try {
 			tc.execute(uow);
+			fail("Should have thrown CommandNotReadyException to indicate unassigned parental relationships");
+		} catch (CommandNotReadyException cnre) {
+		}
+
+		/*
+		 * Fix the situation by assigining parent Ledgers, as should have
+		 * happened originally.
+		 */
+		Ledger cashLedger = new DebitPositiveLedger("Petty Cash");
+		Ledger blahExpense = new DebitPositiveLedger("Blah Expense");
+		Ledger gstPayable = new CreditPositiveLedger("GST Payable");
+
+		price.setParentLedger(cashLedger);
+		gst.setParentLedger(gstPayable);
+		expense.setParentLedger(blahExpense);
+
+		try {
+			tc.execute(uow);
 		} catch (CommandNotReadyException cnre) {
 			fail("Threw " + cnre);
 		}
+
 		uow.commit();
 	}
 
@@ -136,13 +158,14 @@ public class PostTransactionCommandTest extends TestCase
 	}
 
 	public final void testDatestampSettingByPostTransactionCommand() {
+		Ledger someLedger = new DebitPositiveLedger("Blah");
 		/*
 		 * Set up two Entries with differing dates
 		 */
-		Debit gauche = new Debit(new Amount("9.95"));
+		Debit gauche = new Debit(new Amount("9.95"), someLedger);
 		gauche.setDate(new Datestamp("1 Jul 95"));
 
-		Credit droit = new Credit(new Amount("9.95"));
+		Credit droit = new Credit(new Amount("9.95"), someLedger);
 		droit.setDate(new Datestamp("15 Oct 03"));
 
 		/*

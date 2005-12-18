@@ -13,8 +13,8 @@ package accounts.domain;
  */
 public class Debit extends Entry
 {
+	// public static final String COLOR = "midnightblue";
 	public static final String	COLOR	= "steel blue";
-//	public static final String	COLOR	= "midnightblue";
 
 	public Debit() {
 		super();
@@ -22,8 +22,8 @@ public class Debit extends Entry
 		 * an actual null Entry...
 		 */
 	}
-	
-	public Debit(Amount amount) {
-		super(amount);
+
+	public Debit(Amount value, Ledger parent) {
+		super(value, parent);
 	}
 }

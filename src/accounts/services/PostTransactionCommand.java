@@ -6,8 +6,12 @@
  */
 package accounts.services;
 
+import generic.util.DebugException;
+
+import java.util.Iterator;
 import java.util.Set;
 
+import accounts.domain.Entry;
 import accounts.domain.Transaction;
 import accounts.persistence.UnitOfWork;
 
@@ -35,8 +39,23 @@ public class PostTransactionCommand extends Command
 	}
 
 	protected void action(UnitOfWork uow) throws CommandNotReadyException {
-		if (trans.getEntries() == null) {
+		Set entries = trans.getEntries();
+		if (entries == null) {
 			throw new CommandNotReadyException("Transaction passed has no Entries!");
+		}
+
+		Iterator iter = entries.iterator();
+		while (iter.hasNext()) {
+			Entry e = (Entry) iter.next();
+			if (e == null) {
+				throw new DebugException("How the heck did a null Entry end up in the Transaction?");
+			}
+			if (e.getParentLedger() == null) {
+				throw new CommandNotReadyException("Entry " + e.toString() + " parent Ledger not set!");
+			}
+			if (e.getParentTransaction() == null) {
+				throw new CommandNotReadyException("Entry " + e.toString() + " parent Transaction not set!");
+			}
 		}
 
 		if (!trans.isBalanced()) {
@@ -51,7 +70,7 @@ public class PostTransactionCommand extends Command
 		/*
 		 * Persist the Entries of the Transaction, then trans itself.
 		 */
-		Set entries = trans.getEntries();
+
 		// FIXME also the subordinate elements?
 		uow.registerDirty(entries);
 		uow.registerDirty(trans);

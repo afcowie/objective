@@ -29,8 +29,8 @@ public class BasicTransactionTest extends TestCase
 		/*
 		 * Also verifies Credit and Debit super calls are being made.
 		 */
-		Debit one = new Debit(new Amount("10.00"));
-		Credit two = new Credit(new Amount("10.00"));
+		Debit one = new Debit(new Amount("10.00"), null);
+		Credit two = new Credit(new Amount("10.00"), null);
 
 		t.addEntry(one);
 		t.addEntry(two);
@@ -47,9 +47,9 @@ public class BasicTransactionTest extends TestCase
 		/*
 		 * Continue verfication, this time lopsided.
 		 */
-		Credit three = new Credit(new Amount("0.10"));
-		Debit four = new Debit(new Amount("0.03"));
-		Debit five = new Debit(new Amount("0.07"));
+		Credit three = new Credit(new Amount("0.10"), null);
+		Debit four = new Debit(new Amount("0.03"), null);
+		Debit five = new Debit(new Amount("0.07"), null);
 
 		t.addEntry(three);
 		assertFalse(t.isBalanced());
@@ -107,13 +107,14 @@ public class BasicTransactionTest extends TestCase
 		 * {Debit|Credit}'s Amount constructor, will have today's Datestamp.
 		 */
 
-		Debit gauche = new Debit(new Amount("9.95"));
-		Credit droit = new Credit(new Amount("9.95"));
-		assertNotNull(gauche.getDate());
-		assertNotNull(droit.getDate());
+		Debit gauche = new Debit(new Amount("9.95"), null);
+		Credit droit = new Credit(new Amount("9.95"), null);
+		assertNull(gauche.getDate());
+		assertNull(droit.getDate());
 
 		Datestamp today = new Datestamp();
 		today.setAsToday();
+		gauche.setDate(today);
 
 		Datestamp theOtherDay = new Datestamp("14 Oct 03");
 		droit.setDate(theOtherDay);

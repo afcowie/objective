@@ -27,8 +27,12 @@ public class GenericTransaction extends Transaction
 	public GenericTransaction() {
 		super();
 	}
-	
+
 	public GenericTransaction(String description, Set entries) {
-		super(description,entries);
+		super(description, entries);
+	}
+
+	public GenericTransaction(String description, Entry[] entries) {
+		super(description, entries);
 	}
 }
