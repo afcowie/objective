@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import accounts.domain.Entry;
+import accounts.domain.Ledger;
 import accounts.domain.Transaction;
 import accounts.persistence.UnitOfWork;
 
@@ -65,6 +66,18 @@ public class PostTransactionCommand extends Command
 		if (trans.getDate() == null) {
 			throw new CommandNotReadyException(
 					"Transaction doesn't have a date set, which means that the Entries may well have differing dates");
+		}
+
+		/*
+		 * At last, carry out the addition of the [values of the] Entries to the
+		 * [balances of the] Ledgers they bridge to.
+		 */
+
+		iter = entries.iterator();
+		while (iter.hasNext()) {
+			Entry e = (Entry) iter.next();
+			Ledger l = e.getParentLedger();
+			l.addEntry(e);
 		}
 
 		/*

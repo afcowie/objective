@@ -215,4 +215,49 @@ public class PostTransactionCommandTest extends TestCase
 		// no reason to commit to database; we've already tested that.
 		uow.cancel();
 	}
+
+	public final void testAddEntriesToLedgersOnExecute() {
+		Ledger leftLedger = new DebitPositiveLedger("Left side");
+		Ledger rightLedger = new CreditPositiveLedger("Right side");
+
+		/*
+		 * Set up three Entries with accounts (er, ledgers) specified
+		 */
+		Debit one = new Debit(new Amount("1.00"), leftLedger);
+		Debit two = new Debit(new Amount("2.00"), leftLedger);
+		Credit three = new Credit(new Amount("3.00"), rightLedger);
+
+		/*
+		 * Make a Transaction with them, but don't set a date for the
+		 * Transaction, so addEntry can't impose a date.
+		 */
+		Transaction t4 = new Transaction();
+		t4.addEntry(one);
+		t4.addEntry(two);
+		t4.addEntry(three);
+
+		Datestamp today = new Datestamp();
+		today.setAsToday();
+		t4.setDate(today);
+
+		/*
+		 * Now use a PostTransactionCommand to attempt to store the Transaction.
+		 */
+		UnitOfWork uow = new UnitOfWork("testAddEntriesToLedgersOnExecute");
+
+		PostTransactionCommand cmd = new PostTransactionCommand(t4);
+
+		try {
+			cmd.execute(uow);
+		} catch (CommandNotReadyException cnre) {
+			uow.cancel();
+			fail("Should NOT have thrown CommandNotReadyException " + cnre.getMessage());
+		}
+
+		assertEquals("3.00", rightLedger.getBalance().getValue());
+		assertEquals("3.00", leftLedger.getBalance().getValue());
+
+		// no reason to commit to database; we've already tested that.
+		uow.cancel();
+	}
 }
