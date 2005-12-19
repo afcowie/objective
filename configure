@@ -300,11 +300,11 @@ foreach my $arg (@ARGV) {
 		$runtime="$value";
 	} elsif ($key =~ /^compiler/) {
 		$compiler="$value";
-	} elsif ($key =~ /^jdk_home/) {
+	} elsif ($key =~ /^jdk/) {
 		$jdk_home="$value";
-	} elsif ($key =~ /^gcj_home/) {
+	} elsif ($key =~ /^gcj/) {
 		$gcj_home="$value";
-	} elsif ($key =~ /^java-gnome_home/) {
+	} elsif ($key =~ /^java-gnome/) {
 		$javagnome_home="$value";
 	}
 }
