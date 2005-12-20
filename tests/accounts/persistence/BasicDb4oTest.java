@@ -77,24 +77,3 @@ public class BasicDb4oTest extends TestCase
 		container.close();
 	}
 }
-
-class DummyInts
-{
-	int	_num;
-
-	DummyInts(int i) {
-		this._num = i;
-	}
-
-	int getNum() {
-		return _num;
-	}
-
-	void setNum(int num) {
-		this._num = num;
-	}
-
-	public String toString() {
-		return Integer.toString(_num);
-	}
-}

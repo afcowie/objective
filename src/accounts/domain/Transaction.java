@@ -55,14 +55,17 @@ public class Transaction
 	/**
 	 * Create a new transaction prototype, setting the description field and
 	 * providing an initial set of entries. This contstructor is largely
-	 * intended for test cases.
+	 * intended for test cases and mockups.
 	 * 
 	 * @param description
+	 * @param date
+	 *            the Datestamp to assign to the Entries of this Transaction.
 	 * @param entries
 	 *            an array of Entry objects
 	 */
-	public Transaction(String description, Entry[] entries) {
+	public Transaction(String description, Datestamp date, Entry[] entries) {
 		setDescription(description);
+		setDate(date);
 		setEntries(entries);
 	}
 

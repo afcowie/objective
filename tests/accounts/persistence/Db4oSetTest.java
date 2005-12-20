@@ -62,7 +62,7 @@ public class Db4oSetTest extends TestCase
 		Db4oSet blah = new Db4oSet(container);
 		assertNotNull(blah);
 
-		DummyInt one = new DummyInt(1);
+		DummyInts one = new DummyInts(1);
 		container.set(one);
 		container.commit();
 
@@ -78,7 +78,7 @@ public class Db4oSetTest extends TestCase
 		/*
 		 * Add a second object
 		 */
-		DummyInt two = new DummyInt(2);
+		DummyInts two = new DummyInts(2);
 		container.set(two);
 		container.commit();
 
@@ -99,8 +99,8 @@ public class Db4oSetTest extends TestCase
 
 		Db4oSet blah = new Db4oSet(container);
 
-		DummyInt three = new DummyInt(3);
-		DummyInt four = new DummyInt(4);
+		DummyInts three = new DummyInts(3);
+		DummyInts four = new DummyInts(4);
 
 		blah.add(three);
 		blah.add(four);
@@ -108,7 +108,7 @@ public class Db4oSetTest extends TestCase
 		blah.remove(three);
 		assertEquals(1, blah.size());
 		Iterator iter = blah.iterator();
-		DummyInt check = (DummyInt) iter.next();
+		DummyInts check = (DummyInts) iter.next();
 		assertTrue(check == four);
 
 		blah.remove(four);
@@ -118,13 +118,13 @@ public class Db4oSetTest extends TestCase
 		 * Whoa, cool. three and four above are still, actually in the database,
 		 * since cascade delete isn't on...
 		 */
-		ObjectSet results = container.get(DummyInt.class);
+		ObjectSet results = container.get(DummyInts.class);
 		assertEquals(4, results.size());
 
 		container.delete(three);
 		container.delete(four);
 
-		ObjectSet results2 = container.get(DummyInt.class);
+		ObjectSet results2 = container.get(DummyInts.class);
 		assertEquals(2, results2.size());
 
 		container.close();
@@ -135,7 +135,7 @@ public class Db4oSetTest extends TestCase
 	 */
 	public final void testVerifyStoredObjects() {
 		ObjectContainer container = Db4o.openFile(TMPDBFILE);
-		ObjectSet results = container.get(DummyInt.class);
+		ObjectSet results = container.get(DummyInts.class);
 
 		/*
 		 * Whoa, cool. one and two above are still in there, since cascade
@@ -146,7 +146,7 @@ public class Db4oSetTest extends TestCase
 		boolean one = false;
 		boolean two = false;
 		while (results.hasNext()) {
-			DummyInt i = (DummyInt) results.next();
+			DummyInts i = (DummyInts) results.next();
 			if (i.getNum() == 1) {
 				one = true;
 			}
@@ -224,23 +224,6 @@ public class Db4oSetTest extends TestCase
 				(javaPresent && classPresent));
 
 		container.close();
-	}
-}
-
-class DummyInt
-{
-	int	_num;
-
-	DummyInt(int i) {
-		this._num = i;
-	}
-
-	int getNum() {
-		return _num;
-	}
-
-	public String toString() {
-		return Integer.toString(_num);
 	}
 }
 

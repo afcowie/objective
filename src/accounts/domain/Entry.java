@@ -145,7 +145,7 @@ public class Entry
 	 * Print a formatted text version of this Entry on a single line. As entries
 	 * have a two-way relation between Ledgers and Transactions, it either
 	 * displays the parent transaction, or the parent account, depending on the
-	 * FIXME parameter.
+	 * showTransaction parameter.
 	 * 
 	 * @param out
 	 *            OutputWriter you want to print to (presumably passed in a
@@ -181,10 +181,11 @@ public class Entry
 		}
 		if (date == null) {
 			dateText = "No date  ";
+		} else {
+			dateText = date.toString();
 		}
 
-		out.print(dateText.toString());
-
+		out.print(dateText);
 		out.print(pad(idText, MAXIDLEN, true));
 		out.print(pad(descText, MAXDESCLEN, false));
 		/*

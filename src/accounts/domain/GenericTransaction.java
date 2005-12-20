@@ -32,7 +32,10 @@ public class GenericTransaction extends Transaction
 		super(description, entries);
 	}
 
-	public GenericTransaction(String description, Entry[] entries) {
-		super(description, entries);
+	/**
+	 * Somewhat artificial constructor useful for mockups and unit tests
+	 */
+	public GenericTransaction(String description, Datestamp date, Entry[] entries) {
+		super(description, date, entries);
 	}
 }

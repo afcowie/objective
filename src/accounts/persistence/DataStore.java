@@ -10,6 +10,8 @@ import generic.util.DebugException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -224,5 +226,24 @@ public class DataStore
 			throw new UnsupportedOperationException(
 					"You aren't supposed to call setBooks unless initializing a DataStore via InitBooksCommand");
 		}
+	}
+
+	public List query(Object example) {
+		ObjectSet os = container.get(example);
+		final int len = os.size();
+		ArrayList result;
+
+		if (len == 0) {
+			result = new ArrayList(0);
+		} else {
+			result = new ArrayList(len);
+
+			for (int i = 0; i < len; i++) {
+				// automatic activation. Cool.
+				result.add(os.next());
+			}
+		}
+
+		return result;
 	}
 }
