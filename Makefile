@@ -214,6 +214,9 @@ build/demo-setup: tests/accounts/client/OprDynBooksSetup.java
 	@echo "$(JAVA_CMD) OprDynBooksSetup $(DEBUG)"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
 	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.client.OprDynBooksSetup $(DEBUG)
+	@echo "$(JAVA_CMD) OprDynMockTransactions $(DEBUG)"
+	LD_LIBRARY_PATH=$(JNI_PATH) \
+	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.client.OprDynMockTransactions $(DEBUG)
 	touch $@
 
 dump: build/classes-tests build/demo-setup
