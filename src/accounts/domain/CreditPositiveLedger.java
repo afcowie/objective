@@ -29,9 +29,9 @@ public class CreditPositiveLedger extends Ledger
 	 */
 	protected void addToBalance(Entry entry) {
 		if (entry instanceof Credit) {
-			_balance.incrementBy(entry.getAmount());
+			balance.incrementBy(entry.getAmount());
 		} else {
-			_balance.decrementBy(entry.getAmount());
+			balance.decrementBy(entry.getAmount());
 		}
 	}
 

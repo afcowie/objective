@@ -22,14 +22,14 @@ public class Account
 	/*
 	 * Instance variables ---------------------------------
 	 */
-	protected String			_title		= null;
-	protected String			_code		= null;
-	private Set					_ledgers	= null;
+	protected String			title	= null;
+	protected String			code	= null;
+	private Set					ledgers	= null;
 
 	/*
 	 * Cached values --------------------------------------
 	 */
-	private transient Amount	_balance	= null;
+	private transient Amount	balance	= null;
 
 	/*
 	 * Constructors ---------------------------------------
@@ -64,16 +64,16 @@ public class Account
 		/*
 		 * setup
 		 */
-		if (_ledgers == null) {
-			_ledgers = new LinkedHashSet();
+		if (ledgers == null) {
+			ledgers = new LinkedHashSet();
 		}
 		/*
 		 * action
 		 */
-		_ledgers.add(ledger);
+		ledgers.add(ledger);
 
-		if (_balance == null) {
-			_balance = (Amount) ledger.getBalance().clone();
+		if (balance == null) {
+			balance = (Amount) ledger.getBalance().clone();
 		} else {
 			addToBalance(ledger);
 		}
@@ -85,12 +85,12 @@ public class Account
 	 * 
 	 */
 	protected void calculateBalance() {
-		_balance = new Amount("0");
-		if (_ledgers == null) {
+		balance = new Amount("0");
+		if (ledgers == null) {
 			return;
 		}
 
-		Iterator iter = _ledgers.iterator();
+		Iterator iter = ledgers.iterator();
 		while (iter.hasNext()) {
 			Ledger ledger = (Ledger) iter.next();
 			addToBalance(ledger);
@@ -107,15 +107,15 @@ public class Account
 		}
 		if (this instanceof DebitPositiveAccount) {
 			if (ledger instanceof DebitPositiveLedger) {
-				_balance.incrementBy(ledger.getBalance());
+				balance.incrementBy(ledger.getBalance());
 			} else {
-				_balance.decrementBy(ledger.getBalance());
+				balance.decrementBy(ledger.getBalance());
 			}
 		} else if (this instanceof CreditPositiveAccount) {
 			if (ledger instanceof CreditPositiveLedger) {
-				_balance.incrementBy(ledger.getBalance());
+				balance.incrementBy(ledger.getBalance());
 			} else {
-				_balance.decrementBy(ledger.getBalance());
+				balance.decrementBy(ledger.getBalance());
 			}
 		} else {
 			throw new IllegalStateException(
@@ -139,33 +139,37 @@ public class Account
 	 * @return the Set of Ledger objects that comprise this Account.
 	 */
 	public Set getLedgers() {
-		return _ledgers;
+		return ledgers;
 	}
 
 	/**
-	 * Replace the Set of Ledger objects attached to this Account.
+	 * Replace the Set of Ledger objects attached to this Account. Recalculates
+	 * the internal balance. This may be unnecessary as the only real usage of
+	 * this is to replace an internal ledgers Set representation with some other
+	 * implementation of Set which would be based on the same Ledger objects,
+	 * but as ever don't trust the data...
 	 */
 	public void setLeders(Set ledgers) {
-		_ledgers = ledgers;
+		this.ledgers = ledgers;
 		calculateBalance();
 	}
 
 	public Amount getBalance() {
-		return _balance;
+		return balance;
 	}
 
 	/**
 	 * Get the title (name) of the account.
 	 */
 	public String getTitle() {
-		return _title;
+		return title;
 	}
 
 	/**
 	 * Set the title (name) of the account.
 	 */
 	public void setTitle(String title) {
-		_title = title;
+		this.title = title;
 	}
 
 	/**
@@ -174,7 +178,7 @@ public class Account
 	 * @return the account code, as a String.
 	 */
 	public String getCode() {
-		return _code;
+		return code;
 	}
 
 	/**
@@ -193,7 +197,7 @@ public class Account
 		if (code.length() != 6) {
 			throw new IllegalArgumentException("account code needs to be 6 characters long, in the form 'x-yyyy'");
 		}
-		this._code = code;
+		this.code = code;
 	}
 
 	/*
@@ -208,21 +212,21 @@ public class Account
 	 */
 	public void toOutput(PrintWriter out) {
 		out.println();
-		out.print("Account: " + _title);
-		if (_code != null) {
-			out.print(" [" + _code + "]");
+		out.print("Account: " + title);
+		if (code != null) {
+			out.print(" [" + code + "]");
 		}
 		out.println();
 
-		if (_ledgers == null) {
+		if (ledgers == null) {
 			out.println("<no ledgers>");
 			return;
 		}
-		Iterator iter = _ledgers.iterator();
+		Iterator iter = ledgers.iterator();
 		while (iter.hasNext()) {
 			Ledger ledger = (Ledger) iter.next();
 
-			if ((_ledgers.size() == 1) && (ledger.getName() == null)) {
+			if ((ledgers.size() == 1) && (ledger.getName() == null)) {
 				out.println("Ledger: (un-named)");
 			} else {
 				out.println("Ledger: " + ledger.getName());
@@ -234,7 +238,7 @@ public class Account
 	public String getClassString() {
 		return "Account";
 	}
-	
+
 	/**
 	 * Yes, colour is spelled with a u... but in GTK it's spelled color. Fine.
 	 */

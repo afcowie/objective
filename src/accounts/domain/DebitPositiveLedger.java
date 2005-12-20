@@ -28,9 +28,9 @@ public class DebitPositiveLedger extends Ledger
 	 */
 	protected void addToBalance(Entry entry) {
 		if (entry instanceof Debit) {
-			_balance.incrementBy(entry.getAmount());
+			balance.incrementBy(entry.getAmount());
 		} else {
-			_balance.decrementBy(entry.getAmount());
+			balance.decrementBy(entry.getAmount());
 		}
 	}
 

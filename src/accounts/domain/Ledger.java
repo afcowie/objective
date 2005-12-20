@@ -21,13 +21,13 @@ public class Ledger
 	/*
 	 * Instance variables ---------------------------------
 	 */
-	private String				_name		= null;
-	private Set					_entries	= null;
+	private String				name	= null;
+	private Set					entries	= null;
 
 	/*
 	 * Cached values --------------------------------------
 	 */
-	protected transient Amount	_balance	= null;
+	protected transient Amount	balance	= null;
 
 	/*
 	 * Constructors ---------------------------------------
@@ -67,16 +67,16 @@ public class Ledger
 		/*
 		 * setup
 		 */
-		if (_entries == null) {
-			_entries = new LinkedHashSet();
+		if (entries == null) {
+			this.entries = new LinkedHashSet();
 		}
-		if (_balance == null) {
+		if (balance == null) {
 			calculateBalance();
 		}
 		/*
 		 * add
 		 */
-		_entries.add(entry);
+		entries.add(entry);
 		addToBalance(entry);
 	}
 
@@ -86,12 +86,12 @@ public class Ledger
 	 * currently set.
 	 */
 	protected void calculateBalance() {
-		_balance = new Amount("0");
-		if (_entries == null) {
+		balance = new Amount("0");
+		if (entries == null) {
 			return;
 		}
 
-		Iterator iter = _entries.iterator();
+		Iterator iter = entries.iterator();
 		while (iter.hasNext()) {
 			Entry entry = (Entry) iter.next();
 			addToBalance(entry);
@@ -121,11 +121,11 @@ public class Ledger
 	 * certainly not on object instantiation.
 	 */
 	public Amount getBalance() {
-		if (_balance == null) {
+		if (balance == null) {
 			calculateBalance();
 		}
 
-		return _balance;
+		return balance;
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class Ledger
 	 *         important for persistence).
 	 */
 	public Set getEntries() {
-		return _entries;
+		return entries;
 	}
 
 	/**
@@ -144,14 +144,14 @@ public class Ledger
 	 * @return a String with the name of the Ledger.
 	 */
 	public String getName() {
-		return _name;
+		return name;
 	}
 
 	/**
 	 * Set the name of this Ledger.
 	 */
 	public void setName(String name) {
-		_name = name;
+		this.name = name;
 	}
 
 	/*
@@ -159,10 +159,10 @@ public class Ledger
 	 */
 
 	public void toOutput(PrintWriter out) {
-		if ((_entries == null) || (_entries.size() == 0)) {
+		if ((entries == null) || (entries.size() == 0)) {
 			out.println("<no entries>");
 		} else {
-			Iterator iter = _entries.iterator();
+			Iterator iter = entries.iterator();
 			while (iter.hasNext()) {
 				Entry entry = (Entry) iter.next();
 				entry.toOutput(out, true);
