@@ -8,15 +8,14 @@ package accounts.persistence;
 
 import java.io.File;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Set;
+
+import junit.framework.TestCase;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.config.Configuration;
-
-import junit.framework.TestCase;
 
 /**
  * Unit tests of our custom Db4oSet implementation.
@@ -96,38 +95,44 @@ public class Db4oSetTest extends TestCase
 
 	public final void testRemoveObject() {
 		ObjectContainer container = Db4o.openFile(TMPDBFILE);
+		try {
+			Db4oSet anotherBlah = new Db4oSet(container);
 
-		Db4oSet blah = new Db4oSet(container);
+			DummyInts three = new DummyInts(3);
+			DummyInts four = new DummyInts(4);
 
-		DummyInts three = new DummyInts(3);
-		DummyInts four = new DummyInts(4);
+			anotherBlah.add(three);
+			anotherBlah.add(four);
+			container.set(anotherBlah);
 
-		blah.add(three);
-		blah.add(four);
+			anotherBlah.remove(three);
+			assertEquals(1, anotherBlah.size());
+			Iterator iter = anotherBlah.iterator();
+			DummyInts check = (DummyInts) iter.next();
+			assertTrue(check == four);
 
-		blah.remove(three);
-		assertEquals(1, blah.size());
-		Iterator iter = blah.iterator();
-		DummyInts check = (DummyInts) iter.next();
-		assertTrue(check == four);
+			anotherBlah.remove(four);
+			assertEquals(0, anotherBlah.size());
+			container.commit();
+			/*
+			 * If this is backed by a (db4o database aware identityHashMap,
+			 * then: three and four above are actually in the database already
+			 * without the commit. But if it's a normal (db4o database aware)
+			 * HashMap, then it doesn't add them above without the set() call.
+			 * VERY strange.
+			 */
+			ObjectSet results = container.get(DummyInts.class);
+			assertEquals(4, results.size());
 
-		blah.remove(four);
-		assertEquals(0, blah.size());
-		container.commit();
-		/*
-		 * Whoa, cool. three and four above are still, actually in the database,
-		 * since cascade delete isn't on...
-		 */
-		ObjectSet results = container.get(DummyInts.class);
-		assertEquals(4, results.size());
+			container.delete(three);
+			container.delete(four);
 
-		container.delete(three);
-		container.delete(four);
+			ObjectSet results2 = container.get(DummyInts.class);
+			assertEquals(2, results2.size());
 
-		ObjectSet results2 = container.get(DummyInts.class);
-		assertEquals(2, results2.size());
-
-		container.close();
+		} finally {
+			container.close();
+		}
 	}
 
 	/*
@@ -167,8 +172,7 @@ public class Db4oSetTest extends TestCase
 
 		DummyObject obj = new DummyObject();
 
-		obj._set = new Db4oSet(container); // NOW FIXME (1)!!!
-		obj._set = new LinkedHashSet();
+		obj._set = new Db4oSet(container);
 
 		File f1 = new File("hello.java");
 		File f2 = new File("hello.class");
