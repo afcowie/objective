@@ -19,7 +19,6 @@ public class AllPersistenceTests
 
 		suite.addTestSuite(BasicDb4oTest.class);
 		suite.addTestSuite(RollbackDb4oTest.class);
-		suite.addTestSuite(Db4oSetTest.class);
 		suite.addTestSuite(UnitOfWorkTest.class);
 
 		return suite;

@@ -6,6 +6,7 @@
  */
 package accounts.services;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import accounts.client.ObjectiveAccounts;
@@ -47,7 +48,8 @@ public class InitBooksCommand extends Command
 		DataStore store = ObjectiveAccounts.store;
 		store.setBooks(root);
 
-		Set accounts = store.newSet();
+//		Set accounts = store.newSet();
+		Set accounts = new LinkedHashSet();
 		root.setAccountsSet(accounts);
 
 		/*
@@ -55,7 +57,8 @@ public class InitBooksCommand extends Command
 		 * for this Books, and add it as the first currency in the Books's
 		 * Currencies Set
 		 */
-		Set currencies = store.newSet();
+		// Set currencies = store.newSet();
+		Set currencies = new LinkedHashSet();
 		root.setCurrencySet(currencies);
 
 		root.setHomeCurrency(home);

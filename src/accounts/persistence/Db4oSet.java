@@ -22,6 +22,7 @@ import com.db4o.types.Db4oMap;
  * elements are stored in the key part of the map.
  * 
  * @author Andrew Cowie
+ * @deprecated
  */
 public class Db4oSet extends AbstractSet
 {
@@ -51,7 +52,8 @@ public class Db4oSet extends AbstractSet
 	 *            An open ObjectContainer pointing to a Db4o database.
 	 */
 	Db4oSet(ObjectContainer container) {
-		_map = container.ext().collections().newIdentityHashMap(0);
+//		_map = container.ext().collections().newIdentityHashMap(0);
+		_map = container.ext().collections().newHashMap(0);
 	}
 
 	/**

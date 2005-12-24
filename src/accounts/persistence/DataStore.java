@@ -48,6 +48,8 @@ public class DataStore
 	 */
 	static {
 		Configuration config = Db4o.configure();
+		// config.messageLevel(3);
+		// config.singleThreadedClient(true);
 
 		/*
 		 * This is so stupid - why on earth <I>wouldn't<I> you blow an
@@ -95,13 +97,16 @@ public class DataStore
 	 * underlying persistence store.
 	 * 
 	 * @return An empty Set. Actually returns a {@link Db4oSet}.
+	 * @deprecated
 	 */
 	public Set newSet() {
 		if (container == null) {
-			throw new DebugException("You managed ask for a new Linked List without having the container initialized.");
+			throw new DebugException("You managed ask for a new Db4oSet without having the container initialized.");
 		}
 		// was container.ext().collections().newLinkedList();
-		return new Db4oSet(container);
+		// return new Db4oSet(container);
+
+		throw new DebugException("DataStore.newSet() deprecated");
 	}
 
 	/**

@@ -148,8 +148,9 @@ public class Account
 	 * this is to replace an internal ledgers Set representation with some other
 	 * implementation of Set which would be based on the same Ledger objects,
 	 * but as ever don't trust the data...
+	 * @deprecated
 	 */
-	public void setLeders(Set ledgers) {
+	public void setLedgers(Set ledgers) {
 		this.ledgers = ledgers;
 		calculateBalance();
 	}

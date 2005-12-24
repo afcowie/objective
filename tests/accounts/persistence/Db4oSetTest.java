@@ -21,6 +21,7 @@ import com.db4o.config.Configuration;
  * Unit tests of our custom Db4oSet implementation.
  * 
  * @author Andrew Cowie
+ * @deprecated
  */
 public class Db4oSetTest extends TestCase
 {
