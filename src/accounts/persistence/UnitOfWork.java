@@ -36,8 +36,8 @@ import accounts.client.ObjectiveAccounts;
  * DataStore directly and use its save() method directly, but you will loose the
  * notification aspect.
  * <p>
- * This functionality could have been implement using the callbacks provided by
- * db4o, but that is bottom up and requies implementation in each and every
+ * This functionality could have been implemented using the callbacks provided
+ * by db4o, but that is bottom up and requies implementation in each and every
  * domain class. This way, it can cross user interactions and cross multiple
  * simultaneous workers.
  * 
