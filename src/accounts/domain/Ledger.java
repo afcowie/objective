@@ -10,6 +10,9 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
+
+import accounts.services.EntryComparator;
 
 /**
  * Base class for the ledgers within actual accounts.
@@ -188,13 +191,16 @@ public class Ledger
 
 	public void toOutput(PrintWriter out) {
 		if ((entries == null) || (entries.size() == 0)) {
-			out.println("<no entries>");
-		} else {
-			Iterator iter = entries.iterator();
-			while (iter.hasNext()) {
-				Entry entry = (Entry) iter.next();
-				entry.toOutput(out, true);
-			}
+			return;
+		}
+
+		Set sorted = new TreeSet(new EntryComparator());
+		sorted.addAll(entries);
+
+		Iterator iter = sorted.iterator();
+		while (iter.hasNext()) {
+			Entry entry = (Entry) iter.next();
+			entry.toOutput(out, true);
 		}
 	}
 

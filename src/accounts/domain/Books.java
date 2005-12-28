@@ -9,6 +9,9 @@ package accounts.domain;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
+
+import accounts.services.AccountComparator;
 
 /**
  * Root object of a set of accounts.
@@ -58,7 +61,7 @@ public class Books
 	/**
 	 * The home currency that the set of books is denomenated in.
 	 */
-	protected Currency			_homeCurrency = null;
+	protected Currency			_homeCurrency		= null;
 
 	/**
 	 * @return Returns the entire Accounts Set.
@@ -151,7 +154,10 @@ public class Books
 	public void toOutput(PrintWriter out) {
 		out.println("Root:");
 
-		Iterator iter = _accounts.iterator();
+		Set sorted = new TreeSet(new AccountComparator());
+		sorted.addAll(_accounts);
+
+		Iterator iter = sorted.iterator();
 		while (iter.hasNext()) {
 			Account acct = (Account) iter.next();
 

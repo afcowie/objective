@@ -214,11 +214,11 @@ public class Account
 	 */
 	public void toOutput(PrintWriter out) {
 		out.println();
-		out.print("Account: " + title);
+		out.print("Account: \"" + title + "\"");
 		if (code != null) {
 			out.print(" [" + code + "]");
 		}
-		out.println();
+		out.println(" (" + getClassString() + ")");
 
 		if (ledgers == null) {
 			out.println("<no ledgers>");
@@ -229,10 +229,12 @@ public class Account
 			Ledger ledger = (Ledger) iter.next();
 
 			if ((ledgers.size() == 1) && (ledger.getName() == null)) {
-				out.println("Ledger: (un-named)");
+				out.print("Ledger:  (un-named)");
 			} else {
-				out.println("Ledger: " + ledger.getName());
+				out.print("Ledger:  \"" + ledger.getName() + "\"");
 			}
+			out.println(" (" + ledger.getClassString() + ")");
+
 			ledger.toOutput(out);
 		}
 	}

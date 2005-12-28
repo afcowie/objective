@@ -160,7 +160,7 @@ public class Entry
 		String descText = null;
 		String dateText = null;
 		// final int MAXDATELEN = 10;
-		final int MAXIDLEN = 10;
+		final int MAXIDLEN = 9;
 		final int MAXDESCLEN = 30;
 		final int MAXAMOUNTLEN = 15;
 
@@ -177,7 +177,7 @@ public class Entry
 			idText = "";
 		}
 		if (descText == null) {
-			descText = "";
+			descText = "<null>";
 		}
 		if (date == null) {
 			dateText = "No date  ";
@@ -187,6 +187,7 @@ public class Entry
 
 		out.print(dateText);
 		out.print(pad(idText, MAXIDLEN, true));
+		out.print(" ");
 		out.print(pad(descText, MAXDESCLEN, false));
 		/*
 		 * Debit
