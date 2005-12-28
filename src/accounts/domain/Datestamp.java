@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import accounts.persistence.NotActivatedException;
+
 /**
  * The date of a transaction. An object is used both to wrap representation, and
  * to allow changing in Transaction to not have to map through Account to adjust
@@ -26,12 +28,12 @@ public class Datestamp
 	 * We use -1 for uninitialized, to guard against lacking activation, and to
 	 * prevent the ubiquitous 1 Jan 1970 stupidiy.
 	 */
-	private static long	UNSET		= -1;
+	private static final long	UNSET		= -1;
 
 	/*
 	 * Instance variables ---------------------------------
 	 */
-	private long		_timestamp	= UNSET;
+	private long				timestamp	= UNSET;
 
 	/**
 	 * Construct a new Datestamp. Leaves it "unset"
@@ -60,7 +62,7 @@ public class Datestamp
 
 	public Object clone() {
 		Datestamp twin = new Datestamp();
-		twin._timestamp = this._timestamp;
+		twin.timestamp = this.timestamp;
 		return twin;
 	}
 
@@ -76,19 +78,25 @@ public class Datestamp
 	}
 
 	public boolean isSet() {
-		return (!(_timestamp == UNSET));
+		return (!(timestamp == UNSET));
 	}
 
 	/**
 	 * Outputs Datestamp in dd MMM yy (%e %b %y) form.
 	 */
 	public String toString() {
+		if (timestamp == 0) {
+			throw new NotActivatedException();
+		}
+		if (timestamp == UNSET) {
+			return "  UNSET  ";
+		}
 		SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy");
-		return sdf.format(new Date(_timestamp));
+		return sdf.format(new Date(timestamp));
 	}
 
 	public void setDate(Calendar cal) {
-		_timestamp = cal.getTimeInMillis();
+		this.timestamp = cal.getTimeInMillis();
 	}
 
 	/**
@@ -145,10 +153,10 @@ public class Datestamp
 			 * be thrown.
 			 */
 
-			if (_timestamp == UNSET) {
+			if (timestamp == UNSET) {
 				cal.setTime(new Date());
 			} else {
-				cal.setTime(new Date(_timestamp)); // use this Datestamp's year
+				cal.setTime(new Date(timestamp)); // use this Datestamp's year
 			}
 
 			String assumedYear = Integer.toString(cal.get(java.util.Calendar.YEAR));
@@ -176,14 +184,24 @@ public class Datestamp
 			// rethrow, having avoided fallback ladder.
 			throw new ParseException(iae.getMessage(), 0);
 		}
-		_timestamp = d.getTime();
+		this.timestamp = d.getTime();
 	}
 
 	public Date getDate() {
-		return new Date(_timestamp);
+		return new Date(timestamp);
 	}
 
-	/* package */long getInternalTimestamp() {
-		return _timestamp;
+	/**
+	 * Get the internal timestamp which backs this Datestamp object. Exposed
+	 * only so things like sorting can be done more effectively.
+	 * 
+	 * @return a long value. Note that this class only works to day precision -
+	 *         hours and seconds are (supposed to be) zero.
+	 */
+	public long getInternalTimestamp() {
+		if (timestamp == 0) {
+			throw new NotActivatedException();
+		}
+		return timestamp;
 	}
 }
