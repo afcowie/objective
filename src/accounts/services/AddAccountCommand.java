@@ -43,14 +43,11 @@ public class AddAccountCommand extends Command
 			throw new IllegalStateException("How did you add an account that's already in the system?");
 		}
 
-		Set r = account.getLedgers();
-		if (r != null) {
-			uow.registerDirty(r);
-		}
 		/*
-		 * Store the new account itself, and update the collection
+		 * Store the collection. Rely on cascading update depth to add the new
+		 * account object along the way.
 		 */
-		uow.registerDirty(account);
+
 		uow.registerDirty(accounts);
 	}
 

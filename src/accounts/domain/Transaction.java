@@ -133,13 +133,12 @@ public class Transaction
 
 	/**
 	 * Replace the internal list of entries. This is used by the persistence
-	 * layer to replace an internal java.util.Set with a database backed
-	 * Db4oSet. The presumption is that the caller has used getEntries() to
-	 * fetch the Set, and re-instantiated it, and is passing it back in.
-	 * Nevertheless, validation is done here care of iterating over the Set and
-	 * calling addEntry()
-	 * 
-	 * @param entries
+	 * layer to replace an internal java.util.Set with something else. The
+	 * presumption is that the caller has used getEntries() to fetch the Set,
+	 * and re-instantiated it, and is passing it back in. Nevertheless,
+	 * validation is done here care of iterating over the Set and calling
+	 * addEntry()
+	 * @deprecated
 	 */
 	public void setEntries(Set entries) {
 		/*

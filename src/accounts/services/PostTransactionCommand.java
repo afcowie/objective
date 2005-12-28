@@ -81,11 +81,9 @@ public class PostTransactionCommand extends Command
 		}
 
 		/*
-		 * Persist the Entries of the Transaction, then trans itself.
+		 * Persist the Transaction.
 		 */
 
-		// FIXME also the subordinate elements?
-		uow.registerDirty(entries);
 		uow.registerDirty(trans);
 	}
 

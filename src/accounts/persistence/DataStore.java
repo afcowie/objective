@@ -6,15 +6,14 @@
  */
 package accounts.persistence;
 
-import generic.util.DebugException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
+import accounts.domain.Amount;
 import accounts.domain.Books;
 import accounts.domain.Datestamp;
 import accounts.domain.Ledger;
@@ -53,9 +52,10 @@ public class DataStore
 		Configuration config = Db4o.configure();
 		// config.messageLevel(3);
 		// config.singleThreadedClient(true);
+		config.callbacks(false);
 
 		/*
-		 * This is so stupid - why on earth <I>wouldn't<I> you blow an
+		 * This is so stupid - why on earth _wouldn't_ you blow an
 		 * exception if you can't store something?!? So set it to do so.
 		 */
 		config.exceptionsOnNotStorable(true);
@@ -70,16 +70,63 @@ public class DataStore
 		 */
 		config.classActivationDepthConfigurable(true);
 
-		ObjectClass booksObjectClass = config.objectClass(Books.class);
-		booksObjectClass.cascadeOnActivate(true);
-		booksObjectClass.cascadeOnUpdate(true);
+		/*
+		 * The classes for which we want to turn on cascade {update,activate}
+		 * behaviour.
+		 * 
+		 * At the moment, we leave out Account.class, Ledger.class, Entry.class,
+		 * Transaction.class because objects are activated by most resolved
+		 * subtype. (TODO: we need to find out how to change this behaviour so
+		 * we can tune it better)
+		 */
+		Class[] cascadeClasses = {
+			Books.class, LinkedHashSet.class,
+		};
+
+		for (int i = 0; i < cascadeClasses.length; i++) {
+			ObjectClass db4oObjectClass = config.objectClass(cascadeClasses[i]);
+			/*
+			 * By turning cascade on (particularly for the Collection classes
+			 * included in the array above) we create the magic that any time
+			 * one of them is activated it will start a new {update,activate}
+			 * through depth.
+			 */
+			db4oObjectClass.cascadeOnActivate(true);
+			db4oObjectClass.cascadeOnUpdate(true);
+			/*
+			 * Most of these contain a Set of subelements. Make sure it is
+			 * {updated,activated} through it's own internal members (usually 2
+			 * or so deep) to reach the elements themselves.
+			 */
+			db4oObjectClass.minimumActivationDepth(5);
+			db4oObjectClass.updateDepth(5);
+		}
+
+		Class[] leafClasses = {
+			Datestamp.class, Amount.class,
+		};
+
+		for (int i = 0; i < leafClasses.length; i++) {
+			ObjectClass db4oObjectClass = config.objectClass(leafClasses[i]);
+			/*
+			 * These leaf classes only contain primative fields, so stop seeking
+			 * further.
+			 */
+			db4oObjectClass.cascadeOnActivate(false);
+			db4oObjectClass.cascadeOnUpdate(false);
+			db4oObjectClass.minimumActivationDepth(0);
+			db4oObjectClass.updateDepth(0);
+		}
 
 		/*
 		 * Default update depth is zero, so turn on the magic! A setting of 1
-		 * would probably do, so 3 is good Russian style overengineering. Even
-		 * so, this probably needs validation.
+		 * would probably do, but only if we were rigourously set()ing
+		 * subelements and so on. Validating, we find the following value
+		 * necessary. This is probably a fairly significant target for
+		 * performance tuning, but only commit a change to this value after
+		 * extensive testing!
 		 */
-		config.updateDepth(3);
+		config.updateDepth(5);
 	}
 
 	/**
@@ -93,23 +140,6 @@ public class DataStore
 	 */
 	public DataStore(String filename) {
 		container = Db4o.openFile(filename);
-	}
-
-	/**
-	 * Factory method to obtain a new Set, optimized (and tied to) to the
-	 * underlying persistence store.
-	 * 
-	 * @return An empty Set. Actually returns a {@link Db4oSet}.
-	 * @deprecated
-	 */
-	public Set newSet() {
-		if (container == null) {
-			throw new DebugException("You managed ask for a new Db4oSet without having the container initialized.");
-		}
-		// was container.ext().collections().newLinkedList();
-		// return new Db4oSet(container);
-
-		throw new DebugException("DataStore.newSet() deprecated");
 	}
 
 	/**
@@ -153,7 +183,16 @@ public class DataStore
 	 * Hibernate's term for this, so "save" it is.
 	 */
 	public void save(Object obj) {
-		container.set(obj);
+		if (container.ext().isClosed()) {
+			throw new IllegalStateException("You can't save() if the container is closed!");
+		}
+		try {
+			container.set(obj);
+		} catch (Exception e) {
+			System.err.println("FIXME! Uncaught exception when trying to set()");
+			e.printStackTrace();
+			System.err.println("FIXME! Continuing...");
+		}
 	}
 
 	/**

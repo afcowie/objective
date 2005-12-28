@@ -41,14 +41,10 @@ public class InitBooksCommand extends Command
 
 	protected void action(UnitOfWork uow) {
 		Books root = new Books();
-		/*
-		 * We use the built in sets of db4o for greater efficiency and for their
-		 * autoactivation and update features.
-		 */
+
 		DataStore store = ObjectiveAccounts.store;
 		store.setBooks(root);
 
-//		Set accounts = store.newSet();
 		Set accounts = new LinkedHashSet();
 		root.setAccountsSet(accounts);
 
@@ -57,7 +53,7 @@ public class InitBooksCommand extends Command
 		 * for this Books, and add it as the first currency in the Books's
 		 * Currencies Set
 		 */
-		// Set currencies = store.newSet();
+
 		Set currencies = new LinkedHashSet();
 		root.setCurrencySet(currencies);
 
@@ -66,11 +62,10 @@ public class InitBooksCommand extends Command
 		currencies.add(home);
 
 		/*
-		 * Persist.
+		 * Persist. Just the top level Books object; let cascading update depth
+		 * do its thing.
 		 */
-		uow.registerDirty(accounts);
-		uow.registerDirty(currencies);
-		uow.registerDirty(home);
+
 		uow.registerDirty(root);
 	}
 
