@@ -71,6 +71,7 @@ public class Account
 		 * action
 		 */
 		ledgers.add(ledger);
+		ledger.setParentAccount(this);
 
 		if (balance == null) {
 			balance = (Amount) ledger.getBalance().clone();

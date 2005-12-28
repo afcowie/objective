@@ -21,13 +21,15 @@ public class Ledger
 	/*
 	 * Instance variables ---------------------------------
 	 */
-	private String				name	= null;
-	private Set					entries	= null;
+	private String				name			= null;
+	private Set					entries			= null;
+
+	private Account				parentAccount	= null;
 
 	/*
 	 * Cached values --------------------------------------
 	 */
-	protected transient Amount	balance	= null;
+	protected transient Amount	balance			= null;
 
 	/*
 	 * Constructors ---------------------------------------
@@ -152,6 +154,32 @@ public class Ledger
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * parentAccount is a relation which allows one to walk "up" the object
+	 * graph.
+	 * 
+	 * @return the Account which is the parent of this Ledger, which was set
+	 *         when this Ledger was added to an Account.
+	 * @see Entry#getParentLedger()
+	 * @see Entry#getParentTransaction()
+	 * @see Account#addLedger(Ledger)
+	 */
+	public Account getParentAccount() {
+		return parentAccount;
+	}
+
+	/**
+	 * A relation to allow you to track up the object graph, going the reverse
+	 * direction to the Set which Account contains which caries the Ledgers.
+	 * 
+	 * @param parent
+	 *            the Account which this Ledger belongs to.
+	 * @see Account#addLedger(Ledger)
+	 */
+	public void setParentAccount(Account parent) {
+		this.parentAccount = parent;
 	}
 
 	/*
