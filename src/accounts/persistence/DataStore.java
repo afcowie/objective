@@ -16,12 +16,15 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import accounts.domain.Books;
+import accounts.domain.Datestamp;
+import accounts.domain.Ledger;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
+import com.db4o.query.Query;
 
 /**
  * Root class for an accounting database. This is not considered a domain class,
@@ -233,6 +236,23 @@ public class DataStore
 		}
 	}
 
+	/**
+	 * Expose the ability to query by example. Most persistence engines (and, in
+	 * the present instance, the implemented db4o database) provide the ability
+	 * to get objects from the database by specifying a partially instantiated
+	 * object prototype which is used to constrain the query. This call wraps
+	 * the underlying db4o implementation and returns a Java List instead of
+	 * db4o's ObjectSet.
+	 * 
+	 * @param example
+	 *            the example object whose fields provide the prototype which
+	 *            constrains the returned collection of objects. If a class
+	 *            literal is provided (ie Ledger.class) then all Ledger objects
+	 *            persisted in the database will be retrieved.
+	 * @return a List (backed by an ArrayList) of the objects retreieved from
+	 *         the database. If no objects are fetched, then the list will not
+	 *         be null but will have size 0.
+	 */
 	public List query(Object example) {
 		ObjectSet os = container.get(example);
 		final int len = os.size();
@@ -250,5 +270,63 @@ public class DataStore
 		}
 
 		return result;
+	}
+
+	/**
+	 * Get a specified Ledger object. Query by example is nice, of course, but
+	 * in our case we have a complex linked relationship between Accounts (which
+	 * have titles) and the one-or-more Ledgers they contain (each with a
+	 * description). This wraps querying into the database to find a single
+	 * specific Ledger.
+	 * 
+	 * @param accountTitle
+	 *            the Account's title to look for
+	 * @param ledgerName
+	 *            the Ledger to look for within this account.
+	 * @return a Ledger if one found, or null.
+	 */
+	public Ledger getLedger(String accountTitle, String ledgerName) {
+		/*
+		 * Get db4o's Query interface
+		 */
+
+		Query query = container.query();
+
+		/*
+		 * We work inside-out here. Actually, we want ledgers
+		 */
+		query.constrain(Ledger.class);
+
+		/*
+		 * Constrain it with the account and ledger information
+		 */
+		query.descend("name").constrain(ledgerName).contains();
+
+		Query subquery = query.descend("parentAccount");
+		subquery.descend("title").constrain(accountTitle).contains();
+
+		ObjectSet os = query.execute();
+
+		/*
+		 * TODO NOTES: This is SO implementation specific it makes me sick. It
+		 * should really be somewhere closer to the code. On the other hand, it
+		 * is also db4o specific, so this isn't such a bad spot for it. I guess
+		 * it depends on how many finders we end up needing.
+		 */
+
+		final int len = os.size();
+
+		if (len > 1) {
+			throw new UnsupportedOperationException(
+					"When calling getLedger(), you need to specify arguments such that only one ledger will be retreived!");
+		}
+
+		Object obj = os.next();
+
+		if (!(obj instanceof Ledger)) {
+			throw new IllegalStateException("In querying Ledgers, you managed to get something not a Ledger!");
+		}
+
+		return (Ledger) obj;
 	}
 }
