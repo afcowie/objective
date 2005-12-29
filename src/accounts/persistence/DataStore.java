@@ -6,6 +6,8 @@
  */
 package accounts.persistence;
 
+import generic.util.Debug;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,13 +52,14 @@ public class DataStore
 	 */
 	static {
 		Configuration config = Db4o.configure();
+		Debug.register("db4o");
 		// config.messageLevel(3);
 		// config.singleThreadedClient(true);
 		config.callbacks(false);
 
 		/*
-		 * This is so stupid - why on earth _wouldn't_ you blow an
-		 * exception if you can't store something?!? So set it to do so.
+		 * This is so stupid - why on earth _wouldn't_ you blow an exception if
+		 * you can't store something?!? So set it to do so.
 		 */
 		config.exceptionsOnNotStorable(true);
 
