@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class LoanLedger extends CreditPositiveLedger implements ItemsLedger
 {
-	protected Set	_loans	= null;
+	protected Set	loans	= null;
 
 	public LoanLedger() {
 		super();
@@ -29,7 +29,7 @@ public class LoanLedger extends CreditPositiveLedger implements ItemsLedger
 	// throw new IllegalArgumentException("need to specify an array of Loan
 	// objects with this constructor");
 	// }
-	// _loans = loans;
+	// this.loans = loans;
 	// }
 
 	/*
@@ -37,11 +37,11 @@ public class LoanLedger extends CreditPositiveLedger implements ItemsLedger
 	 */
 
 	public Set getItems() {
-		return _loans;
+		return loans;
 	}
 
 	public void setItems(Set items) {
-		_loans = items;
+		loans = items;
 	}
 
 	public String getClassString() {

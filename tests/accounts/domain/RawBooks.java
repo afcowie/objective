@@ -16,7 +16,7 @@ import java.util.LinkedHashSet;
 public class RawBooks extends Books
 {	
 	public RawBooks() {
-		_accounts = new LinkedHashSet();
+		accounts = new LinkedHashSet();
 		
 		CurrencyGainLossAccount gainLoss = new CurrencyGainLossAccount();
 		gainLoss.setTitle("Currency Gain/Loss");

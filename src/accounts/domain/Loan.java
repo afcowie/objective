@@ -23,12 +23,12 @@ import java.text.ParseException;
  */
 public class Loan extends Item
 {
-	protected String	_description	= null;
-	protected Datestamp	_startDate		= null;
-	protected Datestamp	_dueDate		= null;
-	protected String	_interestRate	= null;
-	protected int		_numPeriods		= 0;
-	protected int		_periodsPerYear	= 0;
+	protected String	description		= null;
+	protected Datestamp	startDate		= null;
+	protected Datestamp	dueDate			= null;
+	protected String	interestRate	= null;
+	protected int		numPeriods		= 0;
+	protected int		periodsPerYear	= 0;
 
 	public Loan() {
 	}
@@ -46,24 +46,23 @@ public class Loan extends Item
 	 */
 
 	public String getDescription() {
-		return _description;
+		return description;
 	}
 
 	public void setDescription(String description) {
-		this._description = description;
+		this.description = description;
 	}
 
-	
 	public Datestamp getStartDate() {
-		return _startDate;
+		return startDate;
 	}
 
 	public void setStartDate(Datestamp date) {
-		this._startDate = date;
+		this.startDate = date;
 	}
 
 	public Datestamp getDueDate() {
-		return _dueDate;
+		return dueDate;
 	}
 
 	/**
@@ -73,11 +72,11 @@ public class Loan extends Item
 	 * @param date
 	 */
 	public void setDueDate(Datestamp date) {
-		this._dueDate = date;
+		this.dueDate = date;
 	}
 
 	public int getPeriodsPerYear() {
-		return _periodsPerYear;
+		return periodsPerYear;
 	}
 
 	public void setPeriodsPerYear(int periods) {
@@ -87,18 +86,18 @@ public class Loan extends Item
 		if (periods > 365) {
 			throw new IllegalArgumentException("Interest compounds faster than daily? You're kidding, right?");
 		}
-		this._periodsPerYear = periods;
+		this.periodsPerYear = periods;
 	}
 
 	public void setNumPeriods(int periods) {
 		if (periods < 0) {
 			throw new IllegalArgumentException("The number of periods must be greater than zero");
 		}
-		_numPeriods = periods;
+		numPeriods = periods;
 	}
 
 	public int getNumPeriods() {
-		return _numPeriods;
+		return numPeriods;
 	}
 
 	/*
@@ -112,14 +111,14 @@ public class Loan extends Item
 		if (years < 0) {
 			throw new IllegalArgumentException("The number of years must be greater than zero");
 		}
-		if (_periodsPerYear < 1) {
+		if (periodsPerYear < 1) {
 			throw new IllegalStateException("The number of periods per year must already be set to use setNumYears()");
 		}
-		_numPeriods = years * _periodsPerYear;
+		numPeriods = years * periodsPerYear;
 	}
 
 	public String getIntersestRate() {
-		return _interestRate;
+		return interestRate;
 	}
 
 	/**
@@ -133,7 +132,7 @@ public class Loan extends Item
 	 */
 	public void setInterestRate(String rate) {
 		// TODO validate
-		this._interestRate = rate;
+		this.interestRate = rate;
 	}
 
 	/**
@@ -144,17 +143,17 @@ public class Loan extends Item
 	protected void calculateDueDate() {
 		final long YEARMILLISECONDS = (1000l * 86400l * 365l);
 
-		long startTimestamp = _startDate.getInternalTimestamp();
+		long startTimestamp = startDate.getInternalTimestamp();
 
-		if (_numPeriods == 0) {
+		if (numPeriods == 0) {
 			throw new IllegalStateException("Not much moint in trying to calculateDueDate() if numPeriods isn't set.");
 		}
-		if (_periodsPerYear == 0) {
+		if (periodsPerYear == 0) {
 			throw new IllegalStateException(
 					"Not much moint in trying to calculateDueDate() if the periodsPerYear isn't set.");
 		}
 
-		long dueTimestamp = startTimestamp + YEARMILLISECONDS / _periodsPerYear * _numPeriods;
+		long dueTimestamp = startTimestamp + YEARMILLISECONDS / periodsPerYear * numPeriods;
 
 		Datestamp due = new Datestamp();
 		try {
@@ -166,6 +165,6 @@ public class Loan extends Item
 		} catch (ParseException pe) {
 			throw new IllegalStateException("ParseException hit when trying to calculate the Due Date");
 		}
-		_dueDate = due;
+		dueDate = due;
 	}
 }

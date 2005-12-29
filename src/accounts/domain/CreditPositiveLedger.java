@@ -25,7 +25,7 @@ public class CreditPositiveLedger extends Ledger
 	}
 
 	/*
-	 * Overrides Ledger's addToBalance(). _balance from Ledger.
+	 * Overrides Ledger's addToBalance(). balance from Ledger.
 	 */
 	protected void addToBalance(Entry entry) {
 		if (entry instanceof Credit) {

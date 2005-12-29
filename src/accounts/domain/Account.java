@@ -104,7 +104,7 @@ public class Account
 	 */
 	private void addToBalance(Ledger ledger) {
 		if (ledger == null) {
-			throw new IllegalStateException("How did you get a null Ledger into _ledgers?");
+			throw new IllegalStateException("How did you get a null Ledger into ledgers?");
 		}
 		if (this instanceof DebitPositiveAccount) {
 			if (ledger instanceof DebitPositiveLedger) {

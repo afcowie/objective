@@ -14,7 +14,7 @@ import accounts.persistence.UnitOfWork;
  * The top of the command hierarchy. These classes are the distinct operations
  * that cause changes to be made to the underlying domain model (ie, the command
  * pattern). <BR>
- * <B>COMMAND OBJECTS ARE NOT COMMITRED TO THE DEMO_DATABASE</B>
+ * <B>COMMAND OBJECTS ARE NOT COMMITTED TO THE DATABASE</B>
  * <P>
  * Commands underlie the user interface. Any user interface that updates the
  * domain will use a Command object to do so. While this is slightly cumbersome

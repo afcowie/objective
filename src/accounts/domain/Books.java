@@ -37,7 +37,7 @@ public class Books
 	 * date acceleration. Should be used as the date of the Openning Balance
 	 * transaction? TODO
 	 */
-	protected Datestamp			_dateOfInception	= null;
+	protected Datestamp			dateOfInception		= null;
 
 	/**
 	 * The entire Set of Account objects. At Books level, Accounts are all
@@ -45,43 +45,43 @@ public class Books
 	 * (TODO which may move) are provided to pull accounts from those individual
 	 * subclasses.
 	 */
-	protected Set				_accounts			= null;
+	protected Set				accounts			= null;
 
-	protected Set				_workers			= null;
+	protected Set				workers				= null;
 
-	protected Set				_currencies			= null;
+	protected Set				currencies			= null;
 
 	/*
 	 * Convenience references -----------------------------
 	 */
 
-	protected RevenueAccount	_gainLoss			= null;
-	protected EquityAccount		_retainedEarnings	= null;
+	protected RevenueAccount	gainLoss			= null;
+	protected EquityAccount		retainedEarnings	= null;
 
 	/**
 	 * The home currency that the set of books is denomenated in.
 	 */
-	protected Currency			_homeCurrency		= null;
+	protected Currency			homeCurrency		= null;
 
 	/**
 	 * @return Returns the entire Accounts Set.
 	 */
 	public Set getAccountsSet() {
-		return _accounts;
+		return accounts;
 	}
 
 	public void setAccountsSet(Set accounts) {
 		if (accounts == null) {
 			throw new IllegalArgumentException("Can't make a null Set the accounts held by this Books object!");
 		}
-		_accounts = accounts;
+		this.accounts = accounts;
 	}
 
 	/**
 	 * Get the currency gain/loss Account.
 	 */
 	public RevenueAccount getGainLossAccount() {
-		return _gainLoss;
+		return gainLoss;
 	}
 
 	/**
@@ -91,14 +91,14 @@ public class Books
 	 * currency loss is negative.
 	 */
 	public void setGainLossAccount(RevenueAccount gainLoss) {
-		this._gainLoss = gainLoss;
+		this.gainLoss = gainLoss;
 	}
 
 	/**
 	 * Get the retained earnings Account.
 	 */
 	public EquityAccount getRetainedEarningsAccount() {
-		return _retainedEarnings;
+		return retainedEarnings;
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class Books
 	 * business.
 	 */
 	public void setRetainedEarningsAccount(EquityAccount retainedEarnings) {
-		this._retainedEarnings = retainedEarnings;
+		this.retainedEarnings = retainedEarnings;
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class Books
 	 * business represetned by these Books.
 	 */
 	public Set getWorkers() {
-		return _workers;
+		return workers;
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class Books
 	 * business represented by these Books.
 	 */
 	public void setWorkers(Set workers) {
-		this._workers = workers;
+		this.workers = workers;
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class Books
 	 * {@link AddCurrencyCommand}s
 	 */
 	public Set getCurrencySet() {
-		return _currencies;
+		return currencies;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class Books
 	 * @see InitBooksCommand
 	 */
 	public void setCurrencySet(Set currencies) {
-		_currencies = currencies;
+		this.currencies = currencies;
 	}
 
 	/*
@@ -155,7 +155,7 @@ public class Books
 		out.println("Root:");
 
 		Set sorted = new TreeSet(new AccountComparator());
-		sorted.addAll(_accounts);
+		sorted.addAll(accounts);
 
 		Iterator iter = sorted.iterator();
 		while (iter.hasNext()) {
@@ -166,7 +166,7 @@ public class Books
 	}
 
 	public Currency getHomeCurrency() {
-		return _homeCurrency;
+		return homeCurrency;
 	}
 
 	/**
@@ -178,119 +178,9 @@ public class Books
 		if (home == null) {
 			throw new IllegalArgumentException();
 		}
-		if (_homeCurrency != null) {
+		if (homeCurrency != null) {
 			throw new UnsupportedOperationException("Can't change the home currency once its set!");
 		}
-		_homeCurrency = home;
+		homeCurrency = home;
 	}
-
 }
-
-// /**
-// * @return Returns the liabilities.
-// */
-// public Set getAssetAccounts() {
-// LinkedHashSet assets = new LinkedHashSet();
-//		
-// Iterator iter = _accounts.iterator();
-// while (iter.hasNext()) {
-// Account a = (Account) iter.next();
-// if (a instanceof AssetAccount) {
-// assets.add(a);
-// }
-// }
-// return assets;
-// }
-//
-// /**
-// * @return Returns the liabilities.
-// */
-// public Set getLiabilityAccounts() {
-// LinkedHashSet liabilities = new LinkedHashSet();
-//		
-// Iterator iter = _accounts.iterator();
-// while (iter.hasNext()) {
-// Account a = (Account) iter.next();
-// if (a instanceof LiabilityAccount) {
-// liabilities.add(a);
-// }
-// }
-// return liabilities;
-// }
-//
-// /**
-// * @return Returns a Set of the EquityAccounts.
-// */
-// public Set getEquityAccounts() {
-// LinkedHashSet equities = new LinkedHashSet();
-//		
-// Iterator iter = _accounts.iterator();
-// while (iter.hasNext()) {
-// Account a = (Account) iter.next();
-// if (a instanceof EquityAccount) {
-// equities.add(a);
-// }
-// }
-//
-// return equities;
-// }
-//
-// /**
-// * @return Returns the revenues.
-// */
-// public Set getRevenueAccounts() {
-// LinkedHashSet revenues = new LinkedHashSet();
-//		
-// Iterator iter = _accounts.iterator();
-// while (iter.hasNext()) {
-// Account a = (Account) iter.next();
-// if (a instanceof RevenueAccount) {
-// revenues.add(a);
-// }
-// }
-//
-// return revenues;
-// }
-//
-//
-// /**
-// * @return Returns the expenses.
-// */
-// public Set getExpenseAccounts() {
-// LinkedHashSet expenses = new LinkedHashSet();
-//		
-// Iterator iter = _accounts.iterator();
-// while (iter.hasNext()) {
-// Account a = (Account) iter.next();
-// if (a instanceof ExpenseAccount) {
-// expenses.add(a);
-// }
-// }
-//
-// return expenses;
-// }
-
-// /**
-// *
-// * @return a Set with all the <b>current</b> Accounts presently in the
-// * Books.
-// */
-// public Set getAllAccounts() {
-// int total = 0;
-//
-// total += _assets.size();
-// total += _liabilities.size();
-// total += _equities.size();
-// total += _revenues.size();
-// total += _expenses.size();
-//
-// LinkedHashSet all = new LinkedHashSet(total);
-//
-// all.addAll(_assets);
-// all.addAll(_liabilities);
-// all.addAll(_equities);
-// all.addAll(_revenues);
-// all.addAll(_expenses);
-//
-// return all;
-// }

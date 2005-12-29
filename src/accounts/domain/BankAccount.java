@@ -14,14 +14,14 @@ package accounts.domain;
  */
 public class BankAccount extends AssetAccount implements SingleLedger
 {
-	// private String _institution = null;
-	// private String _name = null;
+	// private String institution = null;
+	// private String name = null;
 
 	/**
 	 * This is a convenience only for use in single ledger accounts, ie, this
 	 * one.
 	 */
-	private DebitPositiveLedger	_ledger	= null;
+	private DebitPositiveLedger	ledger	= null;
 
 	public BankAccount() {
 		super();
@@ -41,30 +41,30 @@ public class BankAccount extends AssetAccount implements SingleLedger
 	public BankAccount(String institution, String name) {
 		super();
 		this.setTitle(institution);
-		// _institution = institution;
-		// _name = name;
+		// this.institution = institution;
+		// this.name = name;
 
-		_ledger = new DebitPositiveLedger();
-		_ledger.setName(name);
-		addLedger(_ledger);
+		ledger = new DebitPositiveLedger();
+		ledger.setName(name);
+		addLedger(ledger);
 	}
 
 	/**
 	 * Add an entry to the (single) Ledger of this BankAccount. FIXME
 	 */
 	public void addEntry(Entry entry) {
-		_ledger.addEntry(entry);
-		entry.setParentLedger(_ledger);
+		ledger.addEntry(entry);
+		entry.setParentLedger(ledger);
 		// TODO recalc account balance?
 	}
 
 	public Ledger getLedger() {
-		return _ledger;
+		return ledger;
 	}
 
 	public void setLedger(Ledger ledger) {
 		if (ledger instanceof DebitPositiveLedger) {
-			_ledger = (DebitPositiveLedger) ledger;
+			this.ledger = (DebitPositiveLedger) ledger;
 		} else {
 			throw new IllegalArgumentException("ledger argument needs ot be DebitPositive");
 		}
