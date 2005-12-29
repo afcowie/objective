@@ -7,7 +7,8 @@
 package generic.util;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Debug control (as used by the xseq program). Debugging output is synchronous
@@ -36,10 +37,9 @@ public class Debug
 {
 	private static final String	DEBUG_SWITCH		= "--debug=";
 
-	// Maps from strings to string lengths.
-	private static ArrayList	activeGroups		= null;
-	private static HashMap		groupText			= null;
-	private static HashMap		groupSpaces			= null;
+	private static TreeSet		activeGroups		= null;
+	private static TreeMap		groupText			= null;
+	private static TreeMap		groupSpaces			= null;
 	private static String		progname			= "<progname not set>";
 
 	/**
@@ -52,9 +52,9 @@ public class Debug
 	private static boolean		allActive			= false;
 
 	static {
-		activeGroups = new ArrayList();
-		groupText = new HashMap();
-		groupSpaces = new HashMap();
+		activeGroups = new TreeSet();
+		groupText = new TreeMap();
+		groupSpaces = new TreeMap();
 
 		String env = System.getProperty("debug");
 
