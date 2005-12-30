@@ -38,4 +38,8 @@ public class GenericTransaction extends Transaction
 	public GenericTransaction(String description, Datestamp date, Entry[] entries) {
 		super(description, date, entries);
 	}
+
+	public String getClassString() {
+		return "Generic Transaction";
+	}
 }

@@ -160,7 +160,7 @@ public class Entry
 		String descText = null;
 		String dateText = null;
 		// final int MAXDATELEN = 10;
-		final int MAXIDLEN = 9;
+		final int MAXIDLEN = 8;
 		final int MAXDESCLEN = 30;
 		final int MAXAMOUNTLEN = 15;
 
@@ -168,9 +168,8 @@ public class Entry
 			idText = parentTransaction.getIdentifier();
 			descText = parentTransaction.getDescription();
 		} else {
-			// id = parentAccount.getCode();
-			// desc = parentAccount.getTitle();
-			descText = "FIXME";
+			idText = parentLedger.getParentAccount().getCode();
+			descText = parentLedger.getParentAccount().getTitle() + " - " + parentLedger.getName();
 		}
 
 		if (idText == null) {
@@ -186,6 +185,7 @@ public class Entry
 		}
 
 		out.print(dateText);
+		out.print(" ");
 		out.print(pad(idText, MAXIDLEN, true));
 		out.print(" ");
 		out.print(pad(descText, MAXDESCLEN, false));

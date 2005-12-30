@@ -6,9 +6,13 @@
  */
 package accounts.domain;
 
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
+
+import accounts.services.EntryComparator;
 
 /**
  * Base class of the Transaction hierarchy. Transactions are operations which
@@ -23,6 +27,11 @@ public class Transaction
 	 * Instance variables ---------------------------------
 	 */
 	protected String	description	= null;
+	/**
+	 * An identifier connected with the transaction. This is <b>not</b> a
+	 * unique id or primary key, but rather some optional meta data originating
+	 * from the external source document.
+	 */
 	protected String	identifier	= null;
 	protected Datestamp	date		= null;
 	protected Set		entries		= null;
@@ -138,6 +147,7 @@ public class Transaction
 	 * and re-instantiated it, and is passing it back in. Nevertheless,
 	 * validation is done here care of iterating over the Set and calling
 	 * addEntry()
+	 * 
 	 * @deprecated
 	 */
 	public void setEntries(Set entries) {
@@ -193,7 +203,10 @@ public class Transaction
 	}
 
 	/**
-	 * Get the identifier for the transaction, assuming one is set.
+	 * Get the identifier for the transaction, assuming one is set. Remember
+	 * that this is <b>not</b> a unique id or primary key, but rather some meta
+	 * data which may <b>optionally</b> be provided. Examples include cheque
+	 * numbers, bill numbers, or statement numbers.
 	 */
 	public String getIdentifier() {
 		return identifier;
@@ -212,8 +225,7 @@ public class Transaction
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Get the date of this transaction
 	 */
 
 	public Datestamp getDate() {
@@ -227,8 +239,6 @@ public class Transaction
 	 * Works through all the entries to update their dates as well. (note that
 	 * {@link Transaction#addEntry(Entry)} does the same update, assuming the
 	 * date of the transaction is already available).
-	 * 
-	 * @param date
 	 */
 
 	public void setDate(Datestamp date) {
@@ -241,5 +251,30 @@ public class Transaction
 			Entry entry = (Entry) iter.next();
 			entry.setDate(date);
 		}
+	}
+
+	/*
+	 * Output ---------------------------------------------
+	 */
+
+	public void toOutput(PrintWriter out) {
+		if ((entries == null) || (entries.size() == 0)) {
+			return;
+		}
+
+		out.println("Transaction: \"" + getDescription() + "\", " + getIdentifier() + " (" + getClassString() + ")");
+
+		Set sorted = new TreeSet(new EntryComparator(this));
+		sorted.addAll(entries);
+
+		Iterator iter = sorted.iterator();
+		while (iter.hasNext()) {
+			Entry entry = (Entry) iter.next();
+			entry.toOutput(out, false);
+		}
+	}
+
+	public String getClassString() {
+		return "Transaction";
 	}
 }

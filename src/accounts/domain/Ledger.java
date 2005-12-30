@@ -194,7 +194,7 @@ public class Ledger
 			return;
 		}
 
-		Set sorted = new TreeSet(new EntryComparator());
+		Set sorted = new TreeSet(new EntryComparator(this));
 		sorted.addAll(entries);
 
 		Iterator iter = sorted.iterator();
