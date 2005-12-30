@@ -193,11 +193,11 @@ public class Account
 	 *            support codes of the form "4-1200"
 	 */
 	public void setCode(String code) throws IllegalArgumentException {
-		if (code.charAt(1) != '-') {
-			throw new IllegalArgumentException("second character of the account code needs to be a '-' character");
-		}
 		if (code.length() != 6) {
 			throw new IllegalArgumentException("account code needs to be 6 characters long, in the form 'x-yyyy'");
+		}
+		if (code.charAt(1) != '-') {
+			throw new IllegalArgumentException("second character of the account code needs to be a '-' character");
 		}
 		this.code = code;
 	}

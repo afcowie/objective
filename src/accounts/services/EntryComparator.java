@@ -124,10 +124,21 @@ public class EntryComparator implements Comparator
 							return 1;
 						} else {
 							/*
-							 * If they're the same position in the set, then
-							 * they're the same object! So finally,
+							 * In normal use, if you're in the same Ledger and
+							 * in the same position in the set, then they're the
+							 * same object! However, unit tests can bust this,
+							 * so finally, order by hash
 							 */
-							return 0;
+							int hash1 = e1.hashCode();
+							int hash2 = e2.hashCode();
+
+							if (hash1 < hash2) {
+								return -1;
+							} else if (hash1 > hash2) {
+								return +1;
+							} else {
+								return 0;
+							}
 						}
 					}
 				}
@@ -194,10 +205,22 @@ public class EntryComparator implements Comparator
 						return 1;
 					} else {
 						/*
-						 * If they're the same position in the set, then they're
-						 * the same object! So finally,
+						 * If they're the same position in the Ledger entries
+						 * Set, then they're the same object! But there are unit
+						 * test cases (even if not normal use ones) where you
+						 * can end up comparing Entries so similar this breaks.
+						 * So finally, use hashes
 						 */
-						return 0;
+						int hash1 = e1.hashCode();
+						int hash2 = e2.hashCode();
+
+						if (hash1 < hash2) {
+							return -1;
+						} else if (hash1 > hash2) {
+							return +1;
+						} else {
+							return 0;
+						}
 					}
 				}
 			}

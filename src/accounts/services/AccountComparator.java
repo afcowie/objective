@@ -97,14 +97,64 @@ public class AccountComparator implements Comparator
 		} else {
 			Account a1 = (Account) o1;
 			Account a2 = (Account) o2;
-			/*
-			 * Same Account subclass, so look into Account's name and order by
-			 * that.
-			 */
-			String title1 = a1.getTitle();
-			String title2 = a2.getTitle();
 
-			return title1.compareTo(title2);
+			/*
+			 * Same Account subclass, so look into Account's code and order by
+			 * it. Note that we generally aren't using this at the moment, so
+			 * you're expected to hit nulls, but this is supported for future
+			 * alternate ordering. TODO perhaps this should rise above the
+			 * result of the indexOf call?
+			 */
+			String code1 = a1.getCode();
+			String code2 = a2.getCode();
+
+			int codeCmp;
+			if ((code1 == null) || (code2 == null)) {
+				// force it to ignore this comparison and move to the
+				// next
+				codeCmp = 0;
+			} else {
+				codeCmp = code1.compareTo(code2);
+			}
+
+			if (codeCmp != 0) {
+				return codeCmp;
+			} else {
+				/*
+				 * Same (or as expected and more likely, null) code, so look
+				 * into Account's name and order by that.
+				 */
+				String title1 = a1.getTitle();
+				String title2 = a2.getTitle();
+
+				int titleCmp;
+				if ((code1 == null) || (code2 == null)) {
+					// force it to ignore this comparison and move to the
+					// next
+					codeCmp = 0;
+				} else {
+					codeCmp = code1.compareTo(code2);
+				}
+
+				if (codeCmp != 0) {
+					return codeCmp;
+				} else {
+					/*
+					 * At this point, go to Object's hashCode. Do not expect to
+					 * get this deep in normal usage.
+					 */
+					int hash1 = a1.hashCode();
+					int hash2 = a2.hashCode();
+
+					if (hash1 < hash2) {
+						return -1;
+					} else if (hash1 > hash2) {
+						return +1;
+					} else {
+						return 0;
+					}
+				}
+			}
 		}
 	}
 }
