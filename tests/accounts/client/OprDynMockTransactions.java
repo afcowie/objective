@@ -18,6 +18,7 @@ import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
+import accounts.persistence.DataStore;
 import accounts.persistence.UnitOfWork;
 import accounts.services.CommandNotReadyException;
 import accounts.services.DatafileServices;
@@ -58,30 +59,51 @@ public class OprDynMockTransactions
 			/*
 			 * Fetch some accounts' ledgers
 			 */
+			DataStore store = ObjectiveAccounts.store;
 
-			Ledger pettyCash = ObjectiveAccounts.store.getLedger("Petty Cash", "Manly");
-			Ledger ownersEquity = ObjectiveAccounts.store.getLedger("Owner's Equity", "");
-			Ledger groundTransport = ObjectiveAccounts.store.getLedger("Travel Expenses", "Ground Transfer");
+			Ledger bankAccount = store.getLedger("ANZ", "Current Account");
+			Ledger pettyCash = store.getLedger("Petty Cash", "Manly");
+			Ledger furniture = store.getLedger("Furniture", "Cost");
+			Ledger gstCollected = store.getLedger("GST", "Collected");
+			Ledger shareholdersLoan = store.getLedger("Shareholder", "Cowie");
+			Ledger gstPaid = store.getLedger("GST", "Paid");
+			Ledger ownersEquity = store.getLedger("Owner's Equity", "");
+			Ledger consultingRevenue = store.getLedger("Procedures", "Fees");
+			Ledger groundTransport = store.getLedger("Travel Expenses", "Ground Transfer");
 
 			/*
 			 * Now start storing some transactions
 			 */
 
 			Transaction[] initialization = {
-					new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 03"), new Entry[] {
-							new Credit(new Amount("1.00"), ownersEquity), new Debit(new Amount("1.00"), pettyCash),
-					}),
-					new GenericTransaction("Loan from owner", new Datestamp("21 Dec 03"), new Entry[] {
-							new Credit(new Amount("52700.00"), ownersEquity),
-							new Debit(new Amount("52700.00"), pettyCash),
-					}),
-					new GenericTransaction("Taxi from airport", new Datestamp("5 Nov 05"), new Entry[] {
-							new Credit(new Amount("9.99"), pettyCash), new Debit(new Amount("9.99"), groundTransport),
-					}),
+				new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 03"), new Entry[] {
+					new Credit(new Amount("1.00"), ownersEquity),
+					new Debit(new Amount("1.00"), pettyCash),
+				}),
+				// FIXME change to some kind of Loan Transaction?
+				new GenericTransaction("Loan from owner", new Datestamp("21 Dec 03"), new Entry[] {
+					new Debit(new Amount("52700.00"), bankAccount),
+					new Credit(new Amount("52700.00"), shareholdersLoan),
+				}),
+				new GenericTransaction("Chair for office", new Datestamp("6 Jan 04"), new Entry[] {
+					new Debit(new Amount("659.10"), furniture),
+					new Debit(new Amount("65.90"), gstPaid),
+					new Credit(new Amount("725.00"), bankAccount),
+				}),
+				// FIXME change Transaction type?
+				new GenericTransaction("Procedures implementation ACME, Inc", new Datestamp("29 Aug 04"), new Entry[] {
+					new Debit(new Amount("21500.00"), bankAccount),
+					new Credit(new Amount("19545.45"), consultingRevenue),
+					new Credit(new Amount("1954.55"), gstCollected),
+				}),
+				new GenericTransaction("Taxi from airport", new Datestamp("5 Nov 05"), new Entry[] {
+					new Credit(new Amount("9.99"), pettyCash),
+					new Debit(new Amount("9.99"), groundTransport),
+				}),
 			};
 
 			for (int i = 0; i < initialization.length; i++) {
-				initialization[i].setIdentifier("I" + padZeros(i, 4));
+				initialization[i].setIdentifier("I" + padZeros(i + 1, 4));
 				PostTransactionCommand cmd = new PostTransactionCommand(initialization[i]);
 				cmd.execute(uow);
 			}

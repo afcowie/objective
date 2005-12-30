@@ -169,7 +169,7 @@ public class Entry
 			descText = parentTransaction.getDescription();
 		} else {
 			idText = parentLedger.getParentAccount().getCode();
-			descText = parentLedger.getParentAccount().getTitle() + " - " + parentLedger.getName();
+			descText = parentLedger.getParentAccount().getTitle() + "|" + parentLedger.getName();
 		}
 
 		if (idText == null) {
