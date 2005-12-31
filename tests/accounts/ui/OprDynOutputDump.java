@@ -6,17 +6,10 @@
  */
 package accounts.ui;
 
-import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
-
 import accounts.client.OprDynBooksSetup;
 import accounts.domain.Books;
-import accounts.domain.Transaction;
 import accounts.persistence.DataStore;
 import accounts.services.DatafileServices;
-import accounts.services.TransactionComparator;
 
 /**
  * Use the toOuput() routine to dump the demo database.
@@ -27,33 +20,29 @@ public class OprDynOutputDump
 {
 	public static void main(String[] args) {
 		DataStore store = null;
+		TextOutput outputter = null;
 		try {
 			store = DatafileServices.openDatafile(OprDynBooksSetup.DEMO_DATABASE);
 
 			Books root = store.getBooks();
 
 			System.out.println();
-			PrintWriter out = new PrintWriter(System.out, true);
-			root.toOutput(out);
 
 			/*
-			 * Hack to show Transactions after Accounts
+			 * First output all the Accounts
 			 */
-			System.out.println();
-			List tL = store.query(Transaction.class);
 
-			TreeSet sorted = new TreeSet(new TransactionComparator());
-			sorted.addAll(tL);
+			outputter = new AccountTextOutput(store);
+			outputter.toOutput(System.out);
 
-			Iterator sI = sorted.iterator();
-			while (sI.hasNext()) {
-				Transaction t = (Transaction) sI.next();
-				t.toOutput(out);
-			}
+			/*
+			 * And now output all the Transactions
+			 */
 
-			out.flush();
-			System.out.println();
-			out.close();
+			outputter = new TransactionTextOutput(store);
+			outputter.toOutput(System.out);
+
+			System.out.flush();
 
 		} catch (Exception e) {
 			e.printStackTrace();

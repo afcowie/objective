@@ -222,7 +222,9 @@ build/demo-setup: tests/accounts/client/OprDynBooksSetup.java
 dump: build/classes-tests build/demo-setup
 	@echo "$(JAVA_CMD) OprDynOutputDump $(DEBUG)"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.ui.OprDynOutputDump $(DEBUG)
+	$(JAVA) -classpath $(CLASSPATH):tmp/classes \
+		-DCOLUMNS=`resize | perl -n -e'print if (s/COLUMNS=(\d*);/\1/)'` \
+		accounts.ui.OprDynOutputDump $(DEBUG)
 
 pop: build/classes-tests build/demo-setup
 	@echo "$(JAVA_CMD) ObjectiveWindowRunner $(DEBUG)"

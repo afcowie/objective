@@ -6,13 +6,9 @@
  */
 package accounts.domain;
 
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
-
-import accounts.services.EntryComparator;
 
 /**
  * Base class of the Transaction hierarchy. Transactions are operations which
@@ -256,23 +252,6 @@ public class Transaction
 	/*
 	 * Output ---------------------------------------------
 	 */
-
-	public void toOutput(PrintWriter out) {
-		if ((entries == null) || (entries.size() == 0)) {
-			return;
-		}
-
-		out.println("Transaction: \"" + getDescription() + "\", " + getIdentifier() + " (" + getClassString() + ")");
-
-		Set sorted = new TreeSet(new EntryComparator(this));
-		sorted.addAll(entries);
-
-		Iterator iter = sorted.iterator();
-		while (iter.hasNext()) {
-			Entry entry = (Entry) iter.next();
-			entry.toOutput(out, false);
-		}
-	}
 
 	public String getClassString() {
 		return "Transaction";

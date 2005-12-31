@@ -6,7 +6,6 @@
  */
 package accounts.domain;
 
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -149,6 +148,7 @@ public class Account
 	 * this is to replace an internal ledgers Set representation with some other
 	 * implementation of Set which would be based on the same Ledger objects,
 	 * but as ever don't trust the data...
+	 * 
 	 * @deprecated
 	 */
 	public void setLedgers(Set ledgers) {
@@ -205,39 +205,6 @@ public class Account
 	/*
 	 * Output ---------------------------------------------
 	 */
-
-	/**
-	 * Print a formatted text version of this Account.
-	 * 
-	 * @param out
-	 *            OutputWriter you want to print to.
-	 */
-	public void toOutput(PrintWriter out) {
-		out.println();
-		out.print("Account: \"" + title + "\"");
-		if (code != null) {
-			out.print(" [" + code + "]");
-		}
-		out.println(" (" + getClassString() + ")");
-
-		if (ledgers == null) {
-			out.println("<no ledgers>");
-			return;
-		}
-		Iterator iter = ledgers.iterator();
-		while (iter.hasNext()) {
-			Ledger ledger = (Ledger) iter.next();
-
-			if ((ledgers.size() == 1) && (ledger.getName() == null)) {
-				out.print("Ledger:  (un-named)");
-			} else {
-				out.print("Ledger:  \"" + ledger.getName() + "\"");
-			}
-			out.println(" (" + ledger.getClassString() + ")");
-
-			ledger.toOutput(out);
-		}
-	}
 
 	public String getClassString() {
 		return "Account";

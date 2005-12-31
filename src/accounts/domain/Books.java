@@ -6,12 +6,7 @@
  */
 package accounts.domain;
 
-import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
-
-import accounts.services.AccountComparator;
 
 /**
  * Root object of a set of accounts.
@@ -146,24 +141,6 @@ public class Books
 	/*
 	 * Output ---------------------------------------------
 	 */
-
-	/**
-	 * Top level call to send the tree this set of books represnts to the given
-	 * Writer (ie, in text form to console).
-	 */
-	public void toOutput(PrintWriter out) {
-		out.println("Root:");
-
-		Set sorted = new TreeSet(new AccountComparator());
-		sorted.addAll(accounts);
-
-		Iterator iter = sorted.iterator();
-		while (iter.hasNext()) {
-			Account acct = (Account) iter.next();
-
-			acct.toOutput(out);
-		}
-	}
 
 	public Currency getHomeCurrency() {
 		return homeCurrency;

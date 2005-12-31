@@ -8,8 +8,6 @@ package accounts.domain;
 
 import generic.util.DebugException;
 
-import java.io.PrintWriter;
-
 /**
  * An entry in an account. These are formed in balanced (total Debits = total
  * Credits) transactions. Entries form a bridge between Transactions and
@@ -137,110 +135,6 @@ public class Entry
 			buf.append("CR");
 		} else {
 			throw new DebugException("huh?");
-		}
-		return buf.toString();
-	}
-
-	/**
-	 * Print a formatted text version of this Entry on a single line. As entries
-	 * have a two-way relation between Ledgers and Transactions, it either
-	 * displays the parent transaction, or the parent account, depending on the
-	 * showTransaction parameter.
-	 * 
-	 * @param out
-	 *            OutputWriter you want to print to (presumably passed in a
-	 *            cascade)
-	 * @param showTransaction
-	 *            Do you want to pull the parent Transaction's description into
-	 *            the output? If not, it will use the parent Account's title.
-	 * 
-	 */
-	public void toOutput(PrintWriter out, boolean showTransaction) {
-		String idText = null;
-		String descText = null;
-		String dateText = null;
-		// final int MAXDATELEN = 10;
-		final int MAXIDLEN = 8;
-		final int MAXDESCLEN = 30;
-		final int MAXAMOUNTLEN = 15;
-
-		if (showTransaction) {
-			idText = parentTransaction.getIdentifier();
-			descText = parentTransaction.getDescription();
-		} else {
-			idText = parentLedger.getParentAccount().getCode();
-			descText = parentLedger.getParentAccount().getTitle() + "|" + parentLedger.getName();
-		}
-
-		if (idText == null) {
-			idText = "";
-		}
-		if (descText == null) {
-			descText = "<null>";
-		}
-		if (date == null) {
-			dateText = "No date  ";
-		} else {
-			dateText = date.toString();
-		}
-
-		out.print(dateText);
-		out.print(" ");
-		out.print(pad(idText, MAXIDLEN, true));
-		out.print(" ");
-		out.print(pad(descText, MAXDESCLEN, false));
-		/*
-		 * Debit
-		 */
-		if (this instanceof Debit) {
-			out.print(pad(toString(), MAXAMOUNTLEN, true));
-		} else {
-			out.print(pad("", MAXAMOUNTLEN, true));
-		}
-
-		if (this instanceof Credit) {
-			out.print(pad(toString(), MAXAMOUNTLEN, true));
-		} else {
-			out.print(pad("", MAXAMOUNTLEN, true));
-		}
-		out.println();
-	}
-
-	/**
-	 * @param str
-	 *            the String to pad.
-	 * @param width
-	 *            maximum length of the padded result.
-	 * @param right
-	 *            if true, right justify. Otherwise, normal left justification.
-	 * @return the padded String.
-	 */
-	private String pad(String str, int width, boolean right) {
-		String trimmed = null;
-		/*
-		 * crop
-		 */
-		int len = str.length();
-		if (len > width) {
-			trimmed = str.substring(0, width);
-			len = width;
-		} else {
-			trimmed = str;
-		}
-		int spaces = width - len;
-
-		/*
-		 * pad
-		 */
-		StringBuffer buf = new StringBuffer("");
-		if (!right) {
-			buf.append(trimmed);
-		}
-		for (int i = 0; i < spaces; i++) {
-			buf.append(" ");
-		}
-		if (right) {
-			buf.append(trimmed);
 		}
 		return buf.toString();
 	}
