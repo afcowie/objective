@@ -2,7 +2,7 @@
  * OprDynBooksSetup.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.client;
 
@@ -11,15 +11,19 @@ import generic.util.Debug;
 import java.io.FileNotFoundException;
 
 import accounts.domain.Amount;
+import accounts.domain.Client;
 import accounts.domain.Credit;
 import accounts.domain.Datestamp;
 import accounts.domain.Debit;
+import accounts.domain.Entity;
 import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
 import accounts.domain.Ledger;
+import accounts.domain.Supplier;
 import accounts.domain.Transaction;
 import accounts.persistence.DataStore;
 import accounts.persistence.UnitOfWork;
+import accounts.services.AddEntityCommand;
 import accounts.services.CommandNotReadyException;
 import accounts.services.DatafileServices;
 import accounts.services.PostTransactionCommand;
@@ -76,30 +80,31 @@ public class OprDynMockTransactions
 			 */
 
 			Transaction[] initialization = {
-				new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 03"), new Entry[] {
-					new Credit(new Amount("1.00"), ownersEquity),
-					new Debit(new Amount("1.00"), pettyCash),
-				}),
-				// FIXME change to some kind of Loan Transaction?
-				new GenericTransaction("Loan from owner", new Datestamp("21 Dec 03"), new Entry[] {
-					new Debit(new Amount("52700.00"), bankAccount),
-					new Credit(new Amount("52700.00"), shareholdersLoan),
-				}),
-				new GenericTransaction("Chair for office", new Datestamp("6 Jan 04"), new Entry[] {
-					new Debit(new Amount("659.10"), furniture),
-					new Debit(new Amount("65.90"), gstPaid),
-					new Credit(new Amount("725.00"), bankAccount),
-				}),
-				// FIXME change Transaction type?
-				new GenericTransaction("Procedures implementation ACME, Inc", new Datestamp("29 Aug 04"), new Entry[] {
-					new Debit(new Amount("21500.00"), bankAccount),
-					new Credit(new Amount("19545.45"), consultingRevenue),
-					new Credit(new Amount("1954.55"), gstCollected),
-				}),
-				new GenericTransaction("Taxi from airport", new Datestamp("5 Nov 05"), new Entry[] {
-					new Credit(new Amount("9.99"), pettyCash),
-					new Debit(new Amount("9.99"), groundTransport),
-				}),
+					new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 03"), new Entry[] {
+							new Credit(new Amount("1.00"), ownersEquity),
+							new Debit(new Amount("1.00"), pettyCash),
+					}),
+					// FIXME change to some kind of Loan Transaction?
+					new GenericTransaction("Loan from owner", new Datestamp("21 Dec 03"), new Entry[] {
+							new Debit(new Amount("52700.00"), bankAccount),
+							new Credit(new Amount("52700.00"), shareholdersLoan),
+					}),
+					new GenericTransaction("Chair for office", new Datestamp("6 Jan 04"), new Entry[] {
+							new Debit(new Amount("659.10"), furniture),
+							new Debit(new Amount("65.90"), gstPaid),
+							new Credit(new Amount("725.00"), bankAccount),
+					}),
+					// FIXME change Transaction type?
+					new GenericTransaction("Procedures implementation ACME, Inc", new Datestamp("29 Aug 04"),
+							new Entry[] {
+									new Debit(new Amount("21500.00"), bankAccount),
+									new Credit(new Amount("19545.45"), consultingRevenue),
+									new Credit(new Amount("1954.55"), gstCollected),
+							}),
+					new GenericTransaction("Taxi from airport", new Datestamp("5 Nov 05"), new Entry[] {
+							new Credit(new Amount("9.99"), pettyCash),
+							new Debit(new Amount("9.99"), groundTransport),
+					}),
 			};
 
 			for (int i = 0; i < initialization.length; i++) {
@@ -109,6 +114,28 @@ public class OprDynMockTransactions
 			}
 
 			Debug.print("main", "Committing.");
+			uow.commit();
+		} catch (CommandNotReadyException cnre) {
+			uow.cancel();
+			throw new IllegalStateException("Shouldn't have had a problem with any commands being not ready!");
+		} catch (Exception e) {
+			uow.cancel();
+			e.printStackTrace();
+		}
+
+		try {
+			uow = new UnitOfWork("Add some clients and suppliers");
+
+			Entity[] entities = {
+					new Client("ACME, Inc"),
+					new Supplier("Katoomba Telecom"),
+			};
+
+			for (int i = 0; i < entities.length; i++) {
+				AddEntityCommand aec = new AddEntityCommand(entities[i]);
+				aec.execute(uow);
+			}
+
 			uow.commit();
 		} catch (CommandNotReadyException cnre) {
 			uow.cancel();

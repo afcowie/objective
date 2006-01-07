@@ -152,6 +152,9 @@ public class Ledger
 	 * Set the name of this Ledger.
 	 */
 	public void setName(String name) {
+		if (name.equals("")) {
+			throw new IllegalArgumentException("Can't set a blank String as the name of a Ledger");
+		}
 		this.name = name;
 	}
 

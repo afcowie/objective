@@ -15,7 +15,7 @@ import accounts.persistence.DataStore;
  */
 public class ObjectiveAccounts
 {
-	public final static String VERSION = "0.1.8";
+	public final static String VERSION = "0.1.9";
 	public static DataStore store = null;
 	
 //	public static ObjectiveAccountsUserInterface	ui	= null;

@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.TreeMap;
 
 import accounts.domain.Account;
+import accounts.domain.AccountsPayable;
+import accounts.domain.AccountsReceivable;
 import accounts.domain.AssetAccount;
 import accounts.domain.BankAccount;
 import accounts.domain.CashAccount;
@@ -45,15 +47,21 @@ public class AccountComparator implements Comparator
 			AssetAccount.class,
 			BankAccount.class,
 			CashAccount.class,
+			AccountsReceivable.class,
 			DepreciatingAssetAccount.class,
+
 			LiabilityAccount.class,
+			AccountsPayable.class,
 			TaxPayableAccount.class,
 			LoanPayableAccount.class,
+
 			EquityAccount.class,
 			OwnersEquityAccount.class,
+
 			RevenueAccount.class,
 			ProfessionalRevenueAccount.class,
 			CurrencyGainLossAccount.class,
+
 			ExpenseAccount.class,
 			GenericExpenseAccount.class,
 		};
