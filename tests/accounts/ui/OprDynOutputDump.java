@@ -2,7 +2,7 @@
  * OprDynOutputDump.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.ui;
 
@@ -38,6 +38,7 @@ public class OprDynOutputDump
 			/*
 			 * And now output all the Transactions
 			 */
+			System.out.println();
 
 			outputter = new TransactionTextOutput(store);
 			outputter.toOutput(System.out);

@@ -2,7 +2,7 @@
  * AccountTextOutput.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.ui;
 
@@ -100,19 +100,22 @@ public class AccountTextOutput extends TextOutput
 			out.println();
 
 			Set lS = a.getLedgers();
-			Iterator lI = lS.iterator();
-			while (lI.hasNext()) {
-				Ledger l = (Ledger) lI.next();
+			if (lS == null) {
+				// no ledgers ?!?
+			} else {
+				Iterator lI = lS.iterator();
+				while (lI.hasNext()) {
+					Ledger l = (Ledger) lI.next();
 
-				out.print(pad("Ledger: \"" + chomp(l.getName(), descWidth + idWidth - 11) + "\" ", descWidth + idWidth,
-						LEFT));
-				out.print(pad(l.getClassString(), typeWidth, RIGHT));
-				out.println();
+					out.print(pad("Ledger: \"" + chomp(l.getName(), descWidth + idWidth - 11) + "\" ", descWidth
+							+ idWidth, LEFT));
+					out.print(pad(l.getClassString(), typeWidth, RIGHT));
+					out.println();
 
-				EntryTextOutput entryOutputter = new EntryTextOutput(l);
-				entryOutputter.toOutput(out);
+					EntryTextOutput entryOutputter = new EntryTextOutput(l);
+					entryOutputter.toOutput(out);
+				}
 			}
-
 			// blank line after account is done
 			out.println();
 		}

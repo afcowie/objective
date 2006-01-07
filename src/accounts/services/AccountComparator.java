@@ -2,7 +2,7 @@
  * AccountComparator.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
@@ -128,16 +128,16 @@ public class AccountComparator implements Comparator
 				String title2 = a2.getTitle();
 
 				int titleCmp;
-				if ((code1 == null) || (code2 == null)) {
+				if ((title1 == null) || (title2== null)) {
 					// force it to ignore this comparison and move to the
 					// next
-					codeCmp = 0;
+					titleCmp = 0;
 				} else {
-					codeCmp = code1.compareTo(code2);
+					titleCmp = title1.compareTo(title2);
 				}
 
-				if (codeCmp != 0) {
-					return codeCmp;
+				if (titleCmp != 0) {
+					return titleCmp;
 				} else {
 					/*
 					 * At this point, go to Object's hashCode. Do not expect to
