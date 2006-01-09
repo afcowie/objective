@@ -21,7 +21,8 @@ public class AllServicesTests
 		suite.addTestSuite(BasicCommandTest.class);
 		suite.addTestSuite(CommandsVsUnitsOfWorkTest.class);
 		suite.addTestSuite(PostTransactionCommandTest.class);
-		suite.addTestSuite(ComparatorsTest.class);
+		suite.addTestSuite(ComparatorsDetailedTest.class);
+		suite.addTestSuite(ComparatorsInTreeSetTest.class);
 		suite.addTestSuite(EntityCommandTest.class);
 
 		return suite;

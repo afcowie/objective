@@ -17,7 +17,9 @@ import accounts.domain.AccountsReceivable;
 import accounts.domain.AssetAccount;
 import accounts.domain.BankAccount;
 import accounts.domain.CashAccount;
+import accounts.domain.CreditPositiveAccount;
 import accounts.domain.CurrencyGainLossAccount;
+import accounts.domain.DebitPositiveAccount;
 import accounts.domain.DepreciatingAssetAccount;
 import accounts.domain.EquityAccount;
 import accounts.domain.ExpenseAccount;
@@ -34,6 +36,10 @@ import accounts.domain.TaxPayableAccount;
  * expressed in this program, have an ordering which is somewhat contrived;
  * since we deprecate acccount codes we use this Comparator to say how accounts
  * should be listed.
+ * <p>
+ * Although Account, DebitPositiveAccount and CreditPositiveAccount are included
+ * in the ordering table - you really ought only to be comparing the "concrete"
+ * subclasses of Account.
  */
 /*
  * Move to Account? No, because it references so many deep classes.
@@ -44,6 +50,10 @@ public class AccountComparator implements Comparator
 
 	static {
 		final Class[] ordering = {
+			Account.class,
+			DebitPositiveAccount.class,
+			CreditPositiveAccount.class,
+
 			AssetAccount.class,
 			BankAccount.class,
 			CashAccount.class,
@@ -136,7 +146,7 @@ public class AccountComparator implements Comparator
 				String title2 = a2.getTitle();
 
 				int titleCmp;
-				if ((title1 == null) || (title2== null)) {
+				if ((title1 == null) || (title2 == null)) {
 					// force it to ignore this comparison and move to the
 					// next
 					titleCmp = 0;

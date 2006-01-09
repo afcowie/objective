@@ -43,7 +43,7 @@ import accounts.persistence.UnitOfWork;
  * 
  * @author Andrew Cowie
  */
-public class ComparatorsTest extends TestCase
+public class ComparatorsInTreeSetTest extends TestCase
 {
 	public static final String	TESTS_DATABASE	= "tmp/unittests/ComparatorsTest.yap";
 	private static boolean		initialized		= false;
