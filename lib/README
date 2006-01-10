@@ -3,7 +3,7 @@ Their source code is shipped in exploded form (as individual files, organized in
 the standard Java hierarchical namespace) to faciliate optimal compilation for
 your plaform. Individual licence terms are as follows:
 
-com/db4o
+com/db4o, version 5.0.018
 --------
 
 db4o is the open source object database engine supplied by:
@@ -12,7 +12,7 @@ db4objects Inc.
 1900 South Norfolk Street
 Suite 350
 San Mateo, CA, 94403
-USA 
+USA
 
 http://www.db4o.com/
 
