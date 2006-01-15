@@ -75,7 +75,6 @@ public class AccountTextOutput extends TextOutput
 	 */
 	public AccountTextOutput(Account a) {
 		accounts = Collections.singleton(a);
-		accounts.add(a);
 	}
 
 	/**
