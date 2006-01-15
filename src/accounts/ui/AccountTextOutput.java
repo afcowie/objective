@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import accounts.domain.Account;
-import accounts.domain.Ledger;
 import accounts.persistence.DataStore;
 import accounts.services.AccountComparator;
 
@@ -100,20 +99,10 @@ public class AccountTextOutput extends TextOutput
 
 			Set lS = a.getLedgers();
 			if (lS == null) {
-				// no ledgers ?!?
+				// no ledgers...
 			} else {
-				Iterator lI = lS.iterator();
-				while (lI.hasNext()) {
-					Ledger l = (Ledger) lI.next();
-
-					out.print(pad("Ledger: \"" + chomp(l.getName(), descWidth + idWidth - 11) + "\" ", descWidth
-							+ idWidth, LEFT));
-					out.print(pad(l.getClassString(), typeWidth, RIGHT));
-					out.println();
-
-					EntryTextOutput entryOutputter = new EntryTextOutput(l);
-					entryOutputter.toOutput(out);
-				}
+				LedgerTextOutput ledgerOutputter = new LedgerTextOutput(lS);
+				ledgerOutputter.toOutput(out);
 			}
 			// blank line after account is done
 			out.println();
