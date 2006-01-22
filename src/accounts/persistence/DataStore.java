@@ -83,7 +83,8 @@ public class DataStore
 		 * we can tune it better)
 		 */
 		Class[] cascadeClasses = {
-			Books.class, LinkedHashSet.class,
+			Books.class,
+			LinkedHashSet.class,
 		};
 
 		for (int i = 0; i < cascadeClasses.length; i++) {
@@ -106,7 +107,8 @@ public class DataStore
 		}
 
 		Class[] leafClasses = {
-			Datestamp.class, Amount.class,
+			Datestamp.class,
+			Amount.class,
 		};
 
 		for (int i = 0; i < leafClasses.length; i++) {

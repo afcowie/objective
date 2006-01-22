@@ -28,6 +28,7 @@ my $quiet;
 # in place on error to facilitate troubleshooting.
 
 `rm -f .config`;
+`rm -f Hello.java Hello.class`;
 
 
 # --------------------------------------------------------------------
