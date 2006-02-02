@@ -208,15 +208,15 @@ DIRECTORY LAYOUT
 
 *	tests		Unit tests. Hierarchy of packages follows src/
 
-*+%	build		stamp files and other artifacts of build process (the
+*+	build		stamp files and other artifacts of build process (the
 			name is used largely because it makes the top level
 			Makefile really nice, ie targets like "build/classes"
 
-*+%	tmp		Output directory used during unit tests
+*+	tmp		Output directory used during unit tests
 
-*+%	tmp/classes	Output directory for compiled classes
+*+	tmp/classes	Output directory for compiled classes
 
-*+%	tmp/native	building & linking binary versions
+*+	tmp/native	building & linking binary versions
 
 Key:
 

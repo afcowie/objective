@@ -1,12 +1,13 @@
-This is ObjectiveAccounts, a program which helps operations teams run through
-mission critical events in a collaborative manner.
+This is ObjectiveAccounts, aka objective, an ongoing effort to create a simple
+but highly usable accounting system suitable for use by consultants, small
+businesses, and small non-profit organizations.
 
     Copyright (C) 2005 Operational Dynamics Consulting Pty Ltd, and others.
     See AUTHORS file for contributors.
     See lib/README for third party code.
 
 1) ObjectiveAccounts source code and documentation
--------------------------------------
+--------------------------------------------------
 
 ObjectiveAccounts is Logiciel Libre and is Open Source; you can redistribute it
 and/or modify it under the terms of the GNU General Public License, version 2
