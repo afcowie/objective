@@ -94,16 +94,16 @@ The whole point of configure is to figure things out for you, but if it can't
 quite figure out where Java is, you can override it by specifying an alternate
 location to find a JDK and/or GCJ, using either of the following:
 
-* jdk_home		(where to find a traditional Java Development Kit,
+* jdk			(where to find a traditional Java Development Kit,
 			 ie JAVA_HOME)
 
-* gcj_home		(location of an alternate GCJ install)
+* gcj			(location of an alternate GCJ install)
 
-* java-gnome_home	(prefix of an alternate java-gnome install)
+* java-gnome		(prefix of an alternate java-gnome install)
 
 For example:
 
-	./configure jdk_home=/opt/sun-jdk-1.4.2.04 java-gnome_home=/opt/gnome2
+	./configure jdk=/opt/sun-jdk-1.4.2.04 java-gnome=/opt/gnome2
 
 If you're having trouble with something as Make runs and need to debug it, you
 can try:
