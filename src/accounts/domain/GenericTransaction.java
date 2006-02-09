@@ -2,11 +2,9 @@
  * GenericTransaction.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
-
-import java.util.Set;
 
 /**
  * A generic transaction in the "general ledger" as traditional accounting
@@ -26,10 +24,6 @@ public class GenericTransaction extends Transaction
 	 */
 	public GenericTransaction() {
 		super();
-	}
-
-	public GenericTransaction(String description, Set entries) {
-		super(description, entries);
 	}
 
 	/**

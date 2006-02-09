@@ -2,7 +2,7 @@
  * Transaction.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -40,21 +40,6 @@ public class Transaction
 		 * Default constructor to permit generic top level searches. We don't
 		 * instantiate the Set here, though - save that for addding an entry.
 		 */
-	}
-
-	/**
-	 * Create a new transaction prototype, setting the description field and
-	 * providing an initial Set of entries.
-	 * 
-	 * @param description
-	 * @param entries
-	 *            a Set containing entry objects.
-	 * @throws NullPointerException
-	 *             if the description passed is null.
-	 */
-	public Transaction(String description, Set entries) {
-		setDescription(description);
-		setEntries(entries);
 	}
 
 	/**
@@ -134,33 +119,6 @@ public class Transaction
 
 	public Set getEntries() {
 		return entries;
-	}
-
-	/**
-	 * Replace the internal list of entries. This is used by the persistence
-	 * layer to replace an internal java.util.Set with something else. The
-	 * presumption is that the caller has used getEntries() to fetch the Set,
-	 * and re-instantiated it, and is passing it back in. Nevertheless,
-	 * validation is done here care of iterating over the Set and calling
-	 * addEntry()
-	 * 
-	 * @deprecated
-	 */
-	public void setEntries(Set entries) {
-		/*
-		 * Replace the internal entries Set.
-		 */
-		this.entries = entries;
-
-		/*
-		 * But make sure it's valid
-		 */
-		Iterator iter = entries.iterator();
-		while (iter.hasNext()) {
-			Entry candidate = (Entry) iter.next();
-			candidate.setParentTransaction(this);
-			candidate.setDate(this.date);
-		}
 	}
 
 	/**

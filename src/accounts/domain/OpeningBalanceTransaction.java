@@ -37,7 +37,7 @@ public class OpeningBalanceTransaction extends GenericTransaction
 	 *            {@link Books#dateOfInception}
 	 */
 	public OpeningBalanceTransaction(Set entries, Datestamp date) {
-		super(LABEL, entries);
+//		super(LABEL, entries);
 		super.setDate(date);
 	}
 

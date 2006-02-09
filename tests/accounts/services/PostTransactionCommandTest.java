@@ -2,19 +2,16 @@
  * PostTransactionCommandTest.java
  *
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
-
+import junit.framework.TestCase;
 import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Credit;
@@ -27,7 +24,9 @@ import accounts.domain.GenericTransaction;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
 import accounts.persistence.UnitOfWork;
-import junit.framework.TestCase;
+
+import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
 
 public class PostTransactionCommandTest extends TestCase
 {
@@ -61,21 +60,21 @@ public class PostTransactionCommandTest extends TestCase
 	 * PostTransactionCommand.action()'
 	 */
 	public void testTransactionCommandWithGeneric() {
-		HashSet entries = new HashSet();
-
 		Credit price = new Credit(new Amount("1100.00"), null);
 		Debit gst = new Debit(new Amount("100.00"), null);
 		Debit expense = new Debit(new Amount("1000.00"), null);
 
-		entries.add(price);
-		entries.add(gst);
-		entries.add(expense);
+		Entry[] entries = new Entry[] {
+			price,
+			gst,
+			expense
+		};
 
-		GenericTransaction t = new GenericTransaction("Test transaction", entries);
-		t.setIdentifier("TEST01");
 		Datestamp d = new Datestamp();
 		d.setAsToday();
-		t.setDate(d);
+
+		GenericTransaction t = new GenericTransaction("Test transaction", d, entries);
+		t.setIdentifier("TEST01");
 
 		assertTrue(t.isBalanced());
 
