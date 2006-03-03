@@ -2,7 +2,7 @@
  * Amount.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -23,12 +23,12 @@ import java.math.BigDecimal;
  * <P>
  * Internally, we store a long, which is the amount * 100. This was inspired by
  * {@link BigDecimal#valueOf(long, int)}- and we use that factory for
- * conversions to take advantage of it's efficiency.
+ * conversions to take advantage of its efficiency.
  * 
  * @author Andrew Cowie
  * 
  */
-public class Amount
+public class Amount implements Comparable
 {
 	/*
 	 * Instance variables ---------------------------------
@@ -59,8 +59,24 @@ public class Amount
 		setValue(value);
 	}
 
-	private Amount(BigDecimal value) {
-		setValue(value);
+	/**
+	 * @param big
+	 *            the BigDecimal whose value you want to make an Amount of.
+	 */
+	public Amount(BigDecimal big) {
+		setValue(big);
+	}
+
+	/**
+	 * Sometimes you just want to do math... and then turn the result into an
+	 * amount. Not for public consumption; use Account(String) to validate user
+	 * input.
+	 * 
+	 * @param cents
+	 *            The long indicating how many cents are in this Amount.
+	 */
+	public Amount(long cents) {
+		this.number = cents;
 	}
 
 	/*
@@ -149,6 +165,16 @@ public class Amount
 	}
 
 	/**
+	 * Sometimes you just want to do math, and so for that purpose we expose the
+	 * underlying number of cents that this Amount uses to represent its value.
+	 * Not for user consumption - if displaying an amount use getValue() or
+	 * toString().
+	 */
+	public long getNumber() {
+		return this.number;
+	}
+
+	/**
 	 * For use in debugging output, and in GUI display. This is equivalent to
 	 * the result of getValue() since we represent our Amounts externally using
 	 * Strings.
@@ -162,7 +188,7 @@ public class Amount
 	 * 
 	 * @return immutable (and possibly a reused Object).
 	 */
-	public BigDecimal getNumber() {
+	public BigDecimal getBigDecimal() {
 		/*
 		 * This leverages the valueOf Factory method by the fact that our use of
 		 * a long value as the Amount's value * 100 equates to a fixed
@@ -186,6 +212,28 @@ public class Amount
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Compare two amounts, returning -1 if this object is less than argument,
+	 * +1 if this object is greater, and 0 if the object has the same internal
+	 * value. [This method implements Comparable interface]
+	 */
+	public int compareTo(Object x) {
+		if (x == null) {
+			throw new NullPointerException("Can't compareTo() against null");
+		}
+		if (!(x instanceof Amount)) {
+			throw new IllegalArgumentException("Object passed to compareTo() is not an Amount");
+		}
+		Amount a = (Amount) x;
+		if (this.number > a.number) {
+			return 1;
+		} else if (this.number < a.number) {
+			return -1;
+		} else {
+			return 0;
+		}
 	}
 
 	/**
@@ -244,7 +292,7 @@ public class Amount
 		} else {
 			fraction = new BigDecimal("0." + p);
 		}
-		BigDecimal result = fraction.multiply(getNumber());
+		BigDecimal result = fraction.multiply(getBigDecimal());
 		return new Amount(result);
 	}
 
@@ -267,7 +315,7 @@ public class Amount
 
 		if ((len == 0) || (period == -1)) {
 			throw new NumberFormatException(
-					"You shouldn't call this on an arbitrary string - only on a two digit decimal String as returned by Amount.getValue()");
+				"You shouldn't call this on an arbitrary string - only on a two digit decimal String as returned by Amount.getValue()");
 		}
 
 		StringBuffer buf = new StringBuffer(str);

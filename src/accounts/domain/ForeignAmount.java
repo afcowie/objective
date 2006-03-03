@@ -2,7 +2,7 @@
  * ForeignAmount.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -131,7 +131,7 @@ public class ForeignAmount extends Amount
 	 */
 	public void setValue(String homeValue) {
 		super.setValue(homeValue);
-		BigDecimal h = super.getNumber();
+		BigDecimal h = super.getBigDecimal();
 		recalculateRateGivenHome(h);
 	}
 

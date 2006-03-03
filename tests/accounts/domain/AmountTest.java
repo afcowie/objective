@@ -2,7 +2,7 @@
  * AmountTest.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -11,8 +11,9 @@ import java.math.BigDecimal;
 import junit.framework.TestCase;
 
 /**
- * TODO One sentance class summary. TODO Class description here.
+ * Unit test Amount class.
  * 
+ * @see accounts.domain.ForeignCurrencyTest
  * @author Andrew Cowie
  */
 public class AmountTest extends TestCase
@@ -33,7 +34,7 @@ public class AmountTest extends TestCase
 		 */
 		assertEquals("0.00", a.getValue());
 
-		BigDecimal num = a.getNumber();
+		BigDecimal num = a.getBigDecimal();
 		assertNotNull(num);
 		assertEquals("0.00", num.toString());
 
@@ -142,7 +143,7 @@ public class AmountTest extends TestCase
 		a.incrementBy(b);
 
 		assertEquals("3.00", a.getValue());
-		assertTrue((new BigDecimal("3").compareTo(a.getNumber())) == 0);
+		assertTrue((new BigDecimal("3").compareTo(a.getBigDecimal())) == 0);
 
 		Amount c = new Amount("-3");
 		Amount d = new Amount("15");
@@ -150,7 +151,7 @@ public class AmountTest extends TestCase
 		c.incrementBy(d);
 
 		assertEquals("12.00", c.getValue());
-		assertTrue((new BigDecimal("12").compareTo(c.getNumber())) == 0);
+		assertTrue((new BigDecimal("12").compareTo(c.getBigDecimal())) == 0);
 	}
 
 	public void testSubtraction() {
@@ -200,7 +201,7 @@ public class AmountTest extends TestCase
 			fail("Should have thrown an exception as argument wasn't a x.xx form String");
 		} catch (NumberFormatException nfe) {
 		}
-		
+
 		assertEquals("12,345.67", a.toString());
 
 		Amount b = new Amount("123");
@@ -211,6 +212,24 @@ public class AmountTest extends TestCase
 
 		Amount d = new Amount("987654321.12");
 		assertEquals("987,654,321.12", d.toString());
+	}
+
+	public void testCompareTo() {
+		Amount a = new Amount("10.00");
+		Amount b = new Amount("11.95");
+		Amount c = new Amount("11.95");
+
+		assertTrue(a.compareTo(b) < 0);
+		assertTrue(b.compareTo(a) > 0);
+
+		assertTrue(c.compareTo(c) == 0);
+		assertTrue(b.compareTo(c) == 0);
+		assertTrue(c.compareTo(b) == 0);
+
+		Amount d = new Amount(1195);
+		assertTrue(c.compareTo(d) == 0);
+		Amount e = new Amount(-1195);
+		assertTrue(e.compareTo(d) < 0);
 	}
 
 }
