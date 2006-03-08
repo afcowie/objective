@@ -2,7 +2,7 @@
  * Timestamp.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -22,7 +22,7 @@ import accounts.persistence.NotActivatedException;
  * 
  * @author Andrew Cowie
  */
-public class Datestamp
+public class Datestamp implements Comparable
 {
 	/**
 	 * We use -1 for uninitialized, to guard against lacking activation, and to
@@ -140,7 +140,7 @@ public class Datestamp
 			cal.setTime(d);
 			if (cal.get(java.util.Calendar.YEAR) < 1970) {
 				throw new IllegalArgumentException(
-						"Can't enter a date before 1970. It parses, but doesn't make sense in ObjectiveAccounts!");
+					"Can't enter a date before 1970. It parses, but doesn't make sense in ObjectiveAccounts!");
 			}
 		} catch (ParseException pe) {
 			/*
@@ -203,5 +203,31 @@ public class Datestamp
 			throw new NotActivatedException();
 		}
 		return timestamp;
+	}
+
+	/**
+	 * Compare two Datestamp objects. [This method implements Comparable
+	 * interface]
+	 * 
+	 * @returns 1 if this one is greater (newer, more recent) than the argument
+	 *          x, -1 if this Datestmap is less than (older) than x, and 0 if
+	 *          they are the same.
+	 */
+	public int compareTo(Object x) {
+		if (x == null) {
+			throw new NullPointerException("Can't compareTo() against null");
+		}
+		if (!(x instanceof Datestamp)) {
+			throw new IllegalArgumentException("Can only compare Datestamp objects");
+		}
+		Datestamp d = (Datestamp) x;
+
+		if (this.timestamp > d.timestamp) {
+			return 1;
+		} else if (this.timestamp < d.timestamp) {
+			return -1;
+		} else {
+			return 0;
+		}
 	}
 }

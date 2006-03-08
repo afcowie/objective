@@ -2,7 +2,7 @@
  * DatestampTest.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -15,7 +15,7 @@ import junit.framework.TestCase;
 public class DatestampTest extends TestCase
 {
 
-	public void testValidDatestampStringInput() {
+	public final void testValidDatestampStringInput() {
 		Datestamp stamp = new Datestamp();
 
 		try {
@@ -62,7 +62,7 @@ public class DatestampTest extends TestCase
 		assertEquals("Day only failed", "15 " + expectedMonth + " " + expectedYear, stamp.toString());
 	}
 
-	public void testInvalidDatestampStringInput() {
+	public final void testInvalidDatestampStringInput() {
 		Datestamp stamp;
 		stamp = new Datestamp();
 		try {
@@ -84,7 +84,22 @@ public class DatestampTest extends TestCase
 			fail("Should have parsed as " + stamp.toString());
 		} catch (ParseException pe) {
 		}
+	}
 
-		
+	public final void testCompareTo() {
+		Datestamp andrew, katrina;
+		andrew = new Datestamp("28 Dec 73");
+		katrina = new Datestamp("18 Mar 74");
+
+		assertTrue(andrew.compareTo(katrina) == -1);
+		assertTrue(katrina.compareTo(andrew) == 1);
+		assertTrue(andrew.compareTo(andrew) == 0);
+
+		try {
+			Object o = new Object();
+			andrew.compareTo(o);
+			fail("Should have bombed on a not-Datestamp");
+		} catch (IllegalArgumentException iae) {
+		}
 	}
 }
