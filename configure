@@ -929,7 +929,7 @@ if ($gcj) {
 
 my $version = `grep VERSION src/accounts/client/ObjectiveAccounts.java`;
 chomp $version;
-$version =~ s/.*VERSION = \"([\d\.]+)\";/$1/;
+$version =~ s/.*VERSION\s*=\s*\"([\w\.\-]+)\";/$1/;
 
 print CONFIG <<HERE ;
 
