@@ -20,6 +20,7 @@ import accounts.domain.Entity;
 import accounts.domain.Ledger;
 import accounts.domain.Supplier;
 import accounts.domain.SupplierLedger;
+import accounts.persistence.IdentifierAlreadyExistsException;
 import accounts.persistence.UnitOfWork;
 
 public class AddEntityCommand extends Command

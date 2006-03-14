@@ -19,6 +19,7 @@ import accounts.domain.Currency;
 import accounts.domain.Ledger;
 import accounts.domain.Supplier;
 import accounts.domain.SupplierLedger;
+import accounts.persistence.IdentifierAlreadyExistsException;
 import accounts.persistence.UnitOfWork;
 import junit.framework.TestCase;
 

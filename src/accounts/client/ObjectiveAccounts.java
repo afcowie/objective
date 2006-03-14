@@ -13,9 +13,10 @@ import accounts.persistence.DataStore;
  * variables for use throughout the program. See the JavaDoc for the public
  * static members of this class. In particlar, note
  * <ul>
- * <li><code>store</code>, a reference to the currently open DataStore object.
- * <li><code>ui</code>, a way to get to the top level UserInterface object so you can cause
- * program wide GUI effects.
+ * <li><code>store</code>, a reference to the currently open DataStore
+ * object.
+ * <li><code>ui</code>, a way to get to the top level UserInterface object
+ * so you can cause program wide GUI effects.
  * </ul>
  * 
  * @author Andrew Cowie
@@ -66,4 +67,22 @@ public class ObjectiveAccounts
 		// }
 	}
 
+	/**
+	 * Get a statement about the copyright of the program code. [If you want to
+	 * do something other than print this to a terminal, then get the individual
+	 * lines by accessing the COPYRIGHT String array directly; it's public.]
+	 * 
+	 * @return the embedded copyright statement joined together into a single
+	 *         String with its lines separated by newlines.
+	 */
+	public static String getCopyrightText() {
+		StringBuffer buf = new StringBuffer();
+
+		for (int i = 0; i < COPYRIGHT.length; i++) {
+			buf.append(COPYRIGHT[i]);
+			buf.append("\n");
+		}
+
+		return buf.toString();
+	}
 }

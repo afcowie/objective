@@ -77,58 +77,58 @@ public class OprDynBooksSetup
 			 */
 
 			Account[] realAccounts = {
-					new CashAccount("Petty Cash", "Manly Office"),
-					new BankAccount("ANZ", "Current Account"),
-					new BankAccount("Citibank", "Chequing Account"),
-					new AccountsReceivable("Trade Debtors"),
-					new DepreciatingAssetAccount("Computer Equipment"),
-					new DepreciatingAssetAccount("Office Equipment"),
-					new DepreciatingAssetAccount("Furniture"),
+				new CashAccount("Petty Cash", "Manly Office"),
+				new BankAccount("ANZ", "Current Account"),
+				new BankAccount("Citibank", "Chequing Account"),
+				new AccountsReceivable("Trade Debtors"),
+				new DepreciatingAssetAccount("Computer Equipment"),
+				new DepreciatingAssetAccount("Office Equipment"),
+				new DepreciatingAssetAccount("Furniture"),
 
-					new AccountsPayable("Trade Creditors"),
-					new TaxPayableAccount("GST"),
-					new LoanPayableAccount("Shareholders' Loans", new LoanLedger[] {
-						new LoanLedger("Andrew Cowie"),
-					}),
+				new AccountsPayable("Trade Creditors"),
+				new TaxPayableAccount("GST"),
+				new LoanPayableAccount("Shareholders' Loans", new LoanLedger[] {
+					new LoanLedger("Andrew Cowie"),
+				}),
 
-					new OwnersEquityAccount("Owner's Equity", "Andrew Cowie"),
+				new OwnersEquityAccount("Owner's Equity", "Andrew Cowie"),
 
-					new ProfessionalRevenueAccount("Strategic Planning and Board Governance", "Consulting Fees"),
-					new ProfessionalRevenueAccount("Leadership & Teamwork", "Consulting Fees"),
-					new ProfessionalRevenueAccount("Procedures", "Consulting Fees"),
-					new ProfessionalRevenueAccount("Systems Performance", "Consulting Fees"),
-					new ProfessionalRevenueAccount("Conference Speaking and Tutorials", "Speaking Fees"),
-					new ProfessionalRevenueAccount("Publications", "Writing Fees"),
-					new ProfessionalRevenueAccount("Internet Services", "Service Fees"),
+				new ProfessionalRevenueAccount("Strategic Planning and Board Governance", "Consulting Fees"),
+				new ProfessionalRevenueAccount("Leadership & Teamwork", "Consulting Fees"),
+				new ProfessionalRevenueAccount("Procedures", "Consulting Fees"),
+				new ProfessionalRevenueAccount("Systems Performance", "Consulting Fees"),
+				new ProfessionalRevenueAccount("Conference Speaking and Tutorials", "Speaking Fees"),
+				new ProfessionalRevenueAccount("Publications", "Writing Fees"),
+				new ProfessionalRevenueAccount("Internet Services", "Service Fees"),
 
-					new GenericExpenseAccount("General and Administrative Expenses", new Ledger[] {
-							new DebitPositiveLedger("Accounting Fees"),
-							new DebitPositiveLedger("Legal Fees"),
-							new DebitPositiveLedger("Government Fees")
-					}),
-					new GenericExpenseAccount("Telecommunications Expenses", new Ledger[] {
-							new DebitPositiveLedger("Phone Lines, Office"),
-							new DebitPositiveLedger("Phone Lines, International"),
-							new DebitPositiveLedger("Phone Cards, Australia"),
-							new DebitPositiveLedger("Phone Cards, International")
-					}),
-					new GenericExpenseAccount("Travel Expenses", new Ledger[] {
-							new DebitPositiveLedger("Tickets, Air"),
-							new DebitPositiveLedger("Tickets, Rail"),
-							new DebitPositiveLedger("Ground Transfer"),
-							new DebitPositiveLedger("Accommodation"),
-							new DebitPositiveLedger("Meals"),
-					}),
-					new GenericExpenseAccount("Meals and Entertainment Expenses", new Ledger[] {
-							new DebitPositiveLedger("Staff Meetings"),
-							new DebitPositiveLedger("Client Meetings"),
-					}),
-					new GenericExpenseAccount("Employment Expenses", new Ledger[] {
-							new DebitPositiveLedger("Staff Ammenities"),
-							new DebitPositiveLedger("Salaries and Benefits"),
-							new DebitPositiveLedger("Recruiting Costs"),
-							new DebitPositiveLedger("Employee Medical Insurance"),
-					}),
+				new GenericExpenseAccount("General and Administrative Expenses", new Ledger[] {
+					new DebitPositiveLedger("Accounting Fees"),
+					new DebitPositiveLedger("Legal Fees"),
+					new DebitPositiveLedger("Government Fees")
+				}),
+				new GenericExpenseAccount("Telecommunications Expenses", new Ledger[] {
+					new DebitPositiveLedger("Phone Lines, Office"),
+					new DebitPositiveLedger("Phone Lines, International"),
+					new DebitPositiveLedger("Phone Cards, Australia"),
+					new DebitPositiveLedger("Phone Cards, International")
+				}),
+				new GenericExpenseAccount("Travel Expenses", new Ledger[] {
+					new DebitPositiveLedger("Tickets, Air"),
+					new DebitPositiveLedger("Tickets, Rail"),
+					new DebitPositiveLedger("Ground Transfer"),
+					new DebitPositiveLedger("Accommodation"),
+					new DebitPositiveLedger("Meals"),
+				}),
+				new GenericExpenseAccount("Meals and Entertainment Expenses", new Ledger[] {
+					new DebitPositiveLedger("Staff Meetings"),
+					new DebitPositiveLedger("Client Meetings"),
+				}),
+				new GenericExpenseAccount("Employment Expenses", new Ledger[] {
+					new DebitPositiveLedger("Staff Ammenities"),
+					new DebitPositiveLedger("Salaries and Benefits"),
+					new DebitPositiveLedger("Recruiting Costs"),
+					new DebitPositiveLedger("Employee Medical Insurance"),
+				}),
 			};
 
 			for (int i = 0; i < realAccounts.length; i++) {
@@ -142,8 +142,8 @@ public class OprDynBooksSetup
 			 * Add any other accouts being used for testing purposes
 			 */
 			Account[] testAccounts = {
-					new CashAccount("Petty Cash", "Toronto Office"),
-					new CashAccount("Petty Cash", "London Office"),
+				new CashAccount("Petty Cash", "Toronto Office"),
+				new CashAccount("Petty Cash", "London Office"),
 			};
 
 			for (int i = 0; i < testAccounts.length; i++) {
@@ -158,14 +158,14 @@ public class OprDynBooksSetup
 			 */
 
 			Currency[] currencies = {
-					home,
-					new Currency("CAD", "Canadian Dollar", "$"),
-					new Currency("USD", "United States Dollar", "$"),
-					new Currency("GBP", "British Pound", "?"),
-					new Currency("CHF", "Swiss Franc", "SFr"),
-					new Currency("EUR", "Eurpoean Union Euro", "?"),
-					new Currency("SGD", "Singaporean Dollar", "S$"),
-					new Currency("INR", "Indian Rupee", "Rs")
+				home,
+				new Currency("CAD", "Canadian Dollar", "$"),
+				new Currency("USD", "United States Dollar", "$"),
+				new Currency("GBP", "British Pound", "?"),
+				new Currency("CHF", "Swiss Franc", "SFr"),
+				new Currency("EUR", "Eurpoean Union Euro", "?"),
+				new Currency("SGD", "Singaporean Dollar", "S$"),
+				new Currency("INR", "Indian Rupee", "Rs")
 			};
 
 			for (int i = 0; i < currencies.length; i++) {

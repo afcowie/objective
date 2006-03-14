@@ -80,31 +80,30 @@ public class OprDynMockTransactions
 			 */
 
 			Transaction[] initialization = {
-					new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 03"), new Entry[] {
-							new Credit(new Amount("1.00"), ownersEquity),
-							new Debit(new Amount("1.00"), pettyCash),
-					}),
-					// FIXME change to some kind of Loan Transaction?
-					new GenericTransaction("Loan from owner", new Datestamp("21 Dec 03"), new Entry[] {
-							new Debit(new Amount("52700.00"), bankAccount),
-							new Credit(new Amount("52700.00"), shareholdersLoan),
-					}),
-					new GenericTransaction("Chair for office", new Datestamp("6 Jan 04"), new Entry[] {
-							new Debit(new Amount("659.10"), furniture),
-							new Debit(new Amount("65.90"), gstPaid),
-							new Credit(new Amount("725.00"), bankAccount),
-					}),
-					// FIXME change Transaction type?
-					new GenericTransaction("Procedures implementation ACME, Inc", new Datestamp("29 Aug 04"),
-							new Entry[] {
-									new Debit(new Amount("21500.00"), bankAccount),
-									new Credit(new Amount("19545.45"), consultingRevenue),
-									new Credit(new Amount("1954.55"), gstCollected),
-							}),
-					new GenericTransaction("Taxi from airport", new Datestamp("5 Nov 05"), new Entry[] {
-							new Credit(new Amount("9.99"), pettyCash),
-							new Debit(new Amount("9.99"), groundTransport),
-					}),
+				new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 03"), new Entry[] {
+					new Credit(new Amount("1.00"), ownersEquity),
+					new Debit(new Amount("1.00"), pettyCash),
+				}),
+				// FIXME change to some kind of Loan Transaction?
+				new GenericTransaction("Loan from owner", new Datestamp("21 Dec 03"), new Entry[] {
+					new Debit(new Amount("52700.00"), bankAccount),
+					new Credit(new Amount("52700.00"), shareholdersLoan),
+				}),
+				new GenericTransaction("Chair for office", new Datestamp("6 Jan 04"), new Entry[] {
+					new Debit(new Amount("659.10"), furniture),
+					new Debit(new Amount("65.90"), gstPaid),
+					new Credit(new Amount("725.00"), bankAccount),
+				}),
+				// FIXME change Transaction type?
+				new GenericTransaction("Procedures implementation ACME, Inc", new Datestamp("29 Aug 04"), new Entry[] {
+					new Debit(new Amount("21500.00"), bankAccount),
+					new Credit(new Amount("19545.45"), consultingRevenue),
+					new Credit(new Amount("1954.55"), gstCollected),
+				}),
+				new GenericTransaction("Taxi from airport", new Datestamp("5 Nov 05"), new Entry[] {
+					new Credit(new Amount("9.99"), pettyCash),
+					new Debit(new Amount("9.99"), groundTransport),
+				}),
 			};
 
 			for (int i = 0; i < initialization.length; i++) {
@@ -127,8 +126,8 @@ public class OprDynMockTransactions
 			uow = new UnitOfWork("Add some clients and suppliers");
 
 			Entity[] entities = {
-					new Client("ACME, Inc"),
-					new Supplier("Katoomba Telecom"),
+				new Client("ACME, Inc"),
+				new Supplier("Katoomba Telecom"),
 			};
 
 			for (int i = 0; i < entities.length; i++) {
