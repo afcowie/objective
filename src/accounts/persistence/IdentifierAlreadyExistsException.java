@@ -2,20 +2,20 @@
  * IdentifierAlreadyExistsException.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.services;
+package accounts.persistence;
 
 /**
- * Blown if, when trying to add an Account or Ledger, the title is already in
- * use.
+ * Blown when, for example, if trying to add an Account or Ledger, the title is
+ * already in use.
  * 
  * @author Andrew Cowie
  */
-public class IdentifierAlreadyExistsException extends Exception
+public class IdentifierAlreadyExistsException extends RuntimeException
 {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long	serialVersionUID	= 2L;
 
 	public IdentifierAlreadyExistsException() {
 		super();

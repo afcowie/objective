@@ -23,6 +23,7 @@ public class AllDomainTests
 		suite.addTestSuite(DatestampTest.class);
 		suite.addTestSuite(BasicLoanTest.class);
 		suite.addTestSuite(ForeignCurrencyTest.class);
+		suite.addTestSuite(IdentifierTest.class);
 
 		return suite;
 	}
