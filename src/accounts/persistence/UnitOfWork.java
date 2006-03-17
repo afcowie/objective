@@ -2,7 +2,7 @@
  * UnitOfWork.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.persistence;
 
@@ -283,6 +283,9 @@ public class UnitOfWork
 	 * least trap UnitOfWork itself from causing leaks.
 	 */
 	protected void finalize() {
+		if (active == true) {
+			Debug.print("memory", "finalizing a UnitOfWork which was neither committed nor cancelled.");
+		}
 		if (dirtyObjects != null) {
 			int i = 0;
 
@@ -316,7 +319,7 @@ public class UnitOfWork
 			}
 
 			Debug.print("memory", "leak in <" + name + ">; " + i + " removed from myChangeListeners and " + j
-					+ " removed from globalChangeListeners");
+				+ " removed from globalChangeListeners");
 		}
 
 		try {
