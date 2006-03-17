@@ -24,6 +24,7 @@ public class AllServicesTests
 		suite.addTestSuite(ComparatorsDetailedTest.class);
 		suite.addTestSuite(ComparatorsInTreeSetTest.class);
 		suite.addTestSuite(EntityCommandTest.class);
+		suite.addTestSuite(IdentifierCommandsTest.class);
 
 		return suite;
 	}

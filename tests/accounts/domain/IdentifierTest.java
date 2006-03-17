@@ -126,5 +126,12 @@ public class IdentifierTest extends TestCase
 		assertEquals(2, ids.indexOf(i0));
 		assertEquals(0, ids.indexOf(i1));
 		assertEquals(1, ids.indexOf(i2));
+
+		ig.removeIdentifier(i2);
+
+		assertEquals(2, ids.size());
+		assertEquals(-1, ids.indexOf(i2));
+		assertEquals(0, ids.indexOf(i1));
+		assertEquals(1, ids.indexOf(i0));
 	}
 }

@@ -21,6 +21,7 @@ public class OprDynOutputDump
 	public static void main(String[] args) {
 		DataStore store = null;
 		TextOutput outputter = null;
+
 		try {
 			store = DatafileServices.openDatafile(OprDynBooksSetup.DEMO_DATABASE);
 

@@ -13,8 +13,9 @@ import java.util.List;
 import accounts.persistence.IdentifierAlreadyExistsException;
 
 /**
- * A group of Identifiers. They are maintained in a specific order which is
- * useful for display purposes.
+ * A group of Identifiers maintained in a specific order for display purposes.
+ * Note that this is really just a named ordered Collection; more than one
+ * IdentifierGroup can include any given Identifier.
  * 
  * @author Andrew Cowie
  */
@@ -72,6 +73,28 @@ public class IdentifierGroup
 		}
 
 		group.addLast(identifier);
+	}
+
+	/**
+	 * Remove an Identifier from this IdentifierGroup.
+	 * 
+	 * @param identifier
+	 *            the Identifier to add.
+	 */
+	public void removeIdentifier(Identifier identifier) {
+		if (group == null) {
+			throw new IllegalStateException();
+		}
+		if (identifier == null) {
+			throw new IllegalArgumentException("Can't remove null");
+		}
+
+		int i = group.indexOf(identifier);
+		if (i == -1) {
+			throw new IllegalArgumentException("This IdentifierGroup doesn't contain that Identifier");
+		} else {
+			group.remove(i);
+		}
 	}
 
 	/**
