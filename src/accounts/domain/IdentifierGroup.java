@@ -21,8 +21,8 @@ import accounts.persistence.IdentifierAlreadyExistsException;
  */
 public class IdentifierGroup
 {
-	private String		label	= null;
-	private LinkedList	group	= null;
+	private String	label	= null;
+	private List	group	= null;
 
 	/**
 	 * Construct a new IdentifierGroup with label as its "title"
@@ -72,7 +72,12 @@ public class IdentifierGroup
 			}
 		}
 
-		group.addLast(identifier);
+		/*
+		 * For a linked list, the behaviour of add() is to append the object to
+		 * the end of the List. [which is what addLast() achieves by simply
+		 * calling add(), so say the docs]
+		 */
+		group.add(identifier);
 	}
 
 	/**
