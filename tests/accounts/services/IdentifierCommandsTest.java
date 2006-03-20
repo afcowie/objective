@@ -11,14 +11,13 @@ import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.TestCase;
 import accounts.client.ObjectiveAccounts;
-import accounts.domain.AustralianPayrollTaxIdentifier;
 import accounts.domain.Identifier;
 import accounts.domain.IdentifierGroup;
 import accounts.domain.PayrollTaxIdentifier;
 import accounts.persistence.UnitOfWork;
-import accounts.services.DatafileServices;
-import junit.framework.TestCase;
+import country.au.domain.AustralianPayrollTaxIdentifier;
 
 public class IdentifierCommandsTest extends TestCase
 {

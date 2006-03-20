@@ -10,6 +10,8 @@ import generic.util.Debug;
 
 import java.io.File;
 
+import country.au.services.AustralianInitBooksCommand;
+
 import accounts.domain.Account;
 import accounts.domain.AccountsPayable;
 import accounts.domain.AccountsReceivable;
@@ -67,9 +69,7 @@ public class OprDynBooksSetup
 		try {
 			uow = new UnitOfWork("Demo Books Setup");
 
-			Currency home = new Currency("AUD", "Australian Dollar", "$");
-
-			InitBooksCommand initBooks = new InitBooksCommand(home);
+			InitBooksCommand initBooks = new AustralianInitBooksCommand();
 			initBooks.execute(uow);
 
 			/*
@@ -158,7 +158,6 @@ public class OprDynBooksSetup
 			 */
 
 			Currency[] currencies = {
-				home,
 				new Currency("CAD", "Canadian Dollar", "$"),
 				new Currency("USD", "United States Dollar", "$"),
 				new Currency("GBP", "British Pound", "?"),

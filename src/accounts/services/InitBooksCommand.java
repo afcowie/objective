@@ -23,7 +23,12 @@ import accounts.persistence.UnitOfWork;
  */
 public class InitBooksCommand extends Command
 {
-	private Currency	home;
+	/**
+	 * The home (native) currency to be set by this Command.
+	 * 
+	 * @see Books#homeCurrency
+	 */
+	protected transient Currency	home;
 
 	/**
 	 * Create a new InitBooksCommand, specifying:
@@ -39,7 +44,18 @@ public class InitBooksCommand extends Command
 		this.home = home;
 	}
 
-	protected void action(UnitOfWork uow) {
+	/**
+	 * Allow the implicit () constructor for subclasses, which can perfectly
+	 * well set the home currency themsleves.
+	 */
+	protected InitBooksCommand() {
+	}
+
+	protected void action(UnitOfWork uow) throws CommandNotReadyException {
+		if (home == null) {
+			throw new CommandNotReadyException("home Currency not set");
+		}
+
 		Books root = new Books();
 
 		DataStore store = ObjectiveAccounts.store;
