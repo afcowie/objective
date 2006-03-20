@@ -43,7 +43,7 @@ public class AccountTextOutput extends TextOutput
 	 *            a DataStore from which to fetch all instances of Account.
 	 */
 	public AccountTextOutput(DataStore store) {
-		List aL = store.query(Account.class);
+		List aL = store.queryByExample(Account.class);
 
 		accounts = new TreeSet(new AccountComparator());
 		accounts.addAll(aL);

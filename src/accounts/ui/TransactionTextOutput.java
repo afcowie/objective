@@ -44,7 +44,7 @@ public class TransactionTextOutput extends TextOutput
 	 *            a DataStore from which to fetch all instances of Transaction.
 	 */
 	public TransactionTextOutput(DataStore store) {
-		List tL = store.query(Transaction.class);
+		List tL = store.queryByExample(Transaction.class);
 
 		transactions = new TreeSet(new TransactionComparator());
 		transactions.addAll(tL);

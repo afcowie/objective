@@ -297,7 +297,7 @@ public class DataStore
 	 *         the database. If no objects are fetched, then the list will not
 	 *         be null but will have size 0.
 	 */
-	public List query(Object example) {
+	public List queryByExample(Object example) {
 		ObjectSet os = container.get(example);
 		final int len = os.size();
 		ArrayList result;

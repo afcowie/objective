@@ -77,7 +77,7 @@ public class ExposeDb4oQueryInterfaceTest extends TestCase
 		 * Query something that isn't in the set
 		 */
 		DummyInts proto1 = new DummyInts(25);
-		List results = store.query(proto1);
+		List results = store.queryByExample(proto1);
 
 		assertEquals(0, results.size());
 
@@ -86,7 +86,7 @@ public class ExposeDb4oQueryInterfaceTest extends TestCase
 		 */
 		DummyInts proto2 = new DummyInts(7);
 
-		results = store.query(proto2);
+		results = store.queryByExample(proto2);
 
 		assertEquals(1, results.size());
 

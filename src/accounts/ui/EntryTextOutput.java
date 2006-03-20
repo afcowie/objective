@@ -62,7 +62,7 @@ public class EntryTextOutput extends TextOutput
 	 *            displaying Entries within.
 	 */
 	public EntryTextOutput(DataStore store, Object context) {
-		List tL = store.query(Transaction.class);
+		List tL = store.queryByExample(Transaction.class);
 
 		entries = new TreeSet(new EntryComparator(context));
 		entries.addAll(tL);

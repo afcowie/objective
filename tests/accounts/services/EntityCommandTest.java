@@ -105,7 +105,7 @@ public class EntityCommandTest extends TestCase
 		 * Now make sure it did what it should have!
 		 */
 
-		List found = ObjectiveAccounts.store.query(ClientLedger.class);
+		List found = ObjectiveAccounts.store.queryByExample(ClientLedger.class);
 		assertEquals("Only should be one ClientLedger in database at this point", 1, found.size());
 
 		Ledger candidate = ObjectiveAccounts.store.getLedger("Accounts Receiv", "");
@@ -213,7 +213,7 @@ public class EntityCommandTest extends TestCase
 		 * Now make sure it did what it should have!
 		 */
 
-		List found = ObjectiveAccounts.store.query(SupplierLedger.class);
+		List found = ObjectiveAccounts.store.queryByExample(SupplierLedger.class);
 		assertEquals("Only should be one SupplierLedger in database at this point", 1, found.size());
 
 		Ledger candidate = ObjectiveAccounts.store.getLedger("Accounts Payab", "");

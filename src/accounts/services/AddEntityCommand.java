@@ -43,7 +43,7 @@ public class AddEntityCommand extends Command
 		Entity prototype = new Entity();
 		prototype.setName(entity.getName());
 
-		List found = ObjectiveAccounts.store.query(prototype);
+		List found = ObjectiveAccounts.store.queryByExample(prototype);
 
 		if (found.size() > 0) {
 			throw new IdentifierAlreadyExistsException(entity.getName() + " already exists as an Entity");
@@ -63,7 +63,7 @@ public class AddEntityCommand extends Command
 		}
 		protoLedger.setName(entity.getName());
 
-		found = ObjectiveAccounts.store.query(protoLedger);
+		found = ObjectiveAccounts.store.queryByExample(protoLedger);
 
 		if (found.size() > 0) {
 			throw new IdentifierAlreadyExistsException("There is already an ItemsLedger with " + entity.getName()
@@ -84,9 +84,9 @@ public class AddEntityCommand extends Command
 	protected void action(UnitOfWork uow) throws CommandNotReadyException {
 		List found;
 		if (candidate instanceof Client) {
-			found = ObjectiveAccounts.store.query(AccountsReceivable.class);
+			found = ObjectiveAccounts.store.queryByExample(AccountsReceivable.class);
 		} else if (candidate instanceof Supplier) {
-			found = ObjectiveAccounts.store.query(AccountsPayable.class);
+			found = ObjectiveAccounts.store.queryByExample(AccountsPayable.class);
 		} else {
 			throw new DebugException(
 					"Huh? How did this AddEntityCommmand come to have neither Client nor Supplier as its candidate Entity?");

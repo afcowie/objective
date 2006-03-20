@@ -67,7 +67,7 @@ public class IdentifierCommandsTest extends TestCase
 		/*
 		 * verify they both got stored
 		 */
-		List l = ObjectiveAccounts.store.query(Identifier.class);
+		List l = ObjectiveAccounts.store.queryByExample(Identifier.class);
 		assertEquals(2, l.size());
 
 		/*
@@ -86,7 +86,7 @@ public class IdentifierCommandsTest extends TestCase
 		}
 		uow.commit();
 
-		l = ObjectiveAccounts.store.query(Identifier.class);
+		l = ObjectiveAccounts.store.queryByExample(Identifier.class);
 		assertEquals(3, l.size());
 	}
 
@@ -98,21 +98,21 @@ public class IdentifierCommandsTest extends TestCase
 		/*
 		 * Verify persistance across individual tests
 		 */
-		List l = ObjectiveAccounts.store.query(Identifier.class);
+		List l = ObjectiveAccounts.store.queryByExample(Identifier.class);
 		assertEquals(3, l.size());
 
 		/*
 		 * Now fetch out one of the Identifiers, change it, and store it.
 		 */
 		Identifier proto = new Identifier("One");
-		l = ObjectiveAccounts.store.query(proto);
+		l = ObjectiveAccounts.store.queryByExample(proto);
 		assertEquals(1, l.size());
 		Identifier found = (Identifier) l.get(0);
 		assertEquals("One", found.getName());
 
 		found.setName("The One");
 
-		l = ObjectiveAccounts.store.query(IdentifierGroup.class);
+		l = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
 		assertEquals(1, l.size());
 		IdentifierGroup grp = (IdentifierGroup) l.get(0);
 
@@ -129,7 +129,7 @@ public class IdentifierCommandsTest extends TestCase
 		 * Should still be three objects; should not be a "One" and should be a
 		 * "The One"
 		 */
-		l = ObjectiveAccounts.store.query(Identifier.class);
+		l = ObjectiveAccounts.store.queryByExample(Identifier.class);
 		assertEquals(3, l.size());
 
 		boolean theone = false;
@@ -182,7 +182,7 @@ public class IdentifierCommandsTest extends TestCase
 	 * different case.
 	 */
 	public final void testStoreIdentifierGroupCommandHavingRemovedOne() {
-		List l = ObjectiveAccounts.store.query(IdentifierGroup.class);
+		List l = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
 		assertEquals(1, l.size());
 
 		IdentifierGroup grp = (IdentifierGroup) l.get(0);
@@ -203,7 +203,7 @@ public class IdentifierCommandsTest extends TestCase
 		 * Now find out if its still in the stored IdentifierGroup (it shouldn't
 		 * be)
 		 */
-		l = ObjectiveAccounts.store.query(IdentifierGroup.class);
+		l = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
 		assertEquals(1, l.size());
 		grp = (IdentifierGroup) l.get(0);
 
@@ -242,7 +242,7 @@ public class IdentifierCommandsTest extends TestCase
 		 * But it should still be in the database.
 		 */
 		Identifier proto = new Identifier("Two");
-		l = ObjectiveAccounts.store.query(proto);
+		l = ObjectiveAccounts.store.queryByExample(proto);
 		assertEquals(1, l.size());
 	}
 }

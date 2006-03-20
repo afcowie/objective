@@ -152,7 +152,7 @@ public class ComparatorsInTreeSetTest extends TestCase
 		Amount totalDebits = new Amount("0.00");
 		Amount totalCredits = new Amount("0.00");
 
-		List eL = ObjectiveAccounts.store.query(Entry.class);
+		List eL = ObjectiveAccounts.store.queryByExample(Entry.class);
 		Iterator eI = eL.iterator();
 		while (eI.hasNext()) {
 			Entry e = (Entry) eI.next();
@@ -171,7 +171,7 @@ public class ComparatorsInTreeSetTest extends TestCase
 	}
 
 	final public void testTransactionComparator() {
-		List tL = ObjectiveAccounts.store.query(Transaction.class);
+		List tL = ObjectiveAccounts.store.queryByExample(Transaction.class);
 		assertEquals(NUM, tL.size());
 
 		TreeSet tS = new TreeSet(new TransactionComparator());
@@ -181,7 +181,7 @@ public class ComparatorsInTreeSetTest extends TestCase
 	}
 
 	final public void testEntryComparatorInLedgerContext() {
-		List eL = ObjectiveAccounts.store.query(Entry.class);
+		List eL = ObjectiveAccounts.store.queryByExample(Entry.class);
 		assertEquals("Original number of Entries not as expected", NUM * 3, eL.size());
 
 		TreeSet eS = new TreeSet(new EntryComparator(new Ledger()));
@@ -191,7 +191,7 @@ public class ComparatorsInTreeSetTest extends TestCase
 	}
 
 	final public void testEntryComparatorInTransactionContext() {
-		List eL = ObjectiveAccounts.store.query(Entry.class);
+		List eL = ObjectiveAccounts.store.queryByExample(Entry.class);
 		assertEquals("Original number of Entries not as expected", NUM * 3, eL.size());
 
 		TreeSet eS = new TreeSet(new EntryComparator(new Transaction()));
@@ -201,7 +201,7 @@ public class ComparatorsInTreeSetTest extends TestCase
 	}
 
 	final public void testAccountComparatorAsInitialized() {
-		List aL = ObjectiveAccounts.store.query(Account.class);
+		List aL = ObjectiveAccounts.store.queryByExample(Account.class);
 		assertEquals("Original number of Entries not as expected", NUM + 2, aL.size());
 
 		TreeSet aS = new TreeSet(new AccountComparator());
@@ -233,7 +233,7 @@ public class ComparatorsInTreeSetTest extends TestCase
 
 		final int expected = 3 * NUM + 2;
 
-		List aL = ObjectiveAccounts.store.query(Account.class);
+		List aL = ObjectiveAccounts.store.queryByExample(Account.class);
 		assertEquals("Original number of Entries not as expected", expected, aL.size());
 
 		TreeSet aS = new TreeSet(new AccountComparator());
