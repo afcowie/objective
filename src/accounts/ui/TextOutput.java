@@ -44,7 +44,7 @@ public abstract class TextOutput
 			int val = Integer.valueOf(env).intValue();
 			if (val < COLUMNS_MIN) {
 				throw new IllegalStateException("Terminal too narrow for TextOutput. Min width " + COLUMNS_MIN
-						+ " characters.");
+					+ " characters.");
 			}
 			COLUMNS = val;
 		}
@@ -58,7 +58,7 @@ public abstract class TextOutput
 	 *            a PrintStream like System.out or System.err
 	 */
 	public final void toOutput(PrintStream out) {
-		toOutput(new PrintWriter(System.out, true));
+		toOutput(new PrintWriter(out, true));
 
 	}
 
@@ -110,7 +110,7 @@ public abstract class TextOutput
 
 		if (width < 4) {
 			throw new IllegalArgumentException(
-					"Can't chomp to less than a width of 4 because of adding three dots as an elipses");
+				"Can't chomp to less than a width of 4 because of adding three dots as an elipses");
 		}
 		/*
 		 * crop

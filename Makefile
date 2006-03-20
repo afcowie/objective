@@ -197,7 +197,7 @@ test: build/unittests
 build/unittests: build/classes-tests
 	@echo "$(JAVA_CMD) AllTests [JUnit]"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes AllTests
+	$(JAVA) -classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes generic.junit.VerboseTestRunner AllTests
 
 
 

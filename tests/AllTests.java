@@ -1,10 +1,11 @@
 /*
- * AllClientTests.java
+ * AllTests.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 
+import generic.junit.VerboseTestRunner;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import accounts.client.AllClientTests;
@@ -17,9 +18,8 @@ import accounts.services.AllServicesTests;
  */
 public class AllTests
 {
-
 	public static void main(String[] args) {
-		junit.textui.TestRunner.run(suite());
+		VerboseTestRunner.run(suite());
 	}
 
 	public static Test suite() {
