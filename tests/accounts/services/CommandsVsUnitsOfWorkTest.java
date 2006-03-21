@@ -8,6 +8,7 @@ package accounts.services;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import junit.framework.TestCase;
@@ -15,6 +16,7 @@ import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.domain.Currency;
+import accounts.domain.Datestamp;
 import accounts.persistence.UnitOfWork;
 
 public class CommandsVsUnitsOfWorkTest extends TestCase
@@ -142,5 +144,29 @@ public class CommandsVsUnitsOfWorkTest extends TestCase
 		 */
 		Books received = ObjectiveAccounts.store.getBooks();
 		assertNotNull(received);
+	}
+
+	/**
+	 * Not much to this one; its just a wrapper around DataStore.save()
+	 */
+	public final void testStoreObjectCommand() {
+		UnitOfWork uow = new UnitOfWork("testInitBooksAndAddAccountsInOneUnitOfWork");
+
+		Datestamp virgin = new Datestamp("18 Mar 96");
+
+		try {
+			StoreObjectCommand soc = new StoreObjectCommand(virgin);
+			soc.execute(uow);
+		} catch (Exception e) {
+			fail("InitBooksCommand shouldn't have thrown anything, let alone " + e);
+		}
+		uow.commit();
+
+		List l = ObjectiveAccounts.store.queryByExample(virgin);
+
+		assertEquals(1, l.size());
+
+		Datestamp slut = (Datestamp) l.get(0);
+		assertSame(slut, virgin);
 	}
 }
