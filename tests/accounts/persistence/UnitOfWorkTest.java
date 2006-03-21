@@ -159,7 +159,9 @@ public class UnitOfWorkTest extends TestCase
 		UnitOfWork observer = new UnitOfWork("observer");
 
 		ObjectContainer container = ObjectiveAccounts.store.getContainer();
-		ObjectSet result = container.get(Tofu.class);
+		final Tofu proto = new Tofu(3);
+		ObjectSet result = container.get(proto);
+		assertEquals(1, result.size());
 		final Tofu innocent = (Tofu) result.next();
 		assertEquals(3, innocent.getNum());
 
@@ -179,7 +181,7 @@ public class UnitOfWorkTest extends TestCase
 
 		UnitOfWork worker = new UnitOfWork("worker");
 
-		ObjectSet anotherResult = container.get(Tofu.class);
+		ObjectSet anotherResult = container.get(proto);
 		Tofu sinful = (Tofu) anotherResult.next();
 		assertEquals(3, sinful.getNum());
 
