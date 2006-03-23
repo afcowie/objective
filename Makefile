@@ -195,9 +195,9 @@ test: build/unittests
 # the point is to *run* these, so we don't touch a stamp file.
 
 build/unittests: build/classes-tests
-	@echo "$(JAVA_CMD) AllTests [JUnit]"
+	@echo "$(JAVA_CMD) UnitTests"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes generic.junit.VerboseTestRunner AllTests
+	$(JAVA) -classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes generic.junit.VerboseTestRunner UnitTests
 
 
 

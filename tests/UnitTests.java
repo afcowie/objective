@@ -33,7 +33,7 @@ import country.au.services.AustralianPayrollTaxTest;
 /**
  * @author Andrew Cowie
  */
-public class AllTests
+public class UnitTests
 {
 	public static void main(String[] args) {
 		VerboseTestRunner.run(suite());
