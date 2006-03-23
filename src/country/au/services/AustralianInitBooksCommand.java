@@ -6,13 +6,13 @@
  */
 package country.au.services;
 
-import country.au.domain.AustralianPayrollTaxIdentifier;
 import accounts.domain.Currency;
 import accounts.domain.IdentifierGroup;
 import accounts.persistence.UnitOfWork;
 import accounts.services.CommandNotReadyException;
 import accounts.services.InitBooksCommand;
 import accounts.services.StoreIdentifierGroupCommand;
+import country.au.domain.AustralianPayrollTaxIdentifier;
 
 /**
  * Setup a set of books appropriate to an company domiciled in Australia.
@@ -36,7 +36,6 @@ public class AustralianInitBooksCommand extends InitBooksCommand
 		AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING = new AustralianPayrollTaxIdentifier(
 			"Tax-free threshold and leave loading claimed");
 		AustralianPayrollTaxIdentifier.NO_TFN_PROVIDED = new AustralianPayrollTaxIdentifier("No TFN (or ABN) quoted");
-
 	}
 
 	/**
@@ -45,9 +44,14 @@ public class AustralianInitBooksCommand extends InitBooksCommand
 	 * through this method via super.action()
 	 */
 	protected void action(UnitOfWork uow) throws CommandNotReadyException {
-
+		/*
+		 * Execute the basic InitBooksCommand
+		 */
 		super.action(uow);
 
+		/*
+		 * Now add the PAYG identifers
+		 */
 		IdentifierGroup grp = new IdentifierGroup("PAYG witholding types");
 		grp.addIdentifier(AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD);
 		grp.addIdentifier(AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_NO_LEAVE_LOADING);
@@ -57,6 +61,10 @@ public class AustralianInitBooksCommand extends InitBooksCommand
 		StoreIdentifierGroupCommand sigc = new StoreIdentifierGroupCommand(grp);
 		sigc.execute(uow);
 
+		/*
+		 * Initialize the PAYG tables as are currently available.
+		 */
+		StoreAustralianPayrollTaxTablesCommand sapttc = new StoreAustralianPayrollTaxTablesCommand();
+		sapttc.execute(uow);
 	}
-
 }
