@@ -28,7 +28,7 @@ import accounts.services.DatafileTest;
 import accounts.services.EntityCommandTest;
 import accounts.services.IdentifierCommandsTest;
 import accounts.services.PostTransactionCommandTest;
-import country.au.services.AustralianPayrollTaxCalculatorTest;
+import country.au.services.AustralianPayrollTaxTest;
 
 /**
  * @author Andrew Cowie
@@ -66,7 +66,7 @@ public class AllTests
 		suite.addTestSuite(ComparatorsInTreeSetTest.class);
 		suite.addTestSuite(EntityCommandTest.class);
 		suite.addTestSuite(IdentifierCommandsTest.class);
-		suite.addTestSuite(AustralianPayrollTaxCalculatorTest.class);
+		suite.addTestSuite(AustralianPayrollTaxTest.class);
 
 		// client
 		suite.addTestSuite(Db4oActivationTest.class);
