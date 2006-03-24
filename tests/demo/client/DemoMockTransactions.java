@@ -4,12 +4,13 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.client;
+package demo.client;
 
 import generic.util.Debug;
 
 import java.io.FileNotFoundException;
 
+import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Client;
 import accounts.domain.Credit;
@@ -33,9 +34,9 @@ import accounts.services.PostTransactionCommand;
  * will move to an eventual Client class). The remainder is a huge number of
  * Commands, instantiated programmatically, to run a bunch of transactions.
  */
-public class OprDynMockTransactions
+public class DemoMockTransactions
 {
-	public final static String	DEMO_DATABASE	= OprDynBooksSetup.DEMO_DATABASE;
+	public final static String	DEMO_DATABASE	= DemoBooksSetup.DEMO_DATABASE;
 
 	public static void main(String[] args) {
 		Debug.setProgname("mock");

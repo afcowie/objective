@@ -4,14 +4,13 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.client;
+package demo.client;
 
 import generic.util.Debug;
 
 import java.io.File;
 
-import country.au.services.AustralianInitBooksCommand;
-
+import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.AccountsPayable;
 import accounts.domain.AccountsReceivable;
@@ -33,6 +32,7 @@ import accounts.services.AddCurrencyCommand;
 import accounts.services.CommandNotReadyException;
 import accounts.services.DatafileServices;
 import accounts.services.InitBooksCommand;
+import country.au.services.AustralianInitBooksCommand;
 
 /**
  * Contains a prelinary main() method and program initialization (much of which
@@ -45,9 +45,9 @@ import accounts.services.InitBooksCommand;
  * <P>
  * <B>NOTE THAT RUNNING THIS DESTROYS ANY EXISTING INSTANCE OF THE DEMO_DATABASE</B>
  */
-public class OprDynBooksSetup
+public class DemoBooksSetup
 {
-	public final static String	DEMO_DATABASE	= "tmp/oprdyn.yap";
+	public final static String	DEMO_DATABASE	= "tmp/demo.yap";
 
 	public static void main(String[] args) {
 		Debug.setProgname("setup");

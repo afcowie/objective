@@ -204,37 +204,37 @@ build/unittests: build/classes-tests
 setup: build/classes-tests setup-rm build/demo-setup
 setup-rm:
 	@echo "RM        demo database"
-	rm -f tmp/oprdyn.yap
+	rm -f tmp/demo.yap
 	rm -f build/demo-setup
 
 # assume, without ordering, that build/classes-tests has been called. Actually
 # depending on it means that this will almost always be called when developing
 # in Eclipse.
-build/demo-setup: tests/accounts/client/OprDynBooksSetup.java
-	@echo "$(JAVA_CMD) OprDynBooksSetup $(DEBUG)"
+build/demo-setup: tests/demo/client/DemoBooksSetup.java
+	@echo "$(JAVA_CMD) DemoBooksSetup $(DEBUG)"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.client.OprDynBooksSetup $(DEBUG)
-	@echo "$(JAVA_CMD) OprDynMockTransactions $(DEBUG)"
+	$(JAVA) -classpath $(CLASSPATH):tmp/classes demo.client.DemoBooksSetup $(DEBUG)
+	@echo "$(JAVA_CMD) DemoMockTransactions $(DEBUG)"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.client.OprDynMockTransactions $(DEBUG)
+	$(JAVA) -classpath $(CLASSPATH):tmp/classes demo.client.DemoMockTransactions $(DEBUG)
 	touch $@
 
 dump: build/classes-tests build/demo-setup
-	@echo "$(JAVA_CMD) OprDynOutputDump $(DEBUG)"
+	@echo "$(JAVA_CMD) DemoOutputDump $(DEBUG)"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
 	$(JAVA) -classpath $(CLASSPATH):tmp/classes \
 		-DCOLUMNS=`resize | perl -n -e'print if (s/COLUMNS=(\d*);/\1/)'` \
-		accounts.ui.OprDynOutputDump $(DEBUG)
+		demo.ui.DemoOutputDump $(DEBUG)
 
 pop: build/classes-tests build/demo-setup
-	@echo "$(JAVA_CMD) ObjectiveWindowRunner $(DEBUG)"
+	@echo "$(JAVA_CMD) DemoWindowRunner $(DEBUG)"
 	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.ui.ObjectiveWindowRunner $(DEBUG)
+	$(JAVA) -classpath $(CLASSPATH):tmp/classes demo.ui.DemoWindowRunner $(DEBUG)
 
-debug: build/classes-dist
-	@echo "$(JAVA_CMD) ObjectiveAccounts $(DEBUG)"
-	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.ui.ObjectiveAccounts $(DEBUG)
+#debug: build/classes-dist
+#	@echo "$(JAVA_CMD) ObjectiveAccounts $(DEBUG)"
+#	LD_LIBRARY_PATH=$(JNI_PATH) \
+#	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.ui.ObjectiveAccounts $(DEBUG)
 
 run: build/classes-dist
 	@echo "target disabled... use `make pop`"
