@@ -10,7 +10,6 @@ import generic.util.Debug;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -83,8 +82,8 @@ public class DataStore
 		 * we can tune it better)
 		 */
 		Class[] cascadeClasses = {
-			Books.class,
-			LinkedHashSet.class,
+		Books.class,
+		LinkedHashSet.class,
 		};
 
 		for (int i = 0; i < cascadeClasses.length; i++) {
@@ -107,8 +106,8 @@ public class DataStore
 		}
 
 		Class[] leafClasses = {
-			Datestamp.class,
-			Amount.class,
+		Datestamp.class,
+		Amount.class,
 		};
 
 		for (int i = 0; i < leafClasses.length; i++) {
@@ -247,7 +246,7 @@ public class DataStore
 
 			if (os.size() > 1) {
 				throw new IllegalStateException(
-						"Whoa. You managed to get more than one Books object into the database. That's really bad.");
+					"Whoa. You managed to get more than one Books object into the database. That's really bad.");
 			} else if (os.size() == 0) {
 				throw new NoSuchElementException("No Books object in this container!");
 			} else {
@@ -272,11 +271,11 @@ public class DataStore
 				this.books = root;
 			} else {
 				throw new IllegalArgumentException(
-						"Can't set a null Books object to DataStore's internally cached root reference.");
+					"Can't set a null Books object to DataStore's internally cached root reference.");
 			}
 		} else {
 			throw new UnsupportedOperationException(
-					"You aren't supposed to call setBooks unless initializing a DataStore via InitBooksCommand");
+				"You aren't supposed to call setBooks unless initializing a DataStore via InitBooksCommand");
 		}
 	}
 
@@ -293,27 +292,45 @@ public class DataStore
 	 *            constrains the returned collection of objects. If a class
 	 *            literal is provided (ie Ledger.class) then all Ledger objects
 	 *            persisted in the database will be retrieved.
-	 * @return a List (backed by an ArrayList) of the objects retreieved from
-	 *         the database. If no objects are fetched, then the list will not
-	 *         be null but will have size 0.
+	 * @return a List of the objects retreieved from the database. If no objects
+	 *         are fetched, then the list will not be null but will have size 0.
+	 *         The List is actually a db4o ObjectSet (implements List) which
+	 *         does lazy but automatic instantiation as you iterate over it.
+	 * @see com.db4o.ObjectSet
 	 */
 	public List queryByExample(Object example) {
 		ObjectSet os = container.get(example);
-		final int len = os.size();
-		ArrayList result;
+		return os;
+	}
 
-		if (len == 0) {
-			result = new ArrayList(0);
-		} else {
-			result = new ArrayList(len);
-
-			for (int i = 0; i < len; i++) {
-				// automatic activation. Cool.
-				result.add(os.next());
-			}
-		}
-
-		return result;
+	/**
+	 * Expose the "native query" interface provided by db4o. The predicate
+	 * argument is an (typically anonymous) Selector with a match() method. For
+	 * example,
+	 * 
+	 * <pre>
+	 * List	result	= nativeQuery(new Selector() {
+	 * 					public boolean match(Type t) {
+	 * 						// something with t
+	 * 					}
+	 * 				});
+	 * </pre>
+	 * 
+	 * @param predicate
+	 *            a Selector implementing a match(SomeObject) method which
+	 *            returns true if SomeObject is to be included in the result
+	 *            set.
+	 * @return a List of the objects retreieved from the database. If no objects
+	 *         are fetched, then the list will not be null but will have size 0.
+	 *         The List is actually a db4o ObjectSet (implements List) which
+	 *         does lazy but automatic instantiation as you iterate over it.
+	 * @see Selector
+	 * @see com.db4o.query.Predicate
+	 * @see com.db4o.ObjectSet
+	 */
+	public List nativeQuery(Selector predicate) {
+		ObjectSet os = container.query(predicate);
+		return os;
 	}
 
 	/**
@@ -362,7 +379,7 @@ public class DataStore
 
 		if (len > 1) {
 			throw new UnsupportedOperationException(
-					"When calling getLedger(), you need to specify arguments such that only one ledger will be retreived!");
+				"When calling getLedger(), you need to specify arguments such that only one ledger will be retreived!");
 		}
 
 		Object obj = os.next();

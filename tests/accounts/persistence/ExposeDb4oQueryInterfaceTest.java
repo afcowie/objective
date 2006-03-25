@@ -79,6 +79,7 @@ public class ExposeDb4oQueryInterfaceTest extends TestCase
 		DummyInts proto1 = new DummyInts(25);
 		List results = store.queryByExample(proto1);
 
+		assertNotNull(results);
 		assertEquals(0, results.size());
 
 		/*
