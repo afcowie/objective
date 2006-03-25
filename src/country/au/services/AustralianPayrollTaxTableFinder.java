@@ -39,7 +39,7 @@ public class AustralianPayrollTaxTableFinder extends Finder
 			throw new IllegalArgumentException("Can't use null as tax scale");
 		}
 		this.scale = scale;
-		this.result = null;
+		reset();
 	}
 
 	public void setDate(Datestamp date) {
@@ -47,7 +47,7 @@ public class AustralianPayrollTaxTableFinder extends Finder
 			throw new IllegalArgumentException("Can't use null as the pay date you're looking up");
 		}
 		this.date = date;
-		this.result = null;
+		reset();
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class AustralianPayrollTaxTableFinder extends Finder
 	/*
 	 * query() returns a list but also caches a reference internally.
 	 */
-	public List query() throws NotFoundException {
+	protected List query() throws NotFoundException {
 		AustralianPayrollTaxTable proto = new AustralianPayrollTaxTable(scale);
 
 		List l = store.queryByExample(proto);
@@ -124,4 +124,10 @@ public class AustralianPayrollTaxTableFinder extends Finder
 		return chosen.getCoefficients();
 	}
 
+	/**
+	 * Clear the cached result; query() will be run again as necessary.
+	 */
+	protected void reset() {
+		this.result = null;
+	}
 }

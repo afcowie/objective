@@ -15,7 +15,6 @@ import accounts.domain.Amount;
 import accounts.domain.Datestamp;
 import accounts.persistence.UnitOfWork;
 import accounts.services.DatafileServices;
-import accounts.services.Finder;
 import accounts.services.NotFoundException;
 import accounts.services.PayrollTaxCalculator;
 import country.au.domain.AustralianPayrollTaxIdentifier;
@@ -73,8 +72,8 @@ public class AustralianPayrollTaxTest extends TestCase
 		 * The init() above runs AustralianInitBooksCommand which in turn calls
 		 * StoreAustralianPayrollTaxTablesCommand so we should be all set up...
 		 */
-		Finder f = new AustralianPayrollTaxTableFinder(AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD,
-			KNOWN_GOOD_DATE);
+		AustralianPayrollTaxTableFinder f = new AustralianPayrollTaxTableFinder(
+			AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD, KNOWN_GOOD_DATE);
 		try {
 			f.query();
 		} catch (NotFoundException nfe) {
@@ -90,7 +89,8 @@ public class AustralianPayrollTaxTest extends TestCase
 		/*
 		 * Try it with a bogus identifier. This only needs to try query().
 		 */
-		Finder bogus = new AustralianPayrollTaxTableFinder(new AustralianPayrollTaxIdentifier("Bogus"), KNOWN_GOOD_DATE);
+		AustralianPayrollTaxTableFinder bogus = new AustralianPayrollTaxTableFinder(new AustralianPayrollTaxIdentifier(
+			"Bogus"), KNOWN_GOOD_DATE);
 		try {
 			bogus.query();
 			fail("Running the tax tables finder against a bogus Identifier didn't throw like it should have.");

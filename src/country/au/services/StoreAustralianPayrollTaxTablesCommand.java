@@ -15,7 +15,6 @@ import accounts.persistence.UnitOfWork;
 import accounts.services.Command;
 import accounts.services.CommandNotReadyException;
 import accounts.services.CommandNotUndoableException;
-import accounts.services.Finder;
 import accounts.services.NotFoundException;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 import country.au.domain.AustralianPayrollTaxTable;
@@ -77,7 +76,7 @@ public class StoreAustralianPayrollTaxTablesCommand extends Command
 		while (iter.hasNext()) {
 			AustralianPayrollTaxTable t = (AustralianPayrollTaxTable) iter.next();
 
-			Finder f = new AustralianPayrollTaxTableFinder(t.getScale(), t.getEffectiveDate());
+			AustralianPayrollTaxTableFinder f = new AustralianPayrollTaxTableFinder(t.getScale(), t.getEffectiveDate());
 			List result = null;
 			try {
 				f.query();

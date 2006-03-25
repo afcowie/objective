@@ -47,11 +47,16 @@ public abstract class Finder
 
 	/**
 	 * Somewhat as a definition, Finders return a List. (After all, they just
-	 * use the underlying db4o query mechanism which we expose via
-	 * DataStore.query() which returns a List). While a specific concrete
-	 * subclass may (and is encouraged to) use specificly crafted methods
-	 * approprate to its use cases, this is the one common API element that we
-	 * have across Finders.
+	 * use the underlying db4o query mechanism which we expose via DataStore's
+	 * .nativeQuery() or .queryByExample() which return List). While concrete
+	 * subclasses may (and indeed are encouraged to) use specificly crafted
+	 * methods approprate to their use cases, this is the one common API element
+	 * that we have across Finders. If all you want is a subclass to have
+	 * query() returning a List as its API, then implement this method with
+	 * public visibility. [Unit tests, of course, can access it as protected
+	 * includes package] If public then an implentation's query() should
+	 * internally cache the result for [re]use by the domain specific result
+	 * methods; otherwise they can be the thing that caches.
 	 * 
 	 * @throws NotFoundException
 	 *             in the event that zero objects are retrieved. This isn't a
@@ -59,5 +64,13 @@ public abstract class Finder
 	 *             your logic when using the finder rather than having to
 	 *             remember to immediately guard against zero result.
 	 */
-	public abstract List query() throws NotFoundException;
+	protected abstract List query() throws NotFoundException;
+
+	/**
+	 * Clear any cached query results in this Finder. Any setters should call
+	 * this in order to invalidate a previous query() or other call's cached
+	 * results. As with query(), expose this as public if appropriate to your
+	 * use case.
+	 */
+	protected abstract void reset();
 }
