@@ -196,8 +196,10 @@ test: build/unittests
 
 build/unittests: build/classes-tests
 	@echo "$(JAVA_CMD) UnitTests"
-	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes generic.junit.VerboseTestRunner UnitTests
+	$(JAVA) \
+		-Djava.library.path=$(JNI_PATH) \
+		-classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes \
+		generic.junit.VerboseTestRunner UnitTests
 
 
 
@@ -212,36 +214,40 @@ setup-rm:
 # in Eclipse.
 build/demo-setup: tests/demo/client/DemoBooksSetup.java
 	@echo "$(JAVA_CMD) DemoBooksSetup $(DEBUG)"
-	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes demo.client.DemoBooksSetup $(DEBUG)
+	$(JAVA) \
+		-Djava.library.path=$(JNI_PATH) \
+		-classpath $(CLASSPATH):tmp/classes \
+		demo.client.DemoBooksSetup $(DEBUG)
 	@echo "$(JAVA_CMD) DemoMockTransactions $(DEBUG)"
-	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes demo.client.DemoMockTransactions $(DEBUG)
+	$(JAVA) \
+		-Djava.library.path=$(JNI_PATH) \
+		-classpath $(CLASSPATH):tmp/classes \
+		demo.client.DemoMockTransactions $(DEBUG)
 	touch $@
 
 dump: build/classes-tests build/demo-setup
 	@echo "$(JAVA_CMD) DemoOutputDump $(DEBUG)"
-	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes \
+	$(JAVA) \
+		-Djava.library.path=$(JNI_PATH) \
+		-classpath $(CLASSPATH):tmp/classes \
 		-DCOLUMNS=`resize | perl -n -e'print if (s/COLUMNS=(\d*);/\1/)'` \
 		demo.ui.DemoOutputDump $(DEBUG)
 
 pop: build/classes-tests build/demo-setup
 	@echo "$(JAVA_CMD) DemoWindowRunner $(DEBUG)"
-	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes demo.ui.DemoWindowRunner $(DEBUG)
-
-#debug: build/classes-dist
-#	@echo "$(JAVA_CMD) ObjectiveAccounts $(DEBUG)"
-#	LD_LIBRARY_PATH=$(JNI_PATH) \
-#	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.ui.ObjectiveAccounts $(DEBUG)
+	$(JAVA) \
+		-Djava.library.path=$(JNI_PATH) \
+		-classpath $(CLASSPATH):tmp/classes \
+		demo.ui.DemoWindowRunner $(DEBUG)
 
 run: build/classes-dist
 	@echo "target disabled... use `make pop`"
 	@exit 1
-	@echo "$(JAVA_CMD) ObjectiveAccounts $(DEBUG)"
-	LD_LIBRARY_PATH=$(JNI_PATH) \
-	$(JAVA) -classpath $(CLASSPATH):tmp/classes accounts.ui.ObjectiveAccounts $(DEBUG)
+#	@echo "$(JAVA_CMD) ObjectiveAccounts $(DEBUG)"
+#	$(JAVA) \
+#		-Djava.library.path=$(JNI_PATH) \
+#		-classpath $(CLASSPATH):tmp/classes \
+#		accounts.ui.ObjectiveAccounts $(DEBUG)
 
 # --------------------------------------------------------------------
 # House keeping
