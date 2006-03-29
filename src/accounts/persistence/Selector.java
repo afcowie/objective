@@ -14,10 +14,17 @@ import com.db4o.query.Predicate;
  * imports. Originally named this "NativePredicate", but given that an anonymous
  * instance of this is the argument to {@link DataStore.nativeQuery()}, that
  * seemed overly verbose. "Selector" seems a good alternative.
+ * <p>
+ * Concrete anonymous classes must implement a method `boolean match()` with a
+ * single argument: a typed parameter all instnaces of which will be iterated
+ * over, fed to match(), and included in query result if true is returned.
  * 
  * @author Andrew Cowie
+ * @see accounts.persistence.DataStore#nativeQuery(Selector)
  */
 public abstract class Selector extends Predicate
 {
-	public static final long	serialVersionUID	= 1L;
+	/*
+	 * boolean match(Type t);
+	 */
 }
