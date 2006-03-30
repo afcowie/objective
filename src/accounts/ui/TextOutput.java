@@ -78,12 +78,19 @@ public abstract class TextOutput
 		/*
 		 * crop
 		 */
-		int len = str.length();
-		if (len > width) {
-			trimmed = str.substring(0, width);
-			len = width;
+		int len;
+		if (str == null) {
+			len = 0;
+			trimmed = "";
 		} else {
-			trimmed = str;
+			len = str.length();
+
+			if (len > width) {
+				trimmed = str.substring(0, width);
+				len = width;
+			} else {
+				trimmed = str;
+			}
 		}
 		int spaces = width - len;
 
@@ -107,10 +114,12 @@ public abstract class TextOutput
 	 * If argument is longer than width, then trim it back and add three dots.
 	 */
 	public static String chomp(String str, int width) {
-
 		if (width < 4) {
 			throw new IllegalArgumentException(
 				"Can't chomp to less than a width of 4 because of adding three dots as an elipses");
+		}
+		if (str == null) {
+			return "";
 		}
 		/*
 		 * crop

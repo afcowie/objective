@@ -44,7 +44,7 @@ public class EntryTextOutput extends TextOutput
 		int remaining = COLUMNS - dateWidth - (2 * amountWidth) - 1;
 		if (remaining < FLEX_MIN) {
 			throw new IllegalStateException("Terminal too narrow for EntryTextOutput. Need width of at least "
-					+ (dateWidth + FLEX_MIN + (2 * amountWidth)) + " characters.");
+				+ (dateWidth + FLEX_MIN + (2 * amountWidth)) + " characters.");
 		}
 		int piece = remaining / 4;
 		idWidth = piece;
@@ -141,12 +141,21 @@ public class EntryTextOutput extends TextOutput
 			out.print(pad(e.getDate().toString(), dateWidth, LEFT));
 
 			if (context instanceof Ledger) {
-				out.print(pad(e.getParentTransaction().getIdentifier() + "  ", idWidth, RIGHT));
-				out.print(pad(chomp(e.getParentTransaction().getDescription(), descWidth), descWidth, LEFT));
+				String id = e.getParentTransaction().getIdentifier();
+				if (id == null) {
+					id = "";
+				}
+				out.print(pad(id + "  ", idWidth, RIGHT));
+
+				String desc = e.getParentTransaction().getDescription();
+				if (desc == null) {
+					desc = "";
+				}
+				out.print(pad(chomp(desc, descWidth), descWidth, LEFT));
 			} else if (context instanceof Transaction) {
 				// skip Account identifier
 				out.print(pad(e.getParentLedger().getParentAccount().getTitle() + "|" + e.getParentLedger().getName(),
-						idWidth + descWidth, LEFT));
+					idWidth + descWidth, LEFT));
 			} else {
 				throw new IllegalStateException("context is not set to either Ledger or Transaction");
 			}
