@@ -111,14 +111,14 @@ public class DatePicker extends HBox
 	 * A Window (constructed from a glade file) containing the Calendar Widget,
 	 * and listeners to catch appropriate keystrokes.
 	 */
-	class DatePickerPopup extends GladeWindow
+	class DatePickerPopup extends AbstractWindow
 	{
 		private Calendar	_calendar	= null;
 
 		public DatePickerPopup(String which, String filename) {
 			super(which, filename);
 
-			_calendar = (org.gnu.gtk.Calendar) _glade.getWidget("calendar");
+			_calendar = (org.gnu.gtk.Calendar) gladeParser.getWidget("calendar");
 			_calendar.addListener(new CalendarListener() {
 				public void calendarEvent(CalendarEvent event) {
 					if (event.getType() == CalendarEvent.Type.DAY_SELECTED_DOUBLE_CLICK) {
@@ -127,11 +127,11 @@ public class DatePicker extends HBox
 				}
 			});
 
-			_window.addListener(new KeyListener() {
+			window.addListener(new KeyListener() {
 				public boolean keyEvent(KeyEvent event) {
 					int key = event.getKeyval();
 					if (key == KeyValue.Escape) {
-						_window.hide();
+						window.hide();
 						return true;
 					} else if (key == KeyValue.Home || key == KeyValue.t) {
 						_date.setAsToday();
@@ -150,7 +150,7 @@ public class DatePicker extends HBox
 
 		private void applySelection() {
 			java.util.Calendar cal = _calendar.getDate();
-			_window.hide();
+			window.hide();
 			_date.setDate(cal);
 			_entry.setText(_date.toString());
 		}
@@ -186,7 +186,7 @@ public class DatePicker extends HBox
 		 * return of false.
 		 */
 		public boolean deleteHook() {
-			_window.hide();
+			window.hide();
 			return true;
 		}
 	}

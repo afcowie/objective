@@ -51,7 +51,7 @@ public class DemoMockTransactions
 		try {
 			ObjectiveAccounts.store = DatafileServices.openDatafile(DEMO_DATABASE);
 		} catch (FileNotFoundException fnfe) {
-			System.err.println("\nDemo database not found! Did you run OprDynBooksSetup?\n");
+			System.err.println("\nDemo database not found! Did you run DemoBooksSetup?\n");
 			System.exit(1);
 		}
 

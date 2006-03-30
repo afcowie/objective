@@ -30,7 +30,7 @@ public class ObjectiveAccounts
 	 * Small helper programs making use of this class (ie to access
 	 * {@link ObjectiveAccounts.store}) do not need to override this constant.
 	 */
-	public static final String		VERSION		= "0.1.10";
+	public static final String		VERSION		= "0.1.11";
 
 	/**
 	 * The copyright statement for this code and a pointer to the top level

@@ -2,7 +2,7 @@
  * ReimbursableExpensesEditorWindow.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.ui;
 
@@ -13,7 +13,7 @@ import org.gnu.gtk.Table;
 import accounts.persistence.UnitOfWork;
 
 /**
- * A window where the expenses incurred by an employee
+ * A Window where the expenses incurred by an Employee
  * 
  * @author Andrew Cowie
  */
@@ -22,39 +22,41 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	/*
 	 * Cached widgets
 	 */
-	protected Table					_table;
+	protected Table					table;
 
-	protected ComboBoxEntry			_who_comboboxentry;
-	protected DatePicker			_datePicker;
-	protected AccountPicker			_accountPicker;
-	protected ForeignAmountEntryBox	_amountEntryBox;
+	protected ComboBoxEntry			who_comboboxentry;
+	protected DatePicker			datePicker;
+	protected AccountPicker			accountPicker;
+	protected ForeignAmountEntryBox	amountEntryBox;
 
-	private UnitOfWork				_uow;
-
+	/**
+	 * Construct the Window. Uses the table from the glade file extensively.
+	 * Takes a UnitOfWork for itself when ready and then returns.
+	 */
 	public ReimbursableExpensesEditorWindow() {
-		super("ReimbursableExpensesEditor_window", "share/ReimbursableExpensesEditorWindow.glade");
+		super("reimbursable", "share/ReimbursableExpensesEditorWindow.glade");
 
-		_datePicker = new DatePicker();
+		datePicker = new DatePicker();
 
-		_table = (Table) _glade.getWidget("general_table");
-		_table.attach(_datePicker, 1, 2, 1, 2);
+		table = (Table) gladeParser.getWidget("general_table");
+		table.attach(datePicker, 1, 2, 1, 2);
 
-		_accountPicker = new AccountPicker();
+		accountPicker = new AccountPicker();
 
-		_table.attach(_accountPicker, 1, 2, 2, 3);
+		table.attach(accountPicker, 1, 2, 2, 3);
 
-		_who_comboboxentry = (ComboBoxEntry) _glade.getWidget("who_comboboxentry");
-		_who_comboboxentry.appendText("Andrew Cowie");
-		_who_comboboxentry.setActive(0);
+		who_comboboxentry = (ComboBoxEntry) gladeParser.getWidget("who_comboboxentry");
+		who_comboboxentry.appendText("Andrew Cowie");
+		who_comboboxentry.setActive(0);
 
-		_amountEntryBox = new ForeignAmountEntryBox();
-		_table.attach(_amountEntryBox, 1, 2, 3, 4);
+		amountEntryBox = new ForeignAmountEntryBox();
+		table.attach(amountEntryBox, 1, 2, 3, 4);
 
-		_accountPicker.grabFocus();
-		_window.showAll();
-		_window.present();
+		accountPicker.grabFocus();
+		window.showAll();
+		window.present();
 
-		_uow = new UnitOfWork("ReimbursableExpensesEditorWindow");
+		uow = new UnitOfWork(me);
 	}
 
 	/**
@@ -70,13 +72,13 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	}
 
 	protected void cancel() {
-		_uow.cancel();
+		uow.cancel();
 		super.cancel();
 	}
 
 	protected void ok() {
 		System.out.println("Warning: ok() action not implemented");
-		_uow.cancel();
+		uow.cancel(); // FIXME change me; overrides calling commit()
 		super.ok();
 	}
 }

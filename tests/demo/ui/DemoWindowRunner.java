@@ -25,6 +25,7 @@ public class DemoWindowRunner
 		Debug.setProgname("windowrunner");
 		Debug.register("main");
 		Debug.register("debug"); // temporary debugs only!
+		Debug.register("command");
 		Debug.register("events");
 		Debug.register("listeners");
 		Debug.register("threads");

@@ -131,7 +131,7 @@ public class AccountPicker extends HBox
 	 * and an Entry box, and listeners to catch appropriate keystrokes. This is
 	 * an inner class of AccountPicker.
 	 */
-	class AccountPickerPopup extends GladeWindow
+	class AccountPickerPopup extends AbstractWindow
 	{
 		private ListStore			_listStore;
 		private TreeModelFilter		_filteredStore;
@@ -173,12 +173,12 @@ public class AccountPicker extends HBox
 			_ledgerObject_DataColumn = new DataColumnObject();
 
 			DataColumn[] accountsPicker_DataColumnsArray = new DataColumn[] {
-					_accountDisplay_DataColumn,
-					_accountTitle_DataColumn,
-					_accountObject_DataColumn,
-					_ledgerDisplay_DataColumn,
-					_ledgerName_DataColumn,
-					_ledgerObject_DataColumn
+				_accountDisplay_DataColumn,
+				_accountTitle_DataColumn,
+				_accountObject_DataColumn,
+				_ledgerDisplay_DataColumn,
+				_ledgerName_DataColumn,
+				_ledgerObject_DataColumn
 			};
 
 			_listStore = new ListStore(accountsPicker_DataColumnsArray);
@@ -187,7 +187,7 @@ public class AccountPicker extends HBox
 
 			_sortedStore = new TreeModelSort(_filteredStore);
 
-			_view = (TreeView) _glade.getWidget("possibles_treeview");
+			_view = (TreeView) gladeParser.getWidget("possibles_treeview");
 			_view.setModel(_sortedStore);
 
 			/*
@@ -202,7 +202,7 @@ public class AccountPicker extends HBox
 			CellRendererText account_CellRenderer = new CellRendererText();
 			account_ViewColumn.packStart(account_CellRenderer, true);
 			account_ViewColumn.addAttributeMapping(account_CellRenderer, CellRendererText.Attribute.MARKUP,
-					_accountDisplay_DataColumn);
+				_accountDisplay_DataColumn);
 
 			account_ViewColumn.setTitle("Account");
 			account_ViewColumn.setClickable(true);
@@ -218,7 +218,7 @@ public class AccountPicker extends HBox
 			CellRendererText ledger_CellRenderer = new CellRendererText();
 			ledger_ViewColumn.packStart(ledger_CellRenderer, true);
 			ledger_ViewColumn.addAttributeMapping(ledger_CellRenderer, CellRendererText.Attribute.MARKUP,
-					_ledgerDisplay_DataColumn);
+				_ledgerDisplay_DataColumn);
 
 			ledger_ViewColumn.setTitle("Ledger");
 			ledger_ViewColumn.setClickable(true);
@@ -237,7 +237,7 @@ public class AccountPicker extends HBox
 			TreeSelection selection = _view.getSelection();
 			selection.setMode(SelectionMode.SINGLE);
 
-			_status = (StatusBar) _glade.getWidget("statusbar");
+			_status = (StatusBar) gladeParser.getWidget("statusbar");
 
 			/*
 			 * Populate
@@ -264,12 +264,12 @@ public class AccountPicker extends HBox
 					final String size = "xx-small";
 					Matcher m = regexAmp.matcher(acct.getTitle());
 					_listStore.setValue(pointer, _accountDisplay_DataColumn, m.replaceAll("&amp;") + "\n<span size=\""
-							+ size + "\" color=\"" + acct.getColor() + "\">" + acct.getClassString() + "</span>");
+						+ size + "\" color=\"" + acct.getColor() + "\">" + acct.getClassString() + "</span>");
 					_listStore.setValue(pointer, _accountTitle_DataColumn, acct.getTitle());
 					_listStore.setValue(pointer, _accountObject_DataColumn, acct);
 
 					_listStore.setValue(pointer, _ledgerDisplay_DataColumn, ledger.getName() + "\n<span size=\"" + size
-							+ "\"color=\"" + ledger.getColor() + "\">" + ledger.getClassString() + "</span>");
+						+ "\"color=\"" + ledger.getColor() + "\">" + ledger.getClassString() + "</span>");
 					_listStore.setValue(pointer, _ledgerName_DataColumn, ledger.getName());
 					_listStore.setValue(pointer, _ledgerObject_DataColumn, ledger);
 				}
@@ -278,7 +278,7 @@ public class AccountPicker extends HBox
 			/*
 			 * Setup the search / filter mechanism.
 			 */
-			Entry e = (Entry) _glade.getWidget("search_entry");
+			Entry e = (Entry) gladeParser.getWidget("search_entry");
 			_search = new SearchEntry(e);
 
 			/*
@@ -366,14 +366,14 @@ public class AccountPicker extends HBox
 				}
 			});
 
-			_window.addListener(new KeyListener() {
+			window.addListener(new KeyListener() {
 				public boolean keyEvent(KeyEvent event) {
 					int key = event.getKeyval();
 					if (key == KeyValue.Escape) {
 						if ((_selectedAccount == null) || (_entry.getText().equals(""))) {
 							clearEntry();
 						}
-						_window.hide();
+						window.hide();
 						clearSearch();
 						return true;
 					} else {
@@ -499,13 +499,13 @@ public class AccountPicker extends HBox
 		 *         destroy.
 		 */
 		protected boolean deleteHook() {
-			_window.hide();
+			window.hide();
 			clearSearch();
 			return true;
 		}
 
 		private void applySelection(TreeIter pointer) {
-			_window.hide();
+			window.hide();
 			_selectedAccount = (Account) _sortedStore.getValue(pointer, _accountObject_DataColumn);
 			_selectedLedger = (Ledger) _sortedStore.getValue(pointer, _ledgerObject_DataColumn);
 			setEntryText();
@@ -541,7 +541,7 @@ public class AccountPicker extends HBox
 			int x = gdkWindow.getOrigin().getX();
 			int y = gdkWindow.getOrigin().getY(); // + gdkWindow.getHeight();
 
-			_window.move(x, y);
+			window.move(x, y);
 
 			super.present();
 			_search.grabFocus();

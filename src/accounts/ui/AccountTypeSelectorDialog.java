@@ -25,10 +25,10 @@ import accounts.domain.CashAccount;
  * 
  * @author Andrew Cowie
  */
-public class AccountTypeSelectorDialog extends GladeWindow
+public class AccountTypeSelectorDialog extends AbstractWindow
 {
 	public AccountTypeSelectorDialog() {
-		super("typeselector","share/AccountTypeSelectorDialog.glade");
+		super("typeselector", "share/AccountTypeSelectorDialog.glade");
 
 		// this one won't actually be displayed, but forms the foundation of the
 		// radiobutton group; otherwise difficult to dynamically instantiate.
@@ -40,7 +40,7 @@ public class AccountTypeSelectorDialog extends GladeWindow
 		// Label
 		// _assetsVBox.add()
 
-		Button ok = (Button) _glade.getWidget("ok_button");
+		Button ok = (Button) gladeParser.getWidget("ok_button");
 		ok.addListener(new ButtonListener() {
 			public void buttonEvent(ButtonEvent event) {
 				if (event.getType() == ButtonEvent.Type.CLICK) {
@@ -50,7 +50,7 @@ public class AccountTypeSelectorDialog extends GladeWindow
 			}
 		});
 
-		Button cancel = (Button) _glade.getWidget("cancel_button");
+		Button cancel = (Button) gladeParser.getWidget("cancel_button");
 		cancel.addListener(new ButtonListener() {
 			public void buttonEvent(ButtonEvent event) {
 				if (event.getType() == ButtonEvent.Type.CLICK) {
@@ -60,8 +60,8 @@ public class AccountTypeSelectorDialog extends GladeWindow
 			}
 		});
 
-		_window.showAll();
-		_window.present();
+		window.showAll();
+		window.present();
 	}
 
 	public void preSelectType(Account type) {
@@ -82,7 +82,7 @@ public class AccountTypeSelectorDialog extends GladeWindow
 
 		}
 		if (activate != null) {
-			RadioButton rb = (RadioButton) _glade.getWidget(activate);
+			RadioButton rb = (RadioButton) gladeParser.getWidget(activate);
 			rb.click();
 		}
 	}
@@ -94,10 +94,11 @@ public class AccountTypeSelectorDialog extends GladeWindow
 	}
 }
 
-class AccountTypeListener implements ButtonListener {
+class AccountTypeListener implements ButtonListener
+{
 
 	public void buttonEvent(ButtonEvent event) {
 		event.notify();
 	}
-	
+
 }
