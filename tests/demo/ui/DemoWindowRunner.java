@@ -1,8 +1,8 @@
 /*
- * ObjectiveWindowRunner.java
+ * DemoWindowRunner.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package demo.ui;
 
@@ -16,6 +16,7 @@ import org.gnu.gtk.GtkInitException;
 import accounts.client.ObjectiveAccounts;
 import accounts.services.DatafileServices;
 import accounts.ui.ReimbursableExpensesEditorWindow;
+import country.au.ui.AustralianPayrollEditorWindow;
 import demo.client.DemoBooksSetup;
 
 public class DemoWindowRunner
@@ -44,18 +45,20 @@ public class DemoWindowRunner
 			System.err.println("The database is locked by another program (doh)");
 			System.exit(2);
 		}
-
 		Debug.print("main", "Initializing Gtk");
 		try {
 			Gtk.initCheck(args);
 		} catch (GtkInitException gie) {
 			Debug.print("main", "Gtk.initCheck() threw an excpetion. Ignoring.");
 		}
-
 		// Debug.print("main", "initializing AccountTypeSelectorDialog");
-		// AccountTypeSelectorDialog selector = new AccountTypeSelectorDialog();
+		// AccountTypeSelectorDialog selector = new
+		// AccountTypeSelectorDialog();
 		Debug.print("main", "Initializing ReimbursableExpensesEditorWindow");
 		ReimbursableExpensesEditorWindow reimburse = new ReimbursableExpensesEditorWindow();
+
+		Debug.print("main", "Initializing AustralianPayrollEditorWindow");
+		AustralianPayrollEditorWindow payroll = new AustralianPayrollEditorWindow();
 
 		Debug.print("main", "Starting Gtk main loop");
 		Gtk.main();
