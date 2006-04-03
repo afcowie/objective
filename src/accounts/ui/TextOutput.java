@@ -2,7 +2,7 @@
  * TextOutput.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.ui;
 
@@ -10,10 +10,6 @@ import generic.util.Environment;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
-
-class Alignment
-{
-}
 
 public abstract class TextOutput
 {
@@ -26,17 +22,17 @@ public abstract class TextOutput
 	protected static final int		COLUMNS_MIN		= 50;
 
 	/**
-	 * Specify left alignment for whatever you are outputting or padding.
+	 * Specify left alignment for whatever you are outputting or padding. Points
+	 * to Align.LEFT; is here for convenience and brevity in subclasses.
 	 */
-	public static final Alignment	LEFT;
+	protected static final Align	LEFT			= Align.LEFT;
 	/**
-	 * Specify right alignment for whatever you are outputting or padding.
+	 * Specify right alignment for whatever you are outputting or padding
+	 * Actually just points at Align.RIGHT; is here for brevity in subclasses.
 	 */
-	public static final Alignment	RIGHT			= new Alignment();
+	protected static final Align	RIGHT			= Align.RIGHT;
 
 	static {
-		LEFT = new Alignment();
-
 		String env = Environment.getenv("COLUMNS");
 		if (env == null) {
 			COLUMNS = COLUMNS_DEFAULT;
@@ -73,7 +69,7 @@ public abstract class TextOutput
 	 *            if RIGHT, right justify. If LEFT, normal left justification.
 	 * @return the padded String.
 	 */
-	public static String pad(String str, int width, Alignment justify) {
+	public static String pad(String str, int width, Align justify) {
 		String trimmed = null;
 		/*
 		 * crop
