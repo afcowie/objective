@@ -40,6 +40,9 @@ public class DemoWindowRunner
 		} catch (FileNotFoundException fnfe) {
 			System.err.println("You need to run OprDynBooksSetup to create the demo dataset.");
 			System.exit(1);
+		} catch (IllegalStateException ise) {
+			System.err.println("The database is locked by another program (doh)");
+			System.exit(2);
 		}
 
 		Debug.print("main", "Initializing Gtk");

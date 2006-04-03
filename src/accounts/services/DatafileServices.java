@@ -2,7 +2,7 @@
  * DatafileServices.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
@@ -32,12 +32,15 @@ public class DatafileServices
 	 * @return a new DataStore open on a new (db4o format) database file.
 	 * @throws IllegalArgumentException
 	 *             if the given filename already exists (no blotto!)
+	 * @throws IllegalStateException
+	 *             if the datastore is locked (eg by another running program you
+	 *             forgot about)
 	 */
 	public static DataStore newDatafile(String filename) {
 		File probe = new File(filename);
 		if (probe.exists()) {
 			throw new IllegalArgumentException(
-					"Proposed datafile already exists (or at least, a file by that name does)");
+				"Proposed datafile already exists (or at least, a file by that name does)");
 		}
 
 		DataStore store = new DataStore(filename);

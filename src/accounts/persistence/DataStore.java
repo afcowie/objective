@@ -141,9 +141,17 @@ public class DataStore
 	 * 
 	 * @param filename
 	 *            the database to open.
+	 * @throws IllegalStateException
+	 *             if the database is locked (ie you've got another instance of
+	 *             the GUI program up. TODO, when we implement multiuser, this
+	 *             will evolve to pooled access.
 	 */
-	public DataStore(String filename) {
-		container = Db4o.openFile(filename);
+	public DataStore(String filename) throws IllegalStateException {
+		try {
+			container = Db4o.openFile(filename);
+		} catch (com.db4o.ext.DatabaseFileLockedException dfle) {
+			throw new IllegalStateException("Database locked");
+		}
 	}
 
 	/**
