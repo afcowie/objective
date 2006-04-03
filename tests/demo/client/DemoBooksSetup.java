@@ -24,8 +24,9 @@ import accounts.domain.Ledger;
 import accounts.domain.LoanLedger;
 import accounts.domain.LoanPayableAccount;
 import accounts.domain.OwnersEquityAccount;
+import accounts.domain.PayrollTaxPayableAccount;
 import accounts.domain.ProfessionalRevenueAccount;
-import accounts.domain.TaxPayableAccount;
+import accounts.domain.SalesTaxPayableAccount;
 import accounts.persistence.UnitOfWork;
 import accounts.services.AddAccountCommand;
 import accounts.services.AddCurrencyCommand;
@@ -86,7 +87,8 @@ public class DemoBooksSetup
 				new DepreciatingAssetAccount("Furniture"),
 
 				new AccountsPayable("Trade Creditors"),
-				new TaxPayableAccount("GST"),
+				new SalesTaxPayableAccount("GST"),
+				new PayrollTaxPayableAccount("PAYG Withholding"),
 				new LoanPayableAccount("Shareholders' Loans", new LoanLedger[] {
 					new LoanLedger("Andrew Cowie"),
 				}),

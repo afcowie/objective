@@ -27,9 +27,10 @@ import accounts.domain.GenericExpenseAccount;
 import accounts.domain.LiabilityAccount;
 import accounts.domain.LoanPayableAccount;
 import accounts.domain.OwnersEquityAccount;
+import accounts.domain.PayrollTaxPayableAccount;
 import accounts.domain.ProfessionalRevenueAccount;
 import accounts.domain.RevenueAccount;
-import accounts.domain.TaxPayableAccount;
+import accounts.domain.SalesTaxPayableAccount;
 
 /**
  * Sort Accounts to match our version of accounting order. Accounts, as
@@ -62,7 +63,8 @@ public class AccountComparator implements Comparator
 
 			LiabilityAccount.class,
 			AccountsPayable.class,
-			TaxPayableAccount.class,
+			SalesTaxPayableAccount.class,
+			PayrollTaxPayableAccount.class,
 			LoanPayableAccount.class,
 
 			EquityAccount.class,

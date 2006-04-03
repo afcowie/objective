@@ -115,10 +115,17 @@ public class AustralianPayrollTaxTest extends TestCase
 
 	public final void testGettersSetters() throws NotFoundException {
 		Amount positiveOne = new Amount("640.22");
+		Amount zero = new Amount("0.00");
 		Amount negative = new Amount("-0.01");
 
 		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(
 			AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD, KNOWN_GOOD_DATE);
+
+		try {
+			calc.setSalary(zero);
+		} catch (Exception e) {
+			fail("setSalary threw " + e + " with a zero Amount. Drat");
+		}
 
 		try {
 			calc.setSalary(negative);

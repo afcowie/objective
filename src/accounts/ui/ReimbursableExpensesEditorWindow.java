@@ -60,7 +60,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	}
 
 	/**
-	 * (overrides {@link GladeWindow#deleteHook()})
+	 * (overrides {@link AbstractWindow#deleteHook()})
 	 */
 	public boolean deleteHook() {
 		// hide & destroy

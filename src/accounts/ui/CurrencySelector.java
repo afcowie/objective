@@ -95,7 +95,7 @@ public class CurrencySelector extends ComboBox
 		this.addListener(new ComboBoxListener() {
 			public void comboBoxEvent(ComboBoxEvent event) {
 				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
-
+					// huh? bug? TODO
 				}
 			}
 		});

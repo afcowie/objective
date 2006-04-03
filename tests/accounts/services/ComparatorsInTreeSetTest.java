@@ -2,7 +2,7 @@
  * Db4oActivationTest.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
@@ -27,7 +27,7 @@ import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
 import accounts.domain.Ledger;
 import accounts.domain.OwnersEquityAccount;
-import accounts.domain.TaxPayableAccount;
+import accounts.domain.SalesTaxPayableAccount;
 import accounts.domain.Transaction;
 import accounts.persistence.UnitOfWork;
 
@@ -215,7 +215,7 @@ public class ComparatorsInTreeSetTest extends TestCase
 			UnitOfWork uow = new UnitOfWork("testAccountComparatorSimilarAccounts");
 
 			for (int i = 0; i < NUM; i++) {
-				Account a = new TaxPayableAccount("GST");
+				Account a = new SalesTaxPayableAccount("GST");
 				AddAccountCommand aac = new AddAccountCommand(a);
 				aac.execute(uow);
 			}
