@@ -20,7 +20,7 @@
   <property name="focus_on_map">True</property>
 
   <child>
-    <widget class="GtkVBox" id="top_vbox">
+    <widget class="GtkVBox" id="top">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>

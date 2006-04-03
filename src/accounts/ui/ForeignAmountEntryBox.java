@@ -262,6 +262,11 @@ public class ForeignAmountEntryBox extends HBox
 	 * Getters and Setters --------------------------------
 	 */
 
+	/**
+	 * The whole point of the Widget is, of course, to generate a ForeignAmount.
+	 * 
+	 * @return the ForeignAmount as specified by the user.
+	 */
 	public ForeignAmount getForeignAmount() {
 		return _foreignAmount;
 	}

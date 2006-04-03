@@ -36,6 +36,8 @@ public class SupplierLedger extends CreditPositiveLedger implements ItemsLedger
 
 	}
 
+	// TODO consider: should this move to ItemsLedger, generically as getEntity?
+
 	public Supplier getSupplier() {
 		return supplier;
 	}
