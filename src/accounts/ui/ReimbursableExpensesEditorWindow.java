@@ -52,7 +52,6 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 		amountEntryBox = new ForeignAmountEntryBox();
 		table.attach(amountEntryBox, 1, 2, 3, 4);
 
-		accountPicker.grabFocus();
 		window.showAll();
 		window.present();
 
