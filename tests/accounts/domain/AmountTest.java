@@ -18,7 +18,7 @@ import junit.framework.TestCase;
  */
 public class AmountTest extends TestCase
 {
-	public void testDefaultConstructor() {
+	public final void testDefaultConstructor() {
 		Amount a = new Amount();
 		assertEquals("0.00", a.getValue());
 
@@ -26,7 +26,7 @@ public class AmountTest extends TestCase
 		assertEquals("0.00", b.getValue());
 	}
 
-	public void testAmountZero() {
+	public final void testAmountZero() {
 		Amount a = new Amount("0");
 
 		/*
@@ -41,7 +41,7 @@ public class AmountTest extends TestCase
 		assertTrue(a.isZero());
 	}
 
-	public void testSetValue() {
+	public final void testSetValue() {
 		Amount a = new Amount("1.1");
 		assertEquals("1.10", a.getValue());
 		assertFalse(a.isZero());
@@ -90,7 +90,7 @@ public class AmountTest extends TestCase
 		assertEquals("49.95", g.getValue());
 	}
 
-	public void testEqualsAndClone() {
+	public final void testEqualsAndClone() {
 		Amount a = new Amount("42");
 		assertTrue(a.equals(a));
 
@@ -106,7 +106,7 @@ public class AmountTest extends TestCase
 		assertFalse(d == c);
 	}
 
-	public void testNegativeNumbers() {
+	public final void testNegativeNumbers() {
 		Amount a = new Amount("-1");
 		assertEquals("-1.00", a.getValue());
 
@@ -135,7 +135,7 @@ public class AmountTest extends TestCase
 
 	}
 
-	public void testAddition() {
+	public final void testAddition() {
 		Amount a = new Amount("1");
 		Amount b = new Amount("2");
 
@@ -154,7 +154,7 @@ public class AmountTest extends TestCase
 		assertTrue((new BigDecimal("12").compareTo(c.getBigDecimal())) == 0);
 	}
 
-	public void testSubtraction() {
+	public final void testSubtraction() {
 		Amount a = new Amount("5.55");
 		Amount b = new Amount("3.33");
 
@@ -188,7 +188,7 @@ public class AmountTest extends TestCase
 		assertEquals("1.00", d.getValue());
 	}
 
-	public void testToString() {
+	public final void testToString() {
 		Amount a = new Amount("12345.67");
 
 		try {
@@ -214,7 +214,7 @@ public class AmountTest extends TestCase
 		assertEquals("987,654,321.12", d.toString());
 	}
 
-	public void testCompareTo() {
+	public final void testCompareTo() {
 		Amount a = new Amount("10.00");
 		Amount b = new Amount("11.95");
 		Amount c = new Amount("11.95");
@@ -232,4 +232,19 @@ public class AmountTest extends TestCase
 		assertTrue(e.compareTo(d) < 0);
 	}
 
+	/**
+	 * At long last we finally have exposed methods to operate on the underlying
+	 * long directly.
+	 */
+	public final void testNumberMethods() {
+		Amount a = new Amount(0);
+		assertTrue(a.isZero());
+
+		Amount b = new Amount();
+		b.setNumber(15634);
+		assertEquals("156.34", b.getValue());
+
+		a.setValue(b);
+		assertEquals("156.34", a.getValue());
+	}
 }

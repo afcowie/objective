@@ -69,8 +69,8 @@ public class Amount implements Comparable
 
 	/**
 	 * Sometimes you just want to do math... and then turn the result into an
-	 * amount. Not for public consumption; use Account(String) to validate user
-	 * input.
+	 * amount. Not for public consumption; use {@link #Amount(String)} to
+	 * validate user input.
 	 * 
 	 * @param cents
 	 *            The long indicating how many cents are in this Amount.
@@ -95,6 +95,18 @@ public class Amount implements Comparable
 
 	protected void setValue(BigDecimal value) {
 		number = bigToNumber(value);
+	}
+
+	/**
+	 * Set the value of this Amount to be equal to the specified argument
+	 * Amount. This is not reference equality! This is a quick way to copy one
+	 * Amount's current Value into another.
+	 */
+	public void setValue(Amount a) {
+		if (a == null) {
+			throw new IllegalArgumentException();
+		}
+		this.number = a.number;
 	}
 
 	/**
@@ -165,6 +177,22 @@ public class Amount implements Comparable
 	}
 
 	/**
+	 * Sometimes you just want to do math. Not for public consumption! Does not
+	 * validate user input (mind you, it's hard to screw up a long). If you are
+	 * parsing user input, use {@link #setValue(String)}.
+	 * <p>
+	 * This is mostly here so you can quickly zero, ie
+	 * <code>salary.setNumber(0)</code>
+	 * 
+	 * @param value
+	 *            The number of cents (ie dollars/100) you want this Amount to
+	 *            represent.
+	 */
+	public void setNumber(long number) {
+		this.number = number;
+	}
+
+	/**
 	 * Sometimes you just want to do math, and so for that purpose we expose the
 	 * underlying number of cents that this Amount uses to represent its value.
 	 * Not for user consumption - if displaying an amount use getValue() or
@@ -175,9 +203,14 @@ public class Amount implements Comparable
 	}
 
 	/**
-	 * For use in debugging output, and in GUI display. This is equivalent to
-	 * the result of getValue() since we represent our Amounts externally using
-	 * Strings.
+	 * Return a comma padded String representation of this Amount. For use in
+	 * debugging output, and in GUI display. This is almost the same as the
+	 * result of getValue() since we represent our Amounts externally using
+	 * Strings, but is padded with commas as a thousands separator. For
+	 * instance, Amount 44423997.45 will be formatted as "44,423,997.45". Note
+	 * that no currency symbols are added.
+	 * 
+	 * @see Amount#padComma(String)
 	 */
 	public String toString() {
 		return padComma(getValue());
@@ -304,9 +337,9 @@ public class Amount implements Comparable
 	}
 
 	/**
-	 * @param num
-	 *            the number (a String with a point and two decimal places) to
-	 *            be formatted.
+	 * @param str
+	 *            the number (a String with a point and two decimal places - ie,
+	 *            the result of getValue()) to be formatted.
 	 * @return a String that has had thousands commas inserted
 	 */
 	protected String padComma(String str) {
@@ -326,5 +359,4 @@ public class Amount implements Comparable
 
 		return buf.toString();
 	}
-
 }
