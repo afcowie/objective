@@ -64,7 +64,7 @@ public abstract class PayrollTaxCalculator extends TaxCalculator
 	/**
 	 * Set the paycheck the Employee actually received.
 	 * 
-	 * @param salary
+	 * @param paid
 	 *            The positive Amount which is the result of subtracting
 	 *            neccessary withholding taxes from the salary an Employee is
 	 *            given. Note that this must be a different object from the
@@ -86,11 +86,32 @@ public abstract class PayrollTaxCalculator extends TaxCalculator
 
 	/**
 	 * Get the Amount to withhold, assuming it has been calculated.
-	 * 
-	 * @return
 	 */
 	public Amount getWithhold() {
 		return withhold;
+	}
+
+	/**
+	 * For editing a transaction whose Entries were calculated using a
+	 * PayrollTaxCalculator you need to be able to set the withhold object as
+	 * well.
+	 * 
+	 * @param withhold
+	 *            the Amount object. An acceptable usage would be
+	 *            <code>new Amount()</code>.
+	 */
+	public void setWithhold(Amount withhold) {
+		if (withhold == null) {
+			throw new IllegalArgumentException("Can't use null as the withhold Amount.");
+		}
+		/*
+		 * don't need the -ve test
+		 */
+		if ((withhold == salary) || (withhold == paycheck)) {
+			throw new IllegalArgumentException(
+				"You can't use the same Amount object for withhold, paycheck and salary fields.");
+		}
+		this.withhold = withhold;
 	}
 
 	public abstract void calculateGivenPayable();

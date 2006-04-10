@@ -176,12 +176,66 @@ public class AustralianPayrollTaxTest extends TestCase
 		assertSame(calc.getPaycheck(), positiveTwo);
 	}
 
+	/**
+	 * Bug that cropped up when we switched from using new Amounts to calls to
+	 * setValue()
+	 */
+	public final void testCalculatorAllFactorsSet() throws NotFoundException {
+		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(
+			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
+		try {
+			calc.calculateGivenSalary();
+			fail("Should have thrown IllegalStateException");
+		} catch (NullPointerException npe) {
+			fail("Threw NullPointerException (since withhold not set)");
+		} catch (IllegalStateException ise) {
+			// that's what should happen
+		}
+
+		calc.setSalary(new Amount());
+
+		try {
+			calc.calculateGivenSalary();
+			fail("Should have thrown IllegalStateException");
+		} catch (NullPointerException npe) {
+			fail("Threw NullPointerException (since withhold not set)");
+		} catch (IllegalStateException ise) {
+			// that's what should happen
+		}
+
+		calc.setPaycheck(new Amount());
+
+		try {
+			calc.calculateGivenSalary();
+			fail("Should have thrown IllegalStateException");
+		} catch (NullPointerException npe) {
+			fail("Threw NullPointerException (since withhold not set)");
+		} catch (IllegalStateException ise) {
+			// that's what should happen
+		}
+
+		calc.setWithhold(new Amount());
+
+		try {
+			calc.calculateGivenSalary();
+			// should now succeed
+		} catch (Exception e) {
+			fail("Unexpected exception where Calculator should now function");
+		}
+
+		assertEquals(0, calc.getWithhold().getNumber());
+	}
+
 	public final void testCalculateWithholdGivenSalary() throws NotFoundException {
 		Amount weeklyEarnings = new Amount("409.00");
 
 		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(
 			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
 		calc.setSalary(weeklyEarnings);
+
+		// mock
+		calc.setWithhold(new Amount());
+		calc.setPaycheck(new Amount());
 
 		calc.calculateGivenSalary();
 		assertEquals("52.00", calc.getWithhold().toString());
@@ -194,6 +248,10 @@ public class AustralianPayrollTaxTest extends TestCase
 		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(
 			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
 		calc.setPaycheck(weeklyPaycheck);
+
+		// mock
+		calc.setSalary(new Amount());
+		calc.setWithhold(new Amount());
 
 		calc.calculateGivenPayable();
 		assertEquals("22.00", calc.getWithhold().toString());

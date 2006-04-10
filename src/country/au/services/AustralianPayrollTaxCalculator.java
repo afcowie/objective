@@ -56,8 +56,8 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 	 */
 	public void calculateGivenPayable() {
 		if (paycheck.isZero()) {
-			salary = new Amount(0);
-			withhold = new Amount(0);
+			salary.setNumber(0);
+			withhold.setNumber(0);
 			return;
 		}
 
@@ -72,7 +72,7 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 		Amount limit = new Amount(paycheck.getNumber() * 10);
 
 		for (; candidate.compareTo(limit) < 0; candidate.incrementBy(new Amount("1.00"))) {
-			setSalary(candidate);
+			salary.setValue(candidate);
 			calculateGivenSalary();
 
 			// System.out.println(candidate + " - " + withhold + " = " +
@@ -80,7 +80,7 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 			if (salary.getNumber() - withhold.getNumber() >= original.getNumber()) {
 				return;
 			}
-			setPaycheck(original);
+			paycheck.setValue(original);
 		}
 		throw new IllegalStateException("Couldn't calculate withholding given paycheck amount");
 	}
@@ -90,6 +90,10 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 	 * is of course the traditional use case.
 	 */
 	public void calculateGivenSalary() {
+		if ((salary == null) || (withhold == null) || (paycheck == null)) {
+			throw new IllegalStateException(
+				"To use a Calculator you need to have all the parameter values set with instantiated objects");
+		}
 
 		BigDecimal weekly = salary.getBigDecimal();
 
@@ -122,12 +126,12 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 
 		long rounded = Math.round(y);
 
-		withhold = new Amount(Long.toString(rounded) + ".00");
+		withhold.setValue(Long.toString(rounded) + ".00");
 
 		/*
 		 * And now reset the paycheck amount.
 		 */
-		paycheck = (Amount) salary.clone();
+		paycheck.setValue(salary.getValue());
 		paycheck.decrementBy(withhold);
 	}
 }
