@@ -11,15 +11,12 @@ import generic.util.DebugException;
 
 import java.util.List;
 
-import org.gnu.gtk.Entry;
+import org.gnu.gtk.ComboBoxEntry;
 import org.gnu.gtk.Gtk;
 import org.gnu.gtk.Label;
+import org.gnu.gtk.Widget;
 import org.gnu.gtk.event.ComboBoxEvent;
 import org.gnu.gtk.event.ComboBoxListener;
-import org.gnu.gtk.event.EntryEvent;
-import org.gnu.gtk.event.EntryListener;
-import org.gnu.gtk.event.FocusEvent;
-import org.gnu.gtk.event.FocusListener;
 
 import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
@@ -36,6 +33,9 @@ import accounts.services.NotFoundException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.SpecificLedgerFinder;
 import accounts.ui.Align;
+import accounts.ui.AmountDisplay;
+import accounts.ui.AmountEntry;
+import accounts.ui.ChangeListener;
 import accounts.ui.DatePicker;
 import accounts.ui.EditorWindow;
 import accounts.ui.IdentifierSelector;
@@ -51,58 +51,81 @@ import country.au.services.AustralianPayrollTaxCalculator;
  */
 public class AustralianPayrollEditorWindow extends EditorWindow
 {
-	private transient String				employeeNameField;
+	private transient Employee				employee	= null;
 
 	/*
 	 * Pointers to the Amounts we are representing so we can avoid double tap
 	 * loops. It might be nice not to need these references, but then, they're
 	 * only references so it doesn't matter!
 	 */
-	private Amount							salary		= null;
-	private Amount							withholding	= null;
-	private Amount							paycheck	= null;
+	private transient Amount				salary		= null;
+	private transient Amount				withholding	= null;
+	private transient Amount				paycheck	= null;
 
 	private AustralianPayrollTaxCalculator	calc;
 
 	private IdentifierSelector				payg_IdentifierSelector;
 	private DatePicker						endDate_Picker;
-	private Entry							salaryAmount_Entry;
-	private Label							withholdingAmount_Entry;
-	private Entry							paycheckAmount_Entry;
+	private AmountEntry						salary_AmountEntry;
+	private AmountDisplay					withholding_AmountDisplay;
+	private AmountEntry						paycheck_AmountEntry;
 
 	/**
 	 * The last case used, either salary or paycheck, so we can recalculate
 	 * appropriately if the tax identifier changes
 	 */
-	private transient Entry					last		= null;
+	private transient Widget				last		= null;
 
 	/**
-	 * Construct the Window. Inherits an initialized UnitOfWork from
-	 * EditorWindow. TODO differentiate between a new set of data, and editing
-	 * old data. New constrcutor(PayrollTransaction)? Probably.
+	 * Construct a Window to edit an existing payroll transaction. This will
+	 * initialize the various windows with the relevent data from the passed
+	 * transaction argument.
+	 * 
+	 * @param t
+	 *            a PayrollTransaction containing an Australian PAYG
+	 *            transaction.
+	 */
+	public AustralianPayrollEditorWindow(PayrollTransaction t) {
+		super("Edit Transaction " + t.getDescription());
+
+		employee = t.getEmployee();
+	}
+
+	/**
+	 * Construct the Window.
 	 */
 	public AustralianPayrollEditorWindow() {
 		super("Enter payroll details");
 
 		/*
+		 * Instantiate objects for the three Amount fields. These will be
+		 * overridden if editing an existing transaction, but otherwise we set
+		 * them up now.
+		 */
+		salary = new Amount(0);
+		withholding = new Amount(0);
+		paycheck = new Amount(0);
+
+		/*
 		 * Pick employee. Mockup; replace with EmployeePicker! TODO
 		 */
 
-		Label employeeName_Label = new Label("Pick employee:");
+		final Label employeeName_Label = new Label("Pick employee:");
 		employeeName_Label.setAlignment(0.0, 0.5);
 		top.packStart(employeeName_Label, false, false, 3);
 
-		Entry employeeName_Entry = new Entry();
-		employeeName_Entry.setText("Andrew Cowie");
-		top.packStart(employeeName_Entry, false, false, 3);
+		final ComboBoxEntry who_ComboBoxEntry = new ComboBoxEntry();
+		who_ComboBoxEntry.appendText("Andrew Cowie");
+		who_ComboBoxEntry.setActive(0);
+		top.packStart(who_ComboBoxEntry, false, false, 3);
 
 		/*
 		 * Pick withholding type Identifier
 		 */
 
-		Label withholdingType_Label = new Label("PAYG withholding type:");
-		withholdingType_Label.setAlignment(0.0, 0.5);
-		top.packStart(withholdingType_Label, false, false, 3);
+		final Label payg_Label = new Label("PAYG withholding type:");
+		payg_Label.setAlignment(0.0, 0.5);
+		top.packStart(payg_Label, false, false, 3);
 
 		// this will be buggy the moment there is more than one! FIXME
 		List found = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
@@ -120,7 +143,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 * we use a little helper class:
 		 */
 
-		TwoColumnTable table = new TwoColumnTable(1);
+		final TwoColumnTable table = new TwoColumnTable(1);
 		final Align LEFT = Align.LEFT;
 		final Align RIGHT = Align.RIGHT;
 
@@ -128,7 +151,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 * Date picker
 		 */
 
-		Label endDate_Label = new Label("Ending at date:");
+		final Label endDate_Label = new Label("Ending at date:");
 		endDate_Label.setAlignment(1.0, 0.5);
 
 		table.attach(endDate_Label, LEFT);
@@ -140,38 +163,33 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 * The salary entry
 		 */
 
-		Label salaryAmount_Label = new Label("Salary:");
-		salaryAmount_Label.setAlignment(1.0, 0.5);
-		table.attach(salaryAmount_Label, LEFT);
+		final Label salary_Label = new Label("Salary:");
+		salary_Label.setAlignment(1.0, 0.5);
+		table.attach(salary_Label, LEFT);
 
-		salaryAmount_Entry = new Entry();
-		table.attach(salaryAmount_Entry, RIGHT);
+		salary_AmountEntry = new AmountEntry();
+		table.attach(salary_AmountEntry, RIGHT);
 
 		/*
-		 * The withholding entry. This one you can't set directly; it's
-		 * calculated.
+		 * The widget to display the withholding Amount. This one you can't set
+		 * directly; it's calculated.
 		 */
-		Label withholdingAmount_Label = new Label("Withholding:");
-		withholdingAmount_Label.setAlignment(1.0, 0.5);
-		table.attach(withholdingAmount_Label, LEFT);
+		final Label withholding_Label = new Label("Withholding:");
+		withholding_Label.setAlignment(1.0, 0.5);
+		table.attach(withholding_Label, LEFT);
 
-		// withholdingAmount_Entry = new Entry();
-		// withholdingAmount_Entry.setEditable(false);
-		// withholdingAmount_Entry.setSensitive(false);
-		withholdingAmount_Entry = new Label("");
-		withholdingAmount_Entry.setAlignment(0.0, 0.5);
-		withholdingAmount_Entry.setPadding(5, 4);
-		table.attach(withholdingAmount_Entry, RIGHT);
+		withholding_AmountDisplay = new AmountDisplay();
+		table.attach(withholding_AmountDisplay, RIGHT);
 
 		/*
 		 * The paycheck entry
 		 */
-		Label paycheckAmount_Label = new Label("Paycheck:");
-		paycheckAmount_Label.setAlignment(1.0, 0.5);
-		table.attach(paycheckAmount_Label, LEFT);
+		final Label paycheck_Label = new Label("Paycheck:");
+		paycheck_Label.setAlignment(1.0, 0.5);
+		table.attach(paycheck_Label, LEFT);
 
-		paycheckAmount_Entry = new Entry();
-		table.attach(paycheckAmount_Entry, RIGHT);
+		paycheck_AmountEntry = new AmountEntry();
+		table.attach(paycheck_AmountEntry, RIGHT);
 
 		/*
 		 * And now put the table into the top Box.
@@ -186,187 +204,116 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 
 		payg_IdentifierSelector.addListener(new ComboBoxListener() {
 			public void comboBoxEvent(ComboBoxEvent event) {
-				AustralianPayrollTaxIdentifier payg = (AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection();
-				Datestamp date = endDate_Picker.getDate();
-				try {
-					calc = new AustralianPayrollTaxCalculator(payg, date);
-
-					/*
-					 * Now recalculate given the existing values...
-					 */
-
-					if (last == null) {
-						return;
-					} else if (last == salaryAmount_Entry) {
-						Debug.print("listeners", "Recalculating given salary");
-
-						calc.setSalary(salary);
-						calc.calculateGivenSalary();
-
-						withholding = calc.getWithhold();
-						withholdingAmount_Entry.setText(withholding.getValue());
-						paycheck = calc.getPaycheck();
-						paycheckAmount_Entry.setText(paycheck.getValue());
-
-					} else if (last == paycheckAmount_Entry) {
-						Debug.print("listeners", "Recalculating given paycheck");
-
-						calc.setPaycheck(paycheck);
-						calc.calculateGivenPayable();
-
-						salary = calc.getSalary();
-						salaryAmount_Entry.setText(salary.getValue());
-						withholding = calc.getWithhold();
-						withholdingAmount_Entry.setText(withholding.getValue());
-					}
-				} catch (NotFoundException nfe) {
-					// FIXME to dialog
-					throw new DebugException("Can't find tax data for identifier " + payg);
-				}
-			}
-		});
-
-		salaryAmount_Entry.addListener(new EntryListener() {
-			public void entryEvent(EntryEvent event) {
-				if (event.getType() == EntryEvent.Type.CHANGED) {
-					/*
-					 * Get the new salary amount and validate it
-					 */
-
-					final String text = salaryAmount_Entry.getText();
-					if (!salaryAmount_Entry.hasFocus()) {
-						return;
-					}
-					if (text.equals("")) {
-						return;
-					}
-
+				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
+					AustralianPayrollTaxIdentifier payg = (AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection();
+					Datestamp date = endDate_Picker.getDate();
 					try {
-						salary.setValue(text);
-					} catch (NumberFormatException nfe) {
-						return;
+						calc = new AustralianPayrollTaxCalculator(payg, date);
+
+						// make sure new calc has the appropriate references
+						calc.setSalary(salary);
+						calc.setWithhold(withholding);
+						calc.setPaycheck(paycheck);
+
+						/*
+						 * Now recalculate given the existing values...
+						 */
+
+						if (last == null) {
+							return;
+						} else if (last == salary_AmountEntry) {
+							Debug.print("listeners", "Recalculating given salary");
+
+							calc.calculateGivenSalary();
+
+							withholding = calc.getWithhold();
+							withholding_AmountDisplay.setAmount(withholding);
+							paycheck = calc.getPaycheck();
+							paycheck_AmountEntry.setAmount(paycheck);
+
+						} else if (last == paycheck_AmountEntry) {
+							Debug.print("listeners", "Recalculating given paycheck");
+
+							calc.calculateGivenPayable();
+
+							salary = calc.getSalary();
+							salary_AmountEntry.setAmount(salary);
+							withholding = calc.getWithhold();
+							withholding_AmountDisplay.setAmount(withholding);
+						}
+					} catch (NotFoundException nfe) {
+						// FIXME to dialog
+						throw new DebugException("Can't find tax data for identifier " + payg);
 					}
-
-					Debug.print("listeners", me + " salary Entry changed, " + salary.toString());
-
-					calc.setSalary(salary);
-
-					/*
-					 * Do the work
-					 */
-					calc.calculateGivenSalary();
-
-					/*
-					 * And display the results.
-					 */
-					withholding = calc.getWithhold();
-					withholdingAmount_Entry.setText(withholding.getValue());
-					paycheck = calc.getPaycheck();
-					paycheckAmount_Entry.setText(paycheck.getValue());
-
-					last = salaryAmount_Entry;
-				}
-
-				if (event.getType() == EntryEvent.Type.ACTIVATE) {
-					final String text = salary.getValue();
-					salaryAmount_Entry.setText(text);
-					salaryAmount_Entry.setCursorPosition(text.length());
 				}
 			}
 		});
 
-		/*
-		 * This fixes the situation where the user has enetered "263" and then
-		 * leaves - the other Entries are set with Amount.getValue()'s String,
-		 * but this one is not.
-		 */
-		salaryAmount_Entry.addListener(new FocusListener() {
-			public boolean focusEvent(FocusEvent event) {
-				if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
-					salaryAmount_Entry.setText(salary.getValue());
-					salaryAmount_Entry.selectRegion(0, 0);
-				}
-				return false;
-			};
+		salary_AmountEntry.addListener(new ChangeListener() {
+			public void userChangedData() {
+
+				Debug.print("listeners", me + " in salary_AmountEntry's changed(), salary now " + salary.toString());
+
+				calc.setSalary(salary);
+
+				/*
+				 * Do the work
+				 */
+				calc.calculateGivenSalary();
+
+				/*
+				 * And display the results.
+				 */
+				withholding = calc.getWithhold();
+				withholding_AmountDisplay.setAmount(withholding);
+				paycheck = calc.getPaycheck();
+				paycheck_AmountEntry.setAmount(paycheck);
+
+				last = salary_AmountEntry;
+			}
 		});
 
 		/*
 		 * Now paycheck... mirror image of salary case above.
 		 */
+		paycheck_AmountEntry.addListener(new ChangeListener() {
+			public void userChangedData() {
 
-		paycheckAmount_Entry.addListener(new EntryListener() {
-			public void entryEvent(EntryEvent event) {
-				if (event.getType() == EntryEvent.Type.CHANGED) {
-					/*
-					 * Get the new paycheck amount and validate it
-					 */
-					final String text = paycheckAmount_Entry.getText();
-					if (!paycheckAmount_Entry.hasFocus()) {
-						return;
-					}
-					if (text.equals("")) {
-						return;
-					}
+				Debug.print("listeners", me + " in paycheck_AmountEntry's changed(), paycheck now "
+					+ paycheck.toString());
 
-					try {
-						paycheck.setValue(text);
-					} catch (NumberFormatException nfe) {
-						return;
-					}
+				calc.setPaycheck(paycheck);
 
-					Debug.print("listeners", me + " paycheck Entry changed, " + paycheck.toString());
+				/*
+				 * Do the work
+				 */
+				calc.calculateGivenPayable();
 
-					calc.setPaycheck(paycheck);
+				/*
+				 * And display the results.
+				 */
 
-					/*
-					 * Do the work
-					 */
-					calc.calculateGivenPayable();
+				salary = calc.getSalary();
+				salary_AmountEntry.setAmount(salary);
+				withholding = calc.getWithhold();
+				withholding_AmountDisplay.setAmount(withholding);
 
-					/*
-					 * And display the results.
-					 */
-
-					salary = calc.getSalary();
-					salaryAmount_Entry.setText(salary.getValue());
-					withholding = calc.getWithhold();
-					withholdingAmount_Entry.setText(withholding.getValue());
-
-					last = paycheckAmount_Entry;
-				}
-
-				if (event.getType() == EntryEvent.Type.ACTIVATE) {
-					final String text = paycheck.getValue();
-					paycheckAmount_Entry.setText(text);
-					paycheckAmount_Entry.setCursorPosition(text.length());
-				}
+				last = paycheck_AmountEntry;
 			}
-		});
-
-		paycheckAmount_Entry.addListener(new FocusListener() {
-			public boolean focusEvent(FocusEvent event) {
-				if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
-					paycheckAmount_Entry.setText(paycheck.getValue());
-					paycheckAmount_Entry.selectRegion(0, 0);
-				}
-				return false;
-			};
+			// }
 		});
 
 		/*
-		 * And now set a useful initial state:
+		 * And finally, set a useful initial state:
 		 */
+
 		payg_IdentifierSelector.setActive(0);
 
-		salary = new Amount(0);
-		withholding = new Amount(0);
-		paycheck = new Amount(0);
+		salary_AmountEntry.setAmount(salary);
+		withholding_AmountDisplay.setAmount(withholding);
+		paycheck_AmountEntry.setAmount(paycheck);
 
-		// somewhat overkill, but this adapts should formatting change...
-		salaryAmount_Entry.setText(salary.getValue());
-		withholdingAmount_Entry.setText(withholding.getValue());
-		paycheckAmount_Entry.setText(paycheck.getValue());
-
+		salary_AmountEntry.grabFocus();
 		present();
 	}
 
@@ -374,7 +321,8 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 	 * Mimic what real UI would have done
 	 */
 	private void mockupFields() {
-		employeeNameField = "Andrew Cowie";
+		employee = new Employee();
+		employee.setName("Andrew Cowie");
 	}
 
 	protected void ok() {
@@ -393,9 +341,6 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		// not found in database");
 		// }
 		// Employee storedEmployee = (Employee) result.get(0);
-		Employee storedEmployee = new Employee();
-		storedEmployee.setName(employeeNameField); // FIXME
-
 		/*
 		 * Get the requisite Ledgers
 		 */
@@ -423,7 +368,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			/*
 			 * Form the Transaction
 			 */
-			PayrollTransaction t = new PayrollTransaction(storedEmployee,
+			PayrollTransaction t = new PayrollTransaction(employee,
 				(AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection());
 			t.setDate(endDate_Picker.getDate());
 

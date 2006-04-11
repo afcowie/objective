@@ -131,7 +131,7 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 		/*
 		 * And now reset the paycheck amount.
 		 */
-		paycheck.setValue(salary.getValue());
+		paycheck.setValue(salary);
 		paycheck.decrementBy(withhold);
 	}
 }
