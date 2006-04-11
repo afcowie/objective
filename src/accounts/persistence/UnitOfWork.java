@@ -47,14 +47,14 @@ public class UnitOfWork
 {
 	private transient HashSet				dirtyObjects			= null;
 	private transient HashSet				interestingObjects		= null;
-	private transient HashSet				myChangeListeners		= null;
+	private transient HashSet				myUpdateListeners		= null;
 
 	/**
 	 * As objects express interest, their callbacks are added to this list. They
 	 * are to be removed on cleanup! LinkedHashSet chosen for the ability to
 	 * quickly iterate over set.
 	 */
-	private transient static LinkedHashSet	globalChangeListeners	= null;
+	private transient static LinkedHashSet	globalUpdateListeners	= null;
 
 	/**
 	 * A unit of work can only be "used" once; that is, once it has been
@@ -73,7 +73,7 @@ public class UnitOfWork
 	private transient DataStore				store;
 
 	static {
-		globalChangeListeners = new LinkedHashSet();
+		globalUpdateListeners = new LinkedHashSet();
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class UnitOfWork
 
 		dirtyObjects = new HashSet();
 		interestingObjects = new HashSet();
-		myChangeListeners = new HashSet();
+		myUpdateListeners = new HashSet();
 
 		active = true;
 	}
@@ -158,14 +158,14 @@ public class UnitOfWork
 	}
 
 	/**
-	 * Add a ChangeListener to UnitOfWork's internal table of listeners which
+	 * Add an UpdateListener to UnitOfWork's internal table of listeners which
 	 * are to be fired when a UnitOfWork somewhere commit()s.
 	 * 
 	 * @param listener
 	 */
-	public void onChange(ChangeListener listener) {
-		myChangeListeners.add(listener);
-		globalChangeListeners.add(listener);
+	public void onChange(UpdateListener listener) {
+		myUpdateListeners.add(listener);
+		globalUpdateListeners.add(listener);
 	}
 
 	/**
@@ -195,9 +195,9 @@ public class UnitOfWork
 		 * iterate over interest list and callback to them
 		 */
 
-		iter = globalChangeListeners.iterator();
+		iter = globalUpdateListeners.iterator();
 		while (iter.hasNext()) {
-			ChangeListener listener = (ChangeListener) iter.next();
+			UpdateListener listener = (UpdateListener) iter.next();
 			Iterator objects = dirtyObjects.iterator();
 			while (objects.hasNext()) {
 				Object dirty = objects.next();
@@ -262,16 +262,16 @@ public class UnitOfWork
 		/*
 		 * Remove listeners this UnitOfWork might have registered.
 		 */
-		iter = myChangeListeners.iterator();
+		iter = myUpdateListeners.iterator();
 		while (iter.hasNext()) {
 			Object listener = iter.next();
 			if (listener != null) {
-				globalChangeListeners.remove(listener);
+				globalUpdateListeners.remove(listener);
 				iter.remove();
 			}
 
 		}
-		myChangeListeners = null;
+		myUpdateListeners = null;
 		active = false;
 	}
 
@@ -301,10 +301,10 @@ public class UnitOfWork
 			Debug.print("memory", "leak in <" + name + ">; " + i + " removed from dirtyObjects");
 		}
 
-		if (myChangeListeners != null) {
+		if (myUpdateListeners != null) {
 			int i = 0;
 			int j = 0;
-			Iterator iter = myChangeListeners.iterator();
+			Iterator iter = myUpdateListeners.iterator();
 			while (iter.hasNext()) {
 				Object listener = iter.next();
 				if (listener != null) {
@@ -312,14 +312,14 @@ public class UnitOfWork
 					i++;
 				}
 
-				if (globalChangeListeners.contains(listener)) {
-					globalChangeListeners.remove(listener);
+				if (globalUpdateListeners.contains(listener)) {
+					globalUpdateListeners.remove(listener);
 					j++;
 				}
 			}
 
-			Debug.print("memory", "leak in <" + name + ">; " + i + " removed from myChangeListeners and " + j
-				+ " removed from globalChangeListeners");
+			Debug.print("memory", "leak in <" + name + ">; " + i + " removed from myUpdateListeners and " + j
+				+ " removed from globalUpdateListeners");
 		}
 
 		try {

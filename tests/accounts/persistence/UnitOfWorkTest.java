@@ -2,7 +2,7 @@
  * UnitOfWorkTest.java
  *
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.persistence;
 
@@ -172,7 +172,7 @@ public class UnitOfWorkTest extends TestCase
 		observer.registerInterest(innocent);
 		observer.registerInterest(innocent);
 
-		observer.onChange(new ChangeListener() {
+		observer.onChange(new UpdateListener() {
 			public void changed(Object obj) {
 				assertSame(innocent, obj);
 				counter++;

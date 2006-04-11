@@ -1,8 +1,8 @@
 /*
- * ChangeListener.java
+ * UpdateListener.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.persistence;
 
@@ -13,7 +13,7 @@ package accounts.persistence;
  * 
  * @author Andrew Cowie
  */
-public interface ChangeListener
+public interface UpdateListener
 {
 	public void changed(Object obj);
 }
