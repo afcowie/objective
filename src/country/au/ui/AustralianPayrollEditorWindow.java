@@ -106,26 +106,43 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		withholding = new Amount(0);
 		paycheck = new Amount(0);
 
+		final Label title_Label = new Label("<big><b>Pay an (Australian) Employee</b></big>");
+		title_Label.setUseMarkup(true);
+		title_Label.setAlignment(0.0, 0.5);
+
+		top.packStart(title_Label, false, false, 3);
+
+		final Align LEFT = Align.LEFT;
+		final Align RIGHT = Align.RIGHT;
+		final Align BOTH = Align.CENTER;
+
+		/*
+		 * From here we have two columns, one for the labels, and one for the
+		 * entry boxes. We use a GtkTable for the layout. It's a pain to use, so
+		 * we use a little helper class:
+		 */
+		final TwoColumnTable table = new TwoColumnTable(1);
+
 		/*
 		 * Pick employee. Mockup; replace with EmployeePicker! TODO
 		 */
 
 		final Label employeeName_Label = new Label("Pick employee:");
-		employeeName_Label.setAlignment(0.0, 0.5);
-		top.packStart(employeeName_Label, false, false, 3);
+		employeeName_Label.setAlignment(1.0, 0.5);
+		table.attach(employeeName_Label, LEFT);
 
 		final ComboBoxEntry who_ComboBoxEntry = new ComboBoxEntry();
 		who_ComboBoxEntry.appendText("Andrew Cowie");
 		who_ComboBoxEntry.setActive(0);
-		top.packStart(who_ComboBoxEntry, false, false, 3);
+		table.attach(who_ComboBoxEntry, RIGHT);
 
 		/*
 		 * Pick withholding type Identifier
 		 */
 
 		final Label payg_Label = new Label("PAYG withholding type:");
-		payg_Label.setAlignment(0.0, 0.5);
-		top.packStart(payg_Label, false, false, 3);
+		payg_Label.setAlignment(1.0, 0.5);
+		table.attach(payg_Label, LEFT);
 
 		// this will be buggy the moment there is more than one! FIXME
 		List found = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
@@ -135,17 +152,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		IdentifierGroup grp = (IdentifierGroup) found.get(0); // FIXME
 
 		payg_IdentifierSelector = new IdentifierSelector(grp);
-		top.packStart(payg_IdentifierSelector, false, false, 0);
-
-		/*
-		 * From here we have two columns, one for the labels, and one for the
-		 * entry boxes. We use a GtkTable for the layout. It's a pain to use, so
-		 * we use a little helper class:
-		 */
-
-		final TwoColumnTable table = new TwoColumnTable(1);
-		final Align LEFT = Align.LEFT;
-		final Align RIGHT = Align.RIGHT;
+		table.attach(payg_IdentifierSelector, BOTH);
 
 		/*
 		 * Date picker
@@ -346,6 +353,9 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 */
 
 		try {
+			if (salary.getNumber() == 0) {
+				throw new CommandNotReadyException("Not much point in trying to commit a paycheck for 0.00");
+			}
 			SpecificLedgerFinder f = new SpecificLedgerFinder();
 
 			// TODO this is standardized and needs to be selected (automatically

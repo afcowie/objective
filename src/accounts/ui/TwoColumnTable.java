@@ -58,14 +58,16 @@ public class TwoColumnTable extends Table
 	 *            the Widget to add to the Table.
 	 * @param leftOrRight
 	 *            which side of the Table widget should go on. Use the public
-	 *            constants {@link Align.LEFT} and {@link Align.RIGHT}!
+	 *            constants {@link Align.LEFT} and {@link Align.RIGHT}, or
+	 *            {@link Align.CENTER} to indicate you want it to span both
+	 *            columns.
 	 */
 	public void attach(Widget widget, Align leftOrRight) {
 		if ((widget == null) || (leftOrRight == null)) {
 			throw new IllegalArgumentException("Can't use null as an argument");
 		}
 
-		if (leftOrRight == lastSide) {
+		if ((leftOrRight == lastSide) || (leftOrRight == Align.CENTER)) {
 			rowCount++;
 			rowComplete = false;
 		} else if (rowComplete) {
@@ -91,6 +93,8 @@ public class TwoColumnTable extends Table
 			super.attach(widget, 0, 1, rowCount - 1, rowCount);
 		} else if (leftOrRight == Align.RIGHT) {
 			super.attach(widget, 1, 2, rowCount - 1, rowCount);
+		} else if (leftOrRight == Align.CENTER) {
+			super.attach(widget, 0, 2, rowCount - 1, rowCount);
 		} else {
 			throw new IllegalArgumentException("Specified alignment not valid here");
 		}
