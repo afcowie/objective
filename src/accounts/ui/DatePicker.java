@@ -2,7 +2,7 @@
  * DatePicker.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.ui;
 
@@ -73,7 +73,7 @@ public class DatePicker extends HBox
 		box.packStart(label, false, false, 0);
 		_pick.add(box);
 
-		packStart(_entry, true, true, 0);
+		packStart(_entry, false, false, 0);
 		packStart(_pick, false, false, 0);
 
 		_pick.addListener(new ButtonListener() {

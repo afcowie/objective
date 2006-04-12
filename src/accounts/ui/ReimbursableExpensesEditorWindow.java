@@ -6,10 +6,17 @@
  */
 package accounts.ui;
 
+import java.io.PrintWriter;
+
 import org.gnu.gtk.ComboBoxEntry;
 import org.gnu.gtk.Gtk;
 import org.gnu.gtk.Table;
 
+import accounts.client.ObjectiveAccounts;
+import accounts.domain.Account;
+import accounts.domain.Books;
+import accounts.domain.Currency;
+import accounts.domain.ForeignAmount;
 import accounts.persistence.UnitOfWork;
 
 /**
@@ -78,6 +85,34 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	protected void ok() {
 		System.out.println("Warning: ok() action not implemented");
 		uow.cancel(); // FIXME change me; overrides calling commit()
+
+		// TODO remove - just demo code.
+
+		final PrintWriter out = new PrintWriter(System.out);
+		out.println("\nDate:\t\t" + datePicker.getDate());
+
+		final Account a = accountPicker.getAccount();
+		if (a != null) {
+			out.println("Account/Ledger:\t" + accountPicker.getAccount().getTitle() + "|"
+				+ accountPicker.getLedger().getName());
+		}
+
+		final ForeignAmount f = amountEntryBox.getForeignAmount();
+		out.print("Amount:\t\t" + f.getCurrency().getSymbol() + f.toString() + " " + f.getCurrency().getCode());
+
+		final Books root = ObjectiveAccounts.store.getBooks();
+		final Currency home = root.getHomeCurrency();
+
+		if (f.getCurrency() != home) {
+			out.println(" [" + f.getRate() + " -> " + home.getSymbol() + f.getValue() + " " + home.getCode() + "]");
+		} else {
+			out.println();
+		}
+		out.println();
+
+		out.flush();
+		out.close();
+
 		super.ok();
 	}
 }
