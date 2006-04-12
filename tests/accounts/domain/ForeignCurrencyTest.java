@@ -45,7 +45,7 @@ public class ForeignCurrencyTest extends TestCase
 		final int expected = 5;
 		if (ForeignAmount.RATE_DECIMAL_PLACES != expected) {
 			fail("No big deal, but you'll need to adjust this test case as it's rather carefully set up to test for "
-					+ expected + " decimal places.");
+				+ expected + " decimal places.");
 		}
 
 		Currency usd = new Currency("USD", "United States Dollar", "$");
@@ -178,7 +178,7 @@ public class ForeignCurrencyTest extends TestCase
 	}
 
 	public final void testAvoidDivideByZero() {
-		Currency eur = new Currency("EUR", "European Euro", "?");
+		Currency eur = new Currency("EUR", "European Euro", "\u20AC");
 		ForeignAmount fa = new ForeignAmount("0.00", eur, "1.500");
 
 		ForeignAmount c = null;
@@ -191,4 +191,21 @@ public class ForeignCurrencyTest extends TestCase
 		assertEquals("0.00", c.getValue());
 	}
 
+	public final void testSetValueAmount() {
+		Currency gbp = new Currency("GBP", "British Pound", "\u00A3");
+		Currency eur = new Currency("EUR", "European Euro", "\u20AC");
+
+		ForeignAmount fa = new ForeignAmount("1.00", gbp, "2.450");
+
+		Amount dummy = new Amount("5.00");
+		fa.setForeignValue(dummy);
+
+		assertEquals("5.00", fa.getForeignValue());
+
+		ForeignAmount other = new ForeignAmount("-10.00", eur, "1.50");
+		fa.setForeignValue(other);
+
+		assertEquals("-36.75", fa.getValue());
+		assertEquals("-15.00", fa.getForeignValue());
+	}
 }

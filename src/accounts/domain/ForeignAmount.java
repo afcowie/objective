@@ -80,6 +80,30 @@ public class ForeignAmount extends Amount
 	}
 
 	/**
+	 * Mirroring the addition to Amount of setValue(Amount), this is a hack to
+	 * make certain UI use cases expedient.
+	 * 
+	 * @param a
+	 *            a regular Amount whose literal numerical value you want to
+	 *            copy and use as the foreign value of this ForeignAmount. Note
+	 *            this is <b>not</b> setting a 1:1 exchange rate; this is just
+	 *            copying whatever value happens to be in the Amount object
+	 *            passed in. Of course, if you pass in a ForeignAmount, then
+	 *            it's actual internal number value (which is denominated in
+	 *            home currency) will be used so you will set this ForeignAmount
+	 *            to the value of the ForeignAmount argument.
+	 */
+	public void setForeignValue(Amount a) {
+		this.foreignNumber = a.getNumber();
+
+		if (this.rate == null) {
+			return;
+		}
+		BigDecimal r = new BigDecimal(this.rate);
+		recalculateHomeGivenRate(r);
+	}
+
+	/**
 	 * Get the Currency in which this ForeignAmount is denominated.
 	 * 
 	 * @return
@@ -92,8 +116,6 @@ public class ForeignAmount extends Amount
 	 * If the currency is changed, then obviously the exchange rate needs to
 	 * change. <b>This method does not recalculate anything, so you need to call
 	 * setRate() or setHomeValue()...</b>
-	 * 
-	 * @param cur
 	 */
 	public void setCurrency(Currency cur) {
 		this.currency = cur;
@@ -200,4 +222,5 @@ public class ForeignAmount extends Amount
 		obj.setValue(this.getValue());
 		return obj;
 	}
+
 }

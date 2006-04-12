@@ -162,9 +162,9 @@ public class DemoBooksSetup
 			Currency[] currencies = {
 				new Currency("CAD", "Canadian Dollar", "$"),
 				new Currency("USD", "United States Dollar", "$"),
-				new Currency("GBP", "British Pound", "?"),
+				new Currency("GBP", "British Pound", "\u00A3"),
 				new Currency("CHF", "Swiss Franc", "SFr"),
-				new Currency("EUR", "Eurpoean Union Euro", "?"),
+				new Currency("EUR", "Eurpoean Union Euro", "\u20AC"),
 				new Currency("SGD", "Singaporean Dollar", "S$"),
 				new Currency("INR", "Indian Rupee", "Rs")
 			};
