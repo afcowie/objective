@@ -25,7 +25,7 @@ import accounts.domain.Amount;
  * <p>
  * Features of this Widget:
  * <ul>
- * <li>TODO Turns the text red if there is an illegal argument.
+ * <li>Turns the text red if there is an illegal argument.
  * </ul>
  * 
  * @author Andrew Cowie
@@ -212,6 +212,22 @@ public class AmountEntry extends HBox
 		final String str = a.getValue();
 		if (!amount_Entry.getText().equals(str)) {
 			amount_Entry.setText(str);
+		}
+	}
+
+	/**
+	 * If you have a String that you want to use as the argument to
+	 * Amount.setValue(), pass it here.
+	 * 
+	 * @param value
+	 *            an Amount value in string form (ie, "120.99"). Will be
+	 *            validated by Amount.
+	 */
+	public void setValue(String value) {
+		amount.setValue(value);
+
+		if (!amount_Entry.getText().equals(value)) {
+			amount_Entry.setText(value);
 		}
 	}
 
