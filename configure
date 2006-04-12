@@ -659,6 +659,8 @@ output "Check Java virtual machines:\n";
 my $java;
 my $gij;
 my $kaffe;
+my $cacao;
+my $jamvm;
 
 if ($os eq "gentoo") {
 	# check java (the one specified by Gentoo's java-config tool)
@@ -695,6 +697,8 @@ if ($os eq "gentoo") {
 
 	# check kaffe
 	check_runtime($kaffe, "kaffe VM", which("kaffe"), "");
+	check_runtime($cacao, "CACAO VM", "/usr/bin/cacao", "");
+	check_runtime($jamvm, "JamVM VM", "/usr/bin/jamvm", "");
 
 } elsif ($os eq "debian") {
 	# check for a proper JDK/JRE java Virtual Machine (presumably either
@@ -868,6 +872,10 @@ if ($runtime) {
 		bail "bad override", "gij specified but not detected." unless $gij;
 	} elsif ($runtime eq "kaffe") {
 		bail "bad override", "kaffe specified but not detected." unless $kaffe;
+	} elsif ($runtime eq "cacao") {
+		bail "bad override", "cacao specified but not detected." unless $cacao;
+	} elsif ($runtime eq "jamvm") {
+		bail "bad override", "jamvm specified but not detected." unless $jamvm;
 	} else {
 		bail "bad override", <<HERE ;
 You specified runtime=$runtime on the command line, but that's not an option.
@@ -879,6 +887,10 @@ HERE
 } else {
 	if ($java) {
 		$runtime = "java";
+	} elsif ($cacao) {
+		$runtime = "cacao";
+	} elsif ($jamvm) {
+		$runtime = "jamvm";
 	} elsif ($gij) {
 		$runtime = "gij";
 	} elsif ($kaffe) {
@@ -897,6 +909,12 @@ if ($runtime eq "java") {
 } elsif ($runtime eq "kaffe") {
 	print CONFIG "JAVA=$kaffe\n";
 	print CONFIG "JAVA_CMD=KAFFE    \n";
+} elsif ($runtime eq "cacao") {
+	print CONFIG "JAVA=$cacao\n";
+	print CONFIG "JAVA_CMD=CACAO    \n";
+} elsif ($runtime eq "jamvm") {
+	print CONFIG "JAVA=$jamvm\n";
+	print CONFIG "JAVA_CMD=JAMVM    \n";
 } else {
 	bail "failed", "INTERNAL ERROR no virtual machine selected";
 }

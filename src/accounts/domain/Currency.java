@@ -29,6 +29,10 @@ public class Currency
 	private String	name;
 	private String	symbol;
 
+	private Currency() {
+		//
+	}
+
 	/**
 	 * 
 	 * @param code
