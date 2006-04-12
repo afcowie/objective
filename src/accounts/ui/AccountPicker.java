@@ -2,7 +2,7 @@
  * AccountPicker.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.ui;
 
@@ -59,31 +59,30 @@ import accounts.domain.Ledger;
  */
 public class AccountPicker extends HBox
 {
-	private Account				_selectedAccount	= null;
-	private Ledger				_selectedLedger		= null;
+	private Account				selectedAccount	= null;
+	private Ledger				selectedLedger	= null;
 
-	private static Account		_lastSelectedAccount;
-	private static Ledger		_lastSelectedLedger;
+	private static Account		lastSelectedAccount;
+	private static Ledger		lastSelectedLedger;
 
 	static {
-		_lastSelectedAccount = null;
-		_lastSelectedLedger = null;
+		lastSelectedAccount = null;
+		lastSelectedLedger = null;
 	}
 
-	// private Label _label = null;
-	private SearchEntry			_entry				= null;
-	private Button				_pick				= null;
-	private AccountPickerPopup	_popup				= null;
+	private SearchEntry			entry			= null;
+	private Button				pick			= null;
+	private AccountPickerPopup	popup			= null;
 
 	public AccountPicker() {
 		super(false, 3);
-		_selectedAccount = _lastSelectedAccount;
-		_selectedLedger = _lastSelectedLedger;
+		selectedAccount = lastSelectedAccount;
+		selectedLedger = lastSelectedLedger;
 
-		_entry = new SearchEntry();
-		_entry.setWidth(20);
+		entry = new SearchEntry();
+		entry.setWidth(20);
 
-		_pick = new Button();
+		pick = new Button();
 		Image icon = new Image(GtkStockItem.JUSTIFY_RIGHT, IconSize.BUTTON);
 		// Label label = new Label("Pick", false);
 		// HBox box = new HBox(false, 1);
@@ -91,22 +90,22 @@ public class AccountPicker extends HBox
 		// box.packStart(icon, false, false, 0);
 		// box.packStart(label, false, false, 0);
 		// _pick.add(box);
-		_pick.add(icon);
+		pick.add(icon);
 
-		packStart(_entry, true, true, 0);
-		packStart(_pick, false, false, 0);
+		packStart(entry, true, true, 0);
+		packStart(pick, false, false, 0);
 
-		_popup = new AccountPickerPopup("accountpicker", "share/AccountPickerPopup.glade");
+		popup = new AccountPickerPopup("accountpicker", "share/AccountPickerPopup.glade");
 
-		_pick.addListener(new ButtonListener() {
+		pick.addListener(new ButtonListener() {
 			public void buttonEvent(ButtonEvent event) {
 				if (event.getType() == ButtonEvent.Type.CLICK) {
-					_popup.present();
+					popup.present();
 				}
 			}
 		});
 
-		_entry.setChangeListener(new EntryListener() {
+		entry.setChangeListener(new EntryListener() {
 			public void entryEvent(EntryEvent event) {
 				Debug.print("listeners", "AccountPicker entry EntryEvent " + event.getType().getName());
 				if ((event.getType() == EntryEvent.Type.CHANGED) || (event.getType() == EntryEvent.Type.ACTIVATE)) {
@@ -114,13 +113,13 @@ public class AccountPicker extends HBox
 					 * If we don't have a selected account, then the keystroke
 					 * or paste or whatever is the seed for the search filter.
 					 */
-					if (_selectedAccount == null) {
-						_popup.setSearch(_entry.getText());
+					if (selectedAccount == null) {
+						popup.setSearch(entry.getText());
 					}
 
-					_popup.present();
+					popup.present();
 
-					_entry.clearText();
+					entry.clearText();
 				}
 			}
 		});
@@ -133,24 +132,24 @@ public class AccountPicker extends HBox
 	 */
 	class AccountPickerPopup extends AbstractWindow
 	{
-		private ListStore			_listStore;
-		private TreeModelFilter		_filteredStore;
-		private TreeModelSort		_sortedStore;
-		private DataColumnString	_accountDisplay_DataColumn;
-		private DataColumnString	_accountTitle_DataColumn;
-		private DataColumnObject	_accountObject_DataColumn;
-		private DataColumnString	_ledgerDisplay_DataColumn;
-		private DataColumnString	_ledgerName_DataColumn;
-		private DataColumnObject	_ledgerObject_DataColumn;
+		private ListStore			listStore;
+		private TreeModelFilter		filteredStore;
+		private TreeModelSort		sortedStore;
+		private DataColumnString	accountDisplay_DataColumn;
+		private DataColumnString	accountTitle_DataColumn;
+		private DataColumnObject	accountObject_DataColumn;
+		private DataColumnString	ledgerDisplay_DataColumn;
+		private DataColumnString	ledgerName_DataColumn;
+		private DataColumnObject	ledgerObject_DataColumn;
 
-		private TreeView			_view;
-		private SearchEntry			_search;
+		private TreeView			view;
+		private SearchEntry			search;
 
-		private int					_visibleRows;
-		private int					_totalRows;
+		private int					visibleRows;
+		private int					totalRows;
 
-		private StatusBar			_status;
-		private int					_lastID	= 0;
+		private StatusBar			status;
+		private int					lastID	= 0;
 
 		public AccountPickerPopup(String which, String filename) {
 			super(which, filename);
@@ -164,31 +163,31 @@ public class AccountPicker extends HBox
 			 * reference back to our domain object model - the thing we're
 			 * actually trying to pick in the first place.
 			 */
-			_accountDisplay_DataColumn = new DataColumnString();
-			_accountTitle_DataColumn = new DataColumnString();
-			_accountObject_DataColumn = new DataColumnObject();
+			accountDisplay_DataColumn = new DataColumnString();
+			accountTitle_DataColumn = new DataColumnString();
+			accountObject_DataColumn = new DataColumnObject();
 
-			_ledgerDisplay_DataColumn = new DataColumnString();
-			_ledgerName_DataColumn = new DataColumnString();
-			_ledgerObject_DataColumn = new DataColumnObject();
+			ledgerDisplay_DataColumn = new DataColumnString();
+			ledgerName_DataColumn = new DataColumnString();
+			ledgerObject_DataColumn = new DataColumnObject();
 
 			DataColumn[] accountsPicker_DataColumnsArray = new DataColumn[] {
-				_accountDisplay_DataColumn,
-				_accountTitle_DataColumn,
-				_accountObject_DataColumn,
-				_ledgerDisplay_DataColumn,
-				_ledgerName_DataColumn,
-				_ledgerObject_DataColumn
+				accountDisplay_DataColumn,
+				accountTitle_DataColumn,
+				accountObject_DataColumn,
+				ledgerDisplay_DataColumn,
+				ledgerName_DataColumn,
+				ledgerObject_DataColumn
 			};
 
-			_listStore = new ListStore(accountsPicker_DataColumnsArray);
+			listStore = new ListStore(accountsPicker_DataColumnsArray);
 
-			_filteredStore = new TreeModelFilter(_listStore);
+			filteredStore = new TreeModelFilter(listStore);
 
-			_sortedStore = new TreeModelSort(_filteredStore);
+			sortedStore = new TreeModelSort(filteredStore);
 
-			_view = (TreeView) gladeParser.getWidget("possibles_treeview");
-			_view.setModel(_sortedStore);
+			view = (TreeView) gladeParser.getWidget("possibles_treeview");
+			view.setModel(sortedStore);
 
 			/*
 			 * As is tradition by now, I observe that "this is the most god
@@ -202,13 +201,13 @@ public class AccountPicker extends HBox
 			CellRendererText account_CellRenderer = new CellRendererText();
 			account_ViewColumn.packStart(account_CellRenderer, true);
 			account_ViewColumn.addAttributeMapping(account_CellRenderer, CellRendererText.Attribute.MARKUP,
-				_accountDisplay_DataColumn);
+				accountDisplay_DataColumn);
 
 			account_ViewColumn.setTitle("Account");
 			account_ViewColumn.setClickable(true);
-			account_ViewColumn.setSortColumn(_accountTitle_DataColumn);
+			account_ViewColumn.setSortColumn(accountTitle_DataColumn);
 
-			_view.appendColumn(account_ViewColumn);
+			view.appendColumn(account_ViewColumn);
 
 			// Ledger column
 			TreeViewColumn ledger_ViewColumn = new TreeViewColumn();
@@ -218,26 +217,26 @@ public class AccountPicker extends HBox
 			CellRendererText ledger_CellRenderer = new CellRendererText();
 			ledger_ViewColumn.packStart(ledger_CellRenderer, true);
 			ledger_ViewColumn.addAttributeMapping(ledger_CellRenderer, CellRendererText.Attribute.MARKUP,
-				_ledgerDisplay_DataColumn);
+				ledgerDisplay_DataColumn);
 
 			ledger_ViewColumn.setTitle("Ledger");
 			ledger_ViewColumn.setClickable(true);
-			ledger_ViewColumn.setSortColumn(_ledgerName_DataColumn);
+			ledger_ViewColumn.setSortColumn(ledgerName_DataColumn);
 
-			_view.appendColumn(ledger_ViewColumn);
+			view.appendColumn(ledger_ViewColumn);
 
 			/*
 			 * overall properties
 			 */
-			_view.setAlternateRowColor(false);
-			_view.setEnableSearch(false);
-			_view.setReorderable(false);
+			view.setAlternateRowColor(false);
+			view.setEnableSearch(false);
+			view.setReorderable(false);
 			account_ViewColumn.click();
 
-			TreeSelection selection = _view.getSelection();
+			TreeSelection selection = view.getSelection();
 			selection.setMode(SelectionMode.SINGLE);
 
-			_status = (StatusBar) gladeParser.getWidget("statusbar");
+			status = (StatusBar) gladeParser.getWidget("statusbar");
 
 			/*
 			 * Populate
@@ -252,7 +251,7 @@ public class AccountPicker extends HBox
 				Set ledgers = acct.getLedgers();
 				Iterator ledgersIter = ledgers.iterator();
 				while (ledgersIter.hasNext()) {
-					TreeIter pointer = _listStore.appendRow();
+					TreeIter pointer = listStore.appendRow();
 
 					Ledger ledger = (Ledger) ledgersIter.next();
 
@@ -263,15 +262,15 @@ public class AccountPicker extends HBox
 					 */
 					final String size = "xx-small";
 					Matcher m = regexAmp.matcher(acct.getTitle());
-					_listStore.setValue(pointer, _accountDisplay_DataColumn, m.replaceAll("&amp;") + "\n<span size=\""
+					listStore.setValue(pointer, accountDisplay_DataColumn, m.replaceAll("&amp;") + "\n<span size=\""
 						+ size + "\" color=\"" + acct.getColor() + "\">" + acct.getClassString() + "</span>");
-					_listStore.setValue(pointer, _accountTitle_DataColumn, acct.getTitle());
-					_listStore.setValue(pointer, _accountObject_DataColumn, acct);
+					listStore.setValue(pointer, accountTitle_DataColumn, acct.getTitle());
+					listStore.setValue(pointer, accountObject_DataColumn, acct);
 
-					_listStore.setValue(pointer, _ledgerDisplay_DataColumn, ledger.getName() + "\n<span size=\"" + size
+					listStore.setValue(pointer, ledgerDisplay_DataColumn, ledger.getName() + "\n<span size=\"" + size
 						+ "\"color=\"" + ledger.getColor() + "\">" + ledger.getClassString() + "</span>");
-					_listStore.setValue(pointer, _ledgerName_DataColumn, ledger.getName());
-					_listStore.setValue(pointer, _ledgerObject_DataColumn, ledger);
+					listStore.setValue(pointer, ledgerName_DataColumn, ledger.getName());
+					listStore.setValue(pointer, ledgerObject_DataColumn, ledger);
 				}
 			}
 
@@ -279,19 +278,19 @@ public class AccountPicker extends HBox
 			 * Setup the search / filter mechanism.
 			 */
 			Entry e = (Entry) gladeParser.getWidget("search_entry");
-			_search = new SearchEntry(e);
+			search = new SearchEntry(e);
 
 			/*
 			 * this is here as needs _search to be initialized, otherwise GTK
 			 * makes a mess
 			 */
 
-			_filteredStore.setVisibleMethod(new TreeModelFilterVisibleMethod() {
+			filteredStore.setVisibleMethod(new TreeModelFilterVisibleMethod() {
 				private Pattern	regex	= null;
 				private String	cached	= "bleep";
 
 				public boolean filter(TreeModel model, TreeIter pointer) {
-					String q = _search.getText();
+					String q = search.getText();
 
 					/*
 					 * This is ugly, but since we had to do it this way to get
@@ -305,13 +304,13 @@ public class AccountPicker extends HBox
 					}
 					Matcher m;
 
-					String accountTitle = model.getValue(pointer, _accountTitle_DataColumn);
+					String accountTitle = model.getValue(pointer, accountTitle_DataColumn);
 					m = regex.matcher(accountTitle);
 					if (m.matches()) {
 						return true;
 					}
 
-					String ledgerName = model.getValue(pointer, _ledgerName_DataColumn);
+					String ledgerName = model.getValue(pointer, ledgerName_DataColumn);
 					m = regex.matcher(ledgerName);
 					if (m.matches()) {
 						return true;
@@ -325,14 +324,14 @@ public class AccountPicker extends HBox
 			/*
 			 * and now we can add the mechanism to refilter on keystrokes.
 			 */
-			_search.setChangeListener(new EntryListener() {
+			search.setChangeListener(new EntryListener() {
 				public void entryEvent(EntryEvent event) {
 					Debug.print("listeners", "AccountPickerPopup search entryEvent " + event.getType().getName());
 					if (event.getType() == EntryEvent.Type.CHANGED) {
 						refilter();
 					}
 					if (event.getType() == EntryEvent.Type.ACTIVATE) {
-						_view.grabFocus();
+						view.grabFocus();
 					}
 				}
 			});
@@ -341,11 +340,11 @@ public class AccountPicker extends HBox
 			 * If in the entry and you press down, jump straight to the rows
 			 * (skipping the headers).
 			 */
-			_search.addListener(new KeyListener() {
+			search.addListener(new KeyListener() {
 				public boolean keyEvent(KeyEvent event) {
 					int key = event.getKeyval();
 					if ((key == KeyValue.Down) || (key == KeyValue.Up)) {
-						_view.grabFocus();
+						view.grabFocus();
 						return true;
 					} else {
 						return false;
@@ -357,10 +356,10 @@ public class AccountPicker extends HBox
 			 * As much as possible, make the cursor go to the end (and deselect
 			 * all the text in the process - otherwise you get an overwrite)
 			 */
-			_search.addListener(new FocusListener() {
+			search.addListener(new FocusListener() {
 				public boolean focusEvent(FocusEvent event) {
 					if (event.getType() == FocusEvent.Type.FOCUS_IN) {
-						_search.setCursorPosition(_search.getText().length());
+						search.setCursorPosition(search.getText().length());
 					}
 					return false;
 				}
@@ -370,7 +369,7 @@ public class AccountPicker extends HBox
 				public boolean keyEvent(KeyEvent event) {
 					int key = event.getKeyval();
 					if (key == KeyValue.Escape) {
-						if ((_selectedAccount == null) || (_entry.getText().equals(""))) {
+						if ((selectedAccount == null) || (entry.getText().equals(""))) {
 							clearEntry();
 						}
 						window.hide();
@@ -383,35 +382,35 @@ public class AccountPicker extends HBox
 			});
 
 			final Pattern regexAtoZ = Pattern.compile("[a-z]");
-			_view.addListener(new KeyListener() {
+			view.addListener(new KeyListener() {
 				public boolean keyEvent(KeyEvent event) {
 					if (event.getType() == KeyEvent.Type.KEY_PRESSED) {
 						int key = event.getKeyval();
 						String str = event.getString();
 
-						String orig = _search.getText();
+						String orig = search.getText();
 						int len = orig.length();
 
 						if (key == KeyValue.BackSpace) {
-							_search.grabFocus();
+							search.grabFocus();
 							if (len > 0) {
-								_search.setText(orig.substring(0, len - 1));
+								search.setText(orig.substring(0, len - 1));
 								refilter();
 							}
 							return true;
 						} else if (key == KeyValue.Left) {
-							_search.grabFocus();
+							search.grabFocus();
 							if (len > 0) {
-								_search.setCursorPosition(len - 1);
+								search.setCursorPosition(len - 1);
 							}
 							return true;
 						} else if (key == KeyValue.Right) {
-							_search.grabFocus();
-							_search.setCursorPosition(len);
+							search.grabFocus();
+							search.setCursorPosition(len);
 							return true;
 						} else if (regexAtoZ.matcher(str).matches()) {
-							_search.grabFocus();
-							_search.setText(_search.getText() + str);
+							search.grabFocus();
+							search.setText(search.getText() + str);
 							refilter();
 							return true;
 						} else {
@@ -424,7 +423,7 @@ public class AccountPicker extends HBox
 				}
 			});
 
-			_view.addListener(new TreeViewListener() {
+			view.addListener(new TreeViewListener() {
 				public void treeViewEvent(TreeViewEvent event) {
 					if (event.getType() == TreeViewEvent.Type.ROW_ACTIVATED) {
 						TreeIter pointer = event.getTreeIter();
@@ -450,28 +449,28 @@ public class AccountPicker extends HBox
 		 */
 		private void refilter() {
 			TreeIter pointer;
-			_totalRows = 0;
+			totalRows = 0;
 
-			pointer = _listStore.getFirstIter();
+			pointer = listStore.getFirstIter();
 			while (pointer != null) {
-				_totalRows++;
+				totalRows++;
 				pointer = pointer.getNextIter();
 			}
 
-			_filteredStore.refilter();
+			filteredStore.refilter();
 
-			_visibleRows = 0;
-			pointer = _filteredStore.getFirstIter();
+			visibleRows = 0;
+			pointer = filteredStore.getFirstIter();
 			while (pointer != null) {
-				_visibleRows++;
+				visibleRows++;
 				pointer = pointer.getNextIter();
 			}
 
-			if (_lastID != 0) {
-				_status.pop(_lastID);
+			if (lastID != 0) {
+				status.pop(lastID);
 			}
-			_lastID = _status.getContextID("" + _visibleRows);
-			_status.push(_lastID, _visibleRows + "/" + _totalRows + " visible");
+			lastID = status.getContextID("" + visibleRows);
+			status.push(lastID, visibleRows + "/" + totalRows + " visible");
 		}
 
 		/**
@@ -484,7 +483,7 @@ public class AccountPicker extends HBox
 			 * So annoying. You'd think you should be able to cast from Widget
 			 * to Window here, but it blows ClassCastException.
 			 */
-			Window top = (Window) _entry.getToplevel();
+			Window top = (Window) entry.getToplevel();
 			top.present();
 		}
 
@@ -506,29 +505,29 @@ public class AccountPicker extends HBox
 
 		private void applySelection(TreeIter pointer) {
 			window.hide();
-			_selectedAccount = (Account) _sortedStore.getValue(pointer, _accountObject_DataColumn);
-			_selectedLedger = (Ledger) _sortedStore.getValue(pointer, _ledgerObject_DataColumn);
+			selectedAccount = (Account) sortedStore.getValue(pointer, accountObject_DataColumn);
+			selectedLedger = (Ledger) sortedStore.getValue(pointer, ledgerObject_DataColumn);
 			setEntryText();
 		}
 
 		private void setEntryText() {
-			String str = _selectedAccount.getTitle() + " - " + _selectedLedger.getName();
-			_entry.setText(str);
+			String str = selectedAccount.getTitle() + " - " + selectedLedger.getName();
+			entry.setText(str);
 		}
 
 		private void clearEntry() {
-			_entry.clearText();
-			_selectedAccount = null;
-			_selectedLedger = null;
+			entry.clearText();
+			selectedAccount = null;
+			selectedLedger = null;
 		}
 
 		private void setSearch(String str) {
-			_search.setText(str);
+			search.setText(str);
 			refilter();
 		}
 
 		private void clearSearch() {
-			_search.clearText();
+			search.clearText();
 		}
 
 		/*
@@ -536,7 +535,7 @@ public class AccountPicker extends HBox
 		 */
 
 		public void present() {
-			org.gnu.gdk.Window gdkWindow = _entry.getWindow();
+			org.gnu.gdk.Window gdkWindow = entry.getWindow();
 
 			int x = gdkWindow.getOrigin().getX();
 			int y = gdkWindow.getOrigin().getY(); // + gdkWindow.getHeight();
@@ -544,7 +543,7 @@ public class AccountPicker extends HBox
 			window.move(x, y);
 
 			super.present();
-			_search.grabFocus();
+			search.grabFocus();
 		}
 
 	}
@@ -616,16 +615,26 @@ public class AccountPicker extends HBox
 	/*
 	 * Getters and Setters --------------------------------
 	 */
+
+	/**
+	 * @return the selected Account object which contains the selected Legdger.
+	 */
 	public Account getAccount() {
-		return _selectedAccount;
+		return selectedAccount;
 	}
 
 	public void setAccount(Account account) {
 		if (account == null) {
-			return;
-			// throw something?
+			throw new IllegalArgumentException("null invalid argument for setAccount()");
 		}
-		_selectedAccount = account;
+		selectedAccount = account;
+	}
+
+	/**
+	 * @return the selected Ledger object whose parent is the selected Account.
+	 */
+	public Ledger getLedger() {
+		return selectedLedger;
 	}
 
 	/*
@@ -633,6 +642,6 @@ public class AccountPicker extends HBox
 	 */
 
 	public void grabFocus() {
-		_entry.grabFocus();
+		entry.grabFocus();
 	}
 }
