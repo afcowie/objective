@@ -8,8 +8,10 @@ package accounts.ui;
 
 import generic.util.Debug;
 
+import org.gnu.gdk.Color;
 import org.gnu.gtk.Entry;
 import org.gnu.gtk.HBox;
+import org.gnu.gtk.StateType;
 import org.gnu.gtk.event.EntryEvent;
 import org.gnu.gtk.event.EntryListener;
 import org.gnu.gtk.event.FocusEvent;
@@ -105,13 +107,13 @@ public class AmountEntry extends HBox
 
 					try {
 						amount.setValue(text);
-						// TODO ensure colour black
+						amount_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
 					} catch (NumberFormatException nfe) {
-						// TODO change colour red
 						/*
 						 * if the user input is invalid, then ignore it. The
 						 * Amount will stay as previously set.
 						 */
+						amount_Entry.setTextColor(StateType.NORMAL, Color.RED);
 						return;
 					}
 

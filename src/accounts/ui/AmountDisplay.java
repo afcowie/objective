@@ -43,8 +43,8 @@ public class AmountDisplay extends HBox
 		 */
 		// FIXME needs libgtk-java 2.8.5
 		// amount_Label.setCanFocus(false);
-		// amount_Label.setSelectable(true);
-		amount_Label.setSelectable(false);
+		amount_Label.setSelectable(true);
+		amount_Label.setBooleanProperty("can-focus", false);
 
 		/*
 		 * The following [2 in setPadding() and 5 in packStart()] pads the Label
