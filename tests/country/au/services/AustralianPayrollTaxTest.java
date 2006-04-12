@@ -257,4 +257,49 @@ public class AustralianPayrollTaxTest extends TestCase
 		assertEquals("22.00", calc.getWithhold().toString());
 		assertEquals("253.00", calc.getSalary().toString());
 	}
+
+	public final void testAgainstOfficialSampleData() throws NotFoundException {
+		PayrollTaxCalculator calc;
+
+		calc = new AustralianPayrollTaxCalculator(AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_NO_LEAVE_LOADING,
+			KNOWN_GOOD_DATE);
+		calc.setWithhold(new Amount());
+		calc.setPaycheck(new Amount());
+
+		calc.setSalary(new Amount("111.00"));
+		calc.calculateGivenSalary();
+		assertEquals("0.00", calc.getWithhold().getValue());
+
+		calc.setSalary(new Amount("300.00"));
+		calc.calculateGivenSalary();
+		assertEquals("28.00", calc.getWithhold().getValue());
+
+		calc.setSalary(new Amount("1587.00"));
+		calc.calculateGivenSalary();
+		assertEquals("466.00", calc.getWithhold().getValue());
+
+		calc.setSalary(new Amount("1828.00"));
+		calc.calculateGivenSalary();
+		assertEquals("571.00", calc.getWithhold().getValue());
+
+		calc = new AustralianPayrollTaxCalculator(AustralianPayrollTaxIdentifier.NO_TFN_PROVIDED, KNOWN_GOOD_DATE);
+		calc.setWithhold(new Amount());
+		calc.setPaycheck(new Amount());
+
+		calc.setSalary(new Amount("50.00"));
+		calc.calculateGivenSalary();
+		assertEquals("24.00", calc.getWithhold().getValue());
+
+		calc.setSalary(new Amount("100.00"));
+		calc.calculateGivenSalary();
+		assertEquals("48.00", calc.getWithhold().getValue());
+
+		calc.setSalary(new Amount("1000.00"));
+		calc.calculateGivenSalary();
+		assertEquals("485.00", calc.getWithhold().getValue());
+
+		calc.setSalary(new Amount("10000.00"));
+		calc.calculateGivenSalary();
+		assertEquals("4850.00", calc.getWithhold().getValue());
+	}
 }
