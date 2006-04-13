@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.ui.AbstractWindow;
 import generic.util.Debug;
 
 import org.gnu.gtk.Button;

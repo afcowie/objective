@@ -6,6 +6,8 @@
  */
 package country.au.ui;
 
+import generic.ui.Align;
+import generic.ui.TwoColumnTable;
 import generic.util.Debug;
 import generic.util.DebugException;
 
@@ -32,14 +34,12 @@ import accounts.services.CommandNotReadyException;
 import accounts.services.NotFoundException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.SpecificLedgerFinder;
-import accounts.ui.Align;
 import accounts.ui.AmountDisplay;
 import accounts.ui.AmountEntry;
 import accounts.ui.ChangeListener;
 import accounts.ui.DatePicker;
 import accounts.ui.EditorWindow;
 import accounts.ui.IdentifierSelector;
-import accounts.ui.TwoColumnTable;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 import country.au.services.AustralianPayrollTaxCalculator;
 
@@ -396,8 +396,10 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		} catch (NotFoundException nfe) {
 			Debug.print("events", "Can't find Ledger " + nfe.getMessage());
 		} catch (CommandNotReadyException cnre) {
-			Debug.print("events", "Command not ready " + cnre.getMessage());
-			uow.cancel();
+			Debug.print("events", "Command not ready: " + cnre.getMessage());
+			if (uow != null) {
+				uow.cancel();
+			}
 			cancel();
 		}
 	}

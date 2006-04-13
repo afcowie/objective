@@ -4,7 +4,7 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2006 Operational Dynamics
  */
-package accounts.ui;
+package generic.ui;
 
 import org.gnu.gtk.Table;
 import org.gnu.gtk.Widget;
@@ -16,7 +16,7 @@ import org.gnu.gtk.Widget;
  * This class is a Table which simply has a left side and a right side and
  * aligns rows to be equally spaced. [Two VBoxes in an HBox wouldn't achieve the
  * same result because the rows on each side would not be parallel; a series of
- * HBoxes in a VBox would lack a common column boundary.
+ * HBoxes in a VBox would lack a common column boundary].
  * 
  * @author Andrew Cowie
  */
@@ -39,6 +39,13 @@ public class TwoColumnTable extends Table
 		// rows, two columns, don't space homogeneously (ie pack tightly)
 		super(initialNumberOfRows, 2, false);
 
+		/*
+		 * Pad the left column with a few pixels so the labels that are
+		 * typically there don't crowd the mutator widgets typically in the
+		 * right column.
+		 */
+		super.setColumnSpacing(0, 3);
+
 		if (initialNumberOfRows < 1) {
 			throw new IllegalArgumentException("Initial size estimate must be positive");
 		}
@@ -46,7 +53,6 @@ public class TwoColumnTable extends Table
 		this.rowCount = 1; // first attach goes into this first row.
 		this.rowCapacity = initialNumberOfRows;
 		this.rowComplete = false;
-
 	}
 
 	/**
@@ -106,5 +112,4 @@ public class TwoColumnTable extends Table
 			lastSide = leftOrRight;
 		}
 	}
-
 }

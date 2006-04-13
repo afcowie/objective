@@ -4,12 +4,13 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.ui;
+package generic.ui;
 
 import generic.util.Environment;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+
 
 public abstract class TextOutput
 {

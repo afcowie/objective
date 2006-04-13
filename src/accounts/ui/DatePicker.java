@@ -6,6 +6,8 @@
  */
 package accounts.ui;
 
+import generic.ui.AbstractWindow;
+
 import java.text.ParseException;
 
 import org.gnu.gdk.KeyValue;

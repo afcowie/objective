@@ -6,6 +6,8 @@
  */
 package accounts.ui;
 
+import generic.ui.TextOutput;
+
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Iterator;

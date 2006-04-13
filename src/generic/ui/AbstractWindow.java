@@ -4,7 +4,7 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.ui;
+package generic.ui;
 
 import generic.util.Debug;
 
@@ -16,8 +16,6 @@ import org.gnu.gtk.VBox;
 import org.gnu.gtk.Window;
 import org.gnu.gtk.event.LifeCycleEvent;
 import org.gnu.gtk.event.LifeCycleListener;
-
-import accounts.client.ObjectiveAccounts;
 
 /**
  * The base class in our Window hierarchy, providing default behaviour common to

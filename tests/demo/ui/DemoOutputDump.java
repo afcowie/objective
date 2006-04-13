@@ -6,11 +6,11 @@
  */
 package demo.ui;
 
+import generic.ui.TextOutput;
 import accounts.domain.Books;
 import accounts.persistence.DataStore;
 import accounts.services.DatafileServices;
 import accounts.ui.AccountTextOutput;
-import accounts.ui.TextOutput;
 import accounts.ui.TransactionTextOutput;
 import demo.client.DemoBooksSetup;
 

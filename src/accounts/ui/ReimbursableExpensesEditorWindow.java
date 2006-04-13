@@ -6,6 +6,8 @@
  */
 package accounts.ui;
 
+import generic.ui.AbstractWindow;
+
 import java.io.PrintWriter;
 
 import org.gnu.gtk.ComboBoxEntry;

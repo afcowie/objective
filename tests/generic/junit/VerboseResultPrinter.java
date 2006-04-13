@@ -6,6 +6,8 @@
  */
 package generic.junit;
 
+import generic.ui.TextOutput;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.regex.Matcher;
@@ -14,14 +16,13 @@ import java.util.regex.Pattern;
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestListener;
-import accounts.ui.TextOutput;
 
 /**
  * Output the test by test results of running a Test, printing the name of each
  * test along the way. This replaces the default notion of
  * junit.textui.ResultPrinter with an equivalent implementation of TestListener.
  * The various callbacks here get called as test cases get started and then
- * succeed, fail, or error. We use our {@link accounts.ui.TextOutput} as a
+ * succeed, fail, or error. We use our {@link generic.ui.TextOutput} as a
  * superclass to get the various useful output routines there. Instantiated by
  * our {@link generic.junit.VerboseTestRunner}.
  * 
