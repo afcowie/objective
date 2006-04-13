@@ -23,12 +23,13 @@ public class AustralianPayrollTaxIdentifier extends PayrollTaxIdentifier
 
 	/**
 	 * A set of useful "constants" indicating previsualized uses of this class.
-	 * They are NOT instantiated here; rather, they are populated if the
+	 * They are NOT instantiated here; rather, they are TODO populated if the
 	 * appropriate Finder runs.
 	 */
 	public static AustralianPayrollTaxIdentifier	TAXFREE_THRESHOLD_WITH_LEAVE_LOADING	= null;
 	public static AustralianPayrollTaxIdentifier	TAXFREE_THRESHOLD_NO_LEAVE_LOADING		= null;
 	public static AustralianPayrollTaxIdentifier	NO_TAXFREE_THRESHOLD					= null;
 	public static AustralianPayrollTaxIdentifier	NO_TFN_PROVIDED							= null;
+	public static AustralianPayrollTaxIdentifier	FOREIGN_RESIDENT						= null;
 
 }

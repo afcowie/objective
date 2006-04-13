@@ -36,6 +36,7 @@ public class AustralianInitBooksCommand extends InitBooksCommand
 		AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING = new AustralianPayrollTaxIdentifier(
 			"Tax-free threshold and leave loading claimed");
 		AustralianPayrollTaxIdentifier.NO_TFN_PROVIDED = new AustralianPayrollTaxIdentifier("No TFN (or ABN) quoted");
+		AustralianPayrollTaxIdentifier.FOREIGN_RESIDENT = new AustralianPayrollTaxIdentifier("Foreign resident");
 	}
 
 	/**
@@ -57,6 +58,7 @@ public class AustralianInitBooksCommand extends InitBooksCommand
 		grp.addIdentifier(AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_NO_LEAVE_LOADING);
 		grp.addIdentifier(AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING);
 		grp.addIdentifier(AustralianPayrollTaxIdentifier.NO_TFN_PROVIDED);
+		grp.addIdentifier(AustralianPayrollTaxIdentifier.FOREIGN_RESIDENT);
 
 		StoreIdentifierGroupCommand sigc = new StoreIdentifierGroupCommand(grp);
 		sigc.execute(uow);

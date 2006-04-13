@@ -82,7 +82,7 @@ public class AustralianPayrollTaxTableFinder extends Finder
 			try {
 				query();
 			} catch (NotFoundException nfe) {
-				throw new IllegalStateException("You've asked for tax table data but there is none stored");
+				throw new NotFoundException("You've asked for tax table data but there is none stored");
 			}
 		}
 

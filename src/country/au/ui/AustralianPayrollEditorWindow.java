@@ -7,15 +7,16 @@
 package country.au.ui;
 
 import generic.ui.Align;
+import generic.ui.ModalDialog;
 import generic.ui.TwoColumnTable;
 import generic.util.Debug;
-import generic.util.DebugException;
 
 import java.util.List;
 
 import org.gnu.gtk.ComboBoxEntry;
 import org.gnu.gtk.Gtk;
 import org.gnu.gtk.Label;
+import org.gnu.gtk.MessageType;
 import org.gnu.gtk.Widget;
 import org.gnu.gtk.event.ComboBoxEvent;
 import org.gnu.gtk.event.ComboBoxListener;
@@ -249,8 +250,15 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 							withholding_AmountDisplay.setAmount(withholding);
 						}
 					} catch (NotFoundException nfe) {
-						// FIXME to dialog
-						throw new DebugException("Can't find tax data for identifier " + payg);
+						ModalDialog dialog = new ModalDialog(
+							"Not found",
+							"Can't find tax data for identifier <b>"
+								+ payg
+								+ "</b> effective <b>"
+								+ calc.getAsAtDate()
+								+ "</b>. That's probably a bug (tax tables tend to be all or nothing) but please try another one.",
+							MessageType.ERROR);
+						dialog.run();
 					}
 				}
 			}
