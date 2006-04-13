@@ -189,11 +189,11 @@ public abstract class AbstractWindow
 		} catch (FileNotFoundException e) {
 			// If it can't find that glade file, we have an app
 			// configuration problem or worse some UI bug, and need to abort.
-			ObjectiveAccounts.abort("Can't find glade file " + gladeFilename + " for " + whichElement);
+			Master.abort("Can't find glade file " + gladeFilename + " for " + whichElement);
 		} catch (Exception e) {
 			e.printStackTrace();
-			ObjectiveAccounts.abort("An internal error occured trying to read and process the glade file "
-				+ gladeFilename + " for " + whichElement);
+			Master.abort("An internal error occured trying to read and process the glade file " + gladeFilename
+				+ " for " + whichElement);
 		}
 		window = (Window) gladeParser.getWidget(whichElement);
 
