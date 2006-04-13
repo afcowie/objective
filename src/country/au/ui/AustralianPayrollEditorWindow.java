@@ -362,7 +362,16 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 
 		try {
 			if (salary.getNumber() == 0) {
-				throw new CommandNotReadyException("Not much point in trying to commit a paycheck for 0.00");
+				ModalDialog dialog = new ModalDialog("Enter some numbers!",
+					"Not much point in trying to commit a paycheck for 0.00, is there?", MessageType.WARNING);
+				dialog.run();
+				/*
+				 * No need to throw CommandNotReadyException; while the state of
+				 * things is indeed not suitable, at this point we can still
+				 * trap it as a business logic problem, rather than a validation
+				 * failure.
+				 */
+				return;
 			}
 			SpecificLedgerFinder f = new SpecificLedgerFinder();
 
@@ -405,10 +414,15 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			Debug.print("events", "Can't find Ledger " + nfe.getMessage());
 		} catch (CommandNotReadyException cnre) {
 			Debug.print("events", "Command not ready: " + cnre.getMessage());
-			if (uow != null) {
-				uow.cancel();
-			}
-			cancel();
+			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(), MessageType.ERROR);
+			dialog.run();
+
+			uow.cancel();
+
+			/*
+			 * Leave the Window open so user can fix, as opposed to calling
+			 * cancel()
+			 */
 		}
 	}
 
