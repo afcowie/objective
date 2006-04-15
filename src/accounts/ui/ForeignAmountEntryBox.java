@@ -154,6 +154,7 @@ public class ForeignAmountEntryBox extends HBox
 				if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
 					rate_Entry.setText(foreignAmount.getRate());
 					rate_Entry.selectRegion(0, 0);
+					rate_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
 				}
 				return false;
 			};

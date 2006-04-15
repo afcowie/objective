@@ -69,6 +69,13 @@ public class IdentifierSelector extends ComboBox
 		while (iI.hasNext()) {
 			Identifier i = (Identifier) iI.next();
 			TreeIter pointer = listStore.appendRow();
+
+			/*
+			 * Hmm. Tried using TextOutput.wrap(i.getName(), 20) but ComboBox
+			 * seems to ignore the fact that wrapping with newlines reduces the
+			 * effective width of the String, instead using the raw String
+			 * length to size the drop down. Damn and other comments.
+			 */
 			listStore.setValue(pointer, nameDisplay_DataColumn, i.getName());
 			listStore.setValue(pointer, identifierObject_DataColumn, i);
 		}

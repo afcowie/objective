@@ -149,6 +149,7 @@ public class AmountEntry extends HBox
 					 * selection.
 					 */
 					amount_Entry.selectRegion(0, 0);
+					amount_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
 				}
 				return false;
 			};
@@ -212,6 +213,7 @@ public class AmountEntry extends HBox
 		final String str = a.getValue();
 		if (!amount_Entry.getText().equals(str)) {
 			amount_Entry.setText(str);
+			amount_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
 		}
 	}
 
@@ -228,6 +230,7 @@ public class AmountEntry extends HBox
 
 		if (!amount_Entry.getText().equals(value)) {
 			amount_Entry.setText(value);
+			amount_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
 		}
 	}
 
