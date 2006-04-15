@@ -3,6 +3,9 @@
  * 
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
+ * 
+ * Word wrap algorithm GPL code imported from xseq.ui.OverviewWindow
+ * Copyright (c) 2004-2005 Operational Dynamics
  */
 package generic.ui;
 
@@ -11,7 +14,22 @@ import generic.util.Environment;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-
+/**
+ * Base class for routines that output text to terminal. It takes care of
+ * working out and making available to subclasses an appropriate terminal width.
+ * Note that this can be set or overridden on the VM command line by setting the
+ * COLUMNS property:
+ * 
+ * <pre>
+ *    java -DCOLUMNS=70 ...
+ * </pre>
+ * 
+ * <p>
+ * This class also has numerous static methods with useful routines for doing
+ * basic formatting on Strings.
+ * 
+ * @author Andrew Cowie
+ */
 public abstract class TextOutput
 {
 	/**
@@ -133,6 +151,62 @@ public abstract class TextOutput
 		} else {
 			return str;
 		}
+	}
+
+	/**
+	 * Carry out manual word wrap on a String. Normalizes all \n and \t
+	 * characters to spaces, trims leading and training whitespace, and then
+	 * inserts \n characters to "wrap" at the specified width boundary.
+	 * <p>
+	 * This code came about because unfortunately, Pango markup has no syntax
+	 * for expressing auto word wrap, and worse, GtkCellRendererText has no
+	 * ability to wrap text. So we (ick) do it by hand.
+	 * 
+	 * @return a single String with newline characters inserted at appropriate
+	 *         points to cause the effect of wrapping at the specified width.
+	 */
+	public static String wrap(String str, int width) {
+		StringBuffer buf = new StringBuffer(str);
+		int index;
+		/*
+		 * normalize any existing IFS characters to spaces
+		 */
+		while ((index = buf.indexOf("\n")) != -1) {
+			buf.setCharAt(index, ' ');
+		}
+		while ((index = buf.indexOf("\t")) != -1) {
+			buf.setCharAt(index, ' ');
+		}
+		/*
+		 * trim. Yes, I know about String.trim(), but we've already done half
+		 * the work it does; no need to be inefficient.
+		 */
+		while (buf.charAt(0) == ' ') {
+			buf.deleteCharAt(0);
+		}
+		while (buf.charAt(buf.length() - 1) == ' ') {
+			buf.deleteCharAt(buf.length() - 1);
+		}
+
+		while ((index = buf.indexOf("  ")) != -1) {
+			buf.deleteCharAt(index);
+		}
+
+		/*
+		 * word wrap.
+		 */
+		int next_space = 0;
+		int line_start = 0;
+
+		while (next_space != -1) {
+			if ((next_space - line_start) > width) {
+				buf.setCharAt(next_space, '\n');
+				line_start = next_space;
+			}
+			next_space = buf.indexOf(" ", next_space + 1); // bounds?
+		}
+
+		return buf.toString();
 	}
 
 }
