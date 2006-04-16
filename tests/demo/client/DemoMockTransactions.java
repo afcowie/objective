@@ -16,6 +16,7 @@ import accounts.domain.Client;
 import accounts.domain.Credit;
 import accounts.domain.Datestamp;
 import accounts.domain.Debit;
+import accounts.domain.Employee;
 import accounts.domain.Entity;
 import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
@@ -28,6 +29,7 @@ import accounts.services.AddEntityCommand;
 import accounts.services.CommandNotReadyException;
 import accounts.services.DatafileServices;
 import accounts.services.PostTransactionCommand;
+import accounts.services.StoreObjectCommand;
 
 /**
  * Contains a prelinary main() method and program initialization (much of which
@@ -134,6 +136,31 @@ public class DemoMockTransactions
 			for (int i = 0; i < entities.length; i++) {
 				AddEntityCommand aec = new AddEntityCommand(entities[i]);
 				aec.execute(uow);
+			}
+
+			uow.commit();
+		} catch (CommandNotReadyException cnre) {
+			uow.cancel();
+			throw new IllegalStateException("Shouldn't have had a problem with any commands being not ready!");
+		} catch (Exception e) {
+			uow.cancel();
+			e.printStackTrace();
+		}
+
+		try {
+			uow = new UnitOfWork("Add some employees");
+
+			Employee[] staff = {
+				new Employee("Andrew Cowie"),
+				new Employee("Katrina Ross"),
+			};
+
+			for (int i = 0; i < staff.length; i++) {
+				// FIXME replace with domain specific command! Perhaps
+				// AddEmployeeCommmand or StoreWorkerCommand or ... to do
+				// Payroll Ledger setups and whatnot
+				StoreObjectCommand soc = new StoreObjectCommand(staff[i]);
+				soc.execute(uow);
 			}
 
 			uow.commit();

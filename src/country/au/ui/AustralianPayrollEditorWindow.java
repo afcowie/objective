@@ -13,7 +13,6 @@ import generic.util.Debug;
 
 import java.util.List;
 
-import org.gnu.gtk.ComboBoxEntry;
 import org.gnu.gtk.Gtk;
 import org.gnu.gtk.Label;
 import org.gnu.gtk.MessageType;
@@ -40,6 +39,7 @@ import accounts.ui.AmountEntry;
 import accounts.ui.ChangeListener;
 import accounts.ui.DatePicker;
 import accounts.ui.EditorWindow;
+import accounts.ui.WorkerPicker;
 import accounts.ui.IdentifierSelector;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 import country.au.services.AustralianPayrollTaxCalculator;
@@ -65,6 +65,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 
 	private AustralianPayrollTaxCalculator	calc;
 
+	private WorkerPicker					employee_WorkerPicker;
 	private IdentifierSelector				payg_IdentifierSelector;
 	private DatePicker						endDate_Picker;
 	private AmountEntry						salary_AmountEntry;
@@ -78,9 +79,9 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 	private transient Widget				last		= null;
 
 	/**
-	 * Construct a Window to edit an existing payroll transaction. This will
-	 * initialize the various windows with the relevent data from the passed
-	 * transaction argument.
+	 * Construct a Window to edit an existing Transaction. This will initialize
+	 * the various windows with the relevent data from the passed transaction
+	 * argument.
 	 * 
 	 * @param t
 	 *            a PayrollTransaction containing an Australian PAYG
@@ -89,23 +90,48 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 	public AustralianPayrollEditorWindow(PayrollTransaction t) {
 		super("Edit Transaction " + t.getDescription());
 
-		employee = t.getEmployee();
+		buildWindow(t);
+
+		/*
+		 * As we're editing, the likely thing is changing the amount, so set
+		 * focus there.
+		 */
+		salary_AmountEntry.grabFocus();
+		present();
 	}
 
 	/**
-	 * Construct the Window.
+	 * Construct the Window to fill in the details of a new Transaction.
 	 */
 	public AustralianPayrollEditorWindow() {
 		super("Enter payroll details");
 
+		buildWindow(null);
+
 		/*
-		 * Instantiate objects for the three Amount fields. These will be
-		 * overridden if editing an existing transaction, but otherwise we set
-		 * them up now.
+		 * start with selecting a person to pay.
 		 */
-		salary = new Amount(0);
-		withholding = new Amount(0);
-		paycheck = new Amount(0);
+		employee_WorkerPicker.grabFocus();
+		present();
+	}
+
+	/**
+	 * Instantiate all the necessary widgets.
+	 * 
+	 * @param t
+	 *            null if new Transaction
+	 */
+	private final void buildWindow(PayrollTransaction t) {
+		if (t == null) {
+			salary = new Amount(0);
+			withholding = new Amount(0);
+			paycheck = new Amount(0);
+
+		} else {
+			employee = t.getEmployee();
+			// FIXME PayrollTransaction needs fields and getters
+			throw new Error("PayrollTransaction needs fields and getters before this can be an editor");
+		}
 
 		final Label title_Label = new Label("<big><b>Pay an (Australian) Employee</b></big>");
 		title_Label.setUseMarkup(true);
@@ -125,17 +151,15 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		final TwoColumnTable table = new TwoColumnTable(1);
 
 		/*
-		 * Pick employee. Mockup; replace with EmployeePicker! TODO
+		 * Pick employee.
 		 */
 
 		final Label employeeName_Label = new Label("Pick employee:");
 		employeeName_Label.setAlignment(1.0, 0.5);
 		table.attach(employeeName_Label, LEFT);
 
-		final ComboBoxEntry who_ComboBoxEntry = new ComboBoxEntry();
-		who_ComboBoxEntry.appendText("Andrew Cowie");
-		who_ComboBoxEntry.setActive(0);
-		table.attach(who_ComboBoxEntry, RIGHT);
+		employee_WorkerPicker = new WorkerPicker(Employee.class);
+		table.attach(employee_WorkerPicker, RIGHT);
 
 		/*
 		 * Pick withholding type Identifier
@@ -145,7 +169,8 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		payg_Label.setAlignment(1.0, 0.5);
 		table.attach(payg_Label, LEFT);
 
-		// this will be buggy the moment there is more than one! FIXME
+		// FIXME this will be buggy the moment there is more than one
+		// IdentifierGroup!
 		List found = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
 		if (found.size() != 1) {
 			throw new Error("Dude, you need to fix the code to deal with reality");
@@ -319,60 +344,53 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		});
 
 		/*
-		 * And finally, set a useful initial state:
+		 * And finally, set a useful initial state. Again, differentiate between
+		 * the new Transaction and edit Transaction cases.
 		 */
 
-		payg_IdentifierSelector.setActive(0);
-
+		if (t == null) {
+			payg_IdentifierSelector.setActive(0);
+		} else {
+			employee_WorkerPicker.setWorker(employee);
+			payg_IdentifierSelector.setIdentifier(t.getTaxIdentifier());
+		}
 		salary_AmountEntry.setAmount(salary);
 		withholding_AmountDisplay.setAmount(withholding);
 		paycheck_AmountEntry.setAmount(paycheck);
 
-		salary_AmountEntry.grabFocus();
-		present();
-	}
-
-	/*
-	 * Mimic what real UI would have done
-	 */
-	private void mockupFields() {
-		employee = new Employee();
-		employee.setName("Andrew Cowie");
 	}
 
 	protected void ok() {
-		mockupFields();
+		employee = (Employee) employee_WorkerPicker.getWorker();
 
 		/*
-		 * Retrieve the actual Employee from the database.
+		 * Basic data guards.
 		 */
 
-		// Employee proto = new Employee();
-		// proto.setName(employeeNameField);
-		//
-		// List result = ObjectiveAccounts.store.queryByExample(proto);
-		// if (result.size() != 1) {
-		// throw new NotFoundException("Employee " + employeeNameField + "
-		// not found in database");
-		// }
-		// Employee storedEmployee = (Employee) result.get(0);
+		if (employee == null) {
+			ModalDialog dialog = new ModalDialog("Select an employee!",
+				"You need to select the person you're trying to pay first.", MessageType.WARNING);
+			dialog.run();
+			return;
+		}
+
+		if (salary.getNumber() == 0) {
+			ModalDialog dialog = new ModalDialog("Enter some numbers!",
+				"Not much point in trying to commit a paycheck for 0.00, is there?", MessageType.WARNING);
+			dialog.run();
+			/*
+			 * No need to throw CommandNotReadyException; while the state of
+			 * things is indeed not suitable, at this point we can still trap it
+			 * as a business logic problem, rather than a validation failure.
+			 */
+			return;
+		}
+
 		/*
 		 * Get the requisite Ledgers
 		 */
 
 		try {
-			if (salary.getNumber() == 0) {
-				ModalDialog dialog = new ModalDialog("Enter some numbers!",
-					"Not much point in trying to commit a paycheck for 0.00, is there?", MessageType.WARNING);
-				dialog.run();
-				/*
-				 * No need to throw CommandNotReadyException; while the state of
-				 * things is indeed not suitable, at this point we can still
-				 * trap it as a business logic problem, rather than a validation
-				 * failure.
-				 */
-				return;
-			}
 			SpecificLedgerFinder f = new SpecificLedgerFinder();
 
 			// TODO this is standardized and needs to be selected (automatically
