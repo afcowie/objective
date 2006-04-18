@@ -29,6 +29,7 @@ import accounts.services.AddEntityCommand;
 import accounts.services.CommandNotReadyException;
 import accounts.services.DatafileServices;
 import accounts.services.PostTransactionCommand;
+import accounts.services.SpecificLedgerFinder;
 import accounts.services.StoreObjectCommand;
 
 /**
@@ -68,15 +69,42 @@ public class DemoMockTransactions
 			 */
 			DataStore store = ObjectiveAccounts.store;
 
-			Ledger bankAccount = store.getLedger("ANZ", "Current Account");
-			Ledger pettyCash = store.getLedger("Petty Cash", "Manly");
-			Ledger furniture = store.getLedger("Furniture", "Cost");
-			Ledger gstCollected = store.getLedger("GST", "Collected");
-			Ledger shareholdersLoan = store.getLedger("Shareholder", "Cowie");
-			Ledger gstPaid = store.getLedger("GST", "Paid");
-			Ledger ownersEquity = store.getLedger("Owner's Equity", "");
-			Ledger consultingRevenue = store.getLedger("Procedures", "Fees");
-			Ledger groundTransport = store.getLedger("Travel Expenses", "Ground Transfer");
+			SpecificLedgerFinder finder = new SpecificLedgerFinder();
+			finder.setAccountTitle("ANZ");
+			finder.setLedgerName("Current Account");
+			Ledger bankAccount = finder.getLedger();
+
+			finder.setAccountTitle("Petty Cash");
+			finder.setLedgerName("Manly");
+			Ledger pettyCash = finder.getLedger();
+
+			finder.setAccountTitle("Furniture");
+			finder.setLedgerName("Cost");
+			Ledger furniture = finder.getLedger();
+
+			finder.setAccountTitle("GST");
+			finder.setLedgerName("Collected");
+			Ledger gstCollected = finder.getLedger();
+
+			finder.setAccountTitle("Shareholder");
+			finder.setLedgerName("Cowie");
+			Ledger shareholdersLoan = finder.getLedger();
+
+			finder.setAccountTitle("GST");
+			finder.setLedgerName("Paid");
+			Ledger gstPaid = finder.getLedger();
+
+			finder.setAccountTitle("Owner's Equity");
+			finder.setLedgerName("");
+			Ledger ownersEquity = finder.getLedger();
+
+			finder.setAccountTitle("Procedures");
+			finder.setLedgerName("Fees");
+			Ledger consultingRevenue = finder.getLedger();
+
+			finder.setAccountTitle("Travel Expenses");
+			finder.setLedgerName("Ground Transfer");
+			Ledger groundTransport = finder.getLedger();
 
 			/*
 			 * Now start storing some transactions

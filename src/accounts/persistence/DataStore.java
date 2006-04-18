@@ -2,7 +2,7 @@
  * DataStore.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.persistence;
 
@@ -17,19 +17,17 @@ import java.util.NoSuchElementException;
 import accounts.domain.Amount;
 import accounts.domain.Books;
 import accounts.domain.Datestamp;
-import accounts.domain.Ledger;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
-import com.db4o.query.Query;
 
 /**
- * Root class for an accounting database. This is not considered a domain class,
- * and we don't want it stored down into the db4o database, so no domain classes
- * should reference it.
+ * A connection to an accounting database. This is not considered a domain
+ * class, and we don't want it stored down into the db4o database, so no domain
+ * classes should reference it.
  * 
  * This wraps the mechanics of configuring and accessing the underlying db4o
  * database. As we build up safety and recovery routines, they will be added
@@ -53,7 +51,6 @@ public class DataStore
 		Configuration config = Db4o.configure();
 		Debug.register("db4o");
 		// config.messageLevel(3);
-		// config.singleThreadedClient(true);
 		config.callbacks(false);
 
 		/*
@@ -339,63 +336,5 @@ public class DataStore
 	public List nativeQuery(Selector predicate) {
 		ObjectSet os = container.query(predicate);
 		return os;
-	}
-
-	/**
-	 * Get a specified Ledger object. Query by example is nice, of course, but
-	 * in our case we have a complex linked relationship between Accounts (which
-	 * have titles) and the one-or-more Ledgers they contain (each with a
-	 * description). This wraps querying into the database to find a single
-	 * specific Ledger.
-	 * 
-	 * @param accountTitle
-	 *            the Account's title to look for
-	 * @param ledgerName
-	 *            the Ledger to look for within this account.
-	 * @return a Ledger if one found, or null.
-	 */
-	public Ledger getLedger(String accountTitle, String ledgerName) {
-		/*
-		 * Get db4o's Query interface
-		 */
-
-		Query query = container.query();
-
-		/*
-		 * We work inside-out here. Actually, we want ledgers
-		 */
-		query.constrain(Ledger.class);
-
-		/*
-		 * Constrain it with the account and ledger information
-		 */
-		query.descend("name").constrain(ledgerName).contains();
-
-		Query subquery = query.descend("parentAccount");
-		subquery.descend("title").constrain(accountTitle).contains();
-
-		ObjectSet os = query.execute();
-
-		/*
-		 * TODO NOTES: This is SO implementation specific it makes me sick. It
-		 * should really be somewhere closer to the code. On the other hand, it
-		 * is also db4o specific, so this isn't such a bad spot for it. I guess
-		 * it depends on how many finders we end up needing.
-		 */
-
-		final int len = os.size();
-
-		if (len > 1) {
-			throw new UnsupportedOperationException(
-				"When calling getLedger(), you need to specify arguments such that only one ledger will be retreived!");
-		}
-
-		Object obj = os.next();
-
-		if (!(obj instanceof Ledger)) {
-			throw new IllegalStateException("In querying Ledgers, you managed to get something not a Ledger!");
-		}
-
-		return (Ledger) obj;
 	}
 }

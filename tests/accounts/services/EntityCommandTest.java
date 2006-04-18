@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import junit.framework.TestCase;
 import accounts.client.ObjectiveAccounts;
 import accounts.domain.AccountsPayable;
 import accounts.domain.AccountsReceivable;
@@ -21,7 +22,6 @@ import accounts.domain.Supplier;
 import accounts.domain.SupplierLedger;
 import accounts.persistence.IdentifierAlreadyExistsException;
 import accounts.persistence.UnitOfWork;
-import junit.framework.TestCase;
 
 public class EntityCommandTest extends TestCase
 {
@@ -50,7 +50,7 @@ public class EntityCommandTest extends TestCase
 		ObjectiveAccounts.store.close();
 	}
 
-	public final void testAddEntityCommandWithClient() {
+	public final void testAddEntityCommandWithClient() throws NotFoundException {
 		Client client = new Client();
 		ClientLedger cl = null;
 		try {
@@ -108,7 +108,11 @@ public class EntityCommandTest extends TestCase
 		List found = ObjectiveAccounts.store.queryByExample(ClientLedger.class);
 		assertEquals("Only should be one ClientLedger in database at this point", 1, found.size());
 
-		Ledger candidate = ObjectiveAccounts.store.getLedger("Accounts Receiv", "");
+		SpecificLedgerFinder finder = new SpecificLedgerFinder();
+		finder.setAccountTitle("Accounts Receiv");
+		finder.setLedgerName("");
+		Ledger candidate = finder.getLedger();
+
 		assertTrue(candidate instanceof ClientLedger);
 
 		/*
@@ -160,7 +164,7 @@ public class EntityCommandTest extends TestCase
 	 * Complete cut and paste of previous test, this time working Supplier and
 	 * SupplierLedger. No InitBooksCommand this time, though.
 	 */
-	public final void testAddEntityCommandWithSupplier() {
+	public final void testAddEntityCommandWithSupplier() throws NotFoundException {
 		Supplier supplier = new Supplier();
 		SupplierLedger sl = null;
 		try {
@@ -216,7 +220,11 @@ public class EntityCommandTest extends TestCase
 		List found = ObjectiveAccounts.store.queryByExample(SupplierLedger.class);
 		assertEquals("Only should be one SupplierLedger in database at this point", 1, found.size());
 
-		Ledger candidate = ObjectiveAccounts.store.getLedger("Accounts Payab", "");
+		SpecificLedgerFinder finder = new SpecificLedgerFinder();
+		finder.setAccountTitle("Accounts Payab");
+		finder.setLedgerName("");
+		Ledger candidate = finder.getLedger();
+
 		assertTrue(candidate instanceof SupplierLedger);
 
 		/*

@@ -39,7 +39,7 @@ public class DatafileServices
 	public static DataStore newDatafile(String filename) {
 		File probe = new File(filename);
 		if (probe.exists()) {
-			throw new IllegalArgumentException(
+			throw new IllegalStateException(
 				"Proposed datafile already exists (or at least, a file by that name does)");
 		}
 

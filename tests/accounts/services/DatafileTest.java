@@ -37,10 +37,10 @@ public class DatafileTest extends TestCase
 
 		try {
 			DatafileServices.newDatafile(TMPDBFILE);
-		} catch (IllegalArgumentException iae) {
+		} catch (IllegalStateException iae) {
 			// it's supposed to throw this.
 		} catch (Exception e) {
-			fail("Didn't throw IllegalArugmentException it should have, " + e.toString());
+			fail("Didn't throw IllegalStateException it should have, " + e.toString());
 		}
 		store.close();
 		assertTrue(store.getContainer().ext().isClosed());
