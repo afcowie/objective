@@ -18,13 +18,13 @@ import accounts.domain.ForeignCurrencyTest;
 import accounts.domain.GenericTransactionTest;
 import accounts.domain.IdentifierTest;
 import accounts.persistence.BasicDb4oTest;
+import accounts.persistence.EngineTest;
+import accounts.persistence.ExposeDb4oQueryInterfaceTest;
 import accounts.persistence.RollbackDb4oTest;
-import accounts.persistence.UnitOfWorkTest;
 import accounts.services.BasicCommandTest;
-import accounts.services.CommandsVsUnitsOfWorkTest;
+import accounts.services.BooksSetByCommandsTest;
 import accounts.services.ComparatorsDetailedTest;
 import accounts.services.ComparatorsInTreeSetTest;
-import accounts.services.DatafileTest;
 import accounts.services.EntityCommandTest;
 import accounts.services.IdentifierCommandsTest;
 import accounts.services.PostTransactionCommandTest;
@@ -45,7 +45,8 @@ public class UnitTests
 		// persistence
 		suite.addTestSuite(BasicDb4oTest.class);
 		suite.addTestSuite(RollbackDb4oTest.class);
-		suite.addTestSuite(UnitOfWorkTest.class);
+		suite.addTestSuite(EngineTest.class);
+		suite.addTestSuite(ExposeDb4oQueryInterfaceTest.class);
 
 		// domain
 		suite.addTestSuite(BasicAccountTest.class);
@@ -58,9 +59,8 @@ public class UnitTests
 		suite.addTestSuite(IdentifierTest.class);
 
 		// services
-		suite.addTestSuite(DatafileTest.class);
 		suite.addTestSuite(BasicCommandTest.class);
-		suite.addTestSuite(CommandsVsUnitsOfWorkTest.class);
+		suite.addTestSuite(BooksSetByCommandsTest.class);
 		suite.addTestSuite(PostTransactionCommandTest.class);
 		suite.addTestSuite(ComparatorsDetailedTest.class);
 		suite.addTestSuite(ComparatorsInTreeSetTest.class);

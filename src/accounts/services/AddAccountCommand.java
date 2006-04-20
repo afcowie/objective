@@ -8,10 +8,9 @@ package accounts.services;
 
 import java.util.Set;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.Books;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
 
 /**
  * Add an Account to the system.
@@ -27,7 +26,7 @@ public class AddAccountCommand extends Command
 	 * 
 	 * @param account
 	 *            The Account to add. Must not already be persisted in the
-	 *            DataStore.
+	 *            DataClient.
 	 */
 	public AddAccountCommand(Account account) {
 		if (account == null) {
@@ -36,8 +35,8 @@ public class AddAccountCommand extends Command
 		this.account = account;
 	}
 
-	protected void action(UnitOfWork uow) {
-		Books root = ObjectiveAccounts.store.getBooks();
+	protected void action(DataClient store) {
+		Books root = store.getBooks();
 		Set accounts = root.getAccountsSet();
 		if (accounts.add(account) == false) { // dup!?!
 			throw new IllegalStateException("How did you add an account that's already in the system?");
@@ -48,10 +47,10 @@ public class AddAccountCommand extends Command
 		 * account object along the way.
 		 */
 
-		uow.registerDirty(accounts);
+		store.save(accounts);
 	}
 
-	protected void reverse(UnitOfWork uow) {
+	protected void reverse(DataClient store) {
 		throw new UnsupportedOperationException();
 	}
 

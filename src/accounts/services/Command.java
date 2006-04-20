@@ -7,8 +7,8 @@
 package accounts.services;
 
 import generic.util.Debug;
-import accounts.client.ObjectiveAccounts;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
+import accounts.persistence.Engine;
 
 /**
  * The top of the command hierarchy. These classes are the distinct operations
@@ -51,54 +51,51 @@ public abstract class Command
 	private transient boolean	executed	= false;
 
 	/**
-	 * Commands all have a transient reference to the system's open DataStore.
-	 * This constructor checks that it is initialized as a safety check. WARNING
-	 * this will have to change if we ever stop having one global DataStore.
+	 * 
+	 * This constructor checks that the persistence Engine has an open datafile
+	 * to work with as a safety check.
 	 */
 	public Command() {
-		if (ObjectiveAccounts.store == null) {
-			throw new IllegalStateException("Trying to setup a Command but the static DataStore is not initialized.");
+		if (Engine.server == null) {
+			throw new IllegalStateException("Trying to setup a Command but the Engine is not initialized.");
 		}
 	}
 
 	/**
 	 * Carry out the work of the command and save the changes to the underlying
-	 * datastore. You should be using uow.registerDirty() here. DO NOT increase
-	 * the visibility of this method to public. It should only be called via
+	 * datastore. You should be using store.save() here. DO NOT increase the
+	 * visibility of this method to public. It should only be called via
 	 * Command.execute().
 	 * 
 	 * @throws CommandNotReadyException
 	 *             If your code needs to abort the Command because the state
-	 *             isn't correct.
+	 *             isn't correct or prerequisites are not met.
 	 */
 	/*
 	 * TODO Rollback? Try again? If so, code to do so automatically will go in
 	 * execute()
 	 */
-	protected abstract void action(UnitOfWork uow) throws CommandNotReadyException;
+	protected abstract void action(DataClient store) throws CommandNotReadyException;
 
 	/**
 	 * Save the Command's changes to the underlying datastore. This method calls
-	 * action() [which subclasses must implement]. It does not call the store
-	 * specific commit - that is up to the application holding the UnitOfWork to
-	 * call that UnitOfWork's .commit()
+	 * action() [which subclasses must implement]. Since Commands can be chained
+	 * or grouped in logical sets, neither this method nor action() call
+	 * commit() - it is up to the application holding the DataClient to do that.
 	 */
-	public final void execute(UnitOfWork uow) throws CommandNotReadyException {
-		if (uow == null) {
+	public final void execute(DataClient store) throws CommandNotReadyException {
+		if (store == null) {
 			throw new IllegalArgumentException("Null UnitOfWork passed!");
-		}
-		if (!uow.isViable()) {
-			throw new IllegalArgumentException("UnitOfWork passed is not viable!");
 		}
 		if (executed) {
 			throw new IllegalStateException("You can't execute a Command that has already been run!");
 		}
 		/*
 		 * Callback: Execute the code to actually save the results of the
-		 * Command in the DataStore. Throws CommandNotReadyException.
+		 * Command in the DataClient. Throws CommandNotReadyException.
 		 */
-		Debug.print("command", getClassString() + " executing action()");
-		action(uow);
+		Debug.print("command", "executing " + getClassString());
+		action(store);
 
 		executed = true;
 	}
@@ -108,22 +105,19 @@ public abstract class Command
 	 * Command and is called by undo() to actually reverse the actions
 	 * previously taken by this command.
 	 */
-	protected abstract void reverse(UnitOfWork uow) throws CommandNotUndoableException;
+	protected abstract void reverse(DataClient client) throws CommandNotUndoableException;
 
 	/**
-	 * Undo the affects of this Command. Undo is not rollback. In the case of
-	 * updates, it instead reapplies the previous state (stored in this object).
-	 * In the case of new object commands, it carries out deletes. The
-	 * UnitOfWork that is passed in is responsible to .commit() afterwards.
+	 * Undo the affects of a Command. Undo is not rollback. In the case of
+	 * updates, you must instead reapply the previous state (assuming it is
+	 * available). In the case of new object commands, you must carry out a
+	 * delete. The code calling this is responsible to .commit() the DataClient
+	 * afterwards.
 	 */
-	public final void undo(UnitOfWork uow) throws CommandNotUndoableException {
-		if (uow == null) {
+	public final void undo(DataClient client) throws CommandNotUndoableException {
+		if (client == null) {
 			throw new IllegalArgumentException("Null UnitOfWork passed!");
 		}
-		if (!uow.isViable()) {
-			throw new IllegalArgumentException("UnitOfWork passed is not viable!");
-		}
-
 		/*
 		 * Check forward/back status
 		 */
@@ -131,8 +125,8 @@ public abstract class Command
 			throw new IllegalStateException("Can't undo a Command that hasn't been executed");
 		}
 
-		Debug.print("command", getClassString() + " executing reverse()");
-		reverse(uow);
+		Debug.print("command", "undoing " + getClassString());
+		reverse(client);
 
 		executed = false; // ?
 	}

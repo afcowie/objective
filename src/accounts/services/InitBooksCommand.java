@@ -9,11 +9,9 @@ package accounts.services;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Books;
 import accounts.domain.Currency;
-import accounts.persistence.DataStore;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
 
 /**
  * Create a new set of company books. Obvisouly, this is the first command, and
@@ -51,14 +49,13 @@ public class InitBooksCommand extends Command
 	protected InitBooksCommand() {
 	}
 
-	protected void action(UnitOfWork uow) throws CommandNotReadyException {
+	protected void action(DataClient store) throws CommandNotReadyException {
 		if (home == null) {
 			throw new CommandNotReadyException("home Currency not set");
 		}
 
 		Books root = new Books();
 
-		DataStore store = ObjectiveAccounts.store;
 		store.setBooks(root);
 
 		Set accounts = new LinkedHashSet();
@@ -82,10 +79,10 @@ public class InitBooksCommand extends Command
 		 * do its thing.
 		 */
 
-		uow.registerDirty(root);
+		store.save(root);
 	}
 
-	public void reverse(UnitOfWork uow) {
+	public void reverse(DataClient store) {
 		throw new UnsupportedOperationException();
 	}
 

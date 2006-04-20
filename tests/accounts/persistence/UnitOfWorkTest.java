@@ -8,14 +8,9 @@ package accounts.persistence;
 
 import generic.util.Debug;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ConcurrentModificationException;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-import accounts.client.ObjectiveAccounts;
-import accounts.services.DatafileServices;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
@@ -24,6 +19,7 @@ import com.db4o.ObjectSet;
  * Excercise the UnitOfWork class.
  * 
  * @author Andrew Cowie
+ * @deprecated
  */
 public class UnitOfWorkTest extends TestCase
 {

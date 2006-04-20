@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
-import accounts.client.ObjectiveAccounts;
-
 /**
  * Mediate access to the datastore. Allows working applicaiton level
  * transactions to register their interest in objects (being notified if that
@@ -28,12 +26,12 @@ import accounts.client.ObjectiveAccounts;
  * This is in the persistence package, but in some sense it's really a part of
  * the services facade which underlies the user interface. Any time the
  * application needs to access stored Objects for a user visable length of time
- * (ie any UI Window that displays domain data from the DataStore), it must grab
+ * (ie any UI Window that displays domain data from the DataClient), it must grab
  * a UnitOfWork and note which objects it is using which it needs to know about
  * if they change state. Likewise, an editor Window, wizard, or command-line
  * tool which wants to make changes to the domain data must get a UnitOfWork and
  * register the Objects it is changing. Obviously, you can always access the
- * DataStore directly and use its save() method directly, but you will loose the
+ * DataClient directly and use its save() method directly, but you will loose the
  * notification aspect.
  * <p>
  * This functionality could have been implemented using the callbacks provided
@@ -42,6 +40,7 @@ import accounts.client.ObjectiveAccounts;
  * simultaneous workers.
  * 
  * @author Andrew Cowie
+ * @deprecated
  */
 public class UnitOfWork
 {
@@ -70,7 +69,7 @@ public class UnitOfWork
 	private transient String				name					= null;
 
 	// for convenience
-	private transient DataStore				store;
+	private transient DataClient				store;
 
 	static {
 		globalUpdateListeners = new LinkedHashSet();
@@ -90,10 +89,10 @@ public class UnitOfWork
 		}
 		this.name = name;
 
-		if (ObjectiveAccounts.store == null) {
-			throw new IllegalStateException("Trying to init a UnitOfWork but the static DataStore is not initialized.");
+		if (Engine.server == null) {
+			throw new IllegalStateException("Trying to init a UnitOfWork but Engine's static DataServer is not initialized.");
 		} else {
-			store = ObjectiveAccounts.store;
+			store = Engine.gainClient();
 		}
 
 		dirtyObjects = new HashSet();
@@ -170,7 +169,7 @@ public class UnitOfWork
 
 	/**
 	 * Persist all the changes made by this unit of work. This save()s the dirty
-	 * objects, then calls the underlying DataStore's commit()
+	 * objects, then calls the underlying DataClient's commit()
 	 * <p>
 	 * Once a UnitOfWork is committed, then it's done and can no longer be used
 	 * and will throw IllegalStateException.
@@ -216,7 +215,7 @@ public class UnitOfWork
 	 * Rollback the changes pending in this UnitOfWork. Somewhat in variance
 	 * with other systems, if you rollback() a UnitOfWork, it continues to be a
 	 * valid, in-flight, UnitOfWork. Note that this <b>DOES</b> call rollback
-	 * on the underlying DataStore.
+	 * on the underlying DataClient.
 	 */
 	public void rollback() {
 		if (!active) {

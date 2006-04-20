@@ -2,60 +2,35 @@
  * BasicCommandTest.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import junit.framework.TestCase;
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.domain.CashAccount;
 import accounts.domain.Currency;
+import accounts.domain.Datestamp;
 import accounts.domain.Ledger;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.BlankDatafileTestCase;
 
-public class BasicCommandTest extends TestCase
+public class BasicCommandTest extends BlankDatafileTestCase
 {
-	public static final String	TESTS_DATABASE	= "tmp/unittests/BasicCommandTest.yap";
-	private static boolean		initialized		= false;
-
-	private void init() {
-		new File(TESTS_DATABASE).delete();
-		ObjectiveAccounts.store = DatafileServices.newDatafile(TESTS_DATABASE);
-		ObjectiveAccounts.store.close();
-		initialized = true;
+	static {
+		DATAFILE = "tmp/unittests/BasicCommandTest.yap";
 	}
-
-	public void setUp() {
-		if (!initialized) {
-			init();
-		}
-		try {
-			ObjectiveAccounts.store = DatafileServices.openDatafile(TESTS_DATABASE);
-		} catch (FileNotFoundException fnfe) {
-			fail("Where is the test database?");
-		}
-	}
-
-	public void tearDown() {
-		ObjectiveAccounts.store.close();
-	}
-
+	
 	public final void testInitBooksCommand() {
 		try {
-			Books one = ObjectiveAccounts.store.getBooks();
-			fail("Should have thrown NoSuchElementException to point out uninitialized DataStore.");
+			Books one = rw.getBooks();
+			fail("Should have thrown NoSuchElementException to point out uninitialized database.");
 		} catch (NoSuchElementException nsee) {
 		}
-
-		UnitOfWork uow = new UnitOfWork("testInitBooksCommand");
 
 		InitBooksCommand ibc = null;
 		/*
@@ -77,13 +52,13 @@ public class BasicCommandTest extends TestCase
 		}
 
 		try {
-			ibc.execute(uow);
+			ibc.execute(rw);
 		} catch (CommandNotReadyException cnre) {
 			fail("threw CommandNotReadyException");
 		}
-		uow.commit();
+		rw.commit();
 
-		Books two = ObjectiveAccounts.store.getBooks();
+		Books two = rw.getBooks();
 		assertNotNull("Should be a Books object by now", two);
 
 		Set accounts = two.getAccountsSet();
@@ -91,36 +66,28 @@ public class BasicCommandTest extends TestCase
 	}
 
 	public final void testPersistenceCascade() {
-		Books root = ObjectiveAccounts.store.getBooks();
-		assertNotNull("Should be a Books object, established by static block, available for retrieval", root);
-
-		// ObjectContainer container = ObjectiveAccounts.store.getContainer();
-		// ObjectClass objcls = Db4o.configure().objectClass(root);
-		// objcls.
-		/*
-		 * How can we test this?
-		 */
+		Books root = rw.getBooks();
+		assertNotNull("Should be a Books object, established by previous test, available for retrieval", root);
 
 		Set accounts = root.getAccountsSet();
 		assertNotNull("Should be an Account Set stored and retreivable", accounts);
 	}
 
 	public final void testAddAccountCommand() {
-		Books root = ObjectiveAccounts.store.getBooks();
+		Books root = rw.getBooks();
 		assertNotNull("Should *still* be a Books object available, established by static block", root);
 
 		CashAccount pettyCash = new CashAccount("Petty Cash", "Manly Office");
 		pettyCash.setCode("1-1201");
 
-		UnitOfWork uow = new UnitOfWork("testAddAccountCommand");
 		AddAccountCommand aac = new AddAccountCommand(pettyCash);
 
 		try {
-			aac.execute(uow);
+			aac.execute(rw);
 		} catch (CommandNotReadyException cnre) {
 			fail("threw CommandNotReadyException");
 		}
-		uow.commit();
+		rw.commit();
 
 		Set accounts = root.getAccountsSet();
 		assertNotNull("Should still be an Account Set", accounts);
@@ -133,11 +100,11 @@ public class BasicCommandTest extends TestCase
 		 * account we created above, but it should be that object!
 		 */
 		assertEquals("Account retreived should match the one we stored", "1-1201", account.getCode());
-		assertTrue("Furthermore, it should BE the object we store", account.equals(pettyCash));
+		assertTrue("Furthermore, it should BE the object we stored", account.equals(pettyCash));
 	}
 
 	public final void testAccountLedgerUpdateCascade() {
-		Books root = ObjectiveAccounts.store.getBooks();
+		Books root = rw.getBooks();
 		Set accounts = root.getAccountsSet();
 		Iterator iter = accounts.iterator();
 
@@ -151,5 +118,28 @@ public class BasicCommandTest extends TestCase
 		assertTrue("There should be a Ledger", ledgersIter.hasNext());
 		Ledger ledger = (Ledger) ledgersIter.next();
 		assertEquals("The Ledger should be the one we expect!", "Manly Office", ledger.getName());
+	}
+	
+
+	/**
+	 * Not much to this one; its just a wrapper around DataClient.save()
+	 */
+	public final void testStoreObjectCommand() {
+		Datestamp virgin = new Datestamp("18 Mar 96");
+
+		try {
+			StoreObjectCommand soc = new StoreObjectCommand(virgin);
+			soc.execute(rw);
+		} catch (Exception e) {
+			fail("InitBooksCommand shouldn't have thrown anything, let alone " + e);
+		}
+		rw.commit();
+
+		List l = rw.queryByExample(virgin);
+
+		assertEquals(1, l.size());
+
+		Datestamp slut = (Datestamp) l.get(0);
+		assertSame(slut, virgin);
 	}
 }

@@ -12,12 +12,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import accounts.client.ObjectiveAccounts;
-import accounts.services.DatafileServices;
-
 /**
- * DataStore needs to expose ways to do queries on the underlying database. Test
- * them here.
+ * DataClient exposes ways to do queries on the underlying database. Test them
+ * here.
  * 
  * @author Andrew Cowie
  */
@@ -29,14 +26,19 @@ public class ExposeDb4oQueryInterfaceTest extends TestCase
 	private void init() {
 		try {
 			new File(TESTS_DATABASE).delete();
-			ObjectiveAccounts.store = DatafileServices.newDatafile(TESTS_DATABASE);
+			Engine.newDatafile(TESTS_DATABASE);
+
+			DataClient ro = Engine.gainClient();
 
 			for (int i = 0; i < 20; i++) {
 				DummyInts d = new DummyInts(i);
-				ObjectiveAccounts.store.save(d);
+				ro.save(d);
 			}
 
-			ObjectiveAccounts.store.close();
+			ro.commit();
+			Engine.releaseClient(ro);
+			Engine.shutdown();
+
 			initialized = true;
 		} catch (Exception e) {
 			System.err.println("Unexpected problem in init()!");
@@ -49,7 +51,7 @@ public class ExposeDb4oQueryInterfaceTest extends TestCase
 			init();
 		}
 		try {
-			ObjectiveAccounts.store = DatafileServices.openDatafile(TESTS_DATABASE);
+			Engine.openDatafile(TESTS_DATABASE);
 		} catch (FileNotFoundException fnfe) {
 			fail("Where is the test database?");
 		}
@@ -57,21 +59,15 @@ public class ExposeDb4oQueryInterfaceTest extends TestCase
 
 	public void tearDown() {
 		try {
-			if (!ObjectiveAccounts.store.getContainer().ext().isClosed()) {
-				ObjectiveAccounts.store.close();
-			} else
-				throw new Exception("closed?!?");
+			Engine.shutdown();
 		} catch (Exception e) {
 			System.err.println("What the hell? " + e);
 			System.err.flush();
 		}
 	}
 
-	/**
-	 * Test DataStore.query()
-	 */
-	public final void testDataStoreQueryByExample() {
-		DataStore store = ObjectiveAccounts.store;
+	public final void testDataClientQueryByExample() {
+		DataClient store = Engine.gainClient();
 
 		/*
 		 * Query something that isn't in the set
@@ -93,5 +89,7 @@ public class ExposeDb4oQueryInterfaceTest extends TestCase
 
 		DummyInts r = (DummyInts) results.get(0);
 		assertEquals(7, r.getNum());
+
+		Engine.releaseClient(store);
 	}
 }

@@ -65,7 +65,7 @@ public final class Engine
 	/**
 	 * The DataServer singleton for the database as opened by this application.
 	 */
-	static DataServer			server	= null;
+	public static DataServer	server	= null;
 
 	private static DataClient	primary	= null;
 
