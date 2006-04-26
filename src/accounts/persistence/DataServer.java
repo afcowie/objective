@@ -169,14 +169,19 @@ public final class DataServer
 	 * @throws IllegalStateException
 	 *             if the database is locked (ie you've got another instance of
 	 *             the GUI program up. TODO, when we implement multiuser, this
-	 *             will evolve to pooled access.
+	 *             will have evolve to starting up the server in TCP mode.
 	 */
 	DataServer(String filename) throws IllegalStateException {
 		try {
 			// port 0 means direct client access only.
 			objectServer = Db4o.openServer(filename, 0);
 		} catch (com.db4o.ext.DatabaseFileLockedException dfle) {
-			// very strange - this doesn't seem to get thrown.
+			/*
+			 * very strange - this doesn't seem to get thrown if you
+			 * openServer() twice from within the same process. It DOES get
+			 * thrown if this process tries to access a database that another
+			 * has opened.
+			 */
 			throw new IllegalStateException("Database locked");
 		}
 		if (objectServer == null) {

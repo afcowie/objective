@@ -28,20 +28,21 @@ public class ExposeDb4oQueryInterfaceTest extends TestCase
 			new File(TESTS_DATABASE).delete();
 			Engine.newDatafile(TESTS_DATABASE);
 
-			DataClient ro = Engine.gainClient();
+			DataClient rw = Engine.gainClient();
 
 			for (int i = 0; i < 20; i++) {
 				DummyInts d = new DummyInts(i);
-				ro.save(d);
+				rw.save(d);
 			}
 
-			ro.commit();
-			Engine.releaseClient(ro);
+			rw.commit();
+			Engine.releaseClient(rw);
 			Engine.shutdown();
 
 			initialized = true;
 		} catch (Exception e) {
 			System.err.println("Unexpected problem in init()!");
+			e.printStackTrace();
 			System.err.flush();
 		}
 	}

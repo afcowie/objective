@@ -193,6 +193,8 @@ public class EngineTest extends TestCase
 			fail("Testing datafile is supposed to exist already");
 		} catch (IOException ioe) {
 			fail("IO interruption while doing backup");
+		} finally {
+			Engine.shutdown();
 		}
 	}
 }
