@@ -91,10 +91,10 @@ public abstract class AbstractWindow
 		gladeParser = null;
 
 		/*
-		 * Form a name usable for debugging and UnitOfWork handles, unique by
-		 * sequence number which we increment. GTK is single threaded so this
-		 * shouldn't be a problem but nevertheless guard against double tap bugs -
-		 * the whole point is to have useful debug information after all.
+		 * Form a name usable for debugging, unique by sequence number which we
+		 * increment. GTK is single threaded so this shouldn't be a problem but
+		 * nevertheless guard against double tap bugs - the whole point is to
+		 * have useful debug information after all.
 		 */
 		synchronized (lock) {
 			me = getClassString() + "-" + seq;

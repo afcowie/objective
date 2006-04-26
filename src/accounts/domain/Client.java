@@ -14,7 +14,7 @@ package accounts.domain;
 public class Client extends Entity
 {
 	public Client() {
-
+		// for searching
 	}
 
 	public Client(String name) {
