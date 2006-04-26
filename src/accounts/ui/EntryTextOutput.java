@@ -20,7 +20,7 @@ import accounts.domain.Debit;
 import accounts.domain.Entry;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
-import accounts.persistence.DataStore;
+import accounts.persistence.DataClient;
 import accounts.services.EntryComparator;
 
 /**
@@ -58,12 +58,12 @@ public class EntryTextOutput extends TextOutput
 
 	/**
 	 * @param store
-	 *            a DataStore from which to fetch all instances of Transaction.
+	 *            a DataClient from which to fetch all instances of Transaction.
 	 * @param context
 	 *            an Object of the class (Ledger or Transaction) that you are
 	 *            displaying Entries within.
 	 */
-	public EntryTextOutput(DataStore store, Object context) {
+	public EntryTextOutput(DataClient store, Object context) {
 		List tL = store.queryByExample(Transaction.class);
 
 		entries = new TreeSet(new EntryComparator(context));

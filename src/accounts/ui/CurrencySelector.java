@@ -2,7 +2,7 @@
  * CurrencySelector.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.ui;
 
@@ -19,9 +19,9 @@ import org.gnu.gtk.TreeIter;
 import org.gnu.gtk.event.ComboBoxEvent;
 import org.gnu.gtk.event.ComboBoxListener;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Books;
 import accounts.domain.Currency;
+import accounts.persistence.DataClient;
 
 /**
  * A ComboBox which allows you to pick a Currency from the internal list of
@@ -36,7 +36,7 @@ public class CurrencySelector extends ComboBox
 	private DataColumnObject	currencyObject_DataColumn;
 	private ListStore			listStore;
 
-	public CurrencySelector() {
+	public CurrencySelector(DataClient store) {
 		/*
 		 * ComboBox is tricky - there are two normal constructors, one for text
 		 * mode and the other for using a TreeModel. The catch is that the
@@ -58,7 +58,8 @@ public class CurrencySelector extends ComboBox
 		currencyObject_DataColumn = new DataColumnObject();
 
 		DataColumn[] currencySelector_DataColumnArray = {
-				codeDisplay_DataColumn, currencyObject_DataColumn
+			codeDisplay_DataColumn,
+			currencyObject_DataColumn
 		};
 
 		listStore = new ListStore(currencySelector_DataColumnArray);
@@ -66,7 +67,7 @@ public class CurrencySelector extends ComboBox
 		/*
 		 * populate
 		 */
-		Books root = ObjectiveAccounts.store.getBooks();
+		Books root = store.getBooks();
 
 		Set currencies = root.getCurrencySet();
 		Iterator iter = currencies.iterator();
@@ -133,6 +134,6 @@ public class CurrencySelector extends ComboBox
 			pointer = pointer.getNextIter();
 		}
 		throw new IllegalArgumentException(
-				"How did you manage to ask to activate a Currency object that isn't in the system?");
+			"How did you manage to ask to activate a Currency object that isn't in the system?");
 	}
 }

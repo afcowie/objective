@@ -22,11 +22,11 @@ import org.gnu.gtk.event.EntryListener;
 import org.gnu.gtk.event.FocusEvent;
 import org.gnu.gtk.event.FocusListener;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Books;
 import accounts.domain.Currency;
 import accounts.domain.ForeignAmount;
+import accounts.persistence.DataClient;
 
 public class ForeignAmountEntryBox extends HBox
 {
@@ -47,10 +47,10 @@ public class ForeignAmountEntryBox extends HBox
 		lastRates = new HashMap();
 	}
 
-	public ForeignAmountEntryBox() {
+	public ForeignAmountEntryBox(DataClient store) {
 		super(false, 3);
 
-		Books root = ObjectiveAccounts.store.getBooks();
+		Books root = store.getBooks();
 		home = root.getHomeCurrency();
 
 		if (lastCurrency == null) {
@@ -63,7 +63,7 @@ public class ForeignAmountEntryBox extends HBox
 		faceValue_AmountEntry.setAmount(new Amount()); // dummy
 		packStart(faceValue_AmountEntry, true, true, 0);
 
-		foreign_CurrencySelector = new CurrencySelector();
+		foreign_CurrencySelector = new CurrencySelector(store);
 		foreign_CurrencySelector.setCurrency(lastCurrency);
 		packStart(foreign_CurrencySelector, false, false, 0);
 

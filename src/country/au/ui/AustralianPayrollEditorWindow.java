@@ -20,7 +20,6 @@ import org.gnu.gtk.Widget;
 import org.gnu.gtk.event.ComboBoxEvent;
 import org.gnu.gtk.event.ComboBoxListener;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Credit;
 import accounts.domain.Datestamp;
@@ -29,7 +28,6 @@ import accounts.domain.Employee;
 import accounts.domain.IdentifierGroup;
 import accounts.domain.Ledger;
 import accounts.domain.PayrollTransaction;
-import accounts.persistence.UnitOfWork;
 import accounts.services.CommandNotReadyException;
 import accounts.services.NotFoundException;
 import accounts.services.PostTransactionCommand;
@@ -39,8 +37,8 @@ import accounts.ui.AmountEntry;
 import accounts.ui.ChangeListener;
 import accounts.ui.DatePicker;
 import accounts.ui.EditorWindow;
-import accounts.ui.WorkerPicker;
 import accounts.ui.IdentifierSelector;
+import accounts.ui.WorkerPicker;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 import country.au.services.AustralianPayrollTaxCalculator;
 
@@ -158,7 +156,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		employeeName_Label.setAlignment(1.0, 0.5);
 		table.attach(employeeName_Label, LEFT);
 
-		employee_WorkerPicker = new WorkerPicker(Employee.class);
+		employee_WorkerPicker = new WorkerPicker(store, Employee.class);
 		table.attach(employee_WorkerPicker, RIGHT);
 
 		/*
@@ -171,7 +169,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 
 		// FIXME this will be buggy the moment there is more than one
 		// IdentifierGroup!
-		List found = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
+		List found = store.queryByExample(IdentifierGroup.class);
 		if (found.size() != 1) {
 			throw new Error("Dude, you need to fix the code to deal with reality");
 		}
@@ -241,7 +239,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 					AustralianPayrollTaxIdentifier payg = (AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection();
 					Datestamp date = endDate_Picker.getDate();
 					try {
-						calc = new AustralianPayrollTaxCalculator(payg, date);
+						calc = new AustralianPayrollTaxCalculator(store, payg, date);
 
 						// make sure new calc has the appropriate references
 						calc.setSalary(salary);
@@ -421,12 +419,10 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			t.addEntry(new Credit(calc.getWithhold(), paygOwing));
 			t.addEntry(new Debit(calc.getSalary(), salariesExpense));
 
-			uow = new UnitOfWork(me);
-
 			PostTransactionCommand ptc = new PostTransactionCommand(t);
-			ptc.execute(uow);
+			ptc.execute(store);
 
-			uow.commit();
+			store.commit();
 			super.ok();
 		} catch (NotFoundException nfe) {
 			Debug.print("events", "Can't find Ledger " + nfe.getMessage());
@@ -434,8 +430,6 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			Debug.print("events", "Command not ready: " + cnre.getMessage());
 			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(), MessageType.ERROR);
 			dialog.run();
-
-			uow.cancel();
 
 			/*
 			 * Leave the Window open so user can fix, as opposed to calling

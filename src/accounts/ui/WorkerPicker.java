@@ -22,9 +22,9 @@ import org.gnu.gtk.TreeIter;
 import org.gnu.gtk.event.ComboBoxEvent;
 import org.gnu.gtk.event.ComboBoxListener;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Employee;
 import accounts.domain.Worker;
+import accounts.persistence.DataClient;
 
 /**
  * A picker allowing you to choose from a list of Workers. This delegates to and
@@ -54,7 +54,7 @@ public class WorkerPicker extends HBox
 	 *            a prototype to constrain the search for candidate Workers to
 	 *            include in the dropdown.
 	 */
-	public WorkerPicker(Object proto) {
+	public WorkerPicker(DataClient store, Object proto) {
 		/*
 		 * This class is a Box subclass only so the Entry doesn't swell
 		 * unnessarily if set in a Table or similar widget. Otherwise, the box
@@ -84,7 +84,7 @@ public class WorkerPicker extends HBox
 		 * Poppulate.
 		 */
 
-		List eL = ObjectiveAccounts.store.queryByExample(proto);
+		List eL = store.queryByExample(proto);
 
 		if (eL.size() == 0) {
 			// TODO replace with NotFoundException

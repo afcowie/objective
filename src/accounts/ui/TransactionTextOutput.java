@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import accounts.domain.Transaction;
-import accounts.persistence.DataStore;
+import accounts.persistence.DataClient;
 import accounts.services.TransactionComparator;
 
 /**
@@ -43,9 +43,9 @@ public class TransactionTextOutput extends TextOutput
 
 	/**
 	 * @param store
-	 *            a DataStore from which to fetch all instances of Transaction.
+	 *            a DataClient from which to fetch all instances of Transaction.
 	 */
-	public TransactionTextOutput(DataStore store) {
+	public TransactionTextOutput(DataClient store) {
 		List tL = store.queryByExample(Transaction.class);
 
 		transactions = new TreeSet(new TransactionComparator());

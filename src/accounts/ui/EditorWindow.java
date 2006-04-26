@@ -17,7 +17,8 @@ import org.gnu.gtk.HSeparator;
 import org.gnu.gtk.event.ButtonEvent;
 import org.gnu.gtk.event.ButtonListener;
 
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
+import accounts.persistence.Engine;
 
 /**
  * A great number of UI windows [will] follow the pattern of being either
@@ -40,7 +41,7 @@ public abstract class EditorWindow extends AbstractWindow
 	 * Every EditorWindow subclass needs a UnitOfWork via which to make changes
 	 * to the database. So here it is; take out an instance in your ok() method.
 	 */
-	protected UnitOfWork	uow	= null;
+	protected DataClient	store;
 
 	/**
 	 * Basic form of EditorWindow. Passes title to AbstractWindow's constructor,
@@ -53,6 +54,7 @@ public abstract class EditorWindow extends AbstractWindow
 		 * Construct the basic form
 		 */
 		super(title);
+		store = Engine.gainClient();
 		addButtons();
 	}
 
@@ -68,6 +70,7 @@ public abstract class EditorWindow extends AbstractWindow
 		 * Construct the glade form
 		 */
 		super(whichElement, gladeFilename);
+		store = Engine.gainClient();
 		addButtons();
 	}
 
@@ -104,8 +107,9 @@ public abstract class EditorWindow extends AbstractWindow
 	 * The cases of cancel and ok need to be done on a specific basis by the
 	 * implementing classes, as is appropriate to their situation. The default
 	 * implementations here simply call AbstractWindow's deleteHook() to cause
-	 * the Window to be dismissed. <b>These do not cancel() or commit() the
-	 * UnitOfWork.</b>
+	 * the Window to be dismissed. <b>These do not commit() or rollback() the
+	 * {@link #store} DataClient that EditorWindow provides. It's too important.
+	 * If you want to commit() you have to choose to do this in your subclass.</b>
 	 */
 	protected void cancel() {
 		deleteHook();
@@ -115,10 +119,24 @@ public abstract class EditorWindow extends AbstractWindow
 		deleteHook();
 	}
 
+	/**
+	 * Release the DataClient back to the Engine and then call
+	 * {@link AbstractWindow#deleteHook()} which should hide and destroy the
+	 * Window. See that method for a description of the meaning of the boolean
+	 * return value. If you override this and don't in turn call this one, then
+	 * you'll have to release the {@link #store} client yourself.
+	 */
+	protected boolean deleteHook() {
+		Engine.releaseClient(store);
+		store = null;
+		super.deleteHook();
+		return false;
+	}
+
 	protected void finalize() throws Throwable {
-		if ((uow != null) && (uow.isViable())) {
-			Debug.print("memory", "UnitOfWork found still open in " + getClassString());
-			uow.cancel();
+		if (store != null) {
+			Debug.print("memory", "DataClient reference still held in " + getClassString());
+			Engine.releaseClient(store);
 		}
 		super.finalize();
 	}

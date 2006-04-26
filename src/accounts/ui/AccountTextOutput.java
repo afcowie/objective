@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import accounts.domain.Account;
-import accounts.persistence.DataStore;
+import accounts.persistence.DataClient;
 import accounts.services.AccountComparator;
 
 /**
@@ -42,9 +42,9 @@ public class AccountTextOutput extends TextOutput
 
 	/**
 	 * @param store
-	 *            a DataStore from which to fetch all instances of Account.
+	 *            a DataClient from which to fetch all instances of Account.
 	 */
-	public AccountTextOutput(DataStore store) {
+	public AccountTextOutput(DataClient store) {
 		List aL = store.queryByExample(Account.class);
 
 		accounts = new TreeSet(new AccountComparator());

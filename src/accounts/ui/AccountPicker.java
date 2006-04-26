@@ -48,10 +48,10 @@ import org.gnu.gtk.event.KeyListener;
 import org.gnu.gtk.event.TreeViewEvent;
 import org.gnu.gtk.event.TreeViewListener;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.domain.Ledger;
+import accounts.persistence.DataClient;
 
 /**
  * A widget to select an account.
@@ -75,8 +75,13 @@ public class AccountPicker extends HBox
 	private Button				pick			= null;
 	private AccountPickerPopup	popup			= null;
 
-	public AccountPicker() {
+	private DataClient			db;
+
+	public AccountPicker(DataClient store) {
 		super(false, 3);
+
+		db = store;
+
 		selectedAccount = lastSelectedAccount;
 		selectedLedger = lastSelectedLedger;
 
@@ -242,7 +247,7 @@ public class AccountPicker extends HBox
 			/*
 			 * Populate
 			 */
-			Books root = ObjectiveAccounts.store.getBooks();
+			Books root = db.getBooks();
 			Set accounts = root.getAccountsSet();
 			Iterator acctIter = accounts.iterator();
 
