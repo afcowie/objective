@@ -285,11 +285,11 @@ dist: distclean
 	cd /tmp && tar xzf objective-$(VERSION).tar.gz
 	cd /tmp/objective-$(VERSION) && rm -r stash && chmod +x configure
 	@echo "TAR       distribution tarball"
-	tar czf objective-$(VERSION).tar.gz -C /tmp objective-$(VERSION)
+	tar cjf objective-$(VERSION).tar.bz2 -C /tmp objective-$(VERSION)
 	@echo "RM        temporary files"
 	rm -r /tmp/objective-$(VERSION)*
 
-tarball: distclean
+tarball: clean
 	@echo "TAR       backup tarball"
-	tar czf objective-$(VERSION)-snapshot-`date +%y%m%d`.tar.gz .
+	tar cjf objective-$(VERSION)-snapshot-`date +%y%m%d`.tar.bz2 --exclude '*.tar.*' .
 
