@@ -137,7 +137,6 @@ public class VerboseResultPrinter extends TextOutput implements TestListener
 		Matcher m = regex.matcher(test.toString());
 		String testCaseName = chomp(" - " + m.replaceFirst("()"), COLUMNS - 10);
 		out.print(pad(testCaseName, COLUMNS - 10, LEFT));
-
+		out.flush();
 	}
-
 }
