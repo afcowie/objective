@@ -8,8 +8,6 @@ package accounts.services;
 
 import java.util.NoSuchElementException;
 
-import junit.framework.TestCase;
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.domain.Currency;
@@ -27,7 +25,7 @@ public class BooksSetByCommandsTest extends BlankDatafileTestCase
 		Books root;
 		try {
 			root = rw.getBooks();
-			fail("Should have thrown NoSuchElementException to point out uninitialized DataClient.");
+			fail("Should have thrown NoSuchElementException to point out uninitialized DataClient; instead you got "+root);
 		} catch (NoSuchElementException nsee) {
 		}
 

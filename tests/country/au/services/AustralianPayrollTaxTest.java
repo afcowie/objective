@@ -6,15 +6,9 @@
  */
 package country.au.services;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
-import junit.framework.TestCase;
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Datestamp;
-import accounts.persistence.UnitOfWork;
-import accounts.services.DatafileServices;
+import accounts.persistence.BlankDatafileTestCase;
 import accounts.services.NotFoundException;
 import accounts.services.PayrollTaxCalculator;
 import country.au.domain.AustralianPayrollTaxIdentifier;
@@ -22,60 +16,37 @@ import country.au.domain.AustralianPayrollTaxIdentifier;
 /**
  * Unit test the PAYG tax calculator and its associated Identifiers, Finders and
  * underlying TaxTable data. Since the Australian varient requires TaxTable data
- * to be in the DataStore already, we use AustralianInitBooksCommand to set up
+ * to be in the DataClient already, we use AustralianInitBooksCommand to set up
  * the constants and in turn store the coefficient data.
  * 
  * @author Andrew Cowie
  */
-public class AustralianPayrollTaxTest extends TestCase
+public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 {
 	private static final Datestamp	KNOWN_GOOD_DATE	= new Datestamp("12 Dec 05");
 
-	public static final String		TESTS_DATABASE	= "tmp/unittests/AustralianPayrollTaxTest.yap";
-	private static boolean			initialized		= false;
-
-	private void init() {
-		new File(TESTS_DATABASE).delete();
-		ObjectiveAccounts.store = DatafileServices.newDatafile(TESTS_DATABASE);
-
-		try {
-			UnitOfWork uow = new UnitOfWork("init");
-			AustralianInitBooksCommand aibc = new AustralianInitBooksCommand();
-			aibc.execute(uow);
-			uow.commit();
-
-		} catch (Exception e) {
-			fail("Exception caught trying to init(): " + e);
-		}
-
-		ObjectiveAccounts.store.close();
-		initialized = true;
+	static {
+		DATAFILE = "tmp/unittests/AustralianPayrollTaxTest.yap";
 	}
 
-	public void setUp() {
-		if (!initialized) {
-			init();
-		}
-		try {
-			ObjectiveAccounts.store = DatafileServices.openDatafile(TESTS_DATABASE);
-		} catch (FileNotFoundException fnfe) {
-			fail("Where is the test database?");
-		}
-	}
-
-	public void tearDown() {
-		ObjectiveAccounts.store.close();
-	}
-
-	public final void testTableDataInitialized() {
+	public final void testEnsureTableDataInitialized() {
 		/*
-		 * The init() above runs AustralianInitBooksCommand which in turn calls
-		 * StoreAustralianPayrollTaxTablesCommand so we should be all set up...
+		 * Initialize a set of books with some identifiers in it already.
+		 * AustralianInitBooksCommand which in turn calls
+		 * StoreAustralianPayrollTaxTablesCommand...
 		 */
+		try {
+			AustralianInitBooksCommand aibc = new AustralianInitBooksCommand();
+			aibc.execute(rw);
+			rw.commit();
+		} catch (Exception e) {
+			fail("Exception caught trying to further initialize datastore: " + e);
+		}
+
 		AustralianPayrollTaxTableFinder f = new AustralianPayrollTaxTableFinder(
 			AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD, KNOWN_GOOD_DATE);
 		try {
-			f.query();
+			f.query(rw);
 		} catch (NotFoundException nfe) {
 			fail("Running the tax tables store command doesn't seem to have worked.");
 		}
@@ -92,7 +63,7 @@ public class AustralianPayrollTaxTest extends TestCase
 		AustralianPayrollTaxTableFinder bogus = new AustralianPayrollTaxTableFinder(new AustralianPayrollTaxIdentifier(
 			"Bogus"), KNOWN_GOOD_DATE);
 		try {
-			bogus.query();
+			bogus.query(rw);
 			fail("Running the tax tables finder against a bogus Identifier didn't throw like it should have.");
 		} catch (NotFoundException nfe) {
 			// good.
@@ -104,9 +75,10 @@ public class AustralianPayrollTaxTest extends TestCase
 		AustralianPayrollTaxTableFinder badDate = new AustralianPayrollTaxTableFinder(
 			AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD, new Datestamp("5 May 91"));
 		try {
-			badDate.query(); // will pass - there is a NO_TAXFREE_THRESHOLD
-			badDate.getCoefficients(); // but this should throw because of the
-			// date
+			// will pass - there is a NO_TAXFREE_THRESHOLD
+			badDate.query(rw);
+			// but this should throw because of the date
+			badDate.getCoefficients();
 			fail("Running the tax tables finder with an ancient date should have thrown.");
 		} catch (NotFoundException nfe) {
 			// good.
@@ -118,7 +90,7 @@ public class AustralianPayrollTaxTest extends TestCase
 		Amount zero = new Amount("0.00");
 		Amount negative = new Amount("-0.01");
 
-		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(
+		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
 			AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD, KNOWN_GOOD_DATE);
 
 		try {
@@ -181,7 +153,7 @@ public class AustralianPayrollTaxTest extends TestCase
 	 * setValue()
 	 */
 	public final void testCalculatorAllFactorsSet() throws NotFoundException {
-		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(
+		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
 			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
 		try {
 			calc.calculateGivenSalary();
@@ -229,7 +201,7 @@ public class AustralianPayrollTaxTest extends TestCase
 	public final void testCalculateWithholdGivenSalary() throws NotFoundException {
 		Amount weeklyEarnings = new Amount("409.00");
 
-		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(
+		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
 			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
 		calc.setSalary(weeklyEarnings);
 
@@ -245,7 +217,7 @@ public class AustralianPayrollTaxTest extends TestCase
 	public final void testCalculateWithholdGivenPayable() throws NotFoundException {
 		Amount weeklyPaycheck = new Amount("231.00");
 
-		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(
+		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
 			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
 		calc.setPaycheck(weeklyPaycheck);
 
@@ -261,8 +233,8 @@ public class AustralianPayrollTaxTest extends TestCase
 	public final void testAgainstOfficialSampleData() throws NotFoundException {
 		PayrollTaxCalculator calc;
 
-		calc = new AustralianPayrollTaxCalculator(AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_NO_LEAVE_LOADING,
-			KNOWN_GOOD_DATE);
+		calc = new AustralianPayrollTaxCalculator(rw,
+			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_NO_LEAVE_LOADING, KNOWN_GOOD_DATE);
 		calc.setWithhold(new Amount());
 		calc.setPaycheck(new Amount());
 
@@ -282,7 +254,7 @@ public class AustralianPayrollTaxTest extends TestCase
 		calc.calculateGivenSalary();
 		assertEquals("571.00", calc.getWithhold().getValue());
 
-		calc = new AustralianPayrollTaxCalculator(AustralianPayrollTaxIdentifier.NO_TFN_PROVIDED, KNOWN_GOOD_DATE);
+		calc = new AustralianPayrollTaxCalculator(rw, AustralianPayrollTaxIdentifier.NO_TFN_PROVIDED, KNOWN_GOOD_DATE);
 		calc.setWithhold(new Amount());
 		calc.setPaycheck(new Amount());
 

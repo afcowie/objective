@@ -6,9 +6,12 @@
  */
 package accounts.services;
 
+import generic.util.DebugException;
+
 import java.util.List;
 
 import accounts.domain.Ledger;
+import accounts.persistence.DataClient;
 import accounts.persistence.Selector;
 
 /**
@@ -19,9 +22,9 @@ import accounts.persistence.Selector;
  */
 public class SpecificLedgerFinder extends Finder
 {
-	private transient String	accountTitle	= null;
-	private transient String	ledgerName		= null;
-	private transient Ledger	foundLedger		= null;
+	private String	accountTitle	= null;
+	private String	ledgerName		= null;
+	private List	result			= null;
 
 	/**
 	 * Construct a blank finder. You'll have to set the account title and ledger
@@ -82,10 +85,9 @@ public class SpecificLedgerFinder extends Finder
 	}
 
 	/**
-	 * As the point of this Finder is to return a single Ledger, we leave this
-	 * protected.
+	 * Query the list of Ledgers from the database
 	 */
-	protected List query() throws NotFoundException {
+	public List query(DataClient store) throws NotFoundException {
 		if ((accountTitle == null) || (ledgerName == null)) {
 			throw new IllegalStateException("You can't run this finder with title or name null");
 		}
@@ -93,16 +95,29 @@ public class SpecificLedgerFinder extends Finder
 			throw new IllegalStateException("You can't run this finder with title and name both blank");
 		}
 
-		return store.nativeQuery(new Selector() {
+		this.result = store.nativeQuery(new Selector() {
+			private String	title	= new String(accountTitle);
+			private String	name	= new String(ledgerName);
+
 			public boolean match(Ledger l) {
-				if (l.getName().indexOf(ledgerName) != -1) {
-					if (l.getParentAccount().getTitle().indexOf(accountTitle) != -1) {
-						return true;
+				try {
+					if (l.getName() == null) {
+						// a bit unusual to have null for a Ledger name, but it
+						// does crop up in test cases here and there.
+						return false;
 					}
+					if (l.getName().indexOf(name) != -1) {
+						if (l.getParentAccount().getTitle().indexOf(title) != -1) {
+							return true;
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				return false;
 			}
 		});
+		return this.result;
 	}
 
 	/**
@@ -117,14 +132,15 @@ public class SpecificLedgerFinder extends Finder
 	 *             have to narrow the search with more precise terms)
 	 */
 	public Ledger getLedger() throws NotFoundException {
-		List result = null;
-		/*
-		 * Run query() if necessary.
-		 */
-		if (foundLedger == null) {
-			result = query();
+		if (result == null) {
+			throw new DebugException("Need to call query() first");
 		}
 		final int len = result.size();
+
+		if (len == 0) {
+			throw new NotFoundException(
+				"Zero retrieved. When using SpecificLedgerFinder, you need to specify arguments such that only one ledger will be result from the query.");
+		}
 
 		if (len > 1) {
 			throw new UnsupportedOperationException(
@@ -138,20 +154,20 @@ public class SpecificLedgerFinder extends Finder
 			throw new IllegalStateException("In querying Ledgers, you managed to get something not a Ledger!");
 		}
 
-		return foundLedger = (Ledger) obj;
+		return (Ledger) obj;
 	}
 
 	/**
-	 * Reset the Finder (null the cached foundLedger) to force getLedger() to
-	 * rerun the query() method.
+	 * Reset the Finder (null the cached result) to force getLedger() to rerun
+	 * the query() method.
 	 */
 	protected void reset() {
-		foundLedger = null;
+		result = null;
 	}
 }
 
 /**
- * Code originally in DataStore. Included here in a null comment to record an
+ * Code originally in DataClient. Included here in a null comment to record an
  * example of using the query SODA interface.
  * 
  * <pre>

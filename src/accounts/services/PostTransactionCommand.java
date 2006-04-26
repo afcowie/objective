@@ -2,7 +2,7 @@
  * PostTransactionCommand.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
@@ -14,7 +14,7 @@ import java.util.Set;
 import accounts.domain.Entry;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
 
 /**
  * Post a Transaction. TODO: This suffices for Add and Update? What about
@@ -39,7 +39,7 @@ public class PostTransactionCommand extends Command
 		trans = t;
 	}
 
-	protected void action(UnitOfWork uow) throws CommandNotReadyException {
+	protected void action(DataClient store) throws CommandNotReadyException {
 		Set entries = trans.getEntries();
 		if (entries == null) {
 			throw new CommandNotReadyException("Transaction passed has no Entries!");
@@ -65,7 +65,7 @@ public class PostTransactionCommand extends Command
 
 		if (trans.getDate() == null) {
 			throw new CommandNotReadyException(
-					"Transaction doesn't have a date set, which means that the Entries may well have differing dates");
+				"Transaction doesn't have a date set, which means that the Entries may well have differing dates");
 		}
 
 		/*
@@ -84,10 +84,10 @@ public class PostTransactionCommand extends Command
 		 * Persist the Transaction.
 		 */
 
-		uow.registerDirty(trans);
+		store.save(trans);
 	}
 
-	public void reverse(UnitOfWork uow) {
+	public void reverse(DataClient store) {
 		throw new UnsupportedOperationException();
 	}
 

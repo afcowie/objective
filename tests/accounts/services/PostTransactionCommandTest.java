@@ -6,13 +6,10 @@
  */
 package accounts.services;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Credit;
 import accounts.domain.CreditPositiveLedger;
@@ -23,36 +20,12 @@ import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.BlankDatafileTestCase;
 
-import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
-
-public class PostTransactionCommandTest extends TestCase
+public class PostTransactionCommandTest extends BlankDatafileTestCase
 {
-	public static final String	TESTS_DATABASE	= "tmp/unittests/PostTransactionCommandTest.yap";
-	private static boolean		initialized		= false;
-
-	private void init() {
-		new File(TESTS_DATABASE).delete();
-		ObjectiveAccounts.store = DatafileServices.newDatafile(TESTS_DATABASE);
-		ObjectiveAccounts.store.close();
-		initialized = true;
-	}
-
-	public void setUp() {
-		if (!initialized) {
-			init();
-		}
-		try {
-			ObjectiveAccounts.store = DatafileServices.openDatafile(TESTS_DATABASE);
-		} catch (FileNotFoundException fnfe) {
-			fail("Where is the test database?");
-		}
-	}
-
-	public void tearDown() {
-		ObjectiveAccounts.store.close();
+	static {
+		DATAFILE = "tmp/unittests/PostTransactionCommandTest.yap";
 	}
 
 	/*
@@ -78,11 +51,10 @@ public class PostTransactionCommandTest extends TestCase
 
 		assertTrue(t.isBalanced());
 
-		UnitOfWork uow = new UnitOfWork("testTransactionCommandWithGeneric");
 		PostTransactionCommand tc = new PostTransactionCommand(t);
 
 		try {
-			tc.execute(uow);
+			tc.execute(rw);
 			fail("Should have thrown CommandNotReadyException to indicate unassigned parental relationships");
 		} catch (CommandNotReadyException cnre) {
 		}
@@ -100,12 +72,12 @@ public class PostTransactionCommandTest extends TestCase
 		expense.setParentLedger(blahExpense);
 
 		try {
-			tc.execute(uow);
+			tc.execute(rw);
 		} catch (CommandNotReadyException cnre) {
 			fail("Threw " + cnre);
 		}
 
-		uow.commit();
+		rw.commit();
 	}
 
 	/*
@@ -115,10 +87,9 @@ public class PostTransactionCommandTest extends TestCase
 	public void testPersistence() {
 		Transaction proto = new Transaction();
 
-		ObjectContainer container = ObjectiveAccounts.store.getContainer();
-		ObjectSet results = container.get(proto);
+		List results = rw.queryByExample(proto);
 		assertEquals(1, results.size());
-		Transaction t = (Transaction) results.next();
+		Transaction t = (Transaction) results.get(0);
 		assertTrue(t instanceof GenericTransaction);
 		GenericTransaction gt = (GenericTransaction) t;
 
@@ -185,12 +156,9 @@ public class PostTransactionCommandTest extends TestCase
 		/*
 		 * Now use a PostTransactionCommand to attempt to store the Transaction.
 		 */
-		UnitOfWork uow = new UnitOfWork("testDatestampSettingByPostTransactionCommand");
-
 		PostTransactionCommand cmd = new PostTransactionCommand(t3);
 		try {
-			cmd.execute(uow);
-			uow.cancel();
+			cmd.execute(rw);
 			fail("Should have thrown CommandNotReadyException to signal that the Date hasn't been set");
 		} catch (CommandNotReadyException cnre) {
 			// correct
@@ -206,13 +174,12 @@ public class PostTransactionCommandTest extends TestCase
 		assertTrue(gauche.getDate().toString().equals(droit.getDate().toString()));
 
 		try {
-			cmd.execute(uow);
+			cmd.execute(rw);
 		} catch (CommandNotReadyException cnre) {
-			uow.cancel();
 			fail("Should NOT have thrown CommandNotReadyException " + cnre.getMessage());
 		}
 		// no reason to commit to database; we've already tested that.
-		uow.cancel();
+		rw.rollback();
 	}
 
 	public final void testAddEntriesToLedgersOnExecute() {
@@ -242,14 +209,11 @@ public class PostTransactionCommandTest extends TestCase
 		/*
 		 * Now use a PostTransactionCommand to attempt to store the Transaction.
 		 */
-		UnitOfWork uow = new UnitOfWork("testAddEntriesToLedgersOnExecute");
-
 		PostTransactionCommand cmd = new PostTransactionCommand(t4);
 
 		try {
-			cmd.execute(uow);
+			cmd.execute(rw);
 		} catch (CommandNotReadyException cnre) {
-			uow.cancel();
 			fail("Should NOT have thrown CommandNotReadyException " + cnre.getMessage());
 		}
 
@@ -257,6 +221,5 @@ public class PostTransactionCommandTest extends TestCase
 		assertEquals("3.00", leftLedger.getBalance().getValue());
 
 		// no reason to commit to database; we've already tested that.
-		uow.cancel();
 	}
 }

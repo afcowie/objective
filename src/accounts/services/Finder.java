@@ -8,8 +8,8 @@ package accounts.services;
 
 import java.util.List;
 
-import accounts.client.ObjectiveAccounts;
-import accounts.persistence.DataStore;
+import accounts.persistence.DataClient;
+import accounts.persistence.Engine;
 
 /**
  * As Commands are the place to put the logic for constructing, valdidating and
@@ -29,42 +29,35 @@ import accounts.persistence.DataStore;
  */
 public abstract class Finder
 {
-	/*
-	 * For convenience
-	 */
-	protected transient DataStore	store	= null;
-
 	/**
 	 * Subclasses should call super() to initialize basic common elements.
 	 */
 	protected Finder() {
-		if (ObjectiveAccounts.store == null) {
-			throw new IllegalStateException("Trying to init a Finder but the static DataStore is not initialized.");
-		} else {
-			store = ObjectiveAccounts.store;
+		if (Engine.server == null) {
+			throw new IllegalStateException("Trying to init a Finder but the persistence Engine is not initialized.");
 		}
 	}
 
 	/**
 	 * Somewhat as a definition, Finders return a List. (After all, they just
-	 * use the underlying db4o query mechanism which we expose via DataStore's
+	 * use the underlying db4o query mechanism which we expose via DataClient's
 	 * .nativeQuery() or .queryByExample() which return List). While concrete
 	 * subclasses may (and indeed are encouraged to) use specificly crafted
 	 * methods approprate to their use cases, this is the one common API element
-	 * that we have across Finders. If all you want is a subclass to have
-	 * query() returning a List as its API, then implement this method with
-	 * public visibility. [Unit tests, of course, can access it as protected
-	 * includes package] If public then an implentation's query() should
-	 * internally cache the result for [re]use by the domain specific result
-	 * methods; otherwise they can be the thing that caches.
+	 * that we have across Finders, and where the reference to the database is
+	 * passed in. An implentation's query() can internally cache the result for
+	 * [re]use by the domain specific result methods; otherwise they can be the
+	 * thing that caches.
 	 * 
+	 * @param an
+	 *            open DataClient from which to retrieve Objects.
 	 * @throws NotFoundException
 	 *             in the event that zero objects are retrieved. This isn't a
 	 *             problem, per se; but this allows you to proceed smoothly with
 	 *             your logic when using the finder rather than having to
 	 *             remember to immediately guard against zero result.
 	 */
-	protected abstract List query() throws NotFoundException;
+	public abstract List query(DataClient store) throws NotFoundException;
 
 	/**
 	 * Clear any cached query results in this Finder. Any setters should call

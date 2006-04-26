@@ -10,7 +10,6 @@ import generic.util.DebugException;
 
 import java.util.List;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.AccountsPayable;
 import accounts.domain.AccountsReceivable;
@@ -20,13 +19,13 @@ import accounts.domain.Entity;
 import accounts.domain.Ledger;
 import accounts.domain.Supplier;
 import accounts.domain.SupplierLedger;
+import accounts.persistence.DataClient;
 import accounts.persistence.IdentifierAlreadyExistsException;
-import accounts.persistence.UnitOfWork;
 
 public class AddEntityCommand extends Command
 {
-	private transient Entity	candidate	= null;
-	private transient Ledger	ledger		= null;
+	private transient Entity	entity	= null;
+	private transient Ledger	ledger	= null;
 
 	/**
 	 * ... Assumes that a ledger in the name of this Entity has not yet been
@@ -34,16 +33,36 @@ public class AddEntityCommand extends Command
 	 * 
 	 * @param entity
 	 */
-	public AddEntityCommand(Entity entity) throws IdentifierAlreadyExistsException {
+	public AddEntityCommand(Entity entity) {
+		this.entity = entity;
+		if (entity instanceof Client) {
+			this.ledger = new ClientLedger((Client) entity);
+		} else if (entity instanceof Supplier) {
+			this.ledger = new SupplierLedger((Supplier) entity);
+		} else {
+			throw new IllegalArgumentException("Huh? How come neither Client nor Supplier?");
+		}
+	}
+
+	/**
+	 * Creates the ItemsLedger appropriate to this Entity
+	 * 
+	 * @throws IdentifierAlreadyExistsException
+	 *             if the Entity you want to store is already present.
+	 */
+	protected void action(DataClient store) throws CommandNotReadyException {
+		if (ledger.getName() == null) {
+			throw new CommandNotReadyException("The Ledger (Client or Supplier) passed has a null name!");
+		}
+
 		/*
-		 * Use DataStore (db4o)'s capability to search by example to see if
+		 * Use DataClient (db4o)'s capability to search by example to see if
 		 * there's already an Entity by this name.
 		 */
-
 		Entity prototype = new Entity();
 		prototype.setName(entity.getName());
 
-		List found = ObjectiveAccounts.store.queryByExample(prototype);
+		List found = store.queryByExample(prototype);
 
 		if (found.size() > 0) {
 			throw new IdentifierAlreadyExistsException(entity.getName() + " already exists as an Entity");
@@ -53,43 +72,28 @@ public class AddEntityCommand extends Command
 		 * Ditto a {Client,Supplier}Ledger by this name
 		 */
 
-		Ledger protoLedger;
-		if (entity instanceof Client) {
-			protoLedger = new ClientLedger();
-		} else if (entity instanceof Supplier) {
-			protoLedger = new SupplierLedger();
-		} else {
-			throw new DebugException("Huh? How come neither Client nor Supplier?");
-		}
+		Ledger protoLedger = new Ledger();
 		protoLedger.setName(entity.getName());
 
-		found = ObjectiveAccounts.store.queryByExample(protoLedger);
+		found = store.queryByExample(protoLedger);
 
 		if (found.size() > 0) {
 			throw new IdentifierAlreadyExistsException("There is already an ItemsLedger with " + entity.getName()
-					+ " as its name");
+				+ " as its name");
 		}
 
 		/*
-		 * Safety checks passed
+		 * Safety checks passed. Now fetch up the appropriate
+		 * Account{Receivable|Payable} Account.
 		 */
-		this.candidate = entity;
-		this.ledger = protoLedger;
 
-	}
-
-	/**
-	 * Creates the ItemsLedger appropriate to this Entity
-	 */
-	protected void action(UnitOfWork uow) throws CommandNotReadyException {
-		List found;
-		if (candidate instanceof Client) {
-			found = ObjectiveAccounts.store.queryByExample(AccountsReceivable.class);
-		} else if (candidate instanceof Supplier) {
-			found = ObjectiveAccounts.store.queryByExample(AccountsPayable.class);
+		if (entity instanceof Client) {
+			found = store.queryByExample(AccountsReceivable.class);
+		} else if (entity instanceof Supplier) {
+			found = store.queryByExample(AccountsPayable.class);
 		} else {
 			throw new DebugException(
-					"Huh? How did this AddEntityCommmand come to have neither Client nor Supplier as its candidate Entity?");
+				"Huh? How did this AddEntityCommmand come to have neither Client nor Supplier as its candidate Entity?");
 		}
 
 		if (found.size() > 1) {
@@ -103,17 +107,15 @@ public class AddEntityCommand extends Command
 
 		// TODO automatically? Linking them in action()?
 
-		uow.registerDirty(candidate);
-		uow.registerDirty(trade);
+		store.save(entity);
+		store.save(trade);
 	}
 
-	protected void reverse(UnitOfWork uow) throws CommandNotUndoableException {
-		// TODO Auto-generated method stub
-
+	protected void reverse(DataClient store) throws CommandNotUndoableException {
+		throw new UnsupportedOperationException();
 	}
 
 	public String getClassString() {
 		return "Add Entity";
 	}
-
 }

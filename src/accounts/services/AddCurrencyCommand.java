@@ -2,16 +2,15 @@
  * AddCurrencyCommand.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
 import java.util.Set;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Books;
 import accounts.domain.Currency;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
 
 /**
  * Add a Currency object to this set of books
@@ -35,11 +34,11 @@ public class AddCurrencyCommand extends Command
 		currency = cur;
 	}
 
-	protected void action(UnitOfWork uow) {
+	protected void action(DataClient store) {
 		/*
 		 * Add currency to Books's currency list
 		 */
-		Books root = ObjectiveAccounts.store.getBooks();
+		Books root = store.getBooks();
 		Set currencies = root.getCurrencySet();
 		currencies.add(currency);
 
@@ -47,11 +46,11 @@ public class AddCurrencyCommand extends Command
 		 * Store the new account itself, and update the collection which
 		 * contains it.
 		 */
-		uow.registerDirty(currency);
-		uow.registerDirty(currencies);
+		store.save(currency);
+		store.save(currencies);
 	}
 
-	public void reverse(UnitOfWork uow) {
+	public void reverse(DataClient store) {
 		throw new UnsupportedOperationException();
 	}
 

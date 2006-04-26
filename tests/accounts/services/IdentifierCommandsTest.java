@@ -6,44 +6,20 @@
  */
 package accounts.services;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Identifier;
 import accounts.domain.IdentifierGroup;
 import accounts.domain.PayrollTaxIdentifier;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.BlankDatafileTestCase;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 
-public class IdentifierCommandsTest extends TestCase
+public class IdentifierCommandsTest extends BlankDatafileTestCase
 {
-	public static final String	TESTS_DATABASE	= "tmp/unittests/IdentifierCommandsTest.yap";
-	private static boolean		initialized		= false;
+	static {
+		DATAFILE = "tmp/unittests/IdentifierCommandsTest.yap";
 
-	private void init() {
-		new File(TESTS_DATABASE).delete();
-		ObjectiveAccounts.store = DatafileServices.newDatafile(TESTS_DATABASE);
-		ObjectiveAccounts.store.close();
-		initialized = true;
-	}
-
-	public void setUp() {
-		if (!initialized) {
-			init();
-		}
-		try {
-			ObjectiveAccounts.store = DatafileServices.openDatafile(TESTS_DATABASE);
-		} catch (FileNotFoundException fnfe) {
-			fail("Where is the test database?");
-		}
-	}
-
-	public void tearDown() {
-		ObjectiveAccounts.store.close();
 	}
 
 	public final void testStoreIdentifierCommandSimple() {
@@ -54,39 +30,37 @@ public class IdentifierCommandsTest extends TestCase
 		grp.addIdentifier(i1);
 		grp.addIdentifier(i2);
 
-		UnitOfWork uow = new UnitOfWork("testStoreIdentifierCommandSimple-1");
 		StoreIdentifierGroupCommand sigc = new StoreIdentifierGroupCommand(grp);
 		try {
-			sigc.execute(uow);
+			sigc.execute(rw);
 		} catch (Exception e) {
 			fail("Shouldn't have thrown " + e);
 		}
 
-		uow.commit();
+		rw.commit();
 
 		/*
 		 * verify they both got stored
 		 */
-		List l = ObjectiveAccounts.store.queryByExample(Identifier.class);
+		List l = rw.queryByExample(Identifier.class);
 		assertEquals(2, l.size());
 
 		/*
 		 * Now make sure adding a third one actually works
 		 */
-		uow = new UnitOfWork("testStoreIdentifierCommandSimple-2");
 
 		PayrollTaxIdentifier i3 = new PayrollTaxIdentifier("Three, PTI");
 		grp.addIdentifier(i3);
 
 		sigc = new StoreIdentifierGroupCommand(grp);
 		try {
-			sigc.execute(uow);
+			sigc.execute(rw);
 		} catch (Exception e) {
 			fail("Shouldn't have thrown " + e);
 		}
-		uow.commit();
+		rw.commit();
 
-		l = ObjectiveAccounts.store.queryByExample(Identifier.class);
+		l = rw.queryByExample(Identifier.class);
 		assertEquals(3, l.size());
 	}
 
@@ -98,38 +72,37 @@ public class IdentifierCommandsTest extends TestCase
 		/*
 		 * Verify persistance across individual tests
 		 */
-		List l = ObjectiveAccounts.store.queryByExample(Identifier.class);
+		List l = rw.queryByExample(Identifier.class);
 		assertEquals(3, l.size());
 
 		/*
 		 * Now fetch out one of the Identifiers, change it, and store it.
 		 */
 		Identifier proto = new Identifier("One");
-		l = ObjectiveAccounts.store.queryByExample(proto);
+		l = rw.queryByExample(proto);
 		assertEquals(1, l.size());
 		Identifier found = (Identifier) l.get(0);
 		assertEquals("One", found.getName());
 
 		found.setName("The One");
 
-		l = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
+		l = rw.queryByExample(IdentifierGroup.class);
 		assertEquals(1, l.size());
 		IdentifierGroup grp = (IdentifierGroup) l.get(0);
 
-		UnitOfWork uow = new UnitOfWork("testStoreIdentifierCommandInChange-1");
 		StoreIdentifierGroupCommand sigc = new StoreIdentifierGroupCommand(grp);
 		try {
-			sigc.execute(uow);
+			sigc.execute(rw);
 		} catch (CommandNotReadyException cnre) {
 			fail("Should not have thrown exception");
 		}
-		uow.commit();
+		rw.commit();
 
 		/*
 		 * Should still be three objects; should not be a "One" and should be a
 		 * "The One"
 		 */
-		l = ObjectiveAccounts.store.queryByExample(Identifier.class);
+		l = rw.queryByExample(Identifier.class);
 		assertEquals(3, l.size());
 
 		boolean theone = false;
@@ -167,13 +140,12 @@ public class IdentifierCommandsTest extends TestCase
 		AustralianPayrollTaxIdentifier i4 = new AustralianPayrollTaxIdentifier("Four, APTI");
 		grp.addIdentifier(i4);
 		try {
-			uow = new UnitOfWork("testStoreIdentifierCommandInChange-2");
 			sigc = new StoreIdentifierGroupCommand(grp);
-			sigc.execute(uow);
+			sigc.execute(rw);
 		} catch (CommandNotReadyException cnre) {
 			fail("Shouldn't have thrown " + cnre);
 		}
-		uow.commit();
+		rw.commit();
 	}
 
 	/**
@@ -182,7 +154,7 @@ public class IdentifierCommandsTest extends TestCase
 	 * different case.
 	 */
 	public final void testStoreIdentifierGroupCommandHavingRemovedOne() {
-		List l = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
+		List l = rw.queryByExample(IdentifierGroup.class);
 		assertEquals(1, l.size());
 
 		IdentifierGroup grp = (IdentifierGroup) l.get(0);
@@ -190,20 +162,19 @@ public class IdentifierCommandsTest extends TestCase
 		List ids = grp.getIdentifiers();
 		ids.remove(1);
 
-		UnitOfWork uow = new UnitOfWork("testStoreIdentifierGroupCommandHavingRemovedOne");
 		StoreIdentifierGroupCommand sigc = new StoreIdentifierGroupCommand(grp);
 		try {
-			sigc.execute(uow);
+			sigc.execute(rw);
 		} catch (CommandNotReadyException cnre) {
 			fail("Should not have thrown " + cnre);
 		}
-		uow.commit();
+		rw.commit();
 
 		/*
 		 * Now find out if its still in the stored IdentifierGroup (it shouldn't
 		 * be)
 		 */
-		l = ObjectiveAccounts.store.queryByExample(IdentifierGroup.class);
+		l = rw.queryByExample(IdentifierGroup.class);
 		assertEquals(1, l.size());
 		grp = (IdentifierGroup) l.get(0);
 
@@ -242,7 +213,7 @@ public class IdentifierCommandsTest extends TestCase
 		 * But it should still be in the database.
 		 */
 		Identifier proto = new Identifier("Two");
-		l = ObjectiveAccounts.store.queryByExample(proto);
+		l = rw.queryByExample(proto);
 		assertEquals(1, l.size());
 	}
 }
