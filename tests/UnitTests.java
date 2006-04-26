@@ -22,6 +22,7 @@ import accounts.persistence.EngineTest;
 import accounts.persistence.ExposeDb4oQueryInterfaceTest;
 import accounts.persistence.RollbackDb4oTest;
 import accounts.services.BasicCommandTest;
+import accounts.services.BasicFinderTest;
 import accounts.services.BooksSetByCommandsTest;
 import accounts.services.ComparatorsDetailedTest;
 import accounts.services.ComparatorsInTreeSetTest;
@@ -64,6 +65,7 @@ public class UnitTests
 		suite.addTestSuite(PostTransactionCommandTest.class);
 		suite.addTestSuite(ComparatorsDetailedTest.class);
 		suite.addTestSuite(ComparatorsInTreeSetTest.class);
+		suite.addTestSuite(BasicFinderTest.class);
 		suite.addTestSuite(EntityCommandTest.class);
 		suite.addTestSuite(IdentifierCommandsTest.class);
 		suite.addTestSuite(AustralianPayrollTaxTest.class);
