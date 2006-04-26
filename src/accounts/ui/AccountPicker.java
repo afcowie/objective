@@ -560,7 +560,7 @@ public class AccountPicker extends HBox
 	 */
 	class SearchEntry extends Entry
 	{
-		private EntryListener	_listener	= null;
+		private EntryListener	listener	= null;
 
 		SearchEntry() {
 			super();
@@ -585,22 +585,22 @@ public class AccountPicker extends HBox
 			if (listener == null) {
 				throw new IllegalArgumentException();
 			}
-			this._listener = listener;
+			this.listener = listener;
 			enableChangeListener();
 		}
 
 		public void disableChangeListener() {
-			if (_listener == null) {
+			if (listener == null) {
 				return;
 			}
-			super.removeListener(_listener);
+			super.removeListener(listener);
 		}
 
 		public void enableChangeListener() {
-			if (_listener == null) {
+			if (listener == null) {
 				return;
 			}
-			super.addListener(_listener);
+			super.addListener(listener);
 		}
 
 		public void clearText() {

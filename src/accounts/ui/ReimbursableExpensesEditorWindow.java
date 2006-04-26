@@ -64,7 +64,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	}
 
 	/**
-	 * (overrides {@link AbstractWindow#deleteHook()})
+	 * (overrides {@link EditorWindow#deleteHook()})
 	 */
 	public boolean deleteHook() {
 		// hide & destroy
