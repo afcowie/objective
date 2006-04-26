@@ -1,5 +1,5 @@
 /*
- * OprDynBooksSetup.java
+ * DemoMockTransactions.java
  * 
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
@@ -10,7 +10,6 @@ import generic.util.Debug;
 
 import java.io.FileNotFoundException;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Amount;
 import accounts.domain.Client;
 import accounts.domain.Credit;
@@ -23,11 +22,10 @@ import accounts.domain.GenericTransaction;
 import accounts.domain.Ledger;
 import accounts.domain.Supplier;
 import accounts.domain.Transaction;
-import accounts.persistence.DataStore;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
+import accounts.persistence.Engine;
 import accounts.services.AddEntityCommand;
 import accounts.services.CommandNotReadyException;
-import accounts.services.DatafileServices;
 import accounts.services.PostTransactionCommand;
 import accounts.services.SpecificLedgerFinder;
 import accounts.services.StoreObjectCommand;
@@ -52,63 +50,70 @@ public class DemoMockTransactions
 
 		Debug.print("main", "Openning database " + DEMO_DATABASE);
 		try {
-			ObjectiveAccounts.store = DatafileServices.openDatafile(DEMO_DATABASE);
+			Engine.openDatafile(DEMO_DATABASE);
 		} catch (FileNotFoundException fnfe) {
 			System.err.println("\nDemo database not found! Did you run DemoBooksSetup?\n");
 			System.exit(1);
 		}
 
-		UnitOfWork uow = null;
+		DataClient rw = Engine.gainClient();
 
 		Debug.print("main", "Running commands...");
 		try {
-			uow = new UnitOfWork("Add Transactions to Demo Books");
-
 			/*
 			 * Fetch some accounts' ledgers
 			 */
-			DataStore store = ObjectiveAccounts.store;
 
 			SpecificLedgerFinder finder = new SpecificLedgerFinder();
 			finder.setAccountTitle("ANZ");
 			finder.setLedgerName("Current Account");
+			finder.query(rw);
 			Ledger bankAccount = finder.getLedger();
 
 			finder.setAccountTitle("Petty Cash");
 			finder.setLedgerName("Manly");
+			finder.query(rw);
 			Ledger pettyCash = finder.getLedger();
 
 			finder.setAccountTitle("Furniture");
 			finder.setLedgerName("Cost");
+			finder.query(rw);
 			Ledger furniture = finder.getLedger();
 
 			finder.setAccountTitle("GST");
 			finder.setLedgerName("Collected");
+			finder.query(rw);
 			Ledger gstCollected = finder.getLedger();
 
 			finder.setAccountTitle("Shareholder");
 			finder.setLedgerName("Cowie");
+			finder.query(rw);
 			Ledger shareholdersLoan = finder.getLedger();
 
 			finder.setAccountTitle("GST");
 			finder.setLedgerName("Paid");
+			finder.query(rw);
 			Ledger gstPaid = finder.getLedger();
 
 			finder.setAccountTitle("Owner's Equity");
 			finder.setLedgerName("");
+			finder.query(rw);
 			Ledger ownersEquity = finder.getLedger();
 
 			finder.setAccountTitle("Procedures");
 			finder.setLedgerName("Fees");
+			finder.query(rw);
 			Ledger consultingRevenue = finder.getLedger();
 
 			finder.setAccountTitle("Travel Expenses");
 			finder.setLedgerName("Ground Transfer");
+			finder.query(rw);
 			Ledger groundTransport = finder.getLedger();
 
 			/*
 			 * Now start storing some transactions
 			 */
+			Debug.print("main", "Store various transactions");
 
 			Transaction[] initialization = {
 				new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 03"), new Entry[] {
@@ -140,21 +145,16 @@ public class DemoMockTransactions
 			for (int i = 0; i < initialization.length; i++) {
 				initialization[i].setIdentifier("I" + padZeros(i + 1, 4));
 				PostTransactionCommand cmd = new PostTransactionCommand(initialization[i]);
-				cmd.execute(uow);
+				cmd.execute(rw);
 			}
 
 			Debug.print("main", "Committing.");
-			uow.commit();
-		} catch (CommandNotReadyException cnre) {
-			uow.cancel();
-			throw new IllegalStateException("Shouldn't have had a problem with any commands being not ready!");
-		} catch (Exception e) {
-			uow.cancel();
-			e.printStackTrace();
-		}
+			rw.commit();
 
-		try {
-			uow = new UnitOfWork("Add some clients and suppliers");
+			/*
+			 * Add a few notional business relations
+			 */
+			Debug.print("main", "Add a few Clients and Suppliers");
 
 			Entity[] entities = {
 				new Client("ACME, Inc"),
@@ -163,20 +163,16 @@ public class DemoMockTransactions
 
 			for (int i = 0; i < entities.length; i++) {
 				AddEntityCommand aec = new AddEntityCommand(entities[i]);
-				aec.execute(uow);
+				aec.execute(rw);
 			}
 
-			uow.commit();
-		} catch (CommandNotReadyException cnre) {
-			uow.cancel();
-			throw new IllegalStateException("Shouldn't have had a problem with any commands being not ready!");
-		} catch (Exception e) {
-			uow.cancel();
-			e.printStackTrace();
-		}
+			Debug.print("main", "Committing.");
+			rw.commit();
 
-		try {
-			uow = new UnitOfWork("Add some employees");
+			/*
+			 * Add some Workers
+			 */
+			Debug.print("main", "Add some Employees");
 
 			Employee[] staff = {
 				new Employee("Andrew Cowie"),
@@ -188,19 +184,23 @@ public class DemoMockTransactions
 				// AddEmployeeCommmand or StoreWorkerCommand or ... to do
 				// Payroll Ledger setups and whatnot
 				StoreObjectCommand soc = new StoreObjectCommand(staff[i]);
-				soc.execute(uow);
+				soc.execute(rw);
 			}
 
-			uow.commit();
+			Debug.print("main", "Committing.");
+			rw.commit();
+
 		} catch (CommandNotReadyException cnre) {
-			uow.cancel();
+			rw.rollback();
 			throw new IllegalStateException("Shouldn't have had a problem with any commands being not ready!");
 		} catch (Exception e) {
-			uow.cancel();
+			rw.rollback();
 			e.printStackTrace();
 		}
 
-		ObjectiveAccounts.store.close();
+		Engine.releaseClient(rw);
+		Engine.shutdown();
+
 		Debug.print("main", "Done.");
 	}
 

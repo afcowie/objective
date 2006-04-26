@@ -2,16 +2,13 @@
  * Db4oActivationTest.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.client;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.Set;
 
-import junit.framework.TestCase;
 import junit.textui.TestRunner;
 import accounts.domain.Account;
 import accounts.domain.Amount;
@@ -25,10 +22,9 @@ import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.BlankDatafileTestCase;
 import accounts.services.AddAccountCommand;
 import accounts.services.CommandNotReadyException;
-import accounts.services.DatafileServices;
 import accounts.services.InitBooksCommand;
 import accounts.services.PostTransactionCommand;
 
@@ -44,10 +40,11 @@ import accounts.services.PostTransactionCommand;
  * 
  * @author Andrew Cowie
  */
-public class Db4oActivationTest extends TestCase
+public class Db4oActivationTest extends BlankDatafileTestCase
 {
-	public static final String	TESTS_DATABASE	= "tmp/unittests/Db4oActivationTest.yap";
-	private static boolean		initialized		= false;
+	static {
+		DATAFILE = "tmp/unittests/Db4oActivationTest.yap";
+	}
 
 	private static final int	DEFAULT			= 20;
 	/**
@@ -60,73 +57,29 @@ public class Db4oActivationTest extends TestCase
 
 	private static final String	DATESTRING		= "15 Jul 04";
 
-	private void init() {
-		try {
-			// Debug.init("all");
-			// Debug.register("main");
-			// Debug.register("command");
-			// Debug.register("memory");
-			// Debug.setProgname("activation");
-
-			new File(TESTS_DATABASE).delete();
-			ObjectiveAccounts.store = DatafileServices.newDatafile(TESTS_DATABASE);
-
-			ObjectiveAccounts.store.close();
-			initialized = true;
-		} catch (Exception e) {
-			System.err.println("Unexpected problem in init()!");
-			System.err.flush();
-		}
-	}
-
-	public void setUp() {
-		if (!initialized) {
-			init();
-		}
-		try {
-			ObjectiveAccounts.store = DatafileServices.openDatafile(TESTS_DATABASE);
-		} catch (FileNotFoundException fnfe) {
-			fail("Where is the test database?");
-		}
-	}
-
-	public void tearDown() {
-		try {
-			if (!ObjectiveAccounts.store.getContainer().ext().isClosed()) {
-				ObjectiveAccounts.store.close();
-			} else
-				throw new Exception("closed?!?");
-		} catch (Exception e) {
-			System.err.println("What the hell? " + e);
-			System.err.flush();
-		}
-	}
-
 	final public void testSetupDeepGraph() {
-		UnitOfWork uow = null;
-		try {
-			uow = new UnitOfWork("Db4oActivationTest.testSetupDeepGraph ibc");
+		// Debug.init("all");
+		// Debug.register("main");
+		// Debug.register("command");
+		// Debug.register("memory");
+		// Debug.setProgname("activation");
 
+		try {
 			Currency home = new Currency("CUR", "Some Currency", "#");
 			InitBooksCommand ibc = new InitBooksCommand(home);
-			ibc.execute(uow);
-			uow.commit();
+			ibc.execute(rw);
+			rw.commit();
 
 			CashAccount[] as = new CashAccount[NUM_ACCOUNTS];
 
 			for (int i = 0; i < NUM_ACCOUNTS; i++) {
-				uow = new UnitOfWork("Db4oActivationTest.testSetupDeepGraph aac " + i);
-
 				as[i] = new CashAccount("N:" + i, "L:" + i);
 				AddAccountCommand aac = new AddAccountCommand(as[i]);
-				aac.execute(uow);
-
-				uow.commit();
+				aac.execute(rw);
+				rw.commit();
 			}
 
 			for (int i = 0; i < NUM_ACCOUNTS; i++) {
-				uow = new UnitOfWork("Db4oActivationTest.testSetupDeepGraph ptc " + i);
-
 				Ledger ll = as[i].getLedger();
 				Ledger lr = as[NUM_ACCOUNTS - i - 1].getLedger();
 
@@ -134,12 +87,13 @@ public class Db4oActivationTest extends TestCase
 				Entry right = new Credit(new Amount("1.00"), lr);
 
 				Transaction gt = new GenericTransaction("T:" + i, new Datestamp(DATESTRING), new Entry[] {
-						left, right
+					left,
+					right
 				});
 
 				PostTransactionCommand ptc = new PostTransactionCommand(gt);
-				ptc.execute(uow);
-				uow.commit();
+				ptc.execute(rw);
+				rw.commit();
 			}
 
 		} catch (CommandNotReadyException cnre) {
@@ -156,7 +110,7 @@ public class Db4oActivationTest extends TestCase
 		Amount totalDebits = new Amount("0.00");
 		Amount totalCredits = new Amount("0.00");
 
-		Books root = ObjectiveAccounts.store.getBooks();
+		Books root = rw.getBooks();
 
 		Set aS = root.getAccountsSet();
 		Iterator aI = aS.iterator();
@@ -227,14 +181,14 @@ public class Db4oActivationTest extends TestCase
 
 	public static void usage() {
 		final String[] msg = {
-				"ERROR.",
-				"Usage: java " + Db4oActivationTest.class.getClass() + " [size]",
-				"",
-				"The single optional argument must be a positive number which will determine",
-				"the number of accounts, transactions and other internal iterations.",
-				"Make it large (100-200) if doing tuning in order to average out startup costs.",
-				"",
-				"The current default is " + DEFAULT + ".",
+			"ERROR.",
+			"Usage: java " + Db4oActivationTest.class.getClass() + " [size]",
+			"",
+			"The single optional argument must be a positive number which will determine",
+			"the number of accounts, transactions and other internal iterations.",
+			"Make it large (100-200) if doing tuning in order to average out startup costs.",
+			"",
+			"The current default is " + DEFAULT + ".",
 
 		};
 		for (int i = 0; i < msg.length; i++) {

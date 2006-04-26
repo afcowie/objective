@@ -7,9 +7,12 @@
 package demo.ui;
 
 import generic.ui.TextOutput;
+
+import java.io.FileNotFoundException;
+
 import accounts.domain.Books;
-import accounts.persistence.DataStore;
-import accounts.services.DatafileServices;
+import accounts.persistence.DataClient;
+import accounts.persistence.Engine;
 import accounts.ui.AccountTextOutput;
 import accounts.ui.TransactionTextOutput;
 import demo.client.DemoBooksSetup;
@@ -22,13 +25,18 @@ import demo.client.DemoBooksSetup;
 public class DemoOutputDump
 {
 	public static void main(String[] args) {
-		DataStore store = null;
 		TextOutput outputter = null;
 
 		try {
-			store = DatafileServices.openDatafile(DemoBooksSetup.DEMO_DATABASE);
+			Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE);
+		} catch (FileNotFoundException fnfe) {
+			System.err.println("\nDemo database not found! Did you run DemoBooksSetup?\n");
+			System.exit(1);
+		}
 
-			Books root = store.getBooks();
+		DataClient ro = Engine.primaryClient();
+		try {
+			Books root = ro.getBooks();
 
 			System.out.println();
 
@@ -36,7 +44,7 @@ public class DemoOutputDump
 			 * First output all the Accounts
 			 */
 
-			outputter = new AccountTextOutput(store);
+			outputter = new AccountTextOutput(ro);
 			outputter.toOutput(System.out);
 
 			/*
@@ -44,17 +52,15 @@ public class DemoOutputDump
 			 */
 			System.out.println();
 
-			outputter = new TransactionTextOutput(store);
+			outputter = new TransactionTextOutput(ro);
 			outputter.toOutput(System.out);
 
 			System.out.flush();
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (store != null) {
-				store.close();
-			}
 		}
+
+		Engine.shutdown();
 	}
 }

@@ -10,7 +10,6 @@ import generic.util.Debug;
 
 import java.io.File;
 
-import accounts.client.ObjectiveAccounts;
 import accounts.domain.Account;
 import accounts.domain.AccountsPayable;
 import accounts.domain.AccountsReceivable;
@@ -27,11 +26,11 @@ import accounts.domain.OwnersEquityAccount;
 import accounts.domain.PayrollTaxPayableAccount;
 import accounts.domain.ProfessionalRevenueAccount;
 import accounts.domain.SalesTaxPayableAccount;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
+import accounts.persistence.Engine;
 import accounts.services.AddAccountCommand;
 import accounts.services.AddCurrencyCommand;
 import accounts.services.CommandNotReadyException;
-import accounts.services.DatafileServices;
 import accounts.services.InitBooksCommand;
 import country.au.services.AustralianInitBooksCommand;
 
@@ -62,16 +61,14 @@ public class DemoBooksSetup
 		new File(DEMO_DATABASE).delete();
 
 		Debug.print("main", "Creating database " + DEMO_DATABASE);
-		ObjectiveAccounts.store = DatafileServices.newDatafile(DEMO_DATABASE);
+		Engine.newDatafile(DEMO_DATABASE);
 
-		UnitOfWork uow = null;
+		DataClient rw = Engine.gainClient();
 
 		Debug.print("main", "Running commands...");
 		try {
-			uow = new UnitOfWork("Demo Books Setup");
-
 			InitBooksCommand initBooks = new AustralianInitBooksCommand();
-			initBooks.execute(uow);
+			initBooks.execute(rw);
 
 			/*
 			 * Create a whole ton of accounts
@@ -133,11 +130,13 @@ public class DemoBooksSetup
 				}),
 			};
 
+			Debug.print("main", "Create a whole ton of accounts");
+
 			for (int i = 0; i < realAccounts.length; i++) {
 				Account a = realAccounts[i];
 
 				AddAccountCommand aac = new AddAccountCommand(a);
-				aac.execute(uow);
+				aac.execute(rw);
 			}
 
 			/*
@@ -152,12 +151,13 @@ public class DemoBooksSetup
 				Account a = testAccounts[i];
 
 				AddAccountCommand aac = new AddAccountCommand(a);
-				aac.execute(uow);
+				aac.execute(rw);
 			}
 
 			/*
 			 * Now setup some other currencies
 			 */
+			Debug.print("main", "Set up some currencies");
 
 			Currency[] currencies = {
 				new Currency("CAD", "Canadian Dollar", "$"),
@@ -173,20 +173,22 @@ public class DemoBooksSetup
 				Currency cur = currencies[i];
 
 				AddCurrencyCommand acc = new AddCurrencyCommand(cur);
-				acc.execute(uow);
+				acc.execute(rw);
 			}
 
 			Debug.print("main", "Committing.");
-			uow.commit();
+			rw.commit();
 		} catch (CommandNotReadyException cnre) {
-			uow.cancel();
+			rw.rollback();
 			throw new IllegalStateException("Shouldn't have had a problem with any commands being not ready!");
 		} catch (Exception e) {
-			uow.cancel();
+			rw.rollback();
 			e.printStackTrace();
 		}
 
-		ObjectiveAccounts.store.close();
+		Engine.releaseClient(rw);
+		Engine.shutdown();
+
 		Debug.print("main", "Done.");
 	}
 }

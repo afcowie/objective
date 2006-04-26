@@ -2,19 +2,15 @@
  * ObjectiveAccounts.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.client;
-
-import accounts.persistence.DataStore;
 
 /**
  * The main reentry point for the whole framework. Holds a number of "global"
  * variables for use throughout the program. See the JavaDoc for the public
  * static members of this class. In particlar, note
  * <ul>
- * <li><code>store</code>, a reference to the currently open DataStore
- * object.
  * <li><code>ui</code>, a way to get to the top level UserInterface object
  * so you can cause program wide GUI effects.
  * </ul>
@@ -38,19 +34,10 @@ public class ObjectiveAccounts
 	 * if you will, but this is here to embed it in distributed bytecode.
 	 */
 	public static final String[]	COPYRIGHT	= new String[] {
-			"Copyright © 2005-2006 Operational Dynamics Consulting Pty Ltd, and others.",
-			"The LICENCE file included with these sources lists the terms under which",
-			"you may use and redistribute this code.",
+		"Copyright © 2005-2006 Operational Dynamics Consulting Pty Ltd, and others.",
+		"The LICENCE file included with these sources lists the terms under which",
+		"you may use and redistribute this code.",
 												};
-	/**
-	 * The database which the program is talking to. There is frequent need for
-	 * code all over the system to have a quick way to get to the data store.
-	 * Rather than using the context idiom, we just hold a public static
-	 * reference here. Programs using the ObjectiveAccounts codebase will want
-	 * to open a data file and put the resultant reference here as a number of
-	 * classes (especaially Commands and Finders) rely on this being set.
-	 */
-	public static DataStore			store		= null;
 
 	// public static ObjectiveAccountsUserInterface ui = null;
 

@@ -13,8 +13,7 @@ import java.io.FileNotFoundException;
 import org.gnu.gtk.Gtk;
 import org.gnu.gtk.GtkInitException;
 
-import accounts.client.ObjectiveAccounts;
-import accounts.services.DatafileServices;
+import accounts.persistence.Engine;
 import accounts.ui.ReimbursableExpensesEditorWindow;
 import country.au.ui.AustralianPayrollEditorWindow;
 import demo.client.DemoBooksSetup;
@@ -32,14 +31,14 @@ public class DemoWindowRunner
 		Debug.register("threads");
 
 		args = Debug.init(args);
-		Debug.print("main", "Starting ObjectiveWindowRunner");
+		Debug.print("main", "Starting DemoWindowRunner");
 
 		Debug.print("main", "Loading demo books");
 
 		try {
-			ObjectiveAccounts.store = DatafileServices.openDatafile(DemoBooksSetup.DEMO_DATABASE);
+			Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE);
 		} catch (FileNotFoundException fnfe) {
-			System.err.println("You need to run OprDynBooksSetup to create the demo dataset.");
+			System.err.println("You need to run DemoBooksSetup to create the demo dataset.");
 			System.exit(1);
 		} catch (IllegalStateException ise) {
 			System.err.println("The database is locked by another program (doh)");
@@ -63,6 +62,6 @@ public class DemoWindowRunner
 		Debug.print("main", "Starting Gtk main loop");
 		Gtk.main();
 		Debug.print("main", "Returned from Gtk main loop");
-		ObjectiveAccounts.store.close();
+		Engine.shutdown();
 	}
 }
