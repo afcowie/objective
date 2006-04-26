@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 
 import accounts.domain.Amount;
 import accounts.domain.Datestamp;
+import accounts.persistence.DataClient;
 import accounts.services.NotFoundException;
 import accounts.services.PayrollTaxCalculator;
 import country.au.domain.AustralianPayrollTaxIdentifier;
@@ -28,19 +29,23 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 	double[][]	coefficients;
 
 	/**
+	 * @param store
+	 *            the DataClient from which to fetch tax Identifiers and tax
+	 *            table data.
 	 * @param asAtDate
 	 *            allows the calculator to pick which set of tax table data is
-	 *            appropriate
+	 *            appropriate.
 	 * @throws IllegalStateException
 	 *             thorwn from the Finder if you've managed to ask for tax data
 	 *             that isn't there.
 	 */
-	public AustralianPayrollTaxCalculator(AustralianPayrollTaxIdentifier scale, Datestamp asAtDate)
+	public AustralianPayrollTaxCalculator(DataClient store, AustralianPayrollTaxIdentifier scale, Datestamp asAtDate)
 		throws NotFoundException {
 
 		super(asAtDate);
 
 		AustralianPayrollTaxTableFinder finder = new AustralianPayrollTaxTableFinder(scale, asAtDate);
+		finder.query(store);
 		this.coefficients = finder.getCoefficients();
 	}
 

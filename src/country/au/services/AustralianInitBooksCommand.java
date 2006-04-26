@@ -8,7 +8,7 @@ package country.au.services;
 
 import accounts.domain.Currency;
 import accounts.domain.IdentifierGroup;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
 import accounts.services.CommandNotReadyException;
 import accounts.services.InitBooksCommand;
 import accounts.services.StoreIdentifierGroupCommand;
@@ -21,6 +21,10 @@ import country.au.domain.AustralianPayrollTaxIdentifier;
  */
 public class AustralianInitBooksCommand extends InitBooksCommand
 {
+	/**
+	 * Construct a Books, initializing Identifiers and setting currency
+	 * appropriate to an Australian company.
+	 */
 	public AustralianInitBooksCommand() {
 		super();
 
@@ -41,14 +45,14 @@ public class AustralianInitBooksCommand extends InitBooksCommand
 
 	/**
 	 * The bulk of the implementation is in
-	 * {@link InitBooksCommand#action(UnitOfWork)}, which we call mid way
+	 * {@link InitBooksCommand#action(DataClient)}, which we call mid way
 	 * through this method via super.action()
 	 */
-	protected void action(UnitOfWork uow) throws CommandNotReadyException {
+	protected void action(DataClient store) throws CommandNotReadyException {
 		/*
 		 * Execute the basic InitBooksCommand
 		 */
-		super.action(uow);
+		super.action(store);
 
 		/*
 		 * Now add the PAYG identifers
@@ -61,12 +65,12 @@ public class AustralianInitBooksCommand extends InitBooksCommand
 		grp.addIdentifier(AustralianPayrollTaxIdentifier.FOREIGN_RESIDENT);
 
 		StoreIdentifierGroupCommand sigc = new StoreIdentifierGroupCommand(grp);
-		sigc.execute(uow);
+		sigc.execute(store);
 
 		/*
 		 * Initialize the PAYG tables as are currently available.
 		 */
 		StoreAustralianPayrollTaxTablesCommand sapttc = new StoreAustralianPayrollTaxTablesCommand();
-		sapttc.execute(uow);
+		sapttc.execute(store);
 	}
 }

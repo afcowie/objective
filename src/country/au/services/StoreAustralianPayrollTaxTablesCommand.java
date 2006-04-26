@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import accounts.domain.Datestamp;
-import accounts.persistence.UnitOfWork;
+import accounts.persistence.DataClient;
 import accounts.services.Command;
 import accounts.services.CommandNotReadyException;
 import accounts.services.CommandNotUndoableException;
@@ -26,7 +26,7 @@ import country.au.domain.AustralianPayrollTaxTable;
  * tables.
  * <p>
  * As subsequent year's data comes along, it can be added here; reexecuting an
- * instance of this Command will update the data sets in the DataStore.
+ * instance of this Command will update the data sets in the DataClient.
  * 
  * @author Andrew Cowie
  */
@@ -89,7 +89,7 @@ public class StoreAustralianPayrollTaxTablesCommand extends Command
 		data.add(table);
 	}
 
-	protected void action(UnitOfWork uow) throws CommandNotReadyException {
+	protected void action(DataClient store) throws CommandNotReadyException {
 		/*
 		 * Pull up any existing instances of the existing table data, so we can
 		 * respectively replace them.
@@ -98,10 +98,10 @@ public class StoreAustralianPayrollTaxTablesCommand extends Command
 		while (iter.hasNext()) {
 			AustralianPayrollTaxTable t = (AustralianPayrollTaxTable) iter.next();
 
-			AustralianPayrollTaxTableFinder f = new AustralianPayrollTaxTableFinder(t.getScale(), t.getEffectiveDate());
-			List result = null;
 			try {
-				f.query();
+				AustralianPayrollTaxTableFinder f = new AustralianPayrollTaxTableFinder(t.getScale(),
+					t.getEffectiveDate());
+				List result = f.query(store);
 
 				if (result.size() == 1) {
 					/*
@@ -120,11 +120,12 @@ public class StoreAustralianPayrollTaxTablesCommand extends Command
 			} catch (NotFoundException nfe) {
 				// no problem.
 			}
-			uow.registerDirty(t);
+
+			store.save(t);
 		}
 	}
 
-	protected void reverse(UnitOfWork uow) throws CommandNotUndoableException {
+	protected void reverse(DataClient store) throws CommandNotUndoableException {
 		throw new CommandNotUndoableException();
 	}
 

@@ -6,11 +6,14 @@
  */
 package country.au.services;
 
+import generic.util.DebugException;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
 import accounts.domain.Datestamp;
+import accounts.persistence.DataClient;
 import accounts.services.Finder;
 import accounts.services.NotFoundException;
 import country.au.domain.AustralianPayrollTaxIdentifier;
@@ -55,11 +58,15 @@ public class AustralianPayrollTaxTableFinder extends Finder
 	 * specific methods. In this case, we <b>only</b>get [all] the tax tables
 	 * that match a given scale; the getTaxTables() method then attempts to pick
 	 * one that is valid for the date given.
+	 * 
+	 * @throws NotFoundException
+	 *             In the event you've asked for tax table data but there is
+	 *             none stored for the data/identifier parameters you've set.
 	 */
 	/*
 	 * query() returns a list but also caches a reference internally.
 	 */
-	protected List query() throws NotFoundException {
+	public List query(DataClient store) throws NotFoundException {
 		AustralianPayrollTaxTable proto = new AustralianPayrollTaxTable(scale);
 
 		List l = store.queryByExample(proto);
@@ -79,11 +86,7 @@ public class AustralianPayrollTaxTableFinder extends Finder
 	 */
 	public double[][] getCoefficients() throws NotFoundException {
 		if (result == null) {
-			try {
-				query();
-			} catch (NotFoundException nfe) {
-				throw new NotFoundException("You've asked for tax table data but there is none stored");
-			}
+			throw new DebugException("Need to call query() first");
 		}
 
 		/*
