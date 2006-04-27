@@ -6,8 +6,6 @@
  */
 package accounts.ui;
 
-import generic.ui.AbstractWindow;
-
 import java.io.PrintWriter;
 
 import org.gnu.gtk.ComboBoxEntry;
@@ -17,6 +15,7 @@ import org.gnu.gtk.Table;
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.domain.Currency;
+import accounts.domain.Employee;
 import accounts.domain.ForeignAmount;
 
 /**
@@ -31,7 +30,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	 */
 	protected Table					table;
 
-	protected ComboBoxEntry			who_comboboxentry;
+	protected WorkerPicker			employee_WorkerPicker;
 	protected DatePicker			datePicker;
 	protected AccountPicker			accountPicker;
 	protected ForeignAmountEntryBox	amountEntryBox;
@@ -52,9 +51,8 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
 		table.attach(accountPicker, 1, 2, 2, 3);
 
-		who_comboboxentry = (ComboBoxEntry) gladeParser.getWidget("who_comboboxentry");
-		who_comboboxentry.appendText("Andrew Cowie");
-		who_comboboxentry.setActive(0);
+		employee_WorkerPicker = new WorkerPicker(store, Employee.class);
+		table.attach(employee_WorkerPicker, 1, 2, 0, 1);
 
 		amountEntryBox = new ForeignAmountEntryBox(store);
 		table.attach(amountEntryBox, 1, 2, 3, 4);
