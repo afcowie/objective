@@ -130,11 +130,8 @@ public abstract class AbstractWindow
 	 * of our windows have. This Window will then be populated programatically
 	 * by the subclass constructor. When that constructor is finished it should
 	 * call present() unless it has a reason not to.
-	 * 
-	 * @param title
-	 *            the String to be used as the user viewable Window title.
 	 */
-	public AbstractWindow(String title) {
+	public AbstractWindow() {
 		/*
 		 * Setup defaultListener, etc
 		 */
@@ -144,8 +141,6 @@ public abstract class AbstractWindow
 		 * Construct Window and set default behaviour.
 		 */
 		window = new Window();
-
-		window.setTitle(title);
 		window.hide();
 
 		window.addListener(defaultListener);
@@ -205,6 +200,14 @@ public abstract class AbstractWindow
 		window.addListener(defaultListener);
 
 		top = (Box) gladeParser.getWidget("top");
+	}
+
+	/**
+	 * @param title
+	 *            the String to be used as the user viewable Window title.
+	 */
+	public void setTitle(String title) {
+		window.setTitle(title);
 	}
 
 	/**

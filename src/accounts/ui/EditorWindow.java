@@ -46,14 +46,12 @@ public abstract class EditorWindow extends AbstractWindow
 	/**
 	 * Basic form of EditorWindow. Passes title to AbstractWindow's constructor,
 	 * and then adds the button box with ok and close.
-	 * 
-	 * @param title
 	 */
-	protected EditorWindow(String title) {
+	protected EditorWindow() {
 		/*
 		 * Construct the basic form
 		 */
-		super(title);
+		super();
 		store = Engine.gainClient();
 		addButtons();
 	}

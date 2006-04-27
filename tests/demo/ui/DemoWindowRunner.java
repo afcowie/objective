@@ -57,7 +57,7 @@ public class DemoWindowRunner
 		ReimbursableExpensesEditorWindow reimburse = new ReimbursableExpensesEditorWindow();
 
 		Debug.print("main", "Initializing AustralianPayrollEditorWindow");
-		AustralianPayrollEditorWindow payroll = new AustralianPayrollEditorWindow();
+		AustralianPayrollEditorWindow payroll = new AustralianPayrollEditorWindow(null);
 
 		Debug.print("main", "Starting Gtk main loop");
 		Gtk.main();
