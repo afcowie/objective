@@ -25,6 +25,7 @@ import accounts.domain.Credit;
 import accounts.domain.Datestamp;
 import accounts.domain.Debit;
 import accounts.domain.Employee;
+import accounts.domain.Entry;
 import accounts.domain.IdentifierGroup;
 import accounts.domain.Ledger;
 import accounts.domain.PayrollTransaction;
@@ -57,9 +58,9 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 	 * loops. It might be nice not to need these references, but then, they're
 	 * only references so it doesn't matter!
 	 */
-	private transient Amount				salary		= null;
-	private transient Amount				withholding	= null;
-	private transient Amount				paycheck	= null;
+	private Amount							salary		= null;
+	private Amount							withholding	= null;
+	private Amount							paycheck	= null;
 
 	private AustralianPayrollTaxCalculator	calc;
 
@@ -74,62 +75,20 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 	 * The last case used, either salary or paycheck, so we can recalculate
 	 * appropriately if the tax identifier changes
 	 */
-	private transient Widget				last		= null;
+	private Widget							last		= null;
+
+	private PayrollTransaction				existing	= null;
 
 	/**
-	 * Construct a Window to edit an existing Transaction. This will initialize
-	 * the various windows with the relevent data from the passed transaction
-	 * argument.
+	 * Construct a Window and instantiate all the necessary widgets.
 	 * 
 	 * @param t
-	 *            a PayrollTransaction containing an Australian PAYG
-	 *            transaction.
+	 *            a PayrollTransaction containing an Australian PAYG transaction
+	 *            if you want to edit an existing Transaction, or null to start
+	 *            a new Transaction. argument.
 	 */
 	public AustralianPayrollEditorWindow(PayrollTransaction t) {
-		super("Edit Transaction " + t.getDescription());
-
-		buildWindow(t);
-
-		/*
-		 * As we're editing, the likely thing is changing the amount, so set
-		 * focus there.
-		 */
-		salary_AmountEntry.grabFocus();
-		present();
-	}
-
-	/**
-	 * Construct the Window to fill in the details of a new Transaction.
-	 */
-	public AustralianPayrollEditorWindow() {
-		super("Enter payroll details");
-
-		buildWindow(null);
-
-		/*
-		 * start with selecting a person to pay.
-		 */
-		employee_WorkerPicker.grabFocus();
-		present();
-	}
-
-	/**
-	 * Instantiate all the necessary widgets.
-	 * 
-	 * @param t
-	 *            null if new Transaction
-	 */
-	private final void buildWindow(PayrollTransaction t) {
-		if (t == null) {
-			salary = new Amount(0);
-			withholding = new Amount(0);
-			paycheck = new Amount(0);
-
-		} else {
-			employee = t.getEmployee();
-			// FIXME PayrollTransaction needs fields and getters
-			throw new Error("PayrollTransaction needs fields and getters before this can be an editor");
-		}
+		super();
 
 		final Label title_Label = new Label("<big><b>Pay an (Australian) Employee</b></big>");
 		title_Label.setUseMarkup(true);
@@ -338,7 +297,6 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 
 				last = paycheck_AmountEntry;
 			}
-			// }
 		});
 
 		/*
@@ -347,15 +305,44 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 */
 
 		if (t == null) {
+			salary = new Amount(0);
+			withholding = new Amount(0);
+			paycheck = new Amount(0);
+
 			payg_IdentifierSelector.setActive(0);
+
+			setTitle("Enter payroll details");
+
+			/*
+			 * start with selecting a person to pay.
+			 */
+			employee_WorkerPicker.grabFocus();
 		} else {
+			salary = t.getSalaryEntry().getAmount();
+			withholding = t.getWithholdingEntry().getAmount();
+			paycheck = t.getPaycheckEntry().getAmount();
+
 			employee_WorkerPicker.setWorker(employee);
 			payg_IdentifierSelector.setIdentifier(t.getTaxIdentifier());
+
+			setTitle("Edit Transaction " + t.getDescription());
+
+			/*
+			 * As we're editing, the likely thing is changing the amount, so set
+			 * focus there.
+			 */
+			salary_AmountEntry.grabFocus();
+
+			/*
+			 * And keep a reference to the passed Transaction
+			 */
+			existing = t;
 		}
 		salary_AmountEntry.setAmount(salary);
 		withholding_AmountDisplay.setAmount(withholding);
 		paycheck_AmountEntry.setAmount(paycheck);
 
+		present();
 	}
 
 	protected void ok() {
@@ -408,20 +395,37 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			f.setLedgerName("Collected");
 			Ledger paygOwing = f.getLedger();
 
-			/*
-			 * Form the Transaction
-			 */
-			PayrollTransaction t = new PayrollTransaction(employee,
-				(AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection());
-			t.setDate(endDate_Picker.getDate());
+			if (existing == null) {
+				/*
+				 * Form the Transaction
+				 */
+				PayrollTransaction t = new PayrollTransaction(employee,
+					(AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection());
+				t.setDate(endDate_Picker.getDate());
 
-			t.addEntry(new Credit(calc.getPaycheck(), bankAccount));
-			t.addEntry(new Credit(calc.getWithhold(), paygOwing));
-			t.addEntry(new Debit(calc.getSalary(), salariesExpense));
+				Entry e;
+				e = new Credit(calc.getPaycheck(), bankAccount);
+				t.addEntry(e);
+				t.setPaycheckEntry(e);
 
-			PostTransactionCommand ptc = new PostTransactionCommand(t);
-			ptc.execute(store);
+				e = new Credit(calc.getWithhold(), paygOwing);
+				t.addEntry(e);
+				t.setWithholdingEntry(e);
 
+				e = new Debit(calc.getSalary(), salariesExpense);
+				t.addEntry(e);
+				t.setSalaryEntry(e);
+
+				PostTransactionCommand ptc = new PostTransactionCommand(t);
+				ptc.execute(store);
+			} else {
+				PayrollTransaction t = existing;
+
+				t.setTaxIdentifier((AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection());
+				/*
+				 * The amounts in the Entries were used directly.
+				 */
+			}
 			store.commit();
 			super.ok();
 		} catch (NotFoundException nfe) {

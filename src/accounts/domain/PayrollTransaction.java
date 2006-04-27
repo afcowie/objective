@@ -9,17 +9,19 @@ package accounts.domain;
 /**
  * A Transaction representing pay to an Employee.
  * 
- * <p>
- * There are no specialty methods to set the individual Entries (salary,
- * withholding, paycheck) that go with the transaction; its assumed the
- * EditorWindow which construts this Transaction can figure those out.
- * 
  * @author Andrew Cowie
  */
 public class PayrollTransaction extends Transaction
 {
 	private Employee				employee;
 	private PayrollTaxIdentifier	taxIdentifier;
+
+	private Datestamp				fromDate;
+	private Datestamp				endDate;
+
+	private Entry					salary;
+	private Entry					withholding;
+	private Entry					paycheck;
 
 	public PayrollTransaction() {
 		super();
@@ -97,5 +99,62 @@ public class PayrollTransaction extends Transaction
 	 */
 	public void setTaxIdentifier(PayrollTaxIdentifier identifier) {
 		this.taxIdentifier = identifier;
+	}
+
+	public Datestamp getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(Datestamp fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public Datestamp getEndDate() {
+		return endDate;
+	}
+
+	/**
+	 * Set the end of the period this pay covers. Certainly, Transaction has a
+	 * Datestamp, but there are cases where you might reasonably have a paycheck
+	 * generated and paid out on a date that is after the end of a pay period.
+	 */
+	public void setEndDate(Datestamp endDate) {
+		this.endDate = endDate;
+	}
+
+	public Entry getPaycheckEntry() {
+		return paycheck;
+	}
+
+	/**
+	 * Designate an Entry as representing the paycheck. This is just a
+	 * reference; you must still addEntry() when forming a Transaction.
+	 */
+	public void setPaycheckEntry(Entry paycheck) {
+		this.paycheck = paycheck;
+	}
+
+	public Entry getSalaryEntry() {
+		return salary;
+	}
+
+	/**
+	 * Designate an Entry as representing the salary. This is just a reference;
+	 * you must still addEntry() when forming a Transaction.
+	 */
+	public void setSalaryEntry(Entry salary) {
+		this.salary = salary;
+	}
+
+	public Entry getWithholdingEntry() {
+		return withholding;
+	}
+
+	/**
+	 * Designate an Entry as representing the withholding. This is just a
+	 * reference; you must still addEntry() when forming a Transaction.
+	 */
+	public void setWithholdingEntry(Entry withholding) {
+		this.withholding = withholding;
 	}
 }
