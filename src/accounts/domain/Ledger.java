@@ -6,6 +6,8 @@
  */
 package accounts.domain;
 
+import generic.util.DebugException;
+
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -59,11 +61,11 @@ public class Ledger
 		 * validation
 		 */
 		if (entry == null) {
-			throw new NullPointerException("attempted to add a null Entry!");
+			throw new IllegalArgumentException("Attempted to add a null Entry!");
 		}
 
 		if (!((entry instanceof Debit) || (entry instanceof Credit))) {
-			throw new IllegalArgumentException("attempted to add an Entry which is neither Debit nor Credit!");
+			throw new DebugException("attempted to add an Entry which is neither Debit nor Credit!");
 		}
 		/*
 		 * setup
@@ -79,6 +81,20 @@ public class Ledger
 		 */
 		entries.add(entry);
 		addToBalance(entry);
+	}
+
+	/**
+	 * Remove an Entry from this ledger, adjusting the balance accordingly.
+	 */
+	public void removeEntry(Entry entry) {
+		if (entry == null) {
+			throw new IllegalArgumentException("Can't remove a null Entry!");
+		}
+		if (!(entries.contains(entry))) {
+			throw new IllegalStateException("You've asked to remove an Entry that isn't in this Ledger");
+		}
+		entries.remove(entry);
+		subtractFromBalance(entry);
 	}
 
 	/**
@@ -100,7 +116,7 @@ public class Ledger
 	}
 
 	/**
-	 * Add and Entry's Amount to to the Ledger's balance.
+	 * Add and Entry's Amount to the Ledger's balance.
 	 * 
 	 * @param entry
 	 *            The Entry whose amount we will add to the Ledger's balance. It
@@ -108,8 +124,21 @@ public class Ledger
 	 */
 	protected void addToBalance(Entry entry) {
 		throw new UnsupportedOperationException(
-				"You're working with a raw Ledger object which is neither Debit nor Credit Postitive, so we can't add Entries to it.");
+			"You're working with a raw Ledger object which is neither Debit nor Credit Postitive, so we can't add Entries to it.");
 
+	}
+
+	/**
+	 * Subtract an Entry's Amount from the Ledger's balance.
+	 * 
+	 * @param entry
+	 *            The Entry whose amount we will subtract from the Ledger's
+	 *            balance. It will be tested for Debit/Credit-ness and added
+	 *            accordingly.
+	 */
+	protected void subtractFromBalance(Entry entry) {
+		throw new UnsupportedOperationException(
+			"You're working with a raw Ledger object which is neither Debit nor Credit Postitive, so we can't subtract an Entry from it.");
 	}
 
 	/*
@@ -204,5 +233,4 @@ public class Ledger
 			return "";
 		}
 	}
-
 }

@@ -2,7 +2,7 @@
  * DebitPositiveLedger.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -31,6 +31,14 @@ public class DebitPositiveLedger extends Ledger
 			balance.incrementBy(entry.getAmount());
 		} else {
 			balance.decrementBy(entry.getAmount());
+		}
+	}
+
+	protected void subtractFromBalance(Entry entry) {
+		if (entry instanceof Debit) {
+			balance.decrementBy(entry.getAmount());
+		} else {
+			balance.incrementBy(entry.getAmount());
 		}
 	}
 

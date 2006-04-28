@@ -2,7 +2,7 @@
  * Entry.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -50,8 +50,8 @@ public class Entry
 	}
 
 	/**
-	 * Construct an Entry specifiying the amount and the account to which it
-	 * will be applied. Note that the account will not have it's addEntry()
+	 * Construct an Entry specifiying the amount and the Ledger to which it
+	 * will be applied. Note that the Ledger will not have it's addEntry()
 	 * method called until a PostTransactionCommand is executed for a
 	 * transaction holding this Entry object.
 	 * 

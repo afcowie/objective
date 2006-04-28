@@ -13,7 +13,8 @@ package accounts.domain;
  * <P>
  * This would have been called GeneralLedgerTransaction but ther was potential
  * for naming confustion as we have modelled the actual ledger(s) in any given
- * account with the Ledger class. This is most assuredly a Transaction.
+ * account with the Ledger class. This is most assuredly an accounting
+ * Transaction.
  * 
  * @author Andrew Cowie
  */
