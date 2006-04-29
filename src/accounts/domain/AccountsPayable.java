@@ -38,6 +38,6 @@ public class AccountsPayable extends LiabilityAccount
 	}
 
 	public String getClassString() {
-		return "Accounts Receivable";
+		return "Accounts Payable";
 	}
 }

@@ -11,24 +11,18 @@ import generic.util.Debug;
 import java.io.FileNotFoundException;
 
 import accounts.domain.Amount;
-import accounts.domain.Client;
 import accounts.domain.Credit;
 import accounts.domain.Datestamp;
 import accounts.domain.Debit;
-import accounts.domain.Employee;
-import accounts.domain.Entity;
 import accounts.domain.Entry;
 import accounts.domain.GenericTransaction;
 import accounts.domain.Ledger;
-import accounts.domain.Supplier;
 import accounts.domain.Transaction;
 import accounts.persistence.DataClient;
 import accounts.persistence.Engine;
-import accounts.services.AddEntityCommand;
 import accounts.services.CommandNotReadyException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.SpecificLedgerFinder;
-import accounts.services.StoreObjectCommand;
 
 /**
  * Contains a prelinary main() method and program initialization (much of which
@@ -146,45 +140,6 @@ public class DemoMockTransactions
 				initialization[i].setReference("R" + padZeros(i + 1, 4));
 				PostTransactionCommand cmd = new PostTransactionCommand(initialization[i]);
 				cmd.execute(rw);
-			}
-
-			Debug.print("main", "Committing.");
-			rw.commit();
-
-			/*
-			 * Add a few notional business relations
-			 */
-			Debug.print("main", "Add a few Clients and Suppliers");
-
-			Entity[] entities = {
-				new Client("ACME, Inc"),
-				new Supplier("Katoomba Telecom"),
-			};
-
-			for (int i = 0; i < entities.length; i++) {
-				AddEntityCommand aec = new AddEntityCommand(entities[i]);
-				aec.execute(rw);
-			}
-
-			Debug.print("main", "Committing.");
-			rw.commit();
-
-			/*
-			 * Add some Workers
-			 */
-			Debug.print("main", "Add some Employees");
-
-			Employee[] staff = {
-				new Employee("Andrew Cowie"),
-				new Employee("Katrina Ross"),
-			};
-
-			for (int i = 0; i < staff.length; i++) {
-				// FIXME replace with domain specific command! Perhaps
-				// AddEmployeeCommmand or StoreWorkerCommand or ... to do
-				// Payroll Ledger setups and whatnot
-				StoreObjectCommand soc = new StoreObjectCommand(staff[i]);
-				soc.execute(rw);
 			}
 
 			Debug.print("main", "Committing.");

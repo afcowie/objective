@@ -15,9 +15,12 @@ import accounts.domain.AccountsPayable;
 import accounts.domain.AccountsReceivable;
 import accounts.domain.BankAccount;
 import accounts.domain.CashAccount;
+import accounts.domain.Client;
 import accounts.domain.Currency;
 import accounts.domain.DebitPositiveLedger;
 import accounts.domain.DepreciatingAssetAccount;
+import accounts.domain.Employee;
+import accounts.domain.Entity;
 import accounts.domain.GenericExpenseAccount;
 import accounts.domain.Ledger;
 import accounts.domain.LoanLedger;
@@ -25,12 +28,15 @@ import accounts.domain.LoanPayableAccount;
 import accounts.domain.OwnersEquityAccount;
 import accounts.domain.PayrollTaxPayableAccount;
 import accounts.domain.ProfessionalRevenueAccount;
-import accounts.domain.SalesTaxPayableAccount;
 import accounts.domain.ReimbursableExpensesPayableAccount;
+import accounts.domain.SalesTaxPayableAccount;
+import accounts.domain.Supplier;
 import accounts.persistence.DataClient;
 import accounts.persistence.Engine;
 import accounts.services.AddAccountCommand;
 import accounts.services.AddCurrencyCommand;
+import accounts.services.AddEntityCommand;
+import accounts.services.AddWorkerCommand;
 import accounts.services.CommandNotReadyException;
 import accounts.services.InitBooksCommand;
 import country.au.services.AustralianInitBooksCommand;
@@ -156,6 +162,9 @@ public class DemoBooksSetup
 				aac.execute(rw);
 			}
 
+			Debug.print("main", "Committing.");
+			rw.commit();
+
 			/*
 			 * Now setup some other currencies
 			 */
@@ -176,6 +185,42 @@ public class DemoBooksSetup
 
 				AddCurrencyCommand acc = new AddCurrencyCommand(cur);
 				acc.execute(rw);
+			}
+
+			Debug.print("main", "Committing.");
+			rw.commit();
+
+			/*
+			 * Add a few notional business relations
+			 */
+			Debug.print("main", "Add a few Clients and Suppliers");
+
+			Entity[] entities = {
+				new Client("ACME, Inc"),
+				new Supplier("Katoomba Telecom"),
+			};
+
+			for (int i = 0; i < entities.length; i++) {
+				AddEntityCommand aec = new AddEntityCommand(entities[i]);
+				aec.execute(rw);
+			}
+
+			Debug.print("main", "Committing.");
+			rw.commit();
+
+			/*
+			 * Add some Workers
+			 */
+			Debug.print("main", "Add some Employees");
+
+			Employee[] staff = {
+				new Employee("Andrew Cowie"),
+				new Employee("Katrina Ross"),
+			};
+
+			for (int i = 0; i < staff.length; i++) {
+				AddWorkerCommand awc = new AddWorkerCommand(staff[i]);
+				awc.execute(rw);
 			}
 
 			Debug.print("main", "Committing.");

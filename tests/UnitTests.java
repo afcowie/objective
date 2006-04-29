@@ -29,6 +29,7 @@ import accounts.services.ComparatorsInTreeSetTest;
 import accounts.services.EntityCommandTest;
 import accounts.services.IdentifierCommandsTest;
 import accounts.services.PostTransactionCommandTest;
+import accounts.services.WorkerCommandsTest;
 import country.au.services.AustralianPayrollTaxTest;
 
 /**
@@ -69,6 +70,7 @@ public class UnitTests
 		suite.addTestSuite(EntityCommandTest.class);
 		suite.addTestSuite(IdentifierCommandsTest.class);
 		suite.addTestSuite(AustralianPayrollTaxTest.class);
+		suite.addTestSuite(WorkerCommandsTest.class);
 
 		// client
 		suite.addTestSuite(Db4oActivationTest.class);

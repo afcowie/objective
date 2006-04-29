@@ -12,7 +12,9 @@ package accounts.domain;
  */
 public class Worker
 {
-	private String	name;
+	private String					name;
+
+	private CreditPositiveLedger	expensesPayable;
 
 	/**
 	 * Get the [full] name of the person.
@@ -29,6 +31,26 @@ public class Worker
 	 *            a String with the full name of the person
 	 */
 	public void setName(String name) {
+		if ((name == null) || (name.equals(""))) {
+			throw new IllegalArgumentException();
+		}
 		this.name = name;
+	}
+
+	/**
+	 * Get the Ledger within the ReimbursableExpensesPayableAccount that refers
+	 * to the amount owing this Worker.
+	 */
+	public Ledger getExpensesPayable() {
+		return expensesPayable;
+	}
+
+	/**
+	 * Set the ReimbursableExpensesPayableAccount that we want to have this
+	 * Worker object point at. Obviously this is only to be called by
+	 * AddWorkerCommand.
+	 */
+	public void setExpensesPayable(CreditPositiveLedger expensesPayable) {
+		this.expensesPayable = expensesPayable;
 	}
 }

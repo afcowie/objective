@@ -105,7 +105,7 @@ public abstract class Command
 	 * Command and is called by undo() to actually reverse the actions
 	 * previously taken by this command.
 	 */
-	protected abstract void reverse(DataClient client) throws CommandNotUndoableException;
+	protected abstract void reverse(DataClient store) throws CommandNotUndoableException;
 
 	/**
 	 * Undo the affects of a Command. Undo is not rollback. In the case of
@@ -114,8 +114,8 @@ public abstract class Command
 	 * delete. The code calling this is responsible to .commit() the DataClient
 	 * afterwards.
 	 */
-	public final void undo(DataClient client) throws CommandNotUndoableException {
-		if (client == null) {
+	public final void undo(DataClient store) throws CommandNotUndoableException {
+		if (store == null) {
 			throw new IllegalArgumentException("Null UnitOfWork passed!");
 		}
 		/*
@@ -126,7 +126,7 @@ public abstract class Command
 		}
 
 		Debug.print("command", "undoing " + getClassString());
-		reverse(client);
+		reverse(store);
 
 		executed = false; // ?
 	}
