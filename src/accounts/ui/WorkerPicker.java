@@ -159,7 +159,7 @@ public class WorkerPicker extends HBox
 	/**
 	 * Set the specified Worker object as the one to be active in this Widget.
 	 * 
-	 * @param identifier
+	 * @param reference
 	 *            The Identifier object to be set as active.
 	 * @throws IllegalArgumentException
 	 *             if you are so foolish as to tell it to programmatically tell

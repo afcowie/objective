@@ -2,7 +2,7 @@
  * EntryTextOutput.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.ui;
 
@@ -102,8 +102,8 @@ public class EntryTextOutput extends TextOutput
 	}
 
 	/**
-	 * @param t
-	 *            a single Transaction to run the outputter over. Use for spot
+	 * @param e
+	 *            a single Entry to run the outputter over. Use for spot
 	 *            debugging only.
 	 * @param context
 	 *            an Object of the class (Ledger or Transaction) that you are
@@ -143,7 +143,7 @@ public class EntryTextOutput extends TextOutput
 			out.print(pad(e.getDate().toString(), dateWidth, LEFT));
 
 			if (context instanceof Ledger) {
-				String id = e.getParentTransaction().getIdentifier();
+				String id = e.getParentTransaction().getReference();
 				if (id == null) {
 					id = "";
 				}
@@ -155,7 +155,7 @@ public class EntryTextOutput extends TextOutput
 				}
 				out.print(pad(chomp(desc, descWidth), descWidth, LEFT));
 			} else if (context instanceof Transaction) {
-				// skip Account identifier
+				// skip Account reference
 				out.print(pad(e.getParentLedger().getParentAccount().getTitle() + "|" + e.getParentLedger().getName(),
 					idWidth + descWidth, LEFT));
 			} else {

@@ -2,7 +2,7 @@
  * EntryComparator.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
@@ -63,22 +63,22 @@ public class EntryComparator implements Comparator
 			} else {
 				/*
 				 * ... we're ordering within a Ledger listing. So first sort by
-				 * Transaction identifier
+				 * Transaction reference
 				 */
-				String id1 = e1.getParentTransaction().getIdentifier();
-				String id2 = e2.getParentTransaction().getIdentifier();
+				String ref1 = e1.getParentTransaction().getReference();
+				String ref2 = e2.getParentTransaction().getReference();
 
-				int idCmp;
-				if ((id1 == null) || (id2 == null)) {
+				int refCmp;
+				if ((ref1 == null) || (ref2 == null)) {
 					// force it to ignore this comparison and move to the next
-					idCmp = 0;
+					refCmp = 0;
 				} else {
 					// String implements Comparable; use it
-					idCmp = id1.compareTo(id2);
+					refCmp = ref1.compareTo(ref2);
 				}
 
-				if (idCmp != 0) {
-					return idCmp;
+				if (refCmp != 0) {
+					return refCmp;
 				} else {
 					/*
 					 * Then sort by Transaction description?

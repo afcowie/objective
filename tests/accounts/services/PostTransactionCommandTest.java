@@ -47,7 +47,7 @@ public class PostTransactionCommandTest extends BlankDatafileTestCase
 		d.setAsToday();
 
 		GenericTransaction t = new GenericTransaction("Test transaction", d, entries);
-		t.setIdentifier("TEST01");
+		t.setReference("TEST01");
 
 		assertTrue(t.isBalanced());
 
@@ -93,7 +93,7 @@ public class PostTransactionCommandTest extends BlankDatafileTestCase
 		assertTrue(t instanceof GenericTransaction);
 		GenericTransaction gt = (GenericTransaction) t;
 
-		assertEquals("TEST01", gt.getIdentifier());
+		assertEquals("TEST01", gt.getReference());
 		assertEquals("Test transaction", gt.getDescription());
 		assertTrue(gt.isBalanced());
 

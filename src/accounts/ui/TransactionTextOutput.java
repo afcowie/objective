@@ -94,7 +94,7 @@ public class TransactionTextOutput extends TextOutput
 			Transaction t = (Transaction) tI.next();
 
 			out.print(pad("\"" + chomp(t.getDescription(), descWidth - 3) + "\" ", descWidth, LEFT));
-			out.print(pad(t.getIdentifier(), idWidth, LEFT));
+			out.print(pad(t.getReference(), idWidth, LEFT));
 			out.print(pad(t.getClassString(), typeWidth, RIGHT));
 
 			out.println();

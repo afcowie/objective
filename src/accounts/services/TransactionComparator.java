@@ -2,7 +2,7 @@
  * TranasctionComparator.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.services;
 
@@ -34,28 +34,28 @@ public class TransactionComparator implements Comparator
 			return +1;
 		} else {
 			/*
-			 * if they're the same date, then order by identifier. There really
-			 * isn't anything special about identifier (remember, it is not a
+			 * if they're the same date, then order by reference. There really
+			 * isn't anything special about reference (remember, it is not a
 			 * unique or primary key) but if they're present on the same day
 			 * they should probably be in order (ie cheque numbers, etc)
 			 */
-			String id1 = t1.getIdentifier();
-			String id2 = t2.getIdentifier();
+			String ref1 = t1.getReference();
+			String ref2 = t2.getReference();
 
-			int idCmp;
-			if ((id1 == null) || (id2 == null)) {
+			int refCmp;
+			if ((ref1 == null) || (ref2 == null)) {
 				// force it to ignore this comparison and move to the next
-				idCmp = 0;
+				refCmp = 0;
 			} else {
 				// String implements Comparable; use it
-				idCmp = id1.compareTo(id2);
+				refCmp = ref1.compareTo(ref2);
 			}
 
-			if (idCmp != 0) {
-				return idCmp;
+			if (refCmp != 0) {
+				return refCmp;
 			} else {
 				/*
-				 * If they're the same date and identifier, then it doesn't
+				 * If they're the same date and reference, then it doesn't
 				 * matter any further, so just order by hash
 				 */
 				int hash1 = t1.hashCode();

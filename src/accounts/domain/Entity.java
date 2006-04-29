@@ -26,8 +26,14 @@ public class Entity
 	 * Identifier" is generically used. Some countries don't have one (although
 	 * Canada's GST registration number actually sufficies); Australia has ABN;
 	 * etc.
+	 * <p>
+	 * Since we use "Identifier" for the hierarchy of database pseudo-constants,
+	 * we use the term "reference" in association with String variables
+	 * describing these identifying numbers.
+	 * 
+	 * @see Transaction#reference
 	 */
-	private String	singleBusinessIdentifier	= null;
+	private String	singleBusinessReference	= null;
 
 	public Entity() {
 
@@ -55,18 +61,18 @@ public class Entity
 		this.name = name;
 	}
 
-	public String getSingleBusinessIdentifier() {
-		return singleBusinessIdentifier;
+	public String getSingleBusinessReference() {
+		return singleBusinessReference;
 	}
 
 	/**
 	 * 
-	 * @param singleBusinessIdentifier
+	 * @param singleBusinessReference
 	 *            Generally expected to be a number, nevertheless this is kept
 	 *            as a String so you can format it (spaces, leading
 	 *            alphanumeric, whatever) how you wish.
 	 */
-	public void setSingleBusinessIdentifier(String singleBusinessIdentifier) {
-		this.singleBusinessIdentifier = singleBusinessIdentifier;
+	public void setSingleBusinessReference(String reference) {
+		this.singleBusinessReference = reference;
 	}
 }

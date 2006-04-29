@@ -143,7 +143,7 @@ public class DemoMockTransactions
 			};
 
 			for (int i = 0; i < initialization.length; i++) {
-				initialization[i].setIdentifier("I" + padZeros(i + 1, 4));
+				initialization[i].setReference("R" + padZeros(i + 1, 4));
 				PostTransactionCommand cmd = new PostTransactionCommand(initialization[i]);
 				cmd.execute(rw);
 			}

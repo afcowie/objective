@@ -24,11 +24,11 @@ public class Transaction
 	 */
 	protected String	description	= null;
 	/**
-	 * An identifier connected with the transaction. This is <b>not</b> a
-	 * unique id or primary key, but rather some optional meta data originating
-	 * from the external source document.
+	 * A reference connected with the transaction. This is <b>not</b> a unique
+	 * id or primary key, but rather some optional meta data originating from
+	 * the external source document.
 	 */
-	protected String	identifier	= null;
+	protected String	reference	= null;
 	protected Datestamp	date		= null;
 	protected Set		entries		= null;
 
@@ -157,25 +157,26 @@ public class Transaction
 	}
 
 	/**
-	 * Get the identifier for the transaction, assuming one is set. Remember
-	 * that this is <b>not</b> a unique id or primary key, but rather some meta
-	 * data which may <b>optionally</b> be provided. Examples include cheque
+	 * Get the reference for the transaction, assuming one is set. Remember that
+	 * this is <b>not</b> a unique id or primary key, but rather some meta data
+	 * which may <b>optionally</b> be provided. Examples include cheque
 	 * numbers, bill numbers, or statement numbers.
 	 */
-	public String getIdentifier() {
-		return identifier;
+	public String getReference() {
+		return reference;
 	}
 
 	/**
-	 * Set an identifier for the transaction. In usage terms, it's optional.
-	 * Typically this will be an invoice number or reciept number. Note that its
-	 * <B>NOT</B> enforced to be unique across Transactions space.
+	 * Set a reference identifier for the transaction. In usage terms, it's
+	 * optional. Typically this will be an invoice number or reciept number.
+	 * Note that its <B>NOT</B> enforced to be unique across Transactions
+	 * space.
 	 * 
-	 * @param identifier
-	 *            the String to set as the Transaction's identifier.
+	 * @param reference
+	 *            the String to set as the Transaction's reference.
 	 */
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
+	public void setReference(String reference) {
+		this.reference = reference;
 	}
 
 	/**
