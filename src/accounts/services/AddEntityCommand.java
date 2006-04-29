@@ -97,7 +97,7 @@ public class AddEntityCommand extends Command
 		}
 
 		if (found.size() > 1) {
-			throw new DebugException("As coded, we only allow for there being one Accounts{Receivable|Payable} accout");
+			throw new DebugException("As coded, we only allow for there being one Accounts{Receivable|Payable} account");
 		} else if (found.size() == 0) {
 			throw new IllegalStateException("Where is the Accounts{Receivable|Payable} account?");
 		}

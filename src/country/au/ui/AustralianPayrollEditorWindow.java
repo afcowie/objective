@@ -385,14 +385,17 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 
 			f.setAccountTitle("ANZ");
 			f.setLedgerName("Current");
+			f.query(store);
 			Ledger bankAccount = f.getLedger();
 
 			f.setAccountTitle("Employment");
 			f.setLedgerName("Salaries");
+			f.query(store);
 			Ledger salariesExpense = f.getLedger();
 
 			f.setAccountTitle("PAYG");
 			f.setLedgerName("Collected");
+			f.query(store);
 			Ledger paygOwing = f.getLedger();
 
 			if (existing == null) {

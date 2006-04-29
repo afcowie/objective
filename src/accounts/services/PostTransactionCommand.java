@@ -17,8 +17,7 @@ import accounts.domain.Transaction;
 import accounts.persistence.DataClient;
 
 /**
- * Post a Transaction. TODO: This suffices for Add and Update? What about
- * Delete?
+ * Post a Transaction.
  * 
  * @author Andrew Cowie
  */
@@ -69,7 +68,7 @@ public class PostTransactionCommand extends Command
 		}
 
 		/*
-		 * At last, carry out the addition of the [values of the] Entries to the
+		 * Carry out the addition of the [values of the] Entries to the
 		 * [balances of the] Ledgers they bridge to.
 		 */
 
