@@ -26,6 +26,7 @@ import accounts.domain.OwnersEquityAccount;
 import accounts.domain.PayrollTaxPayableAccount;
 import accounts.domain.ProfessionalRevenueAccount;
 import accounts.domain.SalesTaxPayableAccount;
+import accounts.domain.ReimbursableExpensesPayableAccount;
 import accounts.persistence.DataClient;
 import accounts.persistence.Engine;
 import accounts.services.AddAccountCommand;
@@ -86,6 +87,7 @@ public class DemoBooksSetup
 				new AccountsPayable("Trade Creditors"),
 				new SalesTaxPayableAccount("GST"),
 				new PayrollTaxPayableAccount("PAYG Withholding"),
+				new ReimbursableExpensesPayableAccount("Expenses Payable"),
 				new LoanPayableAccount("Shareholders' Loans", new LoanLedger[] {
 					new LoanLedger("Andrew Cowie"),
 				}),
