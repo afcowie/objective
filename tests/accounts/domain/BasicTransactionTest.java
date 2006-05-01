@@ -2,7 +2,7 @@
  * BasicTransactionTest.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -142,4 +142,26 @@ public class BasicTransactionTest extends TestCase
 		assertEquals(aNewDay.toString(), droit.getDate().toString());
 	}
 
+	/**
+	 * Having added removeEntry() to Transaction, test it.
+	 */
+	public final void testRemoveEntry() {
+		Debit gauche = new Debit(new Amount("9.95"), null);
+		Credit droit = new Credit(new Amount("9.95"), null);
+
+		Transaction t = new Transaction();
+
+		t.addEntry(droit);
+		t.addEntry(gauche);
+
+		assertEquals(2, t.getEntries().size());
+
+		t.removeEntry(gauche);
+
+		assertEquals(1, t.getEntries().size());
+		assertSame(droit, t.getEntries().iterator().next());
+
+		t.removeEntry(droit);
+		assertEquals(0, t.getEntries().size());
+	}
 }

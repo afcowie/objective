@@ -87,6 +87,22 @@ public class Transaction
 	}
 
 	/**
+	 * Remove an Entry from this Transaction.
+	 * 
+	 * @throws IllegalStateException
+	 *             if you try to remove an Entry that isn't in this Transaction.
+	 */
+	public void removeEntry(Entry entry) {
+		if (entry == null) {
+			throw new IllegalArgumentException("Can't remove a null Entry!");
+		}
+		if (!(entries.contains(entry))) {
+			throw new IllegalStateException("You've asked to remove an Entry that isn't in this Transaction");
+		}
+		entries.remove(entry);
+	}
+
+	/**
 	 * Perform checks on the Transaction object to make sure it is balanced
 	 * Debits == Credits.
 	 */
