@@ -6,17 +6,24 @@
  */
 package accounts.ui;
 
-import java.io.PrintWriter;
+import generic.ui.ModalDialog;
+import generic.util.Debug;
 
-import org.gnu.gtk.ComboBoxEntry;
+import org.gnu.gtk.Entry;
 import org.gnu.gtk.Gtk;
+import org.gnu.gtk.MessageType;
 import org.gnu.gtk.Table;
 
-import accounts.domain.Account;
-import accounts.domain.Books;
-import accounts.domain.Currency;
+import accounts.domain.Amount;
+import accounts.domain.Credit;
+import accounts.domain.Debit;
 import accounts.domain.Employee;
 import accounts.domain.ForeignAmount;
+import accounts.domain.Ledger;
+import accounts.domain.ReimbursableExpensesTransaction;
+import accounts.domain.Worker;
+import accounts.services.CommandNotReadyException;
+import accounts.services.PostTransactionCommand;
 
 /**
  * A Window where the expenses incurred by an Employee
@@ -28,12 +35,15 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	/*
 	 * Cached widgets
 	 */
-	protected Table					table;
+	protected Table							table;
 
-	protected WorkerPicker			employee_WorkerPicker;
-	protected DatePicker			datePicker;
-	protected AccountPicker			accountPicker;
-	protected ForeignAmountEntryBox	amountEntryBox;
+	protected WorkerPicker					person_WorkerPicker;
+	protected DatePicker					datePicker;
+	protected AccountPicker					accountPicker;
+	protected Entry							descriptionEntry;
+	protected ForeignAmountEntryBox			amountEntryBox;
+
+	private ReimbursableExpensesTransaction	existing	= null;
 
 	/**
 	 * Construct the Window. Uses the table from the glade file extensively.
@@ -47,15 +57,18 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 		table = (Table) gladeParser.getWidget("general_table");
 		table.attach(datePicker, 1, 2, 1, 2);
 
+		descriptionEntry = new Entry();
+		table.attach(descriptionEntry, 1, 2, 2, 3);
+
 		accountPicker = new AccountPicker(store);
 
-		table.attach(accountPicker, 1, 2, 2, 3);
+		table.attach(accountPicker, 1, 2, 3, 4);
 
-		employee_WorkerPicker = new WorkerPicker(store, Employee.class);
-		table.attach(employee_WorkerPicker, 1, 2, 0, 1);
+		person_WorkerPicker = new WorkerPicker(store, Employee.class);
+		table.attach(person_WorkerPicker, 1, 2, 0, 1);
 
 		amountEntryBox = new ForeignAmountEntryBox(store);
-		table.attach(amountEntryBox, 1, 2, 3, 4);
+		table.attach(amountEntryBox, 1, 2, 4, 5);
 
 		window.showAll();
 		window.present();
@@ -74,36 +87,75 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	}
 
 	protected void ok() {
-		System.out.println("Warning: ok() action not implemented");
-		store.rollback(); // FIXME change me; overrides calling commit()
+		Worker person = person_WorkerPicker.getWorker();
 
-		// TODO remove - just demo code.
-
-		final PrintWriter out = new PrintWriter(System.out);
-		out.println("\nDate:\t\t" + datePicker.getDate());
-
-		final Account a = accountPicker.getAccount();
-		if (a != null) {
-			out.println("Account/Ledger:\t" + accountPicker.getAccount().getTitle() + "|"
-				+ accountPicker.getLedger().getName());
+		if (person == null) {
+			ModalDialog dialog = new ModalDialog("Select someone!",
+				"You need to select the person you're trying to pay first.", MessageType.WARNING);
+			dialog.run();
+			return;
 		}
 
-		final ForeignAmount f = amountEntryBox.getForeignAmount();
-		out.print("Amount:\t\t" + f.getCurrency().getSymbol() + f.toString() + " " + f.getCurrency().getCode());
-
-		final Books root = store.getBooks();
-		final Currency home = root.getHomeCurrency();
-
-		if (f.getCurrency() != home) {
-			out.println(" [" + f.getRate() + " -> " + home.getSymbol() + f.getValue() + " " + home.getCode() + "]");
-		} else {
-			out.println();
+		if (descriptionEntry.getText().equals("")) {
+			ModalDialog dialog = new ModalDialog(
+				"Enter a description!",
+				"It's really a good idea for each Transaction to have an appropriate description. Something better than 'Expenses reimbursable to Joe Smith' would be good.",
+				MessageType.WARNING);
+			dialog.run();
+			return;
 		}
-		out.println();
 
-		out.flush();
-		out.close();
+		try {
+			Ledger expensesPayable = person.getExpensesPayable();
 
-		super.ok();
+			ReimbursableExpensesTransaction t;
+
+			if (existing == null) {
+				t = new ReimbursableExpensesTransaction();
+
+				t.setWorker(person);
+				t.setDate(datePicker.getDate());
+				t.setDescription(descriptionEntry.getText());
+
+				ForeignAmount fa = amountEntryBox.getForeignAmount();
+
+				Debit left = new Debit(fa, accountPicker.getLedger());
+				t.addEntry(left);
+
+				Credit right = new Credit(new Amount(fa.getValue()), expensesPayable);
+				t.addEntry(right);
+
+				PostTransactionCommand ptc = new PostTransactionCommand(t);
+				ptc.execute(store);
+			} else {
+				throw new UnsupportedOperationException();
+			}
+
+			store.commit();
+			super.ok();
+		} catch (CommandNotReadyException cnre) {
+			Debug.print("events", "Command not ready: " + cnre.getMessage());
+			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(), MessageType.ERROR);
+			dialog.run();
+
+			/*
+			 * Leave the Window open so user can fix, as opposed to calling
+			 * cancel()
+			 */
+		}
+
+		// final ForeignAmount fa = amountEntryBox.getForeignAmount();
+		// out.print("Amount:\t\t" + fa.getCurrency().getSymbol() +
+		// fa.toString() + " " + fa.getCurrency().getCode());
+		//
+		// final Books root = store.getBooks();
+		// final Currency home = root.getHomeCurrency();
+		//
+		// if (fa.getCurrency() != home) {
+		// out.println(" [" + fa.getRate() + " -> " + home.getSymbol() +
+		// fa.getValue() + " " + home.getCode() + "]");
+		// } else {
+		// out.println();
+		// }
 	}
 }
