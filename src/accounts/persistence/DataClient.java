@@ -240,4 +240,23 @@ public final class DataClient
 		ObjectSet os = container.query(predicate);
 		return os;
 	}
+
+	/**
+	 * Retrieve a copy of the object as it is committed to the database.
+	 * 
+	 * @param original
+	 *            The object whose persisted value you want to peek.
+	 * @return a transient object representing the currently committed value of
+	 *         the object; this object is <b>disconnected</b> from the
+	 *         datastore, activated with depth 2.
+	 * @see com.db4o.ext.ExtObjectContainer#peekPersisted(Object, int, boolean)
+	 */
+	public Object peek(Object original) throws NoSuchElementException {
+		Object aboo = container.ext().peekPersisted(original, 2, true);
+
+		if (aboo == null) {
+			throw new NoSuchElementException("No committed version of " + original + " persisted");
+		}
+		return aboo;
+	}
 }

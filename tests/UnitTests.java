@@ -19,7 +19,7 @@ import accounts.domain.GenericTransactionTest;
 import accounts.domain.IdentifierTest;
 import accounts.persistence.BasicDb4oTest;
 import accounts.persistence.EngineTest;
-import accounts.persistence.ExposeDb4oQueryInterfaceTest;
+import accounts.persistence.ExposeDb4oInterfaceTest;
 import accounts.persistence.RollbackDb4oTest;
 import accounts.services.BasicCommandTest;
 import accounts.services.BasicFinderTest;
@@ -48,7 +48,7 @@ public class UnitTests
 		suite.addTestSuite(BasicDb4oTest.class);
 		suite.addTestSuite(RollbackDb4oTest.class);
 		suite.addTestSuite(EngineTest.class);
-		suite.addTestSuite(ExposeDb4oQueryInterfaceTest.class);
+		suite.addTestSuite(ExposeDb4oInterfaceTest.class);
 
 		// domain
 		suite.addTestSuite(BasicAccountTest.class);
