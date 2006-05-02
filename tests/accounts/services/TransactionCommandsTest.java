@@ -1,5 +1,5 @@
 /*
- * PostTransactionCommandTest.java
+ * TransactionCommandsTest.java
  *
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
@@ -22,10 +22,10 @@ import accounts.domain.Ledger;
 import accounts.domain.Transaction;
 import accounts.persistence.BlankDatafileTestCase;
 
-public class PostTransactionCommandTest extends BlankDatafileTestCase
+public class TransactionCommandsTest extends BlankDatafileTestCase
 {
 	static {
-		DATAFILE = "tmp/unittests/PostTransactionCommandTest.yap";
+		DATAFILE = "tmp/unittests/TransactionCommandsTest.yap";
 	}
 
 	/*
@@ -57,6 +57,7 @@ public class PostTransactionCommandTest extends BlankDatafileTestCase
 			tc.execute(rw);
 			fail("Should have thrown CommandNotReadyException to indicate unassigned parental relationships");
 		} catch (CommandNotReadyException cnre) {
+			// good
 		}
 
 		/*
@@ -221,5 +222,115 @@ public class PostTransactionCommandTest extends BlankDatafileTestCase
 		assertEquals("3.00", leftLedger.getBalance().getValue());
 
 		// no reason to commit to database; we've already tested that.
+		rw.rollback();
+	}
+
+	/**
+	 * Now, having evaluating PostTransactionCommand, we gear up to test
+	 * UpdateTransactionCommand. Firstly, make sure that peek() works as we need
+	 * it to across Collections.
+	 */
+	public final void testPeekOnTransaction() throws Exception {
+		List result = rw.queryByExample(Transaction.class);
+		assertEquals(1, result.size());
+
+		Transaction t = (Transaction) result.get(0);
+		Set entries = t.getEntries();
+		assertEquals(3, entries.size());
+
+		Credit price = null;
+		Debit gst = null;
+		Debit expense = null;
+
+		Iterator eI = entries.iterator();
+		while (eI.hasNext()) {
+			Entry e = (Entry) eI.next();
+			if (e instanceof Credit) {
+				price = (Credit) e;
+			} else if (e.getAmount().getNumber() == 10000) {
+				gst = (Debit) e;
+			} else if (e.getAmount().getNumber() == 100000) {
+				expense = (Debit) e;
+			} else {
+				throw new Exception("What Entry did you retrieve?");
+			}
+		}
+		assertNotNull(price);
+		assertNotNull(gst);
+		assertNotNull(expense);
+
+		/*
+		 * Ok, setup complete. Now alter the Entries, changing values and more
+		 * importantly removing one:
+		 */
+		price.getAmount().setValue("2200.00");
+		expense.getAmount().setValue("2200.00");
+		t.removeEntry(gst);
+		assertEquals(2, entries.size());
+		assertTrue(t.isBalanced());
+
+		/*
+		 * Now start peeking, and see what state the Set is in.
+		 */
+
+		Set committedS = (Set) rw.peek(entries);
+
+		assertEquals(3, committedS.size());
+
+		/*
+		 * So how do we identify deleted Entries?
+		 */
+
+		Iterator committedI = committedS.iterator();
+		int present = 0;
+		int missing = 0;
+
+		while (committedI.hasNext()) {
+			Entry eCommitted = (Entry) committedI.next();
+
+			if (eCommitted instanceof Credit) {
+				assertTrue(eCommitted.getAmount().getNumber() == 110000);
+			} else if (eCommitted instanceof Debit) {
+				if (eCommitted.getAmount().getNumber() == 100000) {
+					// ok
+				} else if (eCommitted.getAmount().getNumber() == 10000) {
+					// ok
+				} else {
+					fail("Committed Entry retrieved was not one of or the ones we expected");
+				}
+			}
+
+			/*
+			 * This Entry is disconnected from the database and transient. As a
+			 * fully prepared Entry with parent Ledger and parent Transaction
+			 * set, however, it should provide a perfectly good query prototype
+			 * to result in ONE Entry on queryByExample() - and that returned
+			 * Entry can the be checked to see if it's (referentially equal) in
+			 * the Set.
+			 */
+			List eL = rw.queryByExample(eCommitted);
+			assertEquals(1, eL.size());
+			Entry eReconnected = (Entry) eL.get(0);
+
+			if (entries.contains(eReconnected)) {
+				present++;
+				assertTrue(eReconnected.getAmount().getNumber() == 220000);
+				/*
+				 * Which is interesting - objects retrieved by db4o query
+				 * methods are those dirtied by in flight code. This points out
+				 * the importance of rollback()!
+				 */
+			} else {
+				missing++;
+				/*
+				 * As an algorithm check, we're done. In
+				 * UpdateTransactionCommand, we will build a List of Entries and
+				 * delete them.
+				 */
+			}
+		}
+
+		assertEquals(2, present);
+		assertEquals(1, missing);
 	}
 }

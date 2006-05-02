@@ -101,7 +101,7 @@ public class ExposeDb4oInterfaceTest extends TestCase
 	 * the basic behaviour. It's actually needed for
 	 * {@link UpdateTransactionCommand}, so
 	 * 
-	 * @see FIXME
+	 * @see accounts.services.TransactionCommandsTest#testPeekOnTransaction()
 	 */
 	public final void testPeekPersistedReturnsCommittedObject() {
 		DataClient store = Engine.gainClient();
