@@ -28,6 +28,9 @@ public class CreditPositiveLedger extends Ledger
 	 * Overrides Ledger's addToBalance(). balance from Ledger.
 	 */
 	protected void addToBalance(Entry entry) {
+		if (entry == null) {
+			throw new IllegalArgumentException("Can't add null Entry to a Ledger");
+		}
 		if (entry instanceof Credit) {
 			balance.incrementBy(entry.getAmount());
 		} else {
@@ -36,6 +39,9 @@ public class CreditPositiveLedger extends Ledger
 	}
 
 	protected void subtractFromBalance(Entry entry) {
+		if (entry == null) {
+			throw new IllegalArgumentException("Can't subtract null Entry from a Ledger");
+		}
 		if (entry instanceof Credit) {
 			balance.decrementBy(entry.getAmount());
 		} else {

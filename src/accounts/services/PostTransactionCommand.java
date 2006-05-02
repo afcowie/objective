@@ -6,8 +6,6 @@
  */
 package accounts.services;
 
-import generic.util.DebugException;
-
 import java.util.Iterator;
 import java.util.Set;
 
@@ -21,10 +19,8 @@ import accounts.persistence.DataClient;
  * 
  * @author Andrew Cowie
  */
-public class PostTransactionCommand extends Command
+public class PostTransactionCommand extends TransactionCommand
 {
-	private Transaction	trans	= null;
-
 	/**
 	 * Create a new PostTransactionCommand, specifying:
 	 * 
@@ -32,47 +28,19 @@ public class PostTransactionCommand extends Command
 	 *            the Transaction to be persisted.
 	 */
 	public PostTransactionCommand(Transaction t) {
-		if (t == null) {
-			throw new IllegalArgumentException("Null Transaction passed!");
-		}
-		trans = t;
+		super(t);
 	}
 
 	protected void action(DataClient store) throws CommandNotReadyException {
-		Set entries = trans.getEntries();
-		if (entries == null) {
-			throw new CommandNotReadyException("Transaction passed has no Entries!");
-		}
-
-		Iterator iter = entries.iterator();
-		while (iter.hasNext()) {
-			Entry e = (Entry) iter.next();
-			if (e == null) {
-				throw new DebugException("How the heck did a null Entry end up in the Transaction?");
-			}
-			if (e.getParentLedger() == null) {
-				throw new CommandNotReadyException("Entry " + e.toString() + " parent Ledger not set!");
-			}
-			if (e.getParentTransaction() == null) {
-				throw new CommandNotReadyException("Entry " + e.toString() + " parent Transaction not set!");
-			}
-		}
-
-		if (!trans.isBalanced()) {
-			throw new CommandNotReadyException("Transaction not balanced!");
-		}
-
-		if (trans.getDate() == null) {
-			throw new CommandNotReadyException(
-				"Transaction doesn't have a date set, which means that the Entries may well have differing dates");
-		}
+		super.validate();
 
 		/*
 		 * Carry out the addition of the [values of the] Entries to the
 		 * [balances of the] Ledgers they bridge to.
 		 */
 
-		iter = entries.iterator();
+		Set entries = transaction.getEntries();
+		Iterator iter = entries.iterator();
 		while (iter.hasNext()) {
 			Entry e = (Entry) iter.next();
 			Ledger l = e.getParentLedger();
@@ -83,7 +51,7 @@ public class PostTransactionCommand extends Command
 		 * Persist the Transaction.
 		 */
 
-		store.save(trans);
+		store.save(transaction);
 	}
 
 	public void reverse(DataClient store) {

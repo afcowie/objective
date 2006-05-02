@@ -2,7 +2,7 @@
  * Ledger.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -84,7 +84,10 @@ public class Ledger
 	}
 
 	/**
-	 * Remove an Entry from this ledger, adjusting the balance accordingly.
+	 * Remove an Entry from this ledger, adjusting the balance accordingly. We
+	 * don't set the Entry's parentLedger to null; that's the business of
+	 * whoever is removing this Entry; it'll either be deleted or reused
+	 * immediately so no need to mess with it in that way.
 	 */
 	public void removeEntry(Entry entry) {
 		if (entry == null) {
@@ -92,6 +95,9 @@ public class Ledger
 		}
 		if (!(entries.contains(entry))) {
 			throw new IllegalStateException("You've asked to remove an Entry that isn't in this Ledger");
+		}
+		if (balance == null) {
+			calculateBalance();
 		}
 		entries.remove(entry);
 		subtractFromBalance(entry);

@@ -179,7 +179,11 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 		} catch (CommandNotReadyException cnre) {
 			fail("Should NOT have thrown CommandNotReadyException " + cnre.getMessage());
 		}
-		// no reason to commit to database; we've already tested that.
+
+		/*
+		 * no reason to commit to database; we've already tested that; more to
+		 * the point, keep in clean with one Transaction.
+		 */
 		rw.rollback();
 	}
 
@@ -332,5 +336,62 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 
 		assertEquals(2, present);
 		assertEquals(1, missing);
+
+		rw.rollback();
+		rw.reload(price);
+		rw.reload(gst);
+		rw.reload(expense);
+		rw.reload(t);
+		rw.reload(t.getEntries());
+	}
+
+	public final void testUpdateTransaction() throws Exception {
+		List result = rw.queryByExample(Transaction.class);
+		assertEquals(1, result.size());
+
+		Transaction t = (Transaction) result.get(0);
+		Set entries = t.getEntries();
+		assertEquals(3, entries.size());
+
+		Credit price = null;
+		Debit gst = null;
+		Debit expense = null;
+
+		Iterator eI = entries.iterator();
+		while (eI.hasNext()) {
+			Entry e = (Entry) eI.next();
+			if (e instanceof Credit) {
+				price = (Credit) e;
+			} else if (e.getAmount().getNumber() == 10000) {
+				gst = (Debit) e;
+			} else if (e.getAmount().getNumber() == 100000) {
+				expense = (Debit) e;
+			} else {
+				throw new Exception("What Entry did you retrieve?");
+			}
+		}
+		assertNotNull(price);
+		assertNotNull(gst);
+		assertNotNull(expense);
+
+		/*
+		 * Ok, setup complete. Now alter the Entries, changing values and more
+		 * importantly removing one:
+		 */
+		price.getAmount().setValue("2200.00");
+		expense.getAmount().setValue("2200.00");
+		t.removeEntry(gst);
+
+		UpdateTransactionCommand utc = new UpdateTransactionCommand(t);
+		utc.execute(rw);
+
+		rw.commit();
+
+		result = rw.queryByExample(Transaction.class);
+		assertEquals(1, result.size());
+
+		t = (Transaction) result.get(0);
+		entries = t.getEntries();
+		assertEquals(2, entries.size());
 	}
 }

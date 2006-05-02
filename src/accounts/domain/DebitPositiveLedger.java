@@ -27,6 +27,9 @@ public class DebitPositiveLedger extends Ledger
 	 * Overrides Ledger's addToBalance(). balance from Ledger.
 	 */
 	protected void addToBalance(Entry entry) {
+		if (entry == null) {
+			throw new IllegalArgumentException("Can't add null Entry to a Ledger");
+		}
 		if (entry instanceof Debit) {
 			balance.incrementBy(entry.getAmount());
 		} else {
@@ -35,6 +38,9 @@ public class DebitPositiveLedger extends Ledger
 	}
 
 	protected void subtractFromBalance(Entry entry) {
+		if (entry == null) {
+			throw new IllegalArgumentException("Can't subtract null Entry from a Ledger");
+		}
 		if (entry instanceof Debit) {
 			balance.decrementBy(entry.getAmount());
 		} else {
