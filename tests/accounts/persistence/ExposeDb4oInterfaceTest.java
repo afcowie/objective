@@ -173,5 +173,39 @@ public class ExposeDb4oInterfaceTest extends TestCase
 		}
 
 		Engine.releaseClient(store);
+
+		/*
+		 * Final little wrinkle: when a client is released rollback does not
+		 * occur; even if it did, you still need to reload active objects to
+		 * correct them.
+		 */
+		store = Engine.gainClient();
+
+		results = store.queryByExample(proto);
+		assertEquals(1, results.size());
+		eight = (DummyInts) results.get(0);
+		assertEquals(66, eight.getNum()); // yikes
+		store.reload(eight);
+		assertEquals(8, eight.getNum());
+
+		Engine.releaseClient(store);
+	}
+
+	public final void testDelete() {
+		DataClient store = Engine.gainClient();
+
+		DummyInts proto = new DummyInts(8);
+		List results = store.queryByExample(proto);
+		assertEquals(1, results.size());
+		DummyInts eight = (DummyInts) results.get(0);
+
+		store.delete(eight);
+
+		assertEquals(8, eight.getNum());
+
+		results = store.queryByExample(proto);
+		assertEquals(0, results.size());
+
+		Engine.releaseClient(store);
 	}
 }

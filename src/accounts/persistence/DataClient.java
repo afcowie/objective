@@ -259,4 +259,17 @@ public final class DataClient
 		}
 		return aboo;
 	}
+
+	/**
+	 * The default db4o behaviour is that deletes are NOT recursive (cascading
+	 * in their parleance). You can change that on a per class or per field
+	 * basis by making settings in the static block of {@link DataStore}.
+	 * 
+	 * @param target
+	 *            the Object to be deleted from the database. Only target will
+	 *            be removed, not any of the objects that comprise its fields.
+	 */
+	public void delete(Object target) {
+		container.delete(target);
+	}
 }
