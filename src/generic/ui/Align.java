@@ -6,7 +6,6 @@
  */
 package generic.ui;
 
-
 /**
  * Alignment constants, for convenience. Use object indentity, ie
  * 
