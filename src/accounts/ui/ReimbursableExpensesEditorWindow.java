@@ -93,15 +93,26 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 			ModalDialog dialog = new ModalDialog("Select someone!",
 				"You need to select the person you're trying to pay first.", MessageType.WARNING);
 			dialog.run();
+			person_WorkerPicker.grabFocus();
 			return;
 		}
 
 		if (descriptionEntry.getText().equals("")) {
 			ModalDialog dialog = new ModalDialog(
 				"Enter a description!",
-				"It's really a good idea for each Transaction to have an appropriate description. Something better than 'Expenses reimbursable to Joe Smith' would be good.",
-				MessageType.WARNING);
+				"It's really a good idea for each Transaction to have an appropriate description."
+					+ " Try to be a bit more specific than '<i>Expenses reimbursable to Joe Smith</i>' as that won't facilitate identifying this Transaction in future searches and reports."
+					+ " Perhaps '<i>Taxi from CDG to Paris Hotel</i>' instead.", MessageType.WARNING);
 			dialog.run();
+			descriptionEntry.grabFocus();
+			return;
+		}
+
+		if (accountPicker.getAccount() == null) {
+			ModalDialog dialog = new ModalDialog("Select an Account!",
+				"You need to select the account to which these expenses apply.", MessageType.WARNING);
+			dialog.run();
+			accountPicker.grabFocus();
 			return;
 		}
 
