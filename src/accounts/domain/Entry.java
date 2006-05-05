@@ -50,10 +50,10 @@ public class Entry
 	}
 
 	/**
-	 * Construct an Entry specifiying the amount and the Ledger to which it
-	 * will be applied. Note that the Ledger will not have it's addEntry()
-	 * method called until a PostTransactionCommand is executed for a
-	 * transaction holding this Entry object.
+	 * Construct an Entry specifiying the amount and the Ledger to which it will
+	 * be applied. Note that the Ledger will not have it's addEntry() method
+	 * called until a PostTransactionCommand is executed for a transaction
+	 * holding this Entry object.
 	 * 
 	 * @param value
 	 *            The Amount (be it Debit or Credit) of this Entry.

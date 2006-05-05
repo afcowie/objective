@@ -25,6 +25,12 @@ public class ReimbursableExpensesTransaction extends Transaction
 		super();
 	}
 
+	public ReimbursableExpensesTransaction(Worker person, String description, Datestamp date,
+		Entry[] entries) {
+		super(description, date, entries);
+		setWorker(person);
+	}
+
 	public Worker getWorker() {
 		return worker;
 	}

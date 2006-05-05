@@ -100,7 +100,8 @@ public class DemoBooksSetup
 
 				new OwnersEquityAccount("Owner's Equity", "Andrew Cowie"),
 
-				new ProfessionalRevenueAccount("Strategic Planning and Board Governance", "Consulting Fees"),
+				new ProfessionalRevenueAccount("Strategic Planning and Board Governance",
+					"Consulting Fees"),
 				new ProfessionalRevenueAccount("Leadership & Teamwork", "Consulting Fees"),
 				new ProfessionalRevenueAccount("Procedures", "Consulting Fees"),
 				new ProfessionalRevenueAccount("Systems Performance", "Consulting Fees"),
@@ -227,7 +228,8 @@ public class DemoBooksSetup
 			rw.commit();
 		} catch (CommandNotReadyException cnre) {
 			rw.rollback();
-			throw new IllegalStateException("Shouldn't have had a problem with any commands being not ready!");
+			throw new IllegalStateException(
+				"Shouldn't have had a problem with any commands being not ready!");
 		} catch (Exception e) {
 			rw.rollback();
 			e.printStackTrace();

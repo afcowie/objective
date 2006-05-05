@@ -42,21 +42,34 @@ public class PayrollTransaction extends Transaction
 	}
 
 	/**
-	 * Somewhat artificial constructor useful for mockups and unit tests
+	 * Artificial constructor for mockups and unit tests only. You <i>really</i>
+	 * want to make sure that the entries passed to this are sensible, otherwise
+	 * editing this Transaction will lead to all sorts of unwanted artifacts.
 	 * 
 	 * @param employee
 	 *            The Employee object for the person being paid
 	 * @param date
 	 *            The date the person was paid
 	 * @param entries
-	 *            an array of Entry objects.
+	 *            an array of Entry objects. <b>Must be in order salary,
+	 *            withholding, paycheck</b>
 	 */
-	public PayrollTransaction(Employee employee, Datestamp date, Entry[] entries) {
-		super("Payroll to " + employee.getName(), date, entries);
+	public PayrollTransaction(Employee employee, PayrollTaxIdentifier identifier, Datestamp date,
+		Entry[] entries) {
+		/*
+		 * The super call runs addEntries() over the array; the setters below
+		 * set PayrollTransaction's fields.
+		 */
+		super("Paycheck to " + employee.getName(), date, entries);
+		setTaxIdentifier(identifier);
+		setEndDate(date);
+		setSalaryEntry(entries[0]);
+		setWithholdingEntry(entries[1]);
+		setPaycheckEntry(entries[2]);
 	}
 
 	public String getClassString() {
-		return "Payroll Transaction";
+		return "Payroll";
 	}
 
 	/**

@@ -2,7 +2,7 @@
  * Currency.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -14,7 +14,7 @@ package accounts.domain;
  * <li>$50 AUD
  * <li>$50 CAD
  * <li>$50 USD
- * <li>?50 GBP
+ * <li>£50 GBP
  * <li>S$50 SGD
  * <li>Rs50 INR
  * </ul>
@@ -29,8 +29,8 @@ public class Currency
 	private String	name;
 	private String	symbol;
 
-	private Currency() {
-		//
+	public Currency() {
+		// for searching
 	}
 
 	/**
@@ -58,10 +58,12 @@ public class Currency
 
 	public void setCode(String code) {
 		if (code.length() != 3) {
-			throw new IllegalArgumentException("Currency codes are, by international convention, three characters");
+			throw new IllegalArgumentException(
+				"Currency codes are, by international convention, three characters");
 		}
 		if (!code.equals(code.toUpperCase())) {
-			throw new IllegalArgumentException("Currency codes are, by international convention, upper case");
+			throw new IllegalArgumentException(
+				"Currency codes are, by international convention, upper case");
 		}
 		this.code = code;
 	}
