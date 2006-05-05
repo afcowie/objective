@@ -77,9 +77,9 @@ CLASSES_TESTS=$(shell echo $(SOURCES_TESTS) | sed -e's/\.java/\.class/g' -e's/te
 
 # [same thing, but this time the individual .o targets. There's no native unti
 # test wrapper; _TESTS just picks up the test harness sources]
-NATIVE_DIST=$(shell echo $(SOURCES_DIST) | sed -e's/\.java/\.o/g' -e's/src/tmp\/native/g')
-NATIVE_LIBS=$(shell echo $(SOURCES_LIBS) | sed -e's/\.java/\.o/g' -e's/lib/tmp\/native/g')
-NATIVE_TESTS=$(shell echo $(SOURCES_TESTS) | perl -p -e's/ /\n/g' | grep 'objective/ui' | sed -e's/\.java/\.o/g' -e's/tests/tmp\/native/g')
+#NATIVE_DIST=$(shell echo $(SOURCES_DIST) | sed -e's/\.java/\.o/g' -e's/src/tmp\/native/g')
+#NATIVE_LIBS=$(shell echo $(SOURCES_LIBS) | sed -e's/\.java/\.o/g' -e's/lib/tmp\/native/g')
+#NATIVE_TESTS=$(shell echo $(SOURCES_TESTS) | perl -p -e's/ /\n/g' | grep 'objective/ui' | sed -e's/\.java/\.o/g' -e's/tests/tmp\/native/g')
 
 #
 # convenience target: setup pre-reqs
@@ -162,7 +162,7 @@ tmp/native/%.o: src/%.java
 #
 # build the test sources
 #
-build/classes-tests: build/config build/check-jars-tests build/classes-dist $(CLASSES_TESTS)
+build/classes-tests: build/config build/classes-dist build/check-jars-tests $(CLASSES_TESTS)
 	touch $@
 
 tmp/classes/%.class: tests/%.java
