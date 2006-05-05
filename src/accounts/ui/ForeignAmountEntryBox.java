@@ -8,13 +8,17 @@ package accounts.ui;
 
 import generic.util.Debug;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import org.gnu.gdk.Color;
 import org.gnu.gtk.Entry;
 import org.gnu.gtk.HBox;
 import org.gnu.gtk.Label;
 import org.gnu.gtk.StateType;
+import org.gnu.gtk.Widget;
 import org.gnu.gtk.event.ComboBoxEvent;
 import org.gnu.gtk.event.ComboBoxListener;
 import org.gnu.gtk.event.EntryEvent;
@@ -35,11 +39,11 @@ public class ForeignAmountEntryBox extends HBox
 	private Currency			home;
 	private Currency			lastCurrency;
 
+	private List				grayWidgets;
 	private AmountEntry			faceValue_AmountEntry;
 	private Entry				rate_Entry;
 	private AmountEntry			homeValue_AmountEntry;
 	private CurrencySelector	foreign_CurrencySelector;
-	private Label				homeCode_Label;
 
 	private static HashMap		lastRates;
 
@@ -57,6 +61,8 @@ public class ForeignAmountEntryBox extends HBox
 			lastCurrency = home;
 		}
 
+		grayWidgets = new ArrayList();
+
 		foreignAmount = new ForeignAmount("0.00", lastCurrency, "1.0");
 
 		faceValue_AmountEntry = new AmountEntry();
@@ -67,15 +73,27 @@ public class ForeignAmountEntryBox extends HBox
 		foreign_CurrencySelector.setCurrency(lastCurrency);
 		packStart(foreign_CurrencySelector, false, false, 0);
 
+		// \u00d7 is ×
+		Label x_Label = new Label("\u00d7");
+		packStart(x_Label, false, false, 0);
+		grayWidgets.add(x_Label);
+
 		rate_Entry = new Entry();
 		rate_Entry.setWidth(8);
 		packStart(rate_Entry, true, true, 0);
+		grayWidgets.add(rate_Entry);
+
+		Label equals_Label = new Label("=");
+		packStart(equals_Label, false, false, 0);
+		grayWidgets.add(equals_Label);
 
 		homeValue_AmountEntry = new AmountEntry();
 		packStart(homeValue_AmountEntry, true, true, 0);
+		grayWidgets.add(homeValue_AmountEntry);
 
-		homeCode_Label = new Label(home.getCode());
+		Label homeCode_Label = new Label(home.getCode());
 		packStart(homeCode_Label, false, false, 0);
+		grayWidgets.add(homeCode_Label);
 
 		faceValue_AmountEntry.addListener(new ChangeListener() {
 			public void userChangedData() {
@@ -181,15 +199,22 @@ public class ForeignAmountEntryBox extends HBox
 	 * Utility methods ------------------------------------
 	 */
 
+	/**
+	 * Toggle the sensitivity (grayed out out if not sensitive) of all the
+	 * Widgets that represtnt exchange rate and home value, as listed in the
+	 * grayWidgets List.
+	 */
 	private void grayOut() {
+		boolean state;
 		if (foreign_CurrencySelector.getCurrency() == home) {
-			rate_Entry.setSensitive(false);
-			homeValue_AmountEntry.setSensitive(false);
-			homeCode_Label.setSensitive(false);
+			state = false;
 		} else {
-			rate_Entry.setSensitive(true);
-			homeValue_AmountEntry.setSensitive(true);
-			homeCode_Label.setSensitive(true);
+			state = true;
+		}
+		Iterator wI = grayWidgets.iterator();
+		while (wI.hasNext()) {
+			Widget w = (Widget) wI.next();
+			w.setSensitive(state);
 		}
 	}
 
