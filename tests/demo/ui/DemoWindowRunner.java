@@ -59,6 +59,9 @@ public class DemoWindowRunner
 		Debug.print("main", "Initializing AustralianPayrollEditorWindow");
 		AustralianPayrollEditorWindow payroll = new AustralianPayrollEditorWindow(null);
 
+		Debug.print("main", "Initializing TransactionListViewHolder");
+		TransactionListViewHolder view = new TransactionListViewHolder();
+
 		Debug.print("main", "Starting Gtk main loop");
 		Gtk.main();
 		Debug.print("main", "Returned from Gtk main loop");

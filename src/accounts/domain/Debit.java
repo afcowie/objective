@@ -2,7 +2,7 @@
  * Debit.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
@@ -13,8 +13,9 @@ package accounts.domain;
  */
 public class Debit extends Entry
 {
-	// public static final String COLOR = "midnightblue";
-	public static final String	COLOR	= "steel blue";
+	public static final String	COLOR	= "midnightblue";
+
+	// public static final String COLOR = "steel blue";
 
 	public Debit() {
 		super();
