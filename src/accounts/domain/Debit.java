@@ -15,8 +15,6 @@ public class Debit extends Entry
 {
 	public static final String	COLOR	= "midnightblue";
 
-	// public static final String COLOR = "steel blue";
-
 	public Debit() {
 		super();
 		/*

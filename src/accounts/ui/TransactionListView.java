@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.gnu.gtk.CellRendererText;
 import org.gnu.gtk.DataColumn;
@@ -216,6 +218,12 @@ public class TransactionListView extends TreeView
 
 	}
 
+	private static final Pattern	regexAmp	= Pattern.compile("&");
+
+	private static final String		DARKGRAY	= "darkgray";
+
+	private static final String		CHARCOAL	= "#575757";
+
 	/**
 	 * Load a Set of Transaction objects into the TreeModel underlying this
 	 * widget. This is called by both the constructor and when a new assortment
@@ -243,14 +251,19 @@ public class TransactionListView extends TreeView
 			listStore.setValue(pointer, dateSort_DataColumn, datei);
 
 			StringBuffer titleName = new StringBuffer();
-			titleName.append("<b>");
+			final String OPEN = "<b>";
+			final String CLOSE = "</b>";
+			titleName.append(OPEN);
 			titleName.append(t.getDescription());
-			titleName.append("</b>");
+			titleName.append(CLOSE);
 
 			StringBuffer debitVal = new StringBuffer();
-			StringBuffer creditVal = new StringBuffer();
-			debitVal.append("<b> </b>\n");
-			creditVal.append("<b> </b>\n");
+			debitVal.append(OPEN);
+			debitVal.append(' ');
+			debitVal.append(CLOSE);
+			debitVal.append('\n');
+
+			StringBuffer creditVal = new StringBuffer(debitVal.toString());
 
 			/* ... in this Transaction */
 			long largestDebitNumber = 0;
@@ -272,15 +285,19 @@ public class TransactionListView extends TreeView
 				titleName.append("\n");
 
 				titleName.append("<span color='" + account.getColor() + "'>");
-				titleName.append(account.getTitle());
+				Matcher ma = regexAmp.matcher(account.getTitle());
+				titleName.append(ma.replaceAll("&amp;"));
 				titleName.append("</span>");
 				/*
-				 * We use » \u00bb. Other possibilities: ∞ \u221e, and ∞ \u2446.
+				 * We use » \u00bb. Other possibilities: ∞ \u221e, and ⑆ \u2446.
 				 */
+				titleName.append("<span color='" + CHARCOAL + "'>");
 				titleName.append(" \u00bb ");
+				titleName.append("</span>");
 
 				titleName.append("<span color='" + ledger.getColor() + "'>");
-				titleName.append(ledger.getName());
+				Matcher ml = regexAmp.matcher(ledger.getName());
+				titleName.append(ml.replaceAll("&amp;"));
 				titleName.append("</span>");
 
 				Amount a = entry.getAmount();
@@ -298,23 +315,28 @@ public class TransactionListView extends TreeView
 				value.append(fa.getCurrency().getSymbol());
 				value.append(fa.toString()); // has , separators
 				value.append(' ');
-				value.append("<span color='gray'>");
+				value.append("<span color='" + DARKGRAY + "'>");
 				value.append(fa.getCurrency().getCode());
 				value.append("</span>");
 
 				amountBuffers.add(value);
 				entryObjects.add(entry);
 
+				/*
+				 * We sort the entires by their face value; number from Amount
+				 * represents underlying home quantity.
+				 */
+				long num = Math.round(Double.parseDouble(fa.getForeignValue()) * 100);
 				if (entry instanceof Debit) {
-					if (fa.getNumber() > largestDebitNumber) {
-						largestDebitNumber = fa.getNumber();
+					if (num > largestDebitNumber) {
+						largestDebitNumber = num;
 					}
 					if (value.length() > widestDebitWidth) {
 						widestDebitWidth = value.length();
 					}
 				} else if (entry instanceof Credit) {
-					if (fa.getNumber() > largestCreditNumber) {
-						largestCreditNumber = fa.getNumber();
+					if (num > largestCreditNumber) {
+						largestCreditNumber = num;
 					}
 					if (value.length() > widestCreditWidth) {
 						widestCreditWidth = value.length();
@@ -365,10 +387,8 @@ public class TransactionListView extends TreeView
 			 * attribute to set?)
 			 */
 			debitVal.insert(0, "<span font_desc='mono' color='" + Debit.COLOR + "'>");
-			// debitVal.insert(0, "<span color='"+Debit.COLOR+"'>");
-			creditVal.insert(0, "<span font_desc='mono' color='" + Credit.COLOR + "'>");
-			// creditVal.insert(0, "<span >");
 			debitVal.append("</span>");
+			creditVal.insert(0, "<span font_desc='mono' color='" + Credit.COLOR + "'>");
 			creditVal.append("</span>");
 
 			/*
