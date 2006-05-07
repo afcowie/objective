@@ -290,7 +290,7 @@ my $compiler;
 my $runtime;
 my $jdk_home;
 my $gcj_home;
-my $javagnome_home = "";
+my $javagnome_home = "/opt/local/java-gnome";
 
 foreach my $arg (@ARGV) {
 	my ($key, $value) = split /=/, "$arg";
