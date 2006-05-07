@@ -2,10 +2,13 @@
  * Books.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
 
+import generic.domain.Root;
+
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -21,8 +24,23 @@ import java.util.Set;
  * @author Andrew Cowie
  * @author Paul Drain
  */
-public class Books
+public class Books extends Root
 {
+	static {
+		/*
+		 * The classes for which we want to turn on cascade {update,activate}
+		 * behaviour (these static methods are inherited from root)
+		 * 
+		 * At the moment, we leave out Account.class, Ledger.class, Entry.class,
+		 * Transaction.class because objects are activated by most resolved
+		 * subtype. (TODO: we need to find out how to change this behaviour so
+		 * we can tune it better)
+		 */
+		markCascade(Books.class);
+		markCascade(LinkedHashSet.class);
+		markLeaf(Datestamp.class);
+		markLeaf(Amount.class);
+	}
 	/*
 	 * Instance variables ---------------------------------
 	 */
@@ -67,7 +85,8 @@ public class Books
 
 	public void setAccountsSet(Set accounts) {
 		if (accounts == null) {
-			throw new IllegalArgumentException("Can't make a null Set the accounts held by this Books object!");
+			throw new IllegalArgumentException(
+				"Can't make a null Set the accounts held by this Books object!");
 		}
 		this.accounts = accounts;
 	}

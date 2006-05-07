@@ -6,11 +6,12 @@
  */
 package country.au.services;
 
+import generic.persistence.DataClient;
+
 import java.math.BigDecimal;
 
 import accounts.domain.Amount;
 import accounts.domain.Datestamp;
-import accounts.persistence.DataClient;
 import accounts.services.NotFoundException;
 import accounts.services.PayrollTaxCalculator;
 import country.au.domain.AustralianPayrollTaxIdentifier;

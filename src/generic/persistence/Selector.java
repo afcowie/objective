@@ -4,7 +4,7 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2006 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
 
 import com.db4o.query.Predicate;
 
@@ -20,7 +20,7 @@ import com.db4o.query.Predicate;
  * over, fed to match(), and included in query result if true is returned.
  * 
  * @author Andrew Cowie
- * @see accounts.persistence.DataClient#nativeQuery(Selector)
+ * @see generic.persistence.DataClient#nativeQuery(Selector)
  */
 public abstract class Selector extends Predicate
 {

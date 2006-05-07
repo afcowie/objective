@@ -4,12 +4,16 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
+
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 
 import junit.framework.TestCase;
 

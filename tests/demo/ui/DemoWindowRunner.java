@@ -6,6 +6,7 @@
  */
 package demo.ui;
 
+import generic.persistence.Engine;
 import generic.util.Debug;
 
 import java.io.FileNotFoundException;
@@ -13,7 +14,6 @@ import java.io.FileNotFoundException;
 import org.gnu.gtk.Gtk;
 import org.gnu.gtk.GtkInitException;
 
-import accounts.persistence.Engine;
 import accounts.ui.ReimbursableExpensesEditorWindow;
 import country.au.ui.AustralianPayrollEditorWindow;
 import demo.client.DemoBooksSetup;
@@ -66,5 +66,6 @@ public class DemoWindowRunner
 		Gtk.main();
 		Debug.print("main", "Returned from Gtk main loop");
 		Engine.shutdown();
+		Debug.print("main", "Engine shutdown.");
 	}
 }

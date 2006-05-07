@@ -6,6 +6,8 @@
  */
 package accounts.ui;
 
+import generic.persistence.DataClient;
+
 import java.util.Iterator;
 import java.util.Set;
 
@@ -21,7 +23,6 @@ import org.gnu.gtk.event.ComboBoxListener;
 
 import accounts.domain.Books;
 import accounts.domain.Currency;
-import accounts.persistence.DataClient;
 
 /**
  * A ComboBox which allows you to pick a Currency from the internal list of
@@ -67,7 +68,7 @@ public class CurrencySelector extends ComboBox
 		/*
 		 * populate
 		 */
-		Books root = store.getBooks();
+		Books root = (Books) store.getRoot();
 
 		Set currencies = root.getCurrencySet();
 		Iterator iter = currencies.iterator();

@@ -6,6 +6,8 @@
  */
 package accounts.ui;
 
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
 import generic.ui.AbstractWindow;
 import generic.util.Debug;
 
@@ -17,8 +19,6 @@ import org.gnu.gtk.HSeparator;
 import org.gnu.gtk.event.ButtonEvent;
 import org.gnu.gtk.event.ButtonListener;
 
-import accounts.persistence.DataClient;
-import accounts.persistence.Engine;
 
 /**
  * A great number of UI windows [will] follow the pattern of being either

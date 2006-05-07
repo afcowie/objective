@@ -6,6 +6,9 @@
  */
 package accounts.persistence;
 
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 

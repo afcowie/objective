@@ -6,11 +6,12 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
+
 import java.util.Set;
 
 import accounts.domain.Books;
 import accounts.domain.Currency;
-import accounts.persistence.DataClient;
 
 /**
  * Add a Currency object to this set of books
@@ -38,7 +39,7 @@ public class AddCurrencyCommand extends Command
 		/*
 		 * Add currency to Books's currency list
 		 */
-		Books root = store.getBooks();
+		Books root = (Books) store.getRoot();
 		Set currencies = root.getCurrencySet();
 		currencies.add(currency);
 

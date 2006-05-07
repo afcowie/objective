@@ -6,8 +6,8 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
 import accounts.domain.IdentifierGroup;
-import accounts.persistence.DataClient;
 
 /**
  * Store changes to an IdentifierGroup and, implicitly, its underlying

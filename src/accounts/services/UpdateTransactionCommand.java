@@ -6,6 +6,8 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +16,6 @@ import java.util.Set;
 
 import accounts.domain.Entry;
 import accounts.domain.Transaction;
-import accounts.persistence.DataClient;
 
 /**
  * Update an existing Transaction already stored in the database. This is a

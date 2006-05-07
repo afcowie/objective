@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.persistence.DataClient;
 import generic.ui.Text;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import org.gnu.gtk.TreeViewColumn;
 
 import accounts.domain.Account;
 import accounts.domain.Amount;
+import accounts.domain.Books;
 import accounts.domain.Credit;
 import accounts.domain.Currency;
 import accounts.domain.Debit;
@@ -37,7 +39,6 @@ import accounts.domain.Entry;
 import accounts.domain.ForeignAmount;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
-import accounts.persistence.DataClient;
 import accounts.services.EntryComparator;
 
 public class TransactionListView extends TreeView
@@ -61,7 +62,8 @@ public class TransactionListView extends TreeView
 	public TransactionListView(DataClient db, List transactions) {
 		super();
 
-		home = db.getBooks().getHomeCurrency();
+		Books root = (Books) db.getRoot();
+		home = root.getHomeCurrency();
 
 		typeMarkup_DataColumn = new DataColumnString();
 		dateText_DataColumn = new DataColumnString();

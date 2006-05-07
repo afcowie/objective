@@ -6,11 +6,12 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
+
 import java.util.Set;
 
 import accounts.domain.Account;
 import accounts.domain.Books;
-import accounts.persistence.DataClient;
 
 /**
  * Add an Account to the system.
@@ -36,7 +37,7 @@ public class AddAccountCommand extends Command
 	}
 
 	protected void action(DataClient store) {
-		Books root = store.getBooks();
+		Books root = (Books) store.getRoot();
 		Set accounts = root.getAccountsSet();
 		if (accounts.add(account) == false) { // dup!?!
 			throw new IllegalStateException("How did you add an account that's already in the system?");

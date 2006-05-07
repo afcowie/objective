@@ -6,13 +6,13 @@
  */
 package demo.ui;
 
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
 import generic.ui.TextOutput;
 
 import java.io.FileNotFoundException;
 
 import accounts.domain.Books;
-import accounts.persistence.DataClient;
-import accounts.persistence.Engine;
 import accounts.ui.AccountTextOutput;
 import accounts.ui.TransactionTextOutput;
 import demo.client.DemoBooksSetup;
@@ -36,7 +36,7 @@ public class DemoOutputDump
 
 		DataClient ro = Engine.primaryClient();
 		try {
-			Books root = ro.getBooks();
+			Books root = (Books) ro.getRoot();
 
 			System.out.println();
 

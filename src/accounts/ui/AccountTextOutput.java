@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.persistence.DataClient;
 import generic.ui.TextOutput;
 
 import java.io.PrintWriter;
@@ -16,7 +17,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import accounts.domain.Account;
-import accounts.persistence.DataClient;
 import accounts.services.AccountComparator;
 
 /**

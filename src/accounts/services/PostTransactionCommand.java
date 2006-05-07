@@ -6,13 +6,14 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
+
 import java.util.Iterator;
 import java.util.Set;
 
 import accounts.domain.Entry;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
-import accounts.persistence.DataClient;
 
 /**
  * Post a Transaction.

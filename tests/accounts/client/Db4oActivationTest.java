@@ -110,7 +110,7 @@ public class Db4oActivationTest extends BlankDatafileTestCase
 		Amount totalDebits = new Amount("0.00");
 		Amount totalCredits = new Amount("0.00");
 
-		Books root = rw.getBooks();
+		Books root = (Books) rw.getRoot();
 
 		Set aS = root.getAccountsSet();
 		Iterator aI = aS.iterator();

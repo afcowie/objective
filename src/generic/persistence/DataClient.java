@@ -7,14 +7,15 @@
  * Code originally accounts.persistence.DataStore,
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
+
+import generic.domain.Root;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import accounts.domain.Books;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
@@ -37,7 +38,7 @@ public final class DataClient
 {
 	private transient ObjectContainer	container	= null;
 	private transient boolean			readOnly	= false;
-	private transient Books				books		= null;
+	private transient Root				root		= null;
 	private transient Set				dirty		= null;
 
 	/**
@@ -149,13 +150,12 @@ public final class DataClient
 	}
 
 	/**
-	 * Get the root Books object. Since DataClient wraps an accounts database,
-	 * we have a few utility methods to get to that Object hierarchy. Note that
-	 * DataClient caches this lookup once performed.
+	 * Get the root object, and in doing so verify the version of the datafile.
+	 * Note that DataClient caches this lookup once performed.
 	 */
-	public Books getBooks() {
-		if (books == null) {
-			ObjectSet os = container.get(Books.class);
+	public Root getRoot() {
+		if (root == null) {
+			ObjectSet os = container.get(Root.class);
 
 			if (os.size() > 1) {
 				throw new IllegalStateException(
@@ -163,32 +163,33 @@ public final class DataClient
 			} else if (os.size() == 0) {
 				throw new NoSuchElementException("No Books object in this container!");
 			} else {
-				this.books = (Books) os.next();
+				this.root = (Root) os.next();
 			}
 		}
-		return books;
+		return root;
 	}
 
 	/**
 	 * Set the cached Books object. Internal use only; does not commit to
 	 * database. To be used by InitBooksCommand to allow chaining; regardless of
 	 * Command using this, a commit of the Books object to the database needs to
-	 * be done via a UnitOfWork.
+	 * be done via a Command.
 	 * 
 	 * @param root
-	 *            the Books object to be cached in this DataClient object.
+	 *            the Root object to be cached in this DataClient object
+	 *            preparatory to you persisting it.
 	 */
-	public void setBooks(Books root) {
-		if (books == null) {
+	public void setRoot(Root root) {
+		if (this.root == null) {
 			if (root != null) {
-				this.books = root;
+				this.root = root;
 			} else {
 				throw new IllegalArgumentException(
-					"Can't set a null Books object to DataClient's internally cached root reference.");
+					"Can't set a null Root object to DataClient's internally cached root reference.");
 			}
 		} else {
 			throw new UnsupportedOperationException(
-				"You aren't supposed to call setBooks unless initializing a DataClient via InitBooksCommand");
+				"You aren't supposed to call setRoot unless initializing a DataClient via InitBooksCommand");
 		}
 	}
 

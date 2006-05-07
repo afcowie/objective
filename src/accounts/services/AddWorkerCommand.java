@@ -6,6 +6,7 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
 import generic.util.DebugException;
 
 import java.util.Iterator;
@@ -17,7 +18,6 @@ import accounts.domain.CreditPositiveLedger;
 import accounts.domain.Ledger;
 import accounts.domain.ReimbursableExpensesPayableAccount;
 import accounts.domain.Worker;
-import accounts.persistence.DataClient;
 import accounts.persistence.IdentifierAlreadyExistsException;
 
 /**

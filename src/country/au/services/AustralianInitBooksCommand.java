@@ -6,9 +6,9 @@
  */
 package country.au.services;
 
+import generic.persistence.DataClient;
 import accounts.domain.Currency;
 import accounts.domain.IdentifierGroup;
-import accounts.persistence.DataClient;
 import accounts.services.CommandNotReadyException;
 import accounts.services.InitBooksCommand;
 import accounts.services.StoreIdentifierGroupCommand;

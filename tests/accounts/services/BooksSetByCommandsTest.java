@@ -6,14 +6,15 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
+
 import java.util.NoSuchElementException;
 
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.domain.Currency;
 import accounts.persistence.BlankDatafileTestCase;
-import accounts.persistence.DataClient;
-import accounts.persistence.Engine;
 
 public class BooksSetByCommandsTest extends BlankDatafileTestCase
 {
@@ -24,27 +25,27 @@ public class BooksSetByCommandsTest extends BlankDatafileTestCase
 	public final void testDataStoreGetSetGetBooks() {
 		Books root;
 		try {
-			root = rw.getBooks();
+			root = (Books) rw.getRoot();
 			fail("Should have thrown NoSuchElementException to point out uninitialized DataClient; instead you got "+root);
 		} catch (NoSuchElementException nsee) {
 		}
 
 		try {
-			rw.setBooks(null);
+			rw.setRoot(null);
 			fail("Should have thrown IllegalArgumentException due to null argument");
 		} catch (IllegalArgumentException iae) {
 		}
 
 		root = new Books();
-		rw.setBooks(root);
+		rw.setRoot(root);
 
 		try {
 			Books foo = new Books();
-			rw.setBooks(foo);
+			rw.setRoot(foo);
 			fail("Should have thrown UnsupportedOperationException due to already set (though cached, not saved) books");
 		} catch (UnsupportedOperationException uoe) {
 		}
-		Books received = rw.getBooks();
+		Books received = (Books) rw.getRoot();
 		assertNotNull(received);
 		assertSame(root, received);
 	}
@@ -60,7 +61,7 @@ public class BooksSetByCommandsTest extends BlankDatafileTestCase
 		rw = Engine.gainClient();
 
 		try {
-			Books one = rw.getBooks();
+			Books one = (Books) rw.getRoot();
 			fail("Should have thrown NoSuchElementException to point out uninitialized database.");
 		} catch (NoSuchElementException nsee) {
 		}
@@ -100,7 +101,7 @@ public class BooksSetByCommandsTest extends BlankDatafileTestCase
 
 		try {
 			Books foo = new Books();
-			rw.setBooks(foo);
+			rw.setRoot(foo);
 			fail("Should have thrown UnsupportedOperationException due to already set (by InitBooksCommand) books");
 		} catch (UnsupportedOperationException uoe) {
 		}
@@ -111,13 +112,13 @@ public class BooksSetByCommandsTest extends BlankDatafileTestCase
 		 * We should probably get the same client as above back, so its Books is
 		 * cached up...
 		 */
-		Books received = rw.getBooks();
+		Books received = (Books) rw.getRoot();
 		assertNotNull(received);
 		/*
 		 * But a brand new DataClient won't have a Books cached. Go fetch!
 		 */
 		DataClient fresh = Engine.server.gainClient();
-		Books another = rw.getBooks();
+		Books another = (Books) rw.getRoot();
 		assertNotNull(another);
 		Engine.releaseClient(fresh);
 	}

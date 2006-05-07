@@ -6,6 +6,8 @@
  */
 package demo.client;
 
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
 import generic.util.Debug;
 
 import java.io.FileNotFoundException;
@@ -26,8 +28,6 @@ import accounts.domain.Ledger;
 import accounts.domain.PayrollTransaction;
 import accounts.domain.ReimbursableExpensesTransaction;
 import accounts.domain.Transaction;
-import accounts.persistence.DataClient;
-import accounts.persistence.Engine;
 import accounts.services.CommandNotReadyException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.SpecificLedgerFinder;

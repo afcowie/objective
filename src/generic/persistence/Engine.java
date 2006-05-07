@@ -7,7 +7,7 @@
  * Based on code originally in accounts.services.DatafileServices
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
 
 import generic.util.DebugException;
 

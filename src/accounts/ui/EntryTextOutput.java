@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.persistence.DataClient;
 import generic.ui.TextOutput;
 
 import java.io.PrintWriter;
@@ -20,7 +21,6 @@ import accounts.domain.Debit;
 import accounts.domain.Entry;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
-import accounts.persistence.DataClient;
 import accounts.services.EntryComparator;
 
 /**

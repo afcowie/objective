@@ -4,7 +4,11 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2006 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
+
+import generic.persistence.DataClient;
+import generic.persistence.DataServer;
+import generic.persistence.Engine;
 
 import java.io.File;
 import java.io.FileNotFoundException;

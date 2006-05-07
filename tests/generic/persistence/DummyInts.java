@@ -2,9 +2,9 @@
  * DummyInts.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
 
 /**
  * Something silly but storable to use when unit testing persistence.
@@ -15,15 +15,15 @@ public class DummyInts
 {
 	int	num;
 
-	DummyInts(int i) {
+	public DummyInts(int i) {
 		this.num = i;
 	}
 
-	int getNum() {
+	public int getNum() {
 		return num;
 	}
 
-	void setNum(int num) {
+	public void setNum(int num) {
 		this.num = num;
 	}
 

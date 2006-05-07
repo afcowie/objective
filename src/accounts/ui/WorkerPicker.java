@@ -6,6 +6,8 @@
  */
 package accounts.ui;
 
+import generic.persistence.DataClient;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,7 +26,6 @@ import org.gnu.gtk.event.ComboBoxListener;
 
 import accounts.domain.Employee;
 import accounts.domain.Worker;
-import accounts.persistence.DataClient;
 
 /**
  * A picker allowing you to choose from a list of Workers. This delegates to and

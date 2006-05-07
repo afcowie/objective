@@ -7,7 +7,7 @@
  * Code forked from accounts.persistence.DataStore,
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
 
 import generic.util.Debug;
 import generic.util.DebugException;
@@ -17,19 +17,13 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
-
-import accounts.domain.Amount;
-import accounts.domain.Books;
-import accounts.domain.Datestamp;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
 import com.db4o.config.Configuration;
-import com.db4o.config.ObjectClass;
 import com.db4o.ext.ExtObjectContainer;
 
 /**
@@ -88,59 +82,10 @@ public final class DataServer
 		config.activationDepth(5);
 
 		/*
-		 * But it needs to be further tweaked in a few key places.
+		 * But it needs to be further tweaked in a few key places, which is done
+		 * care of the methods on Root.
 		 */
 		config.classActivationDepthConfigurable(true);
-
-		/*
-		 * The classes for which we want to turn on cascade {update,activate}
-		 * behaviour.
-		 * 
-		 * At the moment, we leave out Account.class, Ledger.class, Entry.class,
-		 * Transaction.class because objects are activated by most resolved
-		 * subtype. (TODO: we need to find out how to change this behaviour so
-		 * we can tune it better)
-		 */
-		Class[] cascadeClasses = {
-		Books.class,
-		LinkedHashSet.class,
-		};
-
-		for (int i = 0; i < cascadeClasses.length; i++) {
-			ObjectClass db4oObjectClass = config.objectClass(cascadeClasses[i]);
-			/*
-			 * By turning cascade on (particularly for the Collection classes
-			 * included in the array above) we create the magic that any time
-			 * one of them is activated it will start a new {update,activate}
-			 * through depth.
-			 */
-			db4oObjectClass.cascadeOnActivate(true);
-			db4oObjectClass.cascadeOnUpdate(true);
-			/*
-			 * Most of these contain a Set of subelements. Make sure it is
-			 * {updated,activated} through it's own internal members (usually 2
-			 * or so deep) to reach the elements themselves.
-			 */
-			db4oObjectClass.minimumActivationDepth(5);
-			db4oObjectClass.updateDepth(5);
-		}
-
-		Class[] leafClasses = {
-		Datestamp.class,
-		Amount.class,
-		};
-
-		for (int i = 0; i < leafClasses.length; i++) {
-			ObjectClass db4oObjectClass = config.objectClass(leafClasses[i]);
-			/*
-			 * These leaf classes only contain primative fields, so stop seeking
-			 * further.
-			 */
-			db4oObjectClass.cascadeOnActivate(false);
-			db4oObjectClass.cascadeOnUpdate(false);
-			db4oObjectClass.minimumActivationDepth(0);
-			db4oObjectClass.updateDepth(0);
-		}
 
 		/*
 		 * Default update depth is zero, so turn on the magic! A setting of 1

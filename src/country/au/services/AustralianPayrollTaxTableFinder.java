@@ -6,6 +6,7 @@
  */
 package country.au.services;
 
+import generic.persistence.DataClient;
 import generic.util.DebugException;
 
 import java.util.Iterator;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import accounts.domain.Datestamp;
-import accounts.persistence.DataClient;
 import accounts.services.Finder;
 import accounts.services.NotFoundException;
 import country.au.domain.AustralianPayrollTaxIdentifier;

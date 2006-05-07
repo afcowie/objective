@@ -6,6 +6,10 @@
  */
 
 import generic.junit.VerboseTestRunner;
+import generic.persistence.BasicDb4oTest;
+import generic.persistence.EngineTest;
+import generic.persistence.ExposeDb4oInterfaceTest;
+import generic.persistence.RollbackDb4oTest;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import accounts.client.Db4oActivationTest;
@@ -17,10 +21,6 @@ import accounts.domain.DatestampTest;
 import accounts.domain.ForeignCurrencyTest;
 import accounts.domain.GenericTransactionTest;
 import accounts.domain.IdentifierTest;
-import accounts.persistence.BasicDb4oTest;
-import accounts.persistence.EngineTest;
-import accounts.persistence.ExposeDb4oInterfaceTest;
-import accounts.persistence.RollbackDb4oTest;
 import accounts.services.BasicCommandTest;
 import accounts.services.BasicFinderTest;
 import accounts.services.BooksSetByCommandsTest;

@@ -6,7 +6,7 @@
  */
 package accounts.services;
 
-import accounts.persistence.DataClient;
+import generic.persistence.DataClient;
 
 /**
  * Store a generic Object to the DataClient. Like all Commands this is just a

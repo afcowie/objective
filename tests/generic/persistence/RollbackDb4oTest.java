@@ -4,7 +4,8 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
+
 
 import java.io.File;
 

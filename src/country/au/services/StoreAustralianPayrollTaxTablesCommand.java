@@ -6,12 +6,13 @@
  */
 package country.au.services;
 
+import generic.persistence.DataClient;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import accounts.domain.Datestamp;
-import accounts.persistence.DataClient;
 import accounts.services.Command;
 import accounts.services.CommandNotReadyException;
 import accounts.services.CommandNotUndoableException;

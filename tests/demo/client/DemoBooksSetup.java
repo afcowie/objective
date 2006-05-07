@@ -6,6 +6,8 @@
  */
 package demo.client;
 
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
 import generic.util.Debug;
 
 import java.io.File;
@@ -31,8 +33,6 @@ import accounts.domain.ProfessionalRevenueAccount;
 import accounts.domain.ReimbursableExpensesPayableAccount;
 import accounts.domain.SalesTaxPayableAccount;
 import accounts.domain.Supplier;
-import accounts.persistence.DataClient;
-import accounts.persistence.Engine;
 import accounts.services.AddAccountCommand;
 import accounts.services.AddCurrencyCommand;
 import accounts.services.AddEntityCommand;

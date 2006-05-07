@@ -6,6 +6,7 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
 import generic.util.DebugException;
 
 import java.util.List;
@@ -19,7 +20,6 @@ import accounts.domain.Entity;
 import accounts.domain.Ledger;
 import accounts.domain.Supplier;
 import accounts.domain.SupplierLedger;
-import accounts.persistence.DataClient;
 import accounts.persistence.IdentifierAlreadyExistsException;
 
 public class AddEntityCommand extends Command

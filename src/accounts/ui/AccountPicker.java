@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.persistence.DataClient;
 import generic.ui.AbstractWindow;
 import generic.util.Debug;
 
@@ -51,7 +52,6 @@ import org.gnu.gtk.event.TreeViewListener;
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.domain.Ledger;
-import accounts.persistence.DataClient;
 
 /**
  * A widget to select an account.
@@ -247,7 +247,7 @@ public class AccountPicker extends HBox
 			/*
 			 * Populate
 			 */
-			Books root = db.getBooks();
+			Books root = (Books) db.getRoot();
 			Set accounts = root.getAccountsSet();
 			Iterator acctIter = accounts.iterator();
 

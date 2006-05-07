@@ -11,9 +11,9 @@ import java.util.List;
 import org.gnu.gtk.Gtk;
 
 import accounts.domain.Transaction;
-import accounts.persistence.DataClient;
-import accounts.persistence.Engine;
 import accounts.ui.TransactionListView;
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
 import generic.ui.AbstractWindow;
 
 public class TransactionListViewHolder extends AbstractWindow

@@ -6,10 +6,11 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
+
 import java.util.List;
 
-import accounts.persistence.DataClient;
-import accounts.persistence.Engine;
 
 /**
  * As Commands are the place to put the logic for constructing, valdidating and

@@ -27,7 +27,7 @@ public class BasicCommandTest extends BlankDatafileTestCase
 	
 	public final void testInitBooksCommand() {
 		try {
-			Books one = rw.getBooks();
+			Books one = (Books) rw.getRoot();
 			fail("Should have thrown NoSuchElementException to point out uninitialized database.");
 		} catch (NoSuchElementException nsee) {
 		}
@@ -58,7 +58,7 @@ public class BasicCommandTest extends BlankDatafileTestCase
 		}
 		rw.commit();
 
-		Books two = rw.getBooks();
+		Books two = (Books) rw.getRoot();
 		assertNotNull("Should be a Books object by now", two);
 
 		Set accounts = two.getAccountsSet();
@@ -66,7 +66,7 @@ public class BasicCommandTest extends BlankDatafileTestCase
 	}
 
 	public final void testPersistenceCascade() {
-		Books root = rw.getBooks();
+		Books root = (Books) rw.getRoot();
 		assertNotNull("Should be a Books object, established by previous test, available for retrieval", root);
 
 		Set accounts = root.getAccountsSet();
@@ -74,7 +74,7 @@ public class BasicCommandTest extends BlankDatafileTestCase
 	}
 
 	public final void testAddAccountCommand() {
-		Books root = rw.getBooks();
+		Books root = (Books) rw.getRoot();
 		assertNotNull("Should *still* be a Books object available, established by static block", root);
 
 		CashAccount pettyCash = new CashAccount("Petty Cash", "Manly Office");
@@ -104,7 +104,7 @@ public class BasicCommandTest extends BlankDatafileTestCase
 	}
 
 	public final void testAccountLedgerUpdateCascade() {
-		Books root = rw.getBooks();
+		Books root = (Books) rw.getRoot();
 		Set accounts = root.getAccountsSet();
 		Iterator iter = accounts.iterator();
 

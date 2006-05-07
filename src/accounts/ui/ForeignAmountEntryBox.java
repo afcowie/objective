@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.persistence.DataClient;
 import generic.util.Debug;
 
 import java.util.ArrayList;
@@ -30,7 +31,6 @@ import accounts.domain.Amount;
 import accounts.domain.Books;
 import accounts.domain.Currency;
 import accounts.domain.ForeignAmount;
-import accounts.persistence.DataClient;
 
 public class ForeignAmountEntryBox extends HBox
 {
@@ -54,7 +54,7 @@ public class ForeignAmountEntryBox extends HBox
 	public ForeignAmountEntryBox(DataClient store) {
 		super(false, 3);
 
-		Books root = store.getBooks();
+		Books root = (Books) store.getRoot();
 		home = root.getHomeCurrency();
 
 		if (lastCurrency == null) {

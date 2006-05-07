@@ -6,12 +6,13 @@
  */
 package accounts.services;
 
+import generic.persistence.DataClient;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import accounts.domain.Books;
 import accounts.domain.Currency;
-import accounts.persistence.DataClient;
 
 /**
  * Create a new set of company books. Obvisouly, this is the first command, and
@@ -56,7 +57,7 @@ public class InitBooksCommand extends Command
 
 		Books root = new Books();
 
-		store.setBooks(root);
+		store.setRoot(root);
 
 		Set accounts = new LinkedHashSet();
 		root.setAccountsSet(accounts);
