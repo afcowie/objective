@@ -30,6 +30,7 @@ import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
 import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
+import com.db4o.ext.ExtObjectContainer;
 
 /**
  * An open accounting database. This wraps the mechanics of configuring and
@@ -228,7 +229,8 @@ public final class DataServer
 					throw new IllegalStateException("Client retrieved from pool is closed!");
 				}
 				if (client == null) {
-					throw new DebugException("How can it pull null as a DataClient from the available pool?");
+					throw new DebugException(
+						"How can it pull null as a DataClient from the available pool?");
 				}
 			} else {
 				Debug.print("pool", "Opening new client");
@@ -255,11 +257,14 @@ public final class DataServer
 	}
 
 	/**
-	 * Return a client to the connection pool.
+	 * Return a client to the connection pool. The client will be asked for its
+	 * list of queried Objects and those objects will be have refresh() called
+	 * on them before returning the client to the pool.
 	 * 
 	 * @param client
-	 *            a DataClient that you are finished with. It should be in a
-	 *            pristine (ie no uncommitted changes made) state.
+	 *            a DataClient that you are finished with. Notwithstanding the
+	 *            measures described above, it should be in a pristine (ie no
+	 *            uncommitted changes made) state.
 	 */
 	public void releaseClient(DataClient client) {
 		synchronized (poolInUse) {
@@ -268,8 +273,18 @@ public final class DataServer
 			}
 			poolInUse.remove(client);
 
+			ExtObjectContainer ext = client.getUnderlyingContainer().ext();
+
 			if (client.getUnderlyingContainer().ext().isClosed()) {
 				throw new DebugException("This client is closed, can't return it to connection pool!");
+			}
+
+			Set dS = client.getDirtyObjects();
+			Iterator dI = dS.iterator();
+			while (dI.hasNext()) {
+				Object dirty = dI.next();
+				ext.refresh(dirty, 1);
+				dI.remove();
 			}
 
 			Debug.print("pool", "Returning client to pool");
@@ -362,7 +377,8 @@ public final class DataServer
 
 	final void poolStatus() {
 		synchronized (poolInUse) {
-			Debug.print("pool", "status: " + poolInUse.size() + " in use, " + poolAvailable.size() + " available");
+			Debug.print("pool", "status: " + poolInUse.size() + " in use, " + poolAvailable.size()
+				+ " available");
 		}
 	}
 

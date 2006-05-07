@@ -9,8 +9,10 @@
  */
 package accounts.persistence;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import accounts.domain.Books;
 
@@ -36,15 +38,18 @@ public final class DataClient
 	private transient ObjectContainer	container	= null;
 	private transient boolean			readOnly	= false;
 	private transient Books				books		= null;
+	private transient Set				dirty		= null;
 
 	/**
 	 * Create a new DataClient instance around a {@link ObjectContainer}.
 	 */
 	DataClient(ObjectContainer container) throws IllegalStateException {
 		if (container == null) {
-			throw new IllegalArgumentException("A bit hard to be instantiating a client with a null ObjectContainer");
+			throw new IllegalArgumentException(
+				"A bit hard to be instantiating a client with a null ObjectContainer");
 		}
 		this.container = container;
+		dirty = new LinkedHashSet();
 	}
 
 	/**
@@ -208,6 +213,7 @@ public final class DataClient
 	 */
 	public List queryByExample(Object example) {
 		ObjectSet os = container.get(example);
+		dirty.addAll(os);
 		return os;
 	}
 
@@ -238,6 +244,7 @@ public final class DataClient
 	 */
 	public List nativeQuery(Selector predicate) {
 		ObjectSet os = container.query(predicate);
+		dirty.addAll(os);
 		return os;
 	}
 
@@ -271,5 +278,16 @@ public final class DataClient
 	 */
 	public void delete(Object target) {
 		container.delete(target);
+	}
+
+	/**
+	 * @return the Set of dirty objects being those that resulted from explicit
+	 *         queries.
+	 * @see DataServer#releaseClient(DataClient) for the method that uses this
+	 *      to refresh these objects before returning a DataClient to the
+	 *      connection pool.
+	 */
+	Set getDirtyObjects() {
+		return dirty;
 	}
 }

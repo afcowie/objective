@@ -2,7 +2,7 @@
  * ExposeDb4oInterfaceTest.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.persistence;
 
@@ -172,20 +172,19 @@ public class ExposeDb4oInterfaceTest extends TestCase
 			// good
 		}
 
-		Engine.releaseClient(store);
-
 		/*
-		 * Final little wrinkle: when a client is released rollback does not
-		 * occur; even if it did, you still need to reload active objects to
-		 * correct them.
+		 * Final little wrinkle: on release, DataStore refreshes all the objects
+		 * that were explicity queried as recorded by DataClient.
 		 */
+
+		assertEquals(66, eight.getNum()); // because we dirtied it
+
+		Engine.releaseClient(store);
 		store = Engine.gainClient();
 
-		results = store.queryByExample(proto);
+		results = store.getUnderlyingContainer().get(proto);
 		assertEquals(1, results.size());
 		eight = (DummyInts) results.get(0);
-		assertEquals(66, eight.getNum()); // yikes
-		store.reload(eight);
 		assertEquals(8, eight.getNum());
 
 		Engine.releaseClient(store);
