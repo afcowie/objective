@@ -8,6 +8,7 @@ package accounts.ui;
 
 import generic.persistence.DataClient;
 import generic.ui.Text;
+import generic.util.Debug;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +29,8 @@ import org.gnu.gtk.TreeIter;
 import org.gnu.gtk.TreeSelection;
 import org.gnu.gtk.TreeView;
 import org.gnu.gtk.TreeViewColumn;
+import org.gnu.gtk.event.TreeViewEvent;
+import org.gnu.gtk.event.TreeViewListener;
 
 import accounts.domain.Account;
 import accounts.domain.Amount;
@@ -217,6 +220,16 @@ public class TransactionListView extends TreeView
 
 		TreeSelection selection = view.getSelection();
 		selection.setMode(SelectionMode.SINGLE);
+
+		view.addListener(new TreeViewListener() {
+			public void treeViewEvent(TreeViewEvent event) {
+				if (event.getType() == TreeViewEvent.Type.MOVE_CURSOR) {
+					Debug.print("listeners", "TreeViewEvent: " + event.getType().getName() + " "
+						+ event.getMovementStep() + "," + event.getHowMany());
+				}
+
+			}
+		});
 
 	}
 
