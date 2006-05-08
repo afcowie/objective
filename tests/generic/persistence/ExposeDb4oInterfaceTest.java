@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-
 import junit.framework.TestCase;
 
 /**
@@ -210,5 +209,87 @@ public class ExposeDb4oInterfaceTest extends TestCase
 		assertEquals(0, results.size());
 
 		Engine.releaseClient(store);
+	}
+
+	public final void testIdMethodsAgainstZero() {
+		DataClient store = Engine.gainClient();
+
+		try {
+			store.getID(null);
+			fail("How can you ask for the ID of null?");
+		} catch (IllegalStateException ise) {
+			// good
+		}
+
+		try {
+			DummyInts notInThere = new DummyInts(2061);
+			store.getID(notInThere);
+			fail("Asking for the ID of an Object that isn't persisted is supposed to throw IllegalStateException");
+		} catch (IllegalStateException ise) {
+			// good
+		}
+
+		try {
+			store.fetchByID(0);
+			fail("Fetching ID 0 is supposed to throw IllegalArgumentException");
+		} catch (IllegalArgumentException iae) {
+			// good
+		}
+
+		try {
+			final long random = 3427323442026l;
+			Object o = store.fetchByID(random);
+			fail("Fetching some random long "
+				+ random
+				+ "as ID actually returned an object: "
+				+ o
+				+ ". Oops. The whole point was to use a long that isn't an actual ID in use. Probably need a differnet long to test this.");
+		} catch (IllegalStateException iae) {
+			// good
+		}
+
+		Engine.releaseClient(store);
+	}
+
+	public final void testIdStabilityAcrossClients() {
+		DataClient store1 = Engine.gainClient();
+		DataClient store2 = Engine.gainClient();
+
+		DummyInts proto = new DummyInts(12);
+		List results = store1.queryByExample(proto);
+		assertEquals(1, results.size());
+		DummyInts twelve1 = (DummyInts) results.get(0);
+		assertEquals(12, twelve1.getNum());
+
+		long id1 = store1.getUnderlyingContainer().ext().getID(twelve1);
+
+		results = store2.queryByExample(proto);
+		assertEquals(1, results.size());
+		DummyInts twelve2 = (DummyInts) results.get(0);
+		assertEquals(12, twelve2.getNum());
+
+		assertTrue(twelve1.getNum() == twelve2.getNum());
+
+		long id2 = store2.getUnderlyingContainer().ext().getID(twelve2);
+
+		assertEquals(id1, id2);
+		assertNotSame(twelve1, twelve2);
+
+		/*
+		 * Now do the same test via DataClient's methods:
+		 */
+
+		id1 = store1.getID(twelve1);
+		id2 = store2.getID(twelve2);
+		assertEquals(id1, id2);
+
+		twelve1 = (DummyInts) store1.fetchByID(id1);
+		twelve2 = (DummyInts) store2.fetchByID(id2);
+
+		assertTrue(twelve1.getNum() == twelve2.getNum());
+		assertNotSame(twelve1, twelve2);
+
+		Engine.releaseClient(store1);
+		Engine.releaseClient(store2);
 	}
 }

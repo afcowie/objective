@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
+import com.db4o.ext.ExtObjectContainer;
 
 /**
  * A connection to an accounting database. This wraps the mechanics of reading
@@ -36,10 +36,10 @@ import com.db4o.ObjectSet;
  */
 public final class DataClient
 {
-	private transient ObjectContainer	container	= null;
-	private transient boolean			readOnly	= false;
-	private transient Root				root		= null;
-	private transient Set				dirty		= null;
+	private transient ExtObjectContainer	container	= null;
+	private transient boolean				readOnly	= false;
+	private transient Root					root		= null;
+	private transient Set					dirty		= null;
 
 	/**
 	 * Create a new DataClient instance around a {@link ObjectContainer}.
@@ -49,7 +49,7 @@ public final class DataClient
 			throw new IllegalArgumentException(
 				"A bit hard to be instantiating a client with a null ObjectContainer");
 		}
-		this.container = container;
+		this.container = container.ext();
 		dirty = new LinkedHashSet();
 	}
 
@@ -126,7 +126,7 @@ public final class DataClient
 		if (readOnly) {
 			throw new UnsupportedOperationException("Can't save() through a read-only client!");
 		}
-		if (container.ext().isClosed()) {
+		if (container.isClosed()) {
 			throw new IllegalStateException("You can't save() if the container is closed!");
 		}
 		try {
@@ -145,7 +145,7 @@ public final class DataClient
 	 * 
 	 * @return The {@link ObjectContainer}that this class wraps.
 	 */
-	ObjectContainer getUnderlyingContainer() {
+	ExtObjectContainer getUnderlyingContainer() {
 		return container;
 	}
 
@@ -260,7 +260,7 @@ public final class DataClient
 	 * @see com.db4o.ext.ExtObjectContainer#peekPersisted(Object, int, boolean)
 	 */
 	public Object peek(Object original) throws NoSuchElementException {
-		Object aboo = container.ext().peekPersisted(original, 2, true);
+		Object aboo = container.peekPersisted(original, 2, true);
 
 		if (aboo == null) {
 			throw new NoSuchElementException("No committed version of " + original + " persisted");
@@ -290,5 +290,54 @@ public final class DataClient
 	 */
 	Set getDirtyObjects() {
 		return dirty;
+	}
+
+	/**
+	 * Get the long ID used internally by db4o to represent the ID of obj as
+	 * persisted. You can use this ID to have another DataClient quickly fetch
+	 * up this object.
+	 * 
+	 * @throws IllegalStateException
+	 *             if the object you asked for isn't stored in this container.
+	 *             That's probably just bad form, but could conceivably represnt
+	 *             a state where you deleted something but still have a
+	 *             reference to it.
+	 * @see #fetchByID(long)
+	 */
+	public long getID(Object obj) {
+		long id = container.getID(obj);
+		if (id == 0) {
+			throw new IllegalStateException();
+		}
+		return id;
+	}
+
+	/**
+	 * Query the database for a specific object by ID. Within the context of a
+	 * single ObjectContainer, the getByID() look up returning whatever is in
+	 * that container's cache (without further activating) is fine. In our
+	 * usage, where we use IDs in the update notifications between clients,
+	 * there is certainly no likelihood that that Container has seen the object
+	 * already. So we activate it here before returning.
+	 * 
+	 * @param id
+	 *            the long object ID for the object you're fetching.
+	 * @throws IllegalStateException
+	 *             if the ID you've requested is not present in this container.
+	 *             The only time you should be asking for an object by ID is if
+	 *             you were given that ID by another DataClient; to have it
+	 *             reported that an this ID doesn't represent an Object in the
+	 *             container is bad indeed.
+	 */
+	public Object fetchByID(long id) {
+		if (id == 0) {
+			throw new IllegalArgumentException("Can't fetch ID 0");
+		}
+		Object target = container.getByID(id);
+		if (target == null) {
+			throw new IllegalStateException("Object of that ID not present");
+		}
+		container.activate(target, 5);
+		return target;
 	}
 }
