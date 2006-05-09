@@ -9,6 +9,7 @@ package accounts.ui;
 import generic.persistence.DataClient;
 import generic.persistence.Engine;
 import generic.ui.AbstractWindow;
+import generic.ui.PrimaryWindow;
 import generic.util.Debug;
 
 import org.gnu.gtk.Button;
@@ -32,7 +33,7 @@ import org.gnu.gtk.event.ButtonListener;
  * 
  * @author Andrew Cowie
  */
-public abstract class EditorWindow extends AbstractWindow
+public abstract class EditorWindow extends PrimaryWindow
 {
 	private Button			cancel;
 	private Button			ok;
@@ -44,8 +45,8 @@ public abstract class EditorWindow extends AbstractWindow
 	protected DataClient	store;
 
 	/**
-	 * Basic form of EditorWindow. Passes title to AbstractWindow's constructor,
-	 * and then adds the button box with ok and close.
+	 * Basic form of EditorWindow. Calls PrimaryWindow's constructor,
+	 * then adds the button box with ok and close.
 	 */
 	protected EditorWindow() {
 		/*
@@ -57,7 +58,7 @@ public abstract class EditorWindow extends AbstractWindow
 	}
 
 	/**
-	 * Glade form of EditorWindow. Passes the parameters to AbstractWindow's
+	 * Glade form of EditorWindow. Passes the parameters to PrimaryWindow's
 	 * glade constructor, then adds the button box with ok and close.
 	 * 
 	 * @param whichElement

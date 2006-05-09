@@ -29,7 +29,7 @@ import org.gnu.gtk.event.LifeCycleListener;
  * <li>the LibGlade parser, if applicable.
  * </ul>
  * <p>
- * AbstractWindow nstalls a useful default LifeCycleHandler, which you can
+ * AbstractWindow installs a useful default LifeCycleHandler, which you can
  * leverage by overriding it or by overriding the implementations of hideHook()
  * and deleteHook()
  * 
@@ -187,8 +187,8 @@ public abstract class AbstractWindow
 			Master.abort("Can't find glade file " + gladeFilename + " for " + whichElement);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Master.abort("An internal error occured trying to read and process the glade file " + gladeFilename
-				+ " for " + whichElement);
+			Master.abort("An internal error occured trying to read and process the glade file "
+				+ gladeFilename + " for " + whichElement);
 		}
 		window = (Window) gladeParser.getWidget(whichElement);
 

@@ -7,13 +7,13 @@
 package country.au.ui;
 
 import generic.ui.Align;
+import generic.ui.Master;
 import generic.ui.ModalDialog;
 import generic.ui.TwoColumnTable;
 import generic.util.Debug;
 
 import java.util.List;
 
-import org.gnu.gtk.Gtk;
 import org.gnu.gtk.Label;
 import org.gnu.gtk.MessageType;
 import org.gnu.gtk.Widget;
@@ -449,8 +449,8 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		// hide & destroy
 		super.deleteHook();
 		// quit
-		System.out.println("Notice: deleteHook() overriden to call Gtk.mainQuit()");
-		Gtk.mainQuit();
+		System.out.println("Notice: deleteHook() overriden to call Master.shutdown()");
+		Master.shutdown();
 		return false;
 	}
 }

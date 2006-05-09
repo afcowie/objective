@@ -6,11 +6,11 @@
  */
 package accounts.ui;
 
+import generic.ui.Master;
 import generic.ui.ModalDialog;
 import generic.util.Debug;
 
 import org.gnu.gtk.Entry;
-import org.gnu.gtk.Gtk;
 import org.gnu.gtk.MessageType;
 import org.gnu.gtk.Table;
 
@@ -81,8 +81,8 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 		// hide & destroy
 		super.deleteHook();
 		// quit
-		System.out.println("Notice: deleteHook() overriden to call Gtk.mainQuit()");
-		Gtk.mainQuit();
+		System.out.println("Notice: deleteHook() overriden to call Master.shutdown()");
+		Master.shutdown();
 		return false;
 	}
 

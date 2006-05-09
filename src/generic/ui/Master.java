@@ -6,6 +6,7 @@
  */
 package generic.ui;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -22,7 +23,24 @@ import org.gnu.gtk.Gtk;
  */
 public class Master
 {
-	protected static Set	callbacks	= new LinkedHashSet();
+	private static Set	callbacks	= new LinkedHashSet();
+	private static Set	windows		= new LinkedHashSet();
+
+	/**
+	 * Register a window as ready for display to the user. While one of our
+	 * Window subclasses can, of course, call present on itself perfectly well,
+	 * we delegate here so that global state such as the list of open windows is
+	 * maintained.
+	 * 
+	 * @param w
+	 */
+	static void regsiterWindow(PrimaryWindow w) {
+		windows.add(w);
+	}
+
+	static void deregisterWindow(PrimaryWindow w) {
+		windows.remove(w);
+	}
 
 	/**
 	 * Register a Hooks class instance (anonymous or otherwise) to be called in
@@ -49,20 +67,59 @@ public class Master
 				target.abort();
 			}
 		} finally {
-			System.err.println("Exiting.");
+			System.err.println("Terminating.");
 			System.err.flush();
 		}
 
 		System.exit(1);
 	}
 
+	private static boolean	shuttingDown	= false;
+
 	/**
-	 * Go down gracefully, calling each registered Hooks shutdown() method.
-	 * Concludes with Gtk.mainQuit(), returning execution control to the main()
-	 * method in the class the program was invoked with.
+	 * Go down gracefully, fist closing any open windows, and then calling each
+	 * registered Hooks shutdown() method. Concludes with Gtk.mainQuit(),
+	 * returning execution control to the main() method in the class the program
+	 * was invoked with.
 	 */
 	public static void shutdown() {
+		/*
+		 * Avoid double-taps
+		 */
+		if (shuttingDown) {
+			return;
+		} else {
+			shuttingDown = true;
+		}
 		System.out.flush();
+
+		/*
+		 * Cleanly dismiss any open PrimaryWindows:
+		 */
+
+		try {
+			// necessary to avoid ConcurrentModificationException
+			ArrayList deadmeat = new ArrayList(windows);
+			Iterator iter;
+
+			iter = deadmeat.iterator();
+			while (iter.hasNext()) {
+				PrimaryWindow w = (PrimaryWindow) iter.next();
+				w.hide();
+			}
+
+			iter = deadmeat.iterator();
+			while (iter.hasNext()) {
+				PrimaryWindow w = (PrimaryWindow) iter.next();
+				w.deleteHook();
+			}
+		} catch (Exception e) {
+		} finally {
+		}
+
+		/*
+		 * Run through any registered shutdown callbacks:
+		 */
 
 		try {
 			Iterator iter = callbacks.iterator();
