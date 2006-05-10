@@ -13,7 +13,8 @@ package accounts.domain;
  */
 public class Debit extends Entry
 {
-	public static final String	COLOR	= "midnightblue";
+	public static final String	COLOR_NORMAL	= "#173faf";
+	public static final String	COLOR_ACTIVE	= "#32fdff";
 
 	public Debit() {
 		super();

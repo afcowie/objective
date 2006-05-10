@@ -26,9 +26,12 @@ import org.gnu.gtk.DataColumnString;
 import org.gnu.gtk.ListStore;
 import org.gnu.gtk.SelectionMode;
 import org.gnu.gtk.TreeIter;
+import org.gnu.gtk.TreePath;
 import org.gnu.gtk.TreeSelection;
 import org.gnu.gtk.TreeView;
 import org.gnu.gtk.TreeViewColumn;
+import org.gnu.gtk.event.TreeSelectionEvent;
+import org.gnu.gtk.event.TreeSelectionListener;
 import org.gnu.gtk.event.TreeViewEvent;
 import org.gnu.gtk.event.TreeViewListener;
 
@@ -49,6 +52,7 @@ public class TransactionListView extends TreeView
 	private transient Currency	home	= null;
 
 	DataColumnString			typeMarkup_DataColumn;
+	DataColumnString			typeSort_DataColumn;
 	DataColumnString			dateText_DataColumn;
 	DataColumnInt				dateSort_DataColumn;
 	DataColumnString			descriptionAccountLedgerText_DataColumn;
@@ -69,6 +73,7 @@ public class TransactionListView extends TreeView
 		home = root.getHomeCurrency();
 
 		typeMarkup_DataColumn = new DataColumnString();
+		typeSort_DataColumn = new DataColumnString();
 		dateText_DataColumn = new DataColumnString();
 		dateSort_DataColumn = new DataColumnInt();
 		descriptionAccountLedgerText_DataColumn = new DataColumnString();
@@ -81,6 +86,7 @@ public class TransactionListView extends TreeView
 
 		listStore = new ListStore(new DataColumn[] {
 			typeMarkup_DataColumn,
+			typeSort_DataColumn,
 			dateText_DataColumn,
 			dateSort_DataColumn,
 			descriptionAccountLedgerText_DataColumn,
@@ -114,7 +120,7 @@ public class TransactionListView extends TreeView
 
 		type_ViewColumn.setTitle("Type");
 		type_ViewColumn.setClickable(true);
-		type_ViewColumn.setSortColumn(typeMarkup_DataColumn); // FIXME Sort
+		type_ViewColumn.setSortColumn(typeSort_DataColumn);
 
 		view.appendColumn(type_ViewColumn);
 
@@ -210,32 +216,36 @@ public class TransactionListView extends TreeView
 		view.setEnableSearch(false);
 		view.setReorderable(false);
 
-		/*
-		 * This does indeed set the foreground text colour, but manual settings
-		 * via Pango <span color=""> markup override foreground and so are
-		 * unaffected. Damn.
-		 */
-		// view.setTextColor(StateType.SELECTED, Color.YELLOW);
 		date_ViewColumn.click();
+
+		/*
+		 * repopulate [via showAsActive()] when a row is selected
+		 */
 
 		TreeSelection selection = view.getSelection();
 		selection.setMode(SelectionMode.SINGLE);
-
-		view.addListener(new TreeViewListener() {
-			public void treeViewEvent(TreeViewEvent event) {
-				if (event.getType() == TreeViewEvent.Type.MOVE_CURSOR) {
-					Debug.print("listeners", "TreeViewEvent: " + event.getType().getName() + " "
-						+ event.getMovementStep() + "," + event.getHowMany());
+		selection.addListener(new TreeSelectionListener() {
+			public void selectionChangedEvent(TreeSelectionEvent event) {
+				TreeSelection selection = (TreeSelection) event.getSource();
+				TreePath[] paths = selection.getSelectedRows();
+				if (paths.length > 0) {
+					showAsActive(paths[0]);
 				}
-
 			}
 		});
 
+		view.addListener(new TreeViewListener() {
+			public void treeViewEvent(TreeViewEvent event) {
+				Debug.print("listeners", "TreeViewEvent: " + event.getType().getName());
+			}
+		});
 	}
 
 	private static final Pattern	regexAmp	= Pattern.compile("&");
 
 	private static final String		DARKGRAY	= "darkgray";
+
+	private static final String		LIGHTGRAY	= "lightgray";
 
 	private static final String		CHARCOAL	= "#575757";
 
@@ -250,179 +260,251 @@ public class TransactionListView extends TreeView
 			Transaction t = (Transaction) tI.next();
 			TreeIter pointer = listStore.appendRow();
 
-			StringBuffer type = new StringBuffer();
-			// type.append("<span color='darkgray'>");
-			type.append(Text.wrap(t.getClassString(), 5));
-			// type.append("</span>");
-
-			listStore.setValue(pointer, typeMarkup_DataColumn, type.toString());
-
-			listStore.setValue(pointer, dateText_DataColumn, "<span font_desc='Mono'>"
-				+ t.getDate().toString() + "</span>");
-
-			final long timestamp = t.getDate().getInternalTimestamp();
-			final long smaller = timestamp / 1000;
-			final int datei = Integer.valueOf(Long.toString(smaller)).intValue();
-			listStore.setValue(pointer, dateSort_DataColumn, datei);
-
-			StringBuffer titleName = new StringBuffer();
-			final String OPEN = "<b>";
-			final String CLOSE = "</b>";
-			titleName.append(OPEN);
-			titleName.append(t.getDescription());
-			titleName.append(CLOSE);
-
-			StringBuffer debitVal = new StringBuffer();
-			debitVal.append(OPEN);
-			debitVal.append(' ');
-			debitVal.append(CLOSE);
-			debitVal.append('\n');
-
-			StringBuffer creditVal = new StringBuffer(debitVal.toString());
-
-			/* ... in this Transaction */
-			long largestDebitNumber = 0;
-			long largestCreditNumber = 0;
-			int widestDebitWidth = 0;
-			int widestCreditWidth = 0;
-
-			List amountBuffers = new ArrayList(3);
-			List entryObjects = new ArrayList(3);
-
-			Set ordered = new TreeSet(new EntryComparator(t));
-			ordered.addAll(t.getEntries());
-			Iterator eI = ordered.iterator();
-			while (eI.hasNext()) {
-				Entry entry = (Entry) eI.next();
-				Ledger ledger = entry.getParentLedger();
-				Account account = ledger.getParentAccount();
-
-				titleName.append("\n");
-
-				titleName.append("<span color='" + account.getColor() + "'>");
-				Matcher ma = regexAmp.matcher(account.getTitle());
-				titleName.append(ma.replaceAll("&amp;"));
-				titleName.append("</span>");
-				/*
-				 * We use » \u00bb. Other possibilities: ∞ \u221e, and ⑆ \u2446.
-				 */
-				titleName.append("<span color='" + CHARCOAL + "'>");
-				titleName.append(" \u00bb ");
-				titleName.append("</span>");
-
-				titleName.append("<span color='" + ledger.getColor() + "'>");
-				Matcher ml = regexAmp.matcher(ledger.getName());
-				titleName.append(ml.replaceAll("&amp;"));
-				titleName.append("</span>");
-
-				Amount a = entry.getAmount();
-				ForeignAmount fa;
-				if (entry.getAmount() instanceof ForeignAmount) {
-					fa = (ForeignAmount) a;
-				} else {
-					fa = new ForeignAmount();
-					fa.setCurrency(home);
-					fa.setRate("1.0");
-					fa.setForeignValue(a);
-				}
-				StringBuffer value = new StringBuffer();
-
-				value.append(fa.getCurrency().getSymbol());
-				value.append(fa.toString()); // has , separators
-				value.append(' ');
-				value.append("<span color='" + DARKGRAY + "'>");
-				value.append(fa.getCurrency().getCode());
-				value.append("</span>");
-
-				amountBuffers.add(value);
-				entryObjects.add(entry);
-
-				/*
-				 * We sort the entires by their face value; number from Amount
-				 * represents underlying home quantity.
-				 */
-				long num = Math.round(Double.parseDouble(fa.getForeignValue()) * 100);
-				if (entry instanceof Debit) {
-					if (num > largestDebitNumber) {
-						largestDebitNumber = num;
-					}
-					if (value.length() > widestDebitWidth) {
-						widestDebitWidth = value.length();
-					}
-				} else if (entry instanceof Credit) {
-					if (num > largestCreditNumber) {
-						largestCreditNumber = num;
-					}
-					if (value.length() > widestCreditWidth) {
-						widestCreditWidth = value.length();
-					}
-				}
-			}
-
 			/*
-			 * Now we iterate over the Entries again, this time applying the max
-			 * width to square the Strings, and then copying them to the
-			 * appropriate left/right credit/debit buffer.
+			 * Populate is geared to be re-used and extracts its Transaction
+			 * from the DataColumnObject there. So in the case of setting up the
+			 * TransactionListView for the first time, set that DataColumn
+			 * before calling populate().
 			 */
-
-			final int num = entryObjects.size();
-			for (int i = 0; i < num; i++) {
-				Entry entry = (Entry) entryObjects.get(i);
-				StringBuffer buf = (StringBuffer) amountBuffers.get(i);
-
-				if (entry instanceof Debit) {
-					int diff = widestDebitWidth - buf.length();
-					for (int j = 0; j < diff; j++) {
-						buf.insert(0, ' ');
-					}
-					debitVal.append(buf);
-					debitVal.append("\n");
-					creditVal.append("\n");
-
-				} else if (entry instanceof Credit) {
-					int diff = widestCreditWidth - buf.length();
-					for (int j = 0; j < diff; j++) {
-						buf.insert(0, ' ');
-					}
-					debitVal.append("\n");
-					creditVal.append(buf);
-					creditVal.append("\n");
-				}
-			}
-
-			/*
-			 * Trim the trailing newline (otherwise we get a blank line in the
-			 * row)
-			 */
-			debitVal.deleteCharAt(debitVal.length() - 1);
-			creditVal.deleteCharAt(creditVal.length() - 1);
-
-			/*
-			 * And set it monospaced (though not terminal - is there a better
-			 * attribute to set?)
-			 */
-			debitVal.insert(0, "<span font_desc='mono' color='" + Debit.COLOR + "'>");
-			debitVal.append("</span>");
-			creditVal.insert(0, "<span font_desc='mono' color='" + Credit.COLOR + "'>");
-			creditVal.append("</span>");
-
-			/*
-			 * Now add the data for the Entries related columns:
-			 */
-			listStore.setValue(pointer, descriptionAccountLedgerText_DataColumn, titleName.toString());
-			listStore.setValue(pointer, descriptionSort_DataColumn, t.getDescription());
-
-			listStore.setValue(pointer, debitAmountsText_DataColumn, debitVal.toString());
-			listStore.setValue(pointer, creditAmountsText_DataColumn, creditVal.toString());
-
-			final int dri = Integer.valueOf(Long.toString(largestDebitNumber)).intValue();
-			listStore.setValue(pointer, debitAmountsSort_DataColumn, dri);
-
-			final int cri = Integer.valueOf(Long.toString(largestCreditNumber)).intValue();
-			listStore.setValue(pointer, creditAmountsSort_DataColumn, cri);
-
 			listStore.setValue(pointer, transactionObject_DataColumn, t);
+
+			populate(pointer, false);
 		}
+	}
+
+	private TreePath	previous	= null;
+
+	/**
+	 * Set a given row of the ListStore as as "active" (ie, selected) by
+	 * repopulaing its DataColumns to have our _ACTIVE color values rather than
+	 * _NORMAL ones. The row that was previously active is set back to "normal".
+	 * 
+	 * @param path
+	 *            the TreePath (presumably extracted from a TreeSelection) that
+	 *            you want to indicate as active.
+	 */
+	private void showAsActive(TreePath path) {
+		TreeIter pointer = listStore.getIter(path);
+		Transaction t = (Transaction) listStore.getValue(pointer, transactionObject_DataColumn);
+		populate(pointer, true);
+
+		if ((previous != null) && (previous != path)) {
+			pointer = listStore.getIter(previous);
+			populate(pointer, false);
+		}
+		previous = path;
+	}
+
+	/**
+	 * Populate a given row with data marked up for presentation and data
+	 * normalized for sorting purposes.
+	 * 
+	 * @param pointer
+	 *            a TreeIter indicating which row you are interested in.
+	 * @param active
+	 *            whether the row is to be rendered with bright colours. Call
+	 *            this as true if the row is selected, otherwise use false for
+	 *            normal colouring.
+	 */
+	/*
+	 * This is moderately hideous, but then what presentation code ever is NOT
+	 * ugly? Note that all the Sort_DataColums fields are nice clean Strings
+	 * generally directly being the underlying text data, whereas the Markup
+	 * ones are where the pango mush goes (which is why we can't sort on them -
+	 * it'd sort by colour!)
+	 */
+	private void populate(TreeIter pointer, boolean active) {
+		Transaction t = (Transaction) listStore.getValue(pointer, transactionObject_DataColumn);
+
+		StringBuffer type = new StringBuffer();
+
+		if (active) {
+			type.append("<span color='" + LIGHTGRAY + "'>");
+		} else {
+			type.append("<span color='" + CHARCOAL + "'>");
+		}
+		type.append(Text.wrap(t.getClassString(), 5));
+		type.append("</span>");
+
+		listStore.setValue(pointer, typeMarkup_DataColumn, type.toString());
+		listStore.setValue(pointer, typeSort_DataColumn, t.getClassString());
+
+		listStore.setValue(pointer, dateText_DataColumn, "<span font_desc='Mono'>"
+			+ t.getDate().toString() + "</span>");
+
+		final long timestamp = t.getDate().getInternalTimestamp();
+		final long smaller = timestamp / 1000;
+		final int datei = Integer.valueOf(Long.toString(smaller)).intValue();
+		listStore.setValue(pointer, dateSort_DataColumn, datei);
+
+		StringBuffer titleName = new StringBuffer();
+		final String OPEN = "<b>";
+		final String CLOSE = "</b>";
+		titleName.append(OPEN);
+		titleName.append(t.getDescription());
+		titleName.append(CLOSE);
+
+		StringBuffer debitVal = new StringBuffer();
+		debitVal.append(OPEN);
+		debitVal.append(' ');
+		debitVal.append(CLOSE);
+		debitVal.append('\n');
+
+		StringBuffer creditVal = new StringBuffer(debitVal.toString());
+
+		/* ... in this Transaction */
+		long largestDebitNumber = 0;
+		long largestCreditNumber = 0;
+		int widestDebitWidth = 0;
+		int widestCreditWidth = 0;
+
+		List amountBuffers = new ArrayList(3);
+		List entryObjects = new ArrayList(3);
+
+		Set ordered = new TreeSet(new EntryComparator(t));
+		ordered.addAll(t.getEntries());
+		Iterator eI = ordered.iterator();
+		while (eI.hasNext()) {
+			Entry entry = (Entry) eI.next();
+			Ledger ledger = entry.getParentLedger();
+			Account account = ledger.getParentAccount();
+
+			titleName.append("\n");
+
+			titleName.append("<span color='");
+			titleName.append(account.getColor(active));
+			titleName.append("'>");
+			Matcher ma = regexAmp.matcher(account.getTitle());
+			titleName.append(ma.replaceAll("&amp;"));
+			titleName.append("</span>");
+			/*
+			 * We use » \u00bb. Other possibilities: ∞ \u221e, and ⑆ \u2446.
+			 */
+			if (active) {
+				titleName.append("<span color='" + LIGHTGRAY + "'>");
+			} else {
+				titleName.append("<span color='" + CHARCOAL + "'>");
+			}
+			titleName.append(" \u00bb ");
+			titleName.append("</span>");
+
+			titleName.append("<span color='");
+			titleName.append(ledger.getColor(active));
+			titleName.append("'>");
+			Matcher ml = regexAmp.matcher(ledger.getName());
+			titleName.append(ml.replaceAll("&amp;"));
+			titleName.append("</span>");
+
+			Amount a = entry.getAmount();
+			ForeignAmount fa;
+			if (entry.getAmount() instanceof ForeignAmount) {
+				fa = (ForeignAmount) a;
+			} else {
+				fa = new ForeignAmount();
+				fa.setCurrency(home);
+				fa.setRate("1.0");
+				fa.setForeignValue(a);
+			}
+			StringBuffer value = new StringBuffer();
+
+			value.append(fa.getCurrency().getSymbol());
+			value.append(fa.toString()); // has , separators
+			value.append(' ');
+			if (active) {
+				value.append("<span color='" + LIGHTGRAY + "'>");
+			} else {
+				value.append("<span color='" + DARKGRAY + "'>");
+			}
+			value.append(fa.getCurrency().getCode());
+			value.append("</span>");
+
+			amountBuffers.add(value);
+			entryObjects.add(entry);
+
+			/*
+			 * We sort the entires by their face value; number from Amount
+			 * represents underlying home quantity.
+			 */
+			long num = Math.round(Double.parseDouble(fa.getForeignValue()) * 100);
+			if (entry instanceof Debit) {
+				if (num > largestDebitNumber) {
+					largestDebitNumber = num;
+				}
+				if (value.length() > widestDebitWidth) {
+					widestDebitWidth = value.length();
+				}
+			} else if (entry instanceof Credit) {
+				if (num > largestCreditNumber) {
+					largestCreditNumber = num;
+				}
+				if (value.length() > widestCreditWidth) {
+					widestCreditWidth = value.length();
+				}
+			}
+		}
+
+		/*
+		 * Now we iterate over the Entries again, this time applying the max
+		 * width to square the Strings, and then copying them to the appropriate
+		 * left/right credit/debit buffer.
+		 */
+
+		final int num = entryObjects.size();
+		for (int i = 0; i < num; i++) {
+			Entry entry = (Entry) entryObjects.get(i);
+			StringBuffer buf = (StringBuffer) amountBuffers.get(i);
+
+			if (entry instanceof Debit) {
+				int diff = widestDebitWidth - buf.length();
+				for (int j = 0; j < diff; j++) {
+					buf.insert(0, ' ');
+				}
+				debitVal.append(buf);
+				debitVal.append("\n");
+				creditVal.append("\n");
+
+			} else if (entry instanceof Credit) {
+				int diff = widestCreditWidth - buf.length();
+				for (int j = 0; j < diff; j++) {
+					buf.insert(0, ' ');
+				}
+				debitVal.append("\n");
+				creditVal.append(buf);
+				creditVal.append("\n");
+			}
+		}
+
+		/*
+		 * Trim the trailing newline (otherwise we get a blank line in the row)
+		 */
+		debitVal.deleteCharAt(debitVal.length() - 1);
+		creditVal.deleteCharAt(creditVal.length() - 1);
+
+		/*
+		 * And set it monospaced (though not terminal - is there a better
+		 * attribute to set?)
+		 */
+		debitVal.insert(0, "<span font_desc='mono' color='"
+			+ (active ? Debit.COLOR_ACTIVE : Debit.COLOR_NORMAL) + "'>");
+		debitVal.append("</span>");
+		creditVal.insert(0, "<span font_desc='mono' color='"
+			+ (active ? Credit.COLOR_ACTIVE : Credit.COLOR_NORMAL) + "'>");
+		creditVal.append("</span>");
+
+		/*
+		 * Now add the data for the Entries related columns:
+		 */
+		listStore.setValue(pointer, descriptionAccountLedgerText_DataColumn, titleName.toString());
+		listStore.setValue(pointer, descriptionSort_DataColumn, t.getDescription());
+
+		listStore.setValue(pointer, debitAmountsText_DataColumn, debitVal.toString());
+		listStore.setValue(pointer, creditAmountsText_DataColumn, creditVal.toString());
+
+		final int dri = Integer.valueOf(Long.toString(largestDebitNumber)).intValue();
+		listStore.setValue(pointer, debitAmountsSort_DataColumn, dri);
+
+		final int cri = Integer.valueOf(Long.toString(largestCreditNumber)).intValue();
+		listStore.setValue(pointer, creditAmountsSort_DataColumn, cri);
 	}
 
 	/**

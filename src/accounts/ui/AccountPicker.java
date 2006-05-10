@@ -269,12 +269,12 @@ public class AccountPicker extends HBox
 					final String size = "xx-small";
 					Matcher m = regexAmp.matcher(acct.getTitle());
 					listStore.setValue(pointer, accountDisplay_DataColumn, m.replaceAll("&amp;") + "\n<span size=\""
-						+ size + "\" color=\"" + acct.getColor() + "\">" + acct.getClassString() + "</span>");
+						+ size + "\" color=\"" + acct.getColor(false) + "\">" + acct.getClassString() + "</span>");
 					listStore.setValue(pointer, accountTitle_DataColumn, acct.getTitle());
 					listStore.setValue(pointer, accountObject_DataColumn, acct);
 
 					listStore.setValue(pointer, ledgerDisplay_DataColumn, ledger.getName() + "\n<span size=\"" + size
-						+ "\"color=\"" + ledger.getColor() + "\">" + ledger.getClassString() + "</span>");
+						+ "\"color=\"" + ledger.getColor(false) + "\">" + ledger.getClassString() + "</span>");
 					listStore.setValue(pointer, ledgerName_DataColumn, ledger.getName());
 					listStore.setValue(pointer, ledgerObject_DataColumn, ledger);
 				}

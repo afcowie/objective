@@ -230,11 +230,20 @@ public class Ledger
 	/**
 	 * Yes, colour is spelled with a u... but in GTK it's spelled color. Fine.
 	 */
-	public String getColor() {
+	public String getColor(boolean active) {
 		if (this instanceof DebitPositiveLedger) {
-			return Debit.COLOR;
+			if (active) {
+				return Debit.COLOR_ACTIVE;
+			} else {
+				return Debit.COLOR_NORMAL;
+			}
 		} else if (this instanceof CreditPositiveLedger) {
-			return Credit.COLOR;
+			if (active) {
+				return Credit.COLOR_ACTIVE;
+			} else {
+				return Credit.COLOR_NORMAL;
+			}
+
 		} else {
 			return "";
 		}

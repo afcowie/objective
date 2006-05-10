@@ -13,7 +13,8 @@ package accounts.domain;
  */
 public class Credit extends Entry
 {
-	public static final String	COLOR	= "#1c631c";
+	public static final String	COLOR_NORMAL	= "#0b8c06";
+	public static final String	COLOR_ACTIVE	= "#a0ff97";
 
 	public Credit() {
 		super();
