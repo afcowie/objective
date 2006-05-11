@@ -143,7 +143,7 @@ public final class DataClient
 	 * provided by this class should be used to access the datastore. But
 	 * there's no overt reason to hide this, particularly for unit testing.
 	 * 
-	 * @return The {@link ObjectContainer}that this class wraps.
+	 * @return The {@link ExtObjectContainer} that this class wraps.
 	 */
 	ExtObjectContainer getUnderlyingContainer() {
 		return container;
@@ -305,6 +305,9 @@ public final class DataClient
 	 * @see #fetchByID(long)
 	 */
 	public long getID(Object obj) {
+		if (obj == null) {
+			throw new IllegalArgumentException();
+		}
 		long id = container.getID(obj);
 		if (id == 0) {
 			throw new IllegalStateException();
@@ -338,6 +341,7 @@ public final class DataClient
 			throw new IllegalStateException("Object of that ID not present");
 		}
 		container.activate(target, 5);
+		dirty.add(target);
 		return target;
 	}
 }

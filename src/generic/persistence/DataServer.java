@@ -218,9 +218,9 @@ public final class DataServer
 			}
 			poolInUse.remove(client);
 
-			ExtObjectContainer ext = client.getUnderlyingContainer().ext();
+			ExtObjectContainer ext = client.getUnderlyingContainer();
 
-			if (client.getUnderlyingContainer().ext().isClosed()) {
+			if (ext.isClosed()) {
 				throw new DebugException("This client is closed, can't return it to connection pool!");
 			}
 

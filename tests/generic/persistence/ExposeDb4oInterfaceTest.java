@@ -217,7 +217,7 @@ public class ExposeDb4oInterfaceTest extends TestCase
 		try {
 			store.getID(null);
 			fail("How can you ask for the ID of null?");
-		} catch (IllegalStateException ise) {
+		} catch (IllegalArgumentException iae) {
 			// good
 		}
 
@@ -291,5 +291,52 @@ public class ExposeDb4oInterfaceTest extends TestCase
 
 		Engine.releaseClient(store1);
 		Engine.releaseClient(store2);
+	}
+
+	public final void testFetchByIdObjectAddedToDirtySet() {
+		DataClient store = Engine.gainClient();
+
+		/*
+		 * So fetch up #17, but do it the hard way so we have an ID to fetch by.
+		 */
+		DummyInts proto = new DummyInts(17);
+		List results = store.getUnderlyingContainer().get(proto);
+		DummyInts seventeen = (DummyInts) results.get(0);
+		assertEquals(17, seventeen.getNum());
+
+		/*
+		 * Fetch it by ID (that being what we need to test)
+		 */
+
+		long id = store.getID(seventeen);
+		Object obj = store.fetchByID(id);
+
+		assertNotNull(obj);
+		assertTrue(obj instanceof DummyInts);
+
+		seventeen = (DummyInts) obj;
+		assertEquals(17, seventeen.getNum());
+
+		/*
+		 * Ok! Now dirty it.
+		 */
+		seventeen.setNum(69);
+		assertEquals(69, seventeen.getNum());
+
+		Engine.releaseClient(store);
+
+		/*
+		 * This should have caused the 69 to be refreshed back to 17
+		 */
+		store = Engine.gainClient();
+
+		results = store.getUnderlyingContainer().get(proto);
+		assertEquals(1, results.size());
+		seventeen = (DummyInts) results.get(0);
+		assertEquals(
+			"releasing a DataClient containing a dirtied object originally fetched by ID should cause that object to be refreshed.",
+			17, seventeen.getNum());
+
+		Engine.releaseClient(store);
 	}
 }
