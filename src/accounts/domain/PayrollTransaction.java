@@ -61,8 +61,10 @@ public class PayrollTransaction extends Transaction
 		 * set PayrollTransaction's fields.
 		 */
 		super("Paycheck to " + employee.getName(), date, entries);
+		setEmployee(employee);
 		setTaxIdentifier(identifier);
 		setEndDate(date);
+
 		setSalaryEntry(entries[0]);
 		setWithholdingEntry(entries[1]);
 		setPaycheckEntry(entries[2]);
