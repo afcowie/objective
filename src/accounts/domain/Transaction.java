@@ -14,6 +14,10 @@ import java.util.Set;
  * Base class of the Transaction hierarchy. Transactions are operations which
  * are balanced double-entry accounting events. That also means that, per GAAP,
  * they have to have a source document somewhere.
+ * <p>
+ * We override {@link #equals()} so this can't be naturally used in TreeSets,
+ * which is fine; see {@link accounts.services.TransactionComparator} if you
+ * need a SortedSet of Transactions.
  * 
  * @author Andrew Cowie
  */
@@ -87,7 +91,9 @@ public class Transaction
 	}
 
 	/**
-	 * Remove an Entry from this Transaction.
+	 * Remove an Entry from this Transaction's entries set. <b>Does not null the
+	 * Entry's members such as parentTransaction and does not have any affect on
+	 * the Entry's parentLedger. That's what UpdateTransactionCommand it for.</b>
 	 * 
 	 * @throws IllegalStateException
 	 *             if you try to remove an Entry that isn't in this Transaction.
@@ -97,7 +103,8 @@ public class Transaction
 			throw new IllegalArgumentException("Can't remove a null Entry!");
 		}
 		if (!(entries.contains(entry))) {
-			throw new IllegalStateException("You've asked to remove an Entry that isn't in this Transaction");
+			throw new IllegalStateException(
+				"You've asked to remove an Entry that isn't in this Transaction");
 		}
 		entries.remove(entry);
 	}
@@ -122,7 +129,8 @@ public class Transaction
 			} else if (entry instanceof Credit) {
 				total.decrementBy(entry.getAmount());
 			} else {
-				throw new IllegalStateException("How did you get an Entry that's neither Debit nor Credit?");
+				throw new IllegalStateException(
+					"How did you get an Entry that's neither Debit nor Credit?");
 			}
 		}
 
@@ -222,6 +230,76 @@ public class Transaction
 			Entry entry = (Entry) iter.next();
 			entry.setDate(date);
 		}
+	}
+
+	/**
+	 * Compare two Transaction objects. This does <b>not</b> use any reference
+	 * equality so it should come up with a true result if two objects are the
+	 * same but in different DataClients. Note also that this does not compare
+	 * entries sets.
+	 */
+	public boolean equals(Object x) {
+		/*
+		 * If it's the same object, return true
+		 */
+		if (x == this) {
+			return true;
+		}
+
+		if (x == null) {
+			return false;
+		}
+
+		if (x instanceof Transaction) {
+			Transaction t = (Transaction) x;
+
+			// if they're both null, fine
+			if (t.date != this.date) {
+				// otherwise, if one is null, can't compare
+				if ((t.date == null) || (this.date == null)) {
+					return false;
+				}
+				// compare timestamps
+				if (t.date.getInternalTimestamp() != this.date.getInternalTimestamp()) {
+					return false;
+				}
+			}
+
+			/*
+			 * For the String fields: if they're the same object, fine,
+			 * otherwise compare the two with String.equals()
+			 */
+			if (t.description != this.description) {
+				if ((t.description == null) || (this.description == null)) {
+					return false;
+				}
+				if (!(t.description.equals(this.description))) {
+					return false;
+				}
+			}
+			if (t.reference != this.reference) {
+				if ((t.reference == null) || (this.reference == null)) {
+					return false;
+				}
+				if (!(t.reference.equals(this.reference))) {
+					return false;
+				}
+			}
+
+			/*
+			 * Quick way to find out if the fully derived classes are the same.
+			 */
+			if (t.getClass() != this.getClass()) {
+				return false;
+			}
+
+			/*
+			 * WARNING: we don't compare entries.
+			 */
+			// FUTURE switch checking database ID?
+			return true;
+		}
+		return false;
 	}
 
 	/*

@@ -35,6 +35,8 @@ import org.gnu.gtk.event.TreeSelectionListener;
 import org.gnu.gtk.event.TreeViewEvent;
 import org.gnu.gtk.event.TreeViewListener;
 
+import country.au.ui.AustralianPayrollEditorWindow;
+
 import accounts.domain.Account;
 import accounts.domain.Amount;
 import accounts.domain.Books;
@@ -44,6 +46,7 @@ import accounts.domain.Debit;
 import accounts.domain.Entry;
 import accounts.domain.ForeignAmount;
 import accounts.domain.Ledger;
+import accounts.domain.PayrollTransaction;
 import accounts.domain.Transaction;
 import accounts.services.EntryComparator;
 
@@ -66,7 +69,7 @@ public class TransactionListView extends TreeView
 
 	TreeView					view;
 
-	public TransactionListView(DataClient db, List transactions) {
+	public TransactionListView(final DataClient db, List transactions) {
 		super();
 
 		Books root = (Books) db.getRoot();
@@ -219,7 +222,9 @@ public class TransactionListView extends TreeView
 		date_ViewColumn.click();
 
 		/*
-		 * repopulate [via showAsActive()] when a row is selected
+		 * repopulate [via showAsActive()] when a row is selected to cause
+		 * colours to adapt to better values appropriate being against the
+		 * selected row background colour.
 		 */
 
 		TreeSelection selection = view.getSelection();
@@ -237,6 +242,19 @@ public class TransactionListView extends TreeView
 		view.addListener(new TreeViewListener() {
 			public void treeViewEvent(TreeViewEvent event) {
 				Debug.print("listeners", "TreeViewEvent: " + event.getType().getName());
+				if (event.getType() == TreeViewEvent.Type.ROW_ACTIVATED) {
+					TreeIter pointer = event.getTreeIter();
+					Transaction t = (Transaction) listStore.getValue(pointer,
+						transactionObject_DataColumn);
+
+					long tID = db.getID(t);
+
+					if (t instanceof PayrollTransaction) {
+						new AustralianPayrollEditorWindow(tID);
+					} else {
+						Debug.print("listeners", "Transaction ignored");
+					}
+				}
 			}
 		});
 	}

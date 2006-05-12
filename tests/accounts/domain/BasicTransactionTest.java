@@ -41,7 +41,8 @@ public class BasicTransactionTest extends TestCase
 		 * should result in a false return and no change to the entries Set.
 		 */
 		boolean result = t.addEntry(two);
-		assertFalse("Trying to add the same Entry object again should have failed and returned false", result);
+		assertFalse("Trying to add the same Entry object again should have failed and returned false",
+			result);
 		assertTrue(t.isBalanced());
 
 		/*
@@ -163,5 +164,57 @@ public class BasicTransactionTest extends TestCase
 
 		t.removeEntry(droit);
 		assertEquals(0, t.getEntries().size());
+	}
+
+	public final void testEquals() {
+		Debit left = new Debit(new Amount("1.00"), null);
+		Credit right = new Credit(new Amount("1.00"), null);
+
+		Debit gauche = new Debit(new Amount("15.00"), null);
+		Credit droit = new Credit(new Amount("15.00"), null);
+
+		Transaction t1 = new Transaction();
+		assertFalse(t1.equals(null));
+		assertTrue(t1.equals(t1));
+
+		t1.setDate(new Datestamp("12 May 06"));
+		assertTrue(t1.equals(t1));
+
+		t1.setDescription("TEST");
+		assertTrue(t1.equals(t1));
+
+		t1.setReference("REF");
+		assertTrue(t1.equals(t1));
+
+		t1.addEntry(droit);
+		t1.addEntry(gauche);
+
+		Transaction t2 = new Transaction();
+		assertFalse(t1.equals(t2));
+
+		t2.setDate(new Datestamp("12 May 06"));
+		assertFalse(t1.equals(t2));
+
+		t2.setDescription("TEST");
+		assertFalse(t1.equals(t2));
+
+		t2.setReference("REF");
+		assertTrue(t1.equals(t2));
+
+		/*
+		 * But Transaction != GenericTransaction, so this should fail
+		 * regardless.
+		 */
+		Transaction t3 = new GenericTransaction();
+		assertFalse(t1.equals(t3));
+
+		t3.setDate(new Datestamp("12 May 06"));
+		assertFalse(t1.equals(t3));
+
+		t3.setDescription("TEST");
+		assertFalse(t1.equals(t3));
+
+		t3.setReference("REF");
+		assertFalse(t1.equals(t3));
 	}
 }

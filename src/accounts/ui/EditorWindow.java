@@ -20,7 +20,6 @@ import org.gnu.gtk.HSeparator;
 import org.gnu.gtk.event.ButtonEvent;
 import org.gnu.gtk.event.ButtonListener;
 
-
 /**
  * A great number of UI windows [will] follow the pattern of being either
  * editors or complementary viewers, named in parallel. This branch of
@@ -45,8 +44,8 @@ public abstract class EditorWindow extends PrimaryWindow
 	protected DataClient	store;
 
 	/**
-	 * Basic form of EditorWindow. Calls PrimaryWindow's constructor,
-	 * then adds the button box with ok and close.
+	 * Basic form of EditorWindow. Calls PrimaryWindow's constructor, then adds
+	 * the button box with ok and close.
 	 */
 	protected EditorWindow() {
 		/*
@@ -122,13 +121,19 @@ public abstract class EditorWindow extends PrimaryWindow
 	 * Release the DataClient back to the Engine and then call
 	 * {@link AbstractWindow#deleteHook()} which should hide and destroy the
 	 * Window. See that method for a description of the meaning of the boolean
-	 * return value. If you override this and don't in turn call this one, then
-	 * you'll have to release the {@link #store} client yourself.
+	 * return value. <b>If you override this and don't in turn call this one,
+	 * then you'll have to release the {@link #store} client yourself.</b>
 	 */
 	protected boolean deleteHook() {
-		Engine.releaseClient(store);
-		store = null;
 		super.deleteHook();
+		new Thread() {
+			public void run() {
+				Debug.print("threads", "Releasing client");
+				Engine.releaseClient(store);
+				store = null;
+			}
+		}.start();
+
 		return false;
 	}
 

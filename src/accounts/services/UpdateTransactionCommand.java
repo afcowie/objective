@@ -7,6 +7,7 @@
 package accounts.services;
 
 import generic.persistence.DataClient;
+import generic.persistence.Selector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,37 +54,42 @@ public class UpdateTransactionCommand extends TransactionCommand
 			original = (Transaction) store.peek(transaction);
 		} catch (NoSuchElementException nsoe) {
 			throw new CommandNotReadyException(
-				"If we can't get the persisted version of the Transaction, how on earth are we updating it? " + nsoe);
+				"If we can't get the persisted version of the Transaction, how on earth are we updating it? "
+					+ nsoe);
 		}
-		Set committedEntries = (Set) store.peek(transaction.getEntries());
 
 		/*
-		 * This algorithm is as established in
-		 * TransactionCommandsTest.testPeekOnTransaction(). We go through the
-		 * committed [disconnected] version of the entries Set and for each one
-		 * do a queryByExample to pull up the live [connected] Entry object. We
-		 * then can test to see if it's present in the live entries Set and act
+		 * We do a native query to pull up the committed list of stored Entries
+		 * as presently committed under this Transaction object. We then can
+		 * test each Entry see if it's present in the live entries Set and act
 		 * accordingly.
 		 */
 
 		Set liveEntries = transaction.getEntries();
 		List missingEntries = new ArrayList();
 
-		Iterator iter = committedEntries.iterator();
-		while (iter.hasNext()) {
-			Entry committed = (Entry) iter.next();
-			List result = store.queryByExample(committed);
-			if (result.size() != 1) {
-				throw new CommandNotReadyException("Querying by example the peeked committed Entry '"
-					+ committed.toString() + "' didn't return an activated live Entry. That's bad. " + result.size());
+		class EntrySelector extends Selector
+		{
+			private Transaction	target;
+
+			EntrySelector(Transaction t) {
+				this.target = t;
 			}
 
-			/*
-			 * The same persisted entity as committed, but this time a reference
-			 * to the live Object that is connected to the database via the
-			 * current DataStore.
-			 */
-			Entry ref = (Entry) result.get(0);
+			public boolean match(Entry entry) {
+				Transaction parent = entry.getParentTransaction();
+
+				if (parent.equals(target)) {
+					return true;
+				}
+				return false;
+			}
+		}
+		List storedEntries = store.nativeQuery(new EntrySelector(transaction));
+
+		Iterator iter = storedEntries.iterator();
+		while (iter.hasNext()) {
+			Entry ref = (Entry) iter.next();
 
 			/*
 			 * Remove the Entry from the parent Ledger to reduce it's balance,

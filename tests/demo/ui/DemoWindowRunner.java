@@ -54,11 +54,11 @@ public class DemoWindowRunner
 		// Debug.print("main", "initializing AccountTypeSelectorDialog");
 		// AccountTypeSelectorDialog selector = new
 		// AccountTypeSelectorDialog();
-		Debug.print("main", "Initializing ReimbursableExpensesEditorWindow");
-		ReimbursableExpensesEditorWindow reimburse = new ReimbursableExpensesEditorWindow();
+//		Debug.print("main", "Initializing ReimbursableExpensesEditorWindow");
+//		ReimbursableExpensesEditorWindow reimburse = new ReimbursableExpensesEditorWindow();
 
-		Debug.print("main", "Initializing AustralianPayrollEditorWindow");
-		AustralianPayrollEditorWindow payroll = new AustralianPayrollEditorWindow(null);
+//		Debug.print("main", "Initializing AustralianPayrollEditorWindow");
+//		AustralianPayrollEditorWindow payroll = new AustralianPayrollEditorWindow();
 
 		Debug.print("main", "Initializing TransactionListViewHolder");
 		TransactionListViewHolder view = new TransactionListViewHolder();

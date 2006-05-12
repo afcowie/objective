@@ -190,6 +190,15 @@ public class DemoMockTransactions
 			cur = null;
 
 			/*
+			 * Get an AustralianPayrollTaxIdentifier. TODO this sucks.
+			 * Generalize to Finder
+			 */
+			AustralianPayrollTaxIdentifier proto = new AustralianPayrollTaxIdentifier(
+				"Tax-free threshold and leave loading claimed");
+			result = rw.queryByExample(proto);
+			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING = (AustralianPayrollTaxIdentifier) result.get(0);
+
+			/*
 			 * Now start storing some transactions
 			 */
 			Debug.print("main", "Store various transactions");

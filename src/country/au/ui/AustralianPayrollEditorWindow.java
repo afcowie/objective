@@ -7,7 +7,6 @@
 package country.au.ui;
 
 import generic.ui.Align;
-import generic.ui.Master;
 import generic.ui.ModalDialog;
 import generic.ui.TwoColumnTable;
 import generic.util.Debug;
@@ -33,6 +32,7 @@ import accounts.services.CommandNotReadyException;
 import accounts.services.NotFoundException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.SpecificLedgerFinder;
+import accounts.services.UpdateTransactionCommand;
 import accounts.ui.AmountDisplay;
 import accounts.ui.AmountEntry;
 import accounts.ui.ChangeListener;
@@ -80,15 +80,34 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 	private PayrollTransaction				existing	= null;
 
 	/**
+	 * Construct a Window and instantiate all the necessary widgets for a new
+	 * PayrollTransaction.
+	 */
+	public AustralianPayrollEditorWindow() {
+		this(0);
+	}
+
+	/**
 	 * Construct a Window and instantiate all the necessary widgets.
 	 * 
-	 * @param t
-	 *            a PayrollTransaction containing an Australian PAYG transaction
-	 *            if you want to edit an existing Transaction, or null to start
-	 *            a new Transaction. argument.
+	 * @param tID
+	 *            the object ID of a PayrollTransaction containing an Australian
+	 *            PAYG transaction you want to edit
 	 */
-	public AustralianPayrollEditorWindow(PayrollTransaction t) {
+	/*
+	 * The business with ID 0 is a bit of subtrefuge. Obviously the no-arg
+	 * constructor uses 0, but we don't want to be public about that as in
+	 * general use ID 0 is meaningless and sign of an error. Here it means new.
+	 */
+	public AustralianPayrollEditorWindow(long tID) {
 		super();
+
+		PayrollTransaction t;
+		if (tID == 0) {
+			t = null;
+		} else {
+			t = (PayrollTransaction) store.fetchByID(tID);
+		}
 
 		final Label title_Label = new Label("<big><b>Pay an (Australian) Employee</b></big>");
 		title_Label.setUseMarkup(true);
@@ -187,9 +206,9 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		top.packStart(table, true, true, 0);
 
 		/*
-		 * Now attach the listeners: A new Calculator if the Identifier is
-		 * changed; and run the Calculator if an Amount is changed in either
-		 * salary or paycheck entry fields.
+		 * Hook up the listener to the PAYG IdentifierSelector. This one is
+		 * first because when the initial state is set, it needs to be hooked up
+		 * so that the appropriate calculator is instantiated.
 		 */
 
 		payg_IdentifierSelector.addListener(new ComboBoxListener() {
@@ -246,10 +265,62 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			}
 		});
 
+		/*
+		 * Set a useful initial state. Again, differentiate between the new
+		 * Transaction and edit Transaction cases. Specifically, this is before
+		 * the listeners are attached to ensure that setting the objects doesn't
+		 * result in double-tap bugs.
+		 */
+
+		if (t == null) {
+			salary = new Amount(0);
+			withholding = new Amount(0);
+			paycheck = new Amount(0);
+
+			payg_IdentifierSelector.setActive(0);
+
+			setTitle("Enter payroll details");
+
+			/*
+			 * start with selecting a person to pay.
+			 */
+			employee_WorkerPicker.grabFocus();
+		} else {
+			salary = t.getSalaryEntry().getAmount();
+			withholding = t.getWithholdingEntry().getAmount();
+			paycheck = t.getPaycheckEntry().getAmount();
+
+			employee_WorkerPicker.setWorker(t.getEmployee());
+			payg_IdentifierSelector.setIdentifier(t.getTaxIdentifier());
+
+			setTitle("Edit Transaction " + t.getDescription());
+
+			/*
+			 * As we're editing, the likely thing is changing the amount, so set
+			 * focus there.
+			 */
+			salary_AmountEntry.grabFocus();
+
+			/*
+			 * And keep a reference to the passed Transaction
+			 */
+			existing = t;
+		}
+		salary_AmountEntry.setAmount(salary);
+		withholding_AmountDisplay.setAmount(withholding);
+		paycheck_AmountEntry.setAmount(paycheck);
+
+		/*
+		 * Now hook up the listeners: A new Calculator if the Identifier is
+		 * changed; and run the Calculator if an Amount is changed in either
+		 * salary or paycheck entry fields.
+		 */
+
 		salary_AmountEntry.addListener(new ChangeListener() {
 			public void userChangedData() {
 
-				Debug.print("listeners", me + " in salary_AmountEntry's changed(), salary now " + salary.toString());
+				Debug.print("listeners", me + " in salary_AmountEntry's changed(), salary now "
+					+ salary.toString());
 
 				calc.setSalary(salary);
 
@@ -299,50 +370,12 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			}
 		});
 
-		/*
-		 * And finally, set a useful initial state. Again, differentiate between
-		 * the new Transaction and edit Transaction cases.
-		 */
-
-		if (t == null) {
-			salary = new Amount(0);
-			withholding = new Amount(0);
-			paycheck = new Amount(0);
-
-			payg_IdentifierSelector.setActive(0);
-
-			setTitle("Enter payroll details");
-
-			/*
-			 * start with selecting a person to pay.
-			 */
-			employee_WorkerPicker.grabFocus();
-		} else {
-			salary = t.getSalaryEntry().getAmount();
-			withholding = t.getWithholdingEntry().getAmount();
-			paycheck = t.getPaycheckEntry().getAmount();
-
-			employee_WorkerPicker.setWorker(employee);
-			payg_IdentifierSelector.setIdentifier(t.getTaxIdentifier());
-
-			setTitle("Edit Transaction " + t.getDescription());
-
-			/*
-			 * As we're editing, the likely thing is changing the amount, so set
-			 * focus there.
-			 */
-			salary_AmountEntry.grabFocus();
-
-			/*
-			 * And keep a reference to the passed Transaction
-			 */
-			existing = t;
-		}
-		salary_AmountEntry.setAmount(salary);
-		withholding_AmountDisplay.setAmount(withholding);
-		paycheck_AmountEntry.setAmount(paycheck);
-
 		present();
+		/*
+		 * TODO: if we implement PrimaryTransaction then use its value to point
+		 * to which Entry is last:
+		 */
+		last = salary_AmountEntry;
 	}
 
 	protected void ok() {
@@ -428,6 +461,8 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 				/*
 				 * The amounts in the Entries were used directly.
 				 */
+				UpdateTransactionCommand utc = new UpdateTransactionCommand(t);
+				utc.execute(store);
 			}
 			store.commit();
 			super.ok();
@@ -435,22 +470,15 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			Debug.print("events", "Can't find Ledger " + nfe.getMessage());
 		} catch (CommandNotReadyException cnre) {
 			Debug.print("events", "Command not ready: " + cnre.getMessage());
-			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(), MessageType.ERROR);
+			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(),
+				MessageType.ERROR);
 			dialog.run();
 
 			/*
 			 * Leave the Window open so user can fix, as opposed to calling
 			 * cancel()
 			 */
+			present();
 		}
-	}
-
-	public boolean deleteHook() {
-		// hide & destroy
-		super.deleteHook();
-		// quit
-		System.out.println("Notice: deleteHook() overriden to call Master.shutdown()");
-		Master.shutdown();
-		return false;
 	}
 }

@@ -112,15 +112,19 @@ public class IdentifierSelector extends ComboBox
 	 * @param identifier
 	 *            The Identifier object to be set as active.
 	 * @throws IllegalArgumentException
-	 *             if you are so foolish as to tell it to select a Currency
-	 *             object which isn't in the system currency table.
+	 *             if you are so foolish as to tell it to select an Identifier
+	 *             object which isn't in the IdentifierGroup this Selector represents
 	 */
 	public void setIdentifier(Identifier identifier) {
+		if (identifier == null) {
+			return;
+		}
 		TreeIter pointer = listStore.getFirstIter();
 
 		while (pointer != null) {
 			if (listStore.getValue(pointer, identifierObject_DataColumn) == identifier) {
 				this.setActiveIter(pointer);
+				this.activate();
 				return;
 			}
 			pointer = pointer.getNextIter();
