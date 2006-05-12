@@ -28,7 +28,7 @@ public class DemoOutputDump
 		TextOutput outputter = null;
 
 		try {
-			Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE);
+			Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE, Books.class);
 		} catch (FileNotFoundException fnfe) {
 			System.err.println("\nDemo database not found! Did you run DemoBooksSetup?\n");
 			System.exit(1);

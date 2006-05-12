@@ -75,23 +75,29 @@ public final class Engine
 	 * unit tests, this should probably get called exactly once. :)
 	 * 
 	 * @param filename
+	 * @param rootType
+	 *            The Class object representing the root of your hierarchy.
+	 *            Specify this if you have a static initalizer there that you
+	 *            which to ensure is run (ie, to configure object cascade
+	 *            properties) before your database is opened.
 	 * @throws IllegalArgumentException
 	 *             if the given filename already exists (no blotto!)
 	 * @throws IllegalStateException
 	 *             if the datastore is locked (eg by another running program you
 	 *             forgot about)
 	 */
-	public static void newDatafile(String filename) {
+	public static void newDatafile(String filename, Class rootType) {
 		if (server != null) {
 			throw new IllegalStateException("Engine is already representing an open datafile");
 		}
 
 		File probe = new File(filename);
 		if (probe.exists()) {
-			throw new IllegalStateException("Proposed datafile already exists (or at least, a file by that name does)");
+			throw new IllegalStateException(
+				"Proposed datafile already exists (or at least, a file by that name does)");
 		}
 
-		server = new DataServer(filename);
+		server = new DataServer(filename, rootType);
 
 		/*
 		 * Integrity check
@@ -107,10 +113,15 @@ public final class Engine
 	 * 
 	 * @param filename
 	 *            the path to the database you wish to open.
+	 * @param rootType
+	 *            The Class object representing the root of your hierarchy.
+	 *            Specify this if you have a static initalizer there that you
+	 *            which to ensure is run (ie, to configure object cascade
+	 *            properties) before your database is openned.
 	 * @throws FileNotFoundException
 	 *             if the specified datafile is not found.
 	 */
-	public static void openDatafile(String filename) throws FileNotFoundException {
+	public static void openDatafile(String filename, Class rootType) throws FileNotFoundException {
 		if (server != null) {
 			throw new IllegalStateException("Engine is already representing an open datafile");
 		}
@@ -120,7 +131,7 @@ public final class Engine
 			throw new FileNotFoundException();
 		}
 
-		server = new DataServer(filename);
+		server = new DataServer(filename, rootType);
 
 		/*
 		 * Integrity check

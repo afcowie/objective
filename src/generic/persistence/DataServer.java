@@ -9,6 +9,7 @@
  */
 package generic.persistence;
 
+import generic.domain.Root;
 import generic.util.Debug;
 import generic.util.DebugException;
 
@@ -42,8 +43,8 @@ import com.db4o.ext.ExtObjectContainer;
  * <code>static {...}</code> block.
  * <p>
  * The expected use of this class is to use {@link Engine#newDatafile(String)}
- * or {@link Engine#openDatafile(String)} to open a DataServer and from there to
- * use its static server reference to obtain clients.
+ * or {@link Engine#openDatafile(String, Class)} to open a DataServer and from
+ * there to use its static server reference to obtain clients.
  * 
  * @author Andrew Cowie
  */
@@ -104,20 +105,43 @@ public final class DataServer
 	 * {@link Db4o.openFile()}).
 	 * <p>
 	 * <b>WARNING</b> This is assumed to be the first use of the Db4o engine,
-	 * so this is where global configuration of Db4o is done - see the
-	 * <code>static {...}</code> code block in this class.
+	 * so global configuration of Db4o needs to be complete before this is
+	 * called - see the <code>static {...}</code> code block in this class.
 	 * <p>
 	 * As coded presently, we open the server for in-process access only, rather
 	 * than listening on a TCP port. Easily changed.
 	 * 
 	 * @param filename
 	 *            the database to open.
+	 * @param rootType
+	 *            the Class object representing your subclass of Root which is
+	 *            the top of your object hierarchy. This is used to make sure
+	 *            that the static initializations to customize Db4o's
+	 *            Configuration have happened by forcing that Root subclass to
+	 *            be loaded by the JVM before DataServer creates the db4o
+	 *            ObjectServer.
 	 * @throws IllegalStateException
 	 *             if the database is locked (ie you've got another instance of
 	 *             the GUI program up. TODO, when we implement multiuser, this
 	 *             will have evolve to starting up the server in TCP mode.
 	 */
-	DataServer(String filename) throws IllegalStateException {
+	DataServer(String filename, Class rootType) throws IllegalStateException {
+		if (rootType != null) {
+			try {
+				if (!Root.class.isAssignableFrom(rootType)) {
+					throw new ClassCastException("WTF?");
+				}
+				rootType.newInstance();
+			} catch (Exception e) {
+				/*
+				 * We just ignore exceptions. The whole point of this is to do
+				 * our best to have your base Root subclass loaded so its static
+				 * block gets run.
+				 */
+				System.err.println("Warning: instantiating a " + rootType.getName() + " threw " + e);
+			}
+		}
+
 		try {
 			// port 0 means direct client access only.
 			objectServer = Db4o.openServer(filename, 0);
@@ -170,7 +194,7 @@ public final class DataServer
 			if (poolAvailable.size() > 0) {
 				Debug.print("pool", "Getting client from pool");
 				client = (DataClient) poolAvailable.removeLast();
-				if (client.getUnderlyingContainer().ext().isClosed()) {
+				if (client.getUnderlyingContainer().isClosed()) {
 					throw new IllegalStateException("Client retrieved from pool is closed!");
 				}
 				if (client == null) {
@@ -228,7 +252,7 @@ public final class DataServer
 			Iterator dI = dS.iterator();
 			while (dI.hasNext()) {
 				Object dirty = dI.next();
-				ext.refresh(dirty, 1);
+				ext.refresh(dirty, 5);
 				dI.remove();
 			}
 

@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import org.gnu.gtk.Gtk;
 import org.gnu.gtk.GtkInitException;
 
+import accounts.domain.Books;
 import accounts.ui.ReimbursableExpensesEditorWindow;
 import country.au.ui.AustralianPayrollEditorWindow;
 import demo.client.DemoBooksSetup;
@@ -36,7 +37,7 @@ public class DemoWindowRunner
 		Debug.print("main", "Loading demo books");
 
 		try {
-			Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE);
+			Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE, Books.class);
 		} catch (FileNotFoundException fnfe) {
 			System.err.println("You need to run DemoBooksSetup to create the demo dataset.");
 			System.exit(1);

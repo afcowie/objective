@@ -30,7 +30,7 @@ public class ExposeDb4oInterfaceTest extends TestCase
 	private void init() {
 		try {
 			new File(TESTS_DATABASE).delete();
-			Engine.newDatafile(TESTS_DATABASE);
+			Engine.newDatafile(TESTS_DATABASE, null);
 
 			DataClient rw = Engine.gainClient();
 
@@ -56,7 +56,7 @@ public class ExposeDb4oInterfaceTest extends TestCase
 			init();
 		}
 		try {
-			Engine.openDatafile(TESTS_DATABASE);
+			Engine.openDatafile(TESTS_DATABASE, null);
 		} catch (FileNotFoundException fnfe) {
 			fail("Where is the test database?");
 		}

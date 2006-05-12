@@ -6,10 +6,6 @@
  */
 package generic.persistence;
 
-import generic.persistence.DataClient;
-import generic.persistence.DataServer;
-import generic.persistence.Engine;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,7 +27,7 @@ public class EngineTest extends TestCase
 	public final void testNewDatafile() {
 		new File(TESTFILE).delete();
 
-		Engine.newDatafile(TESTFILE);
+		Engine.newDatafile(TESTFILE, null);
 		assertNotNull(Engine.server);
 		Engine.shutdown();
 		assertNull(Engine.server);
@@ -39,17 +35,17 @@ public class EngineTest extends TestCase
 
 	public final void testOpenDatafile() throws FileNotFoundException {
 		try {
-			Engine.openDatafile("/no/such/file.yap");
+			Engine.openDatafile("/no/such/file.yap", null);
 			fail("Should have thrown FileNotFoundException");
 		} catch (FileNotFoundException fnfe) {
 		}
 
-		Engine.openDatafile(TESTFILE); // throws, but shouldn't!
+		Engine.openDatafile(TESTFILE, null); // throws, but shouldn't!
 		assertNotNull(Engine.server);
 		assertTrue("New datafile doesn't exist!", new File(TESTFILE).exists());
 
 		try {
-			Engine.openDatafile(TESTFILE);
+			Engine.openDatafile(TESTFILE, null);
 			fail("Should have failed because datafile already open, locked and so should have raised exception");
 		} catch (IllegalStateException ise) {
 		}
@@ -66,7 +62,7 @@ public class EngineTest extends TestCase
 	 * Directly evaluate DataServer's connection pool mechanism
 	 */
 	public final void testConnectionPool() throws FileNotFoundException {
-		DataServer server = server = new DataServer(TESTFILE);
+		DataServer server = server = new DataServer(TESTFILE, null);
 		assertNotNull(server);
 
 		DataClient c1 = server.gainClient();
@@ -124,7 +120,7 @@ public class EngineTest extends TestCase
 	 * static methods.
 	 */
 	public final void testEngineWrappingDataServer() throws FileNotFoundException {
-		Engine.openDatafile(TESTFILE);
+		Engine.openDatafile(TESTFILE, null);
 
 		DataClient c1 = Engine.gainClient();
 
@@ -167,7 +163,7 @@ public class EngineTest extends TestCase
 	}
 
 	public final void testEnginePrimaryClient() throws FileNotFoundException {
-		Engine.openDatafile(TESTFILE);
+		Engine.openDatafile(TESTFILE, null);
 
 		DataClient p = Engine.primaryClient();
 
@@ -180,7 +176,7 @@ public class EngineTest extends TestCase
 
 	public final void testBackupDatafile() {
 		try {
-			Engine.openDatafile(TESTFILE);
+			Engine.openDatafile(TESTFILE, null);
 			assertNotNull(Engine.server);
 
 			/*

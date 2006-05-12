@@ -12,6 +12,8 @@ import generic.persistence.Engine;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import accounts.domain.Books;
+
 import junit.framework.TestCase;
 
 /**
@@ -42,7 +44,7 @@ public class BlankDatafileTestCase extends TestCase
 	public void setUp() {
 		if (initialized == this.getClass()) {
 			try {
-				Engine.openDatafile(DATAFILE);
+				Engine.openDatafile(DATAFILE, Books.class);
 			} catch (FileNotFoundException fnfe) {
 				throw new Error(fnfe);
 			}
@@ -52,7 +54,7 @@ public class BlankDatafileTestCase extends TestCase
 			}
 
 			new File(DATAFILE).delete();
-			Engine.newDatafile(DATAFILE);
+			Engine.newDatafile(DATAFILE, Books.class);
 
 			initialized = this.getClass();
 		}

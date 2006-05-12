@@ -57,7 +57,7 @@ public class BooksSetByCommandsTest extends BlankDatafileTestCase
 		 */
 		Engine.releaseClient(rw);
 		Engine.shutdown();
-		Engine.openDatafile(DATAFILE);
+		Engine.openDatafile(DATAFILE, Books.class);
 		rw = Engine.gainClient();
 
 		try {

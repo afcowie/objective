@@ -16,6 +16,7 @@ import java.util.List;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 
 import accounts.domain.Amount;
+import accounts.domain.Books;
 import accounts.domain.Credit;
 import accounts.domain.Currency;
 import accounts.domain.Datestamp;
@@ -59,7 +60,7 @@ public class DemoMockTransactions
 
 		Debug.print("main", "Openning database " + DEMO_DATABASE);
 		try {
-			Engine.openDatafile(DEMO_DATABASE);
+			Engine.openDatafile(DEMO_DATABASE, Books.class);
 		} catch (FileNotFoundException fnfe) {
 			System.err.println("\nDemo database not found! Did you run DemoBooksSetup?\n");
 			System.exit(1);

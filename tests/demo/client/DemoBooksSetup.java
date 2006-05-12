@@ -16,6 +16,7 @@ import accounts.domain.Account;
 import accounts.domain.AccountsPayable;
 import accounts.domain.AccountsReceivable;
 import accounts.domain.BankAccount;
+import accounts.domain.Books;
 import accounts.domain.CashAccount;
 import accounts.domain.Client;
 import accounts.domain.Currency;
@@ -68,7 +69,7 @@ public class DemoBooksSetup
 		new File(DEMO_DATABASE).delete();
 
 		Debug.print("main", "Creating database " + DEMO_DATABASE);
-		Engine.newDatafile(DEMO_DATABASE);
+		Engine.newDatafile(DEMO_DATABASE, Books.class);
 
 		DataClient rw = Engine.gainClient();
 
