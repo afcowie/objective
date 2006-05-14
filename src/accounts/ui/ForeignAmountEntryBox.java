@@ -10,9 +10,10 @@ import generic.persistence.DataClient;
 import generic.util.Debug;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.gnu.gdk.Color;
 import org.gnu.gtk.Entry;
@@ -45,10 +46,13 @@ public class ForeignAmountEntryBox extends HBox
 	private AmountEntry			homeValue_AmountEntry;
 	private CurrencySelector	foreign_CurrencySelector;
 
-	private static HashMap		lastRates;
+	/*
+	 * These are just Strings, so ok to be cross-Container.
+	 */
+	private static Map			lastRates;
 
 	static {
-		lastRates = new HashMap();
+		lastRates = new WeakHashMap();
 	}
 
 	public ForeignAmountEntryBox(DataClient store) {
@@ -113,7 +117,6 @@ public class ForeignAmountEntryBox extends HBox
 		foreign_CurrencySelector.addListener(new ComboBoxListener() {
 			public void comboBoxEvent(ComboBoxEvent event) {
 				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
-					Debug.print("listeners", "currencySelector CHANGED");
 					Currency cur = foreign_CurrencySelector.getCurrency();
 					foreignAmount.setCurrency(cur);
 
@@ -121,6 +124,7 @@ public class ForeignAmountEntryBox extends HBox
 					if (rate == null) {
 						rate = "1.0";
 					}
+					Debug.print("listeners", "currencySelector CHANGED " + cur.getCode() + " @" + rate);
 
 					foreignAmount.setRate(rate);
 					rate_Entry.setText(foreignAmount.getRate());
@@ -201,7 +205,7 @@ public class ForeignAmountEntryBox extends HBox
 
 	/**
 	 * Toggle the sensitivity (grayed out out if not sensitive) of all the
-	 * Widgets that represtnt exchange rate and home value, as listed in the
+	 * Widgets that represent exchange rate and home value, as listed in the
 	 * grayWidgets List.
 	 */
 	private void grayOut() {
@@ -242,9 +246,16 @@ public class ForeignAmountEntryBox extends HBox
 	public void setForeignAmount(ForeignAmount amount) {
 		this.foreignAmount = amount;
 		faceValue_AmountEntry.setValue(foreignAmount.getForeignValue());
-		foreign_CurrencySelector.setCurrency(foreignAmount.getCurrency());
-		rate_Entry.setText(foreignAmount.getRate());
-		homeValue_AmountEntry.setAmount(foreignAmount);
-	}
 
+		Currency cur = foreignAmount.getCurrency();
+		String rate = foreignAmount.getRate();
+		lastRates.put(cur, rate);
+
+		foreign_CurrencySelector.setCurrency(cur);
+
+		rate_Entry.setText(rate);
+		homeValue_AmountEntry.setAmount(foreignAmount);
+
+		grayOut();
+	}
 }

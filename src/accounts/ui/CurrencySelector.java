@@ -18,8 +18,6 @@ import org.gnu.gtk.DataColumnObject;
 import org.gnu.gtk.DataColumnString;
 import org.gnu.gtk.ListStore;
 import org.gnu.gtk.TreeIter;
-import org.gnu.gtk.event.ComboBoxEvent;
-import org.gnu.gtk.event.ComboBoxListener;
 
 import accounts.domain.Books;
 import accounts.domain.Currency;
@@ -86,21 +84,8 @@ public class CurrencySelector extends ComboBox
 
 		CellRendererText code_CellRenderer = new CellRendererText();
 		this.packStart(code_CellRenderer, true);
-		this.addAttributeMapping(code_CellRenderer, CellRendererText.Attribute.TEXT, codeDisplay_DataColumn);
-
-		/*
-		 * Idea (record elsewhere): prepopulate with a set of default
-		 * currencies. Perhaps in {Raw|Cooked}Books.
-		 */
-
-		// this.packStart(combo, false, false, 0);
-		this.addListener(new ComboBoxListener() {
-			public void comboBoxEvent(ComboBoxEvent event) {
-				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
-					// huh? bug? TODO
-				}
-			}
-		});
+		this.addAttributeMapping(code_CellRenderer, CellRendererText.Attribute.TEXT,
+			codeDisplay_DataColumn);
 	}
 
 	/**

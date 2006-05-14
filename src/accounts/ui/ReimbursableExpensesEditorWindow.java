@@ -6,9 +6,11 @@
  */
 package accounts.ui;
 
-import generic.client.Master;
 import generic.ui.ModalDialog;
 import generic.util.Debug;
+
+import java.util.Iterator;
+import java.util.Set;
 
 import org.gnu.gtk.Entry;
 import org.gnu.gtk.MessageType;
@@ -24,6 +26,7 @@ import accounts.domain.ReimbursableExpensesTransaction;
 import accounts.domain.Worker;
 import accounts.services.CommandNotReadyException;
 import accounts.services.PostTransactionCommand;
+import accounts.services.UpdateTransactionCommand;
 
 /**
  * A Window where the expenses incurred by an Employee
@@ -46,10 +49,17 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	private ReimbursableExpensesTransaction	existing	= null;
 
 	/**
-	 * Construct the Window. Uses the table from the glade file extensively.
-	 * Takes a UnitOfWork for itself when ready and then returns.
+	 * Construct a window to create a new ReimbursableExpensesTransaction.
+	 * 
 	 */
 	public ReimbursableExpensesEditorWindow() {
+		this(0);
+	}
+
+	/**
+	 * Construct the Window. Uses the table from the glade file extensively.
+	 */
+	public ReimbursableExpensesEditorWindow(long id) {
 		super("reimbursable", "share/ReimbursableExpensesEditorWindow.glade");
 
 		datePicker = new DatePicker();
@@ -70,20 +80,29 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 		amountEntryBox = new ForeignAmountEntryBox(store);
 		table.attach(amountEntryBox, 1, 2, 4, 5);
 
-		window.showAll();
-		window.present();
-	}
-
-	/**
-	 * (overrides {@link EditorWindow#deleteHook()})
-	 */
-	public boolean deleteHook() {
-		// hide & destroy
-		super.deleteHook();
-		// quit
-		System.out.println("Notice: deleteHook() overriden to call Master.shutdown()");
-		Master.shutdown();
-		return false;
+		ReimbursableExpensesTransaction t;
+		if (id == 0) {
+			t = new ReimbursableExpensesTransaction();
+		} else {
+			t = (ReimbursableExpensesTransaction) store.fetchByID(id);
+			datePicker.setDate(t.getDate());
+			person_WorkerPicker.setWorker(t.getWorker());
+			Set entries = t.getEntries();
+			Iterator iter = entries.iterator();
+			while (iter.hasNext()) {
+				accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
+				Ledger l = e.getParentLedger();
+				if (l == t.getWorker().getExpensesPayable()) {
+					// FIXME
+				} else {
+					accountPicker.setAccount(l.getParentAccount());
+					accountPicker.setLedger(l);
+					amountEntryBox.setForeignAmount((ForeignAmount) e.getAmount());
+				}
+			}
+			descriptionEntry.setText(t.getDescription());
+			existing = t;
+		}
 	}
 
 	protected void ok() {
@@ -120,7 +139,6 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 			Ledger expensesPayable = person.getExpensesPayable();
 
 			ReimbursableExpensesTransaction t;
-
 			if (existing == null) {
 				t = new ReimbursableExpensesTransaction();
 
@@ -139,14 +157,37 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 				PostTransactionCommand ptc = new PostTransactionCommand(t);
 				ptc.execute(store);
 			} else {
-				throw new UnsupportedOperationException();
+				t = existing;
+				t.setDescription(descriptionEntry.getText());
+
+				Set entries = t.getEntries();
+				Iterator iter = entries.iterator();
+				while (iter.hasNext()) {
+					accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
+					Ledger l = e.getParentLedger();
+					ForeignAmount fa = amountEntryBox.getForeignAmount();
+
+					if (l == t.getWorker().getExpensesPayable()) {
+						// the Credit
+						Amount ha = e.getAmount();
+						ha.setValue(fa);
+					} else {
+						// the Debit
+						e.setAmount(fa);
+						e.setParentLedger(accountPicker.getLedger());
+					}
+				}
+
+				UpdateTransactionCommand utc = new UpdateTransactionCommand(t);
+				utc.execute(store);
 			}
 
 			store.commit();
 			super.ok();
 		} catch (CommandNotReadyException cnre) {
 			Debug.print("events", "Command not ready: " + cnre.getMessage());
-			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(), MessageType.ERROR);
+			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(),
+				MessageType.ERROR);
 			dialog.run();
 
 			/*

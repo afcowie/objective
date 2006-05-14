@@ -370,7 +370,6 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			}
 		});
 
-		present();
 		/*
 		 * TODO: if we implement PrimaryTransaction then use its value to point
 		 * to which Entry is last:

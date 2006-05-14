@@ -63,13 +63,13 @@ public class AccountPicker extends HBox
 	private Account				selectedAccount	= null;
 	private Ledger				selectedLedger	= null;
 
-	private static Account		lastSelectedAccount;
-	private static Ledger		lastSelectedLedger;
-
-	static {
-		lastSelectedAccount = null;
-		lastSelectedLedger = null;
-	}
+	// private static Account lastSelectedAccount;
+	// private static Ledger lastSelectedLedger;
+	//
+	// static {
+	// lastSelectedAccount = null;
+	// lastSelectedLedger = null;
+	// }
 
 	private SearchEntry			entry			= null;
 	private Button				pick			= null;
@@ -82,8 +82,8 @@ public class AccountPicker extends HBox
 
 		db = store;
 
-		selectedAccount = lastSelectedAccount;
-		selectedLedger = lastSelectedLedger;
+		// selectedAccount = lastSelectedAccount;
+		// selectedLedger = lastSelectedLedger;
 
 		entry = new SearchEntry();
 		entry.setWidth(20);
@@ -114,7 +114,8 @@ public class AccountPicker extends HBox
 		entry.setChangeListener(new EntryListener() {
 			public void entryEvent(EntryEvent event) {
 				Debug.print("listeners", "AccountPicker entry EntryEvent " + event.getType().getName());
-				if ((event.getType() == EntryEvent.Type.CHANGED) || (event.getType() == EntryEvent.Type.ACTIVATE)) {
+				if ((event.getType() == EntryEvent.Type.CHANGED)
+					|| (event.getType() == EntryEvent.Type.ACTIVATE)) {
 					/*
 					 * If we don't have a selected account, then the keystroke
 					 * or paste or whatever is the seed for the search filter.
@@ -206,8 +207,8 @@ public class AccountPicker extends HBox
 
 			CellRendererText account_CellRenderer = new CellRendererText();
 			account_ViewColumn.packStart(account_CellRenderer, true);
-			account_ViewColumn.addAttributeMapping(account_CellRenderer, CellRendererText.Attribute.MARKUP,
-				accountDisplay_DataColumn);
+			account_ViewColumn.addAttributeMapping(account_CellRenderer,
+				CellRendererText.Attribute.MARKUP, accountDisplay_DataColumn);
 
 			account_ViewColumn.setTitle("Account");
 			account_ViewColumn.setClickable(true);
@@ -222,8 +223,8 @@ public class AccountPicker extends HBox
 
 			CellRendererText ledger_CellRenderer = new CellRendererText();
 			ledger_ViewColumn.packStart(ledger_CellRenderer, true);
-			ledger_ViewColumn.addAttributeMapping(ledger_CellRenderer, CellRendererText.Attribute.MARKUP,
-				ledgerDisplay_DataColumn);
+			ledger_ViewColumn.addAttributeMapping(ledger_CellRenderer,
+				CellRendererText.Attribute.MARKUP, ledgerDisplay_DataColumn);
 
 			ledger_ViewColumn.setTitle("Ledger");
 			ledger_ViewColumn.setClickable(true);
@@ -268,13 +269,15 @@ public class AccountPicker extends HBox
 					 */
 					final String size = "xx-small";
 					Matcher m = regexAmp.matcher(acct.getTitle());
-					listStore.setValue(pointer, accountDisplay_DataColumn, m.replaceAll("&amp;") + "\n<span size=\""
-						+ size + "\" color=\"" + acct.getColor(false) + "\">" + acct.getClassString() + "</span>");
+					listStore.setValue(pointer, accountDisplay_DataColumn, m.replaceAll("&amp;")
+						+ "\n<span size=\"" + size + "\" color=\"" + acct.getColor(false) + "\">"
+						+ acct.getClassString() + "</span>");
 					listStore.setValue(pointer, accountTitle_DataColumn, acct.getTitle());
 					listStore.setValue(pointer, accountObject_DataColumn, acct);
 
-					listStore.setValue(pointer, ledgerDisplay_DataColumn, ledger.getName() + "\n<span size=\"" + size
-						+ "\"color=\"" + ledger.getColor(false) + "\">" + ledger.getClassString() + "</span>");
+					listStore.setValue(pointer, ledgerDisplay_DataColumn, ledger.getName()
+						+ "\n<span size=\"" + size + "\"color=\"" + ledger.getColor(false) + "\">"
+						+ ledger.getClassString() + "</span>");
 					listStore.setValue(pointer, ledgerName_DataColumn, ledger.getName());
 					listStore.setValue(pointer, ledgerObject_DataColumn, ledger);
 				}
@@ -332,7 +335,8 @@ public class AccountPicker extends HBox
 			 */
 			search.setChangeListener(new EntryListener() {
 				public void entryEvent(EntryEvent event) {
-					Debug.print("listeners", "AccountPickerPopup search entryEvent " + event.getType().getName());
+					Debug.print("listeners", "AccountPickerPopup search entryEvent "
+						+ event.getType().getName());
 					if (event.getType() == EntryEvent.Type.CHANGED) {
 						refilter();
 					}
@@ -516,11 +520,6 @@ public class AccountPicker extends HBox
 			setEntryText();
 		}
 
-		private void setEntryText() {
-			String str = selectedAccount.getTitle() + " - " + selectedLedger.getName();
-			entry.setText(str);
-		}
-
 		private void clearEntry() {
 			entry.clearText();
 			selectedAccount = null;
@@ -634,6 +633,7 @@ public class AccountPicker extends HBox
 			throw new IllegalArgumentException("null invalid argument for setAccount()");
 		}
 		selectedAccount = account;
+		setEntryText();
 	}
 
 	/**
@@ -641,6 +641,25 @@ public class AccountPicker extends HBox
 	 */
 	public Ledger getLedger() {
 		return selectedLedger;
+	}
+
+	public void setLedger(Ledger ledger) {
+		if (ledger == null) {
+			throw new IllegalArgumentException("null invalid argument for setLedger()");
+		}
+		selectedLedger = ledger;
+		setEntryText();
+	}
+
+	/**
+	 * If both an account and ledger have been selected when this is called,
+	 * then it will format up a string for display in the Entry.
+	 */
+	private void setEntryText() {
+		if ((selectedAccount != null) && (selectedLedger != null)) {
+			String str = selectedAccount.getTitle() + " \u00bb " + selectedLedger.getName();
+			entry.setText(str);
+		}
 	}
 
 	/*

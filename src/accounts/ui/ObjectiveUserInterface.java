@@ -102,14 +102,14 @@ public class ObjectiveUserInterface extends UserInterface
 		if (target instanceof PayrollTransaction) {
 			editor = new AustralianPayrollEditorWindow(id);
 		} else if (target instanceof ReimbursableExpensesTransaction) {
-			editor = new ReimbursableExpensesEditorWindow();
-			throw new UnsupportedOperationException(
-				"ReimbursableExpensesEditorWindow not yet configured for editing");
+			editor = new ReimbursableExpensesEditorWindow(id);
 		} else if (target instanceof GenericTransaction) {
 			throw new UnsupportedOperationException("No editor for GenericTransaction yet");
 		}
 
 		idsToEditors.put(ID, editor);
 		editorsToIds.put(editor, ID);
+
+		editor.present();
 	}
 }

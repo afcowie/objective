@@ -100,7 +100,10 @@ public class Amount implements Comparable
 	/**
 	 * Set the value of this Amount to be equal to the specified argument
 	 * Amount. This is not reference equality! This is a quick way to copy one
-	 * Amount's current Value into another.
+	 * Amount's current Value into another. For example, if you have a
+	 * ForeignAmount, and need a home currency Amount as the balancing entry,
+	 * then you can use this to "copy" the home value out of the ForeignAmount
+	 * and use its underlying home value as the value for this.
 	 */
 	public void setValue(Amount a) {
 		if (a == null) {
