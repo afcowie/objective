@@ -6,7 +6,7 @@
  */
 package accounts.ui;
 
-import generic.ui.Master;
+import generic.client.Master;
 import generic.ui.ModalDialog;
 import generic.util.Debug;
 

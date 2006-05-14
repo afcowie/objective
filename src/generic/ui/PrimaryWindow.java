@@ -6,6 +6,8 @@
  */
 package generic.ui;
 
+import generic.client.Master;
+
 /**
  * Denote a window as being one of the primary ones which a user interacts with.
  * These windows will be registered with generic.ui.Master and thus be available
@@ -21,7 +23,8 @@ public abstract class PrimaryWindow extends AbstractWindow
 	 * then registers this window with Master.
 	 */
 	public PrimaryWindow() {
-		Master.regsiterWindow(this);
+		super();
+		Master.ui.regsiterWindow(this);
 	}
 
 	/**
@@ -30,12 +33,12 @@ public abstract class PrimaryWindow extends AbstractWindow
 	 */
 	public PrimaryWindow(String whichElement, String gladeFilename) {
 		super(whichElement, gladeFilename);
-		Master.regsiterWindow(this);
+		Master.ui.regsiterWindow(this);
 	}
 
 	protected boolean deleteHook() {
 		super.deleteHook();
-		Master.deregisterWindow(this);
+		Master.ui.deregisterWindow(this);
 		return false;
 	}
 

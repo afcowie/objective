@@ -6,6 +6,7 @@
  */
 package demo.ui;
 
+import generic.client.Master;
 import generic.persistence.Engine;
 import generic.util.Debug;
 
@@ -15,8 +16,7 @@ import org.gnu.gtk.Gtk;
 import org.gnu.gtk.GtkInitException;
 
 import accounts.domain.Books;
-import accounts.ui.ReimbursableExpensesEditorWindow;
-import country.au.ui.AustralianPayrollEditorWindow;
+import accounts.ui.ObjectiveUserInterface;
 import demo.client.DemoBooksSetup;
 
 public class DemoWindowRunner
@@ -51,14 +51,12 @@ public class DemoWindowRunner
 		} catch (GtkInitException gie) {
 			Debug.print("main", "Gtk.initCheck() threw an excpetion. Ignoring.");
 		}
+
+		Master.ui = new ObjectiveUserInterface();
+
 		// Debug.print("main", "initializing AccountTypeSelectorDialog");
 		// AccountTypeSelectorDialog selector = new
 		// AccountTypeSelectorDialog();
-//		Debug.print("main", "Initializing ReimbursableExpensesEditorWindow");
-//		ReimbursableExpensesEditorWindow reimburse = new ReimbursableExpensesEditorWindow();
-
-//		Debug.print("main", "Initializing AustralianPayrollEditorWindow");
-//		AustralianPayrollEditorWindow payroll = new AustralianPayrollEditorWindow();
 
 		Debug.print("main", "Initializing TransactionListViewHolder");
 		TransactionListViewHolder view = new TransactionListViewHolder();

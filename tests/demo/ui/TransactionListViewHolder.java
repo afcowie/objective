@@ -6,10 +6,10 @@
  */
 package demo.ui;
 
+import generic.client.Master;
 import generic.persistence.DataClient;
 import generic.persistence.Engine;
 import generic.ui.AbstractWindow;
-import generic.ui.Master;
 
 import java.util.List;
 

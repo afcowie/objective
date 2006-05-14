@@ -6,6 +6,7 @@
  */
 package generic.ui;
 
+import generic.client.Master;
 import generic.util.Debug;
 
 import java.io.FileNotFoundException;

@@ -26,7 +26,7 @@ public class ObjectiveAccounts
 	 * Small helper programs making use of this class (ie to access
 	 * {@link ObjectiveAccounts.store}) do not need to override this constant.
 	 */
-	public static final String		VERSION		= "0.1.13";
+	public static final String		VERSION		= "0.1.15";
 
 	/**
 	 * The copyright statement for this code and a pointer to the top level
@@ -34,7 +34,7 @@ public class ObjectiveAccounts
 	 * if you will, but this is here to embed it in distributed bytecode.
 	 */
 	public static final String[]	COPYRIGHT	= new String[] {
-		"Copyright © 2005-2006 Operational Dynamics Consulting Pty Ltd, and others.",
+		"Copyright Â© 2005-2006 Operational Dynamics Consulting Pty Ltd, and others.",
 		"The LICENCE file included with these sources lists the terms under which",
 		"you may use and redistribute this code.",
 												};

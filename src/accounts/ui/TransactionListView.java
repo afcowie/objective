@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.client.Master;
 import generic.persistence.DataClient;
 import generic.ui.Text;
 import generic.util.Debug;
@@ -35,8 +36,6 @@ import org.gnu.gtk.event.TreeSelectionListener;
 import org.gnu.gtk.event.TreeViewEvent;
 import org.gnu.gtk.event.TreeViewListener;
 
-import country.au.ui.AustralianPayrollEditorWindow;
-
 import accounts.domain.Account;
 import accounts.domain.Amount;
 import accounts.domain.Books;
@@ -46,7 +45,6 @@ import accounts.domain.Debit;
 import accounts.domain.Entry;
 import accounts.domain.ForeignAmount;
 import accounts.domain.Ledger;
-import accounts.domain.PayrollTransaction;
 import accounts.domain.Transaction;
 import accounts.services.EntryComparator;
 
@@ -247,13 +245,7 @@ public class TransactionListView extends TreeView
 					Transaction t = (Transaction) listStore.getValue(pointer,
 						transactionObject_DataColumn);
 
-					long tID = db.getID(t);
-
-					if (t instanceof PayrollTransaction) {
-						new AustralianPayrollEditorWindow(tID);
-					} else {
-						Debug.print("listeners", "Transaction ignored");
-					}
+					Master.ui.launch(db, t);
 				}
 			}
 		});

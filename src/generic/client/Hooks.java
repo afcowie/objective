@@ -4,7 +4,8 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2006 Operational Dynamics
  */
-package generic.ui;
+package generic.client;
+
 
 /**
  * A set of callbacks which can be registered with the {@link Master} global UI
@@ -14,11 +15,8 @@ package generic.ui;
  * 
  * @author Andrew Cowie
  */
-public class Hooks
+public abstract class Hooks
 {
-	protected Hooks() {
-	}
-
 	/**
 	 * Essential emergency cleanup to attempt before the application thunders
 	 * in. At the end of the abort callback sequence, System.exit() will be

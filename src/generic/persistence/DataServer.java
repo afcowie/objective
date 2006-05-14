@@ -241,21 +241,22 @@ public final class DataServer
 				throw new IllegalStateException("This client not recorded as checked out!");
 			}
 			poolInUse.remove(client);
+		}
+		ExtObjectContainer ext = client.getUnderlyingContainer();
 
-			ExtObjectContainer ext = client.getUnderlyingContainer();
+		if (ext.isClosed()) {
+			throw new DebugException("This client is closed, can't return it to connection pool!");
+		}
 
-			if (ext.isClosed()) {
-				throw new DebugException("This client is closed, can't return it to connection pool!");
-			}
+		Set dS = client.getDirtyObjects();
+		Iterator dI = dS.iterator();
+		while (dI.hasNext()) {
+			Object dirty = dI.next();
+			ext.refresh(dirty, 5);
+			dI.remove();
+		}
 
-			Set dS = client.getDirtyObjects();
-			Iterator dI = dS.iterator();
-			while (dI.hasNext()) {
-				Object dirty = dI.next();
-				ext.refresh(dirty, 5);
-				dI.remove();
-			}
-
+		synchronized (poolInUse) {
 			Debug.print("pool", "Returning client to pool");
 			poolAvailable.addLast(client);
 		}
