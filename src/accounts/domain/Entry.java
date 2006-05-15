@@ -14,7 +14,7 @@ import generic.util.DebugException;
  * Accounts.
  * <P>
  * Note that an Entry's datestamp is shared with a transaction, so adding an
- * entry to a transaction will cause it to adopt that transactions Datestamp
+ * entry to a transaction will cause it to adopt that Transaction's Datestamp
  * object if one is set.
  * 
  * @author Andrew Cowie
@@ -64,9 +64,6 @@ public class Entry
 	public Entry(Amount value, Ledger ledger) {
 		this.amount = value;
 		this.parentLedger = ledger;
-		// this.date = new Datestamp();
-		// date.setAsToday();
-
 	}
 
 	/*
@@ -125,7 +122,7 @@ public class Entry
 	 */
 	public String toString() {
 		// TODO Are Entries only in native currency?
-		StringBuffer buf = new StringBuffer('$');
+		StringBuffer buf = new StringBuffer();
 		buf.append(amount.getValue());
 		buf.append(' ');
 
