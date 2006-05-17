@@ -94,11 +94,12 @@ public class ComparatorsInTreeSetTest extends BlankDatafileTestCase
 				Entry lefttwo = new Debit(new Amount("10.00"), gstpaid);
 				Entry right = new Credit(new Amount("110.00"), petty);
 
-				Transaction gt = new GenericTransaction("T:" + i, new Datestamp(DATESTRING), new Entry[] {
-					leftone,
-					lefttwo,
-					right
-				});
+				Transaction gt = new GenericTransaction("T:" + i, new Datestamp(DATESTRING),
+					new Entry[] {
+						leftone,
+						lefttwo,
+						right
+					});
 
 				PostTransactionCommand ptc = new PostTransactionCommand(gt);
 				ptc.execute(rw);
@@ -120,10 +121,14 @@ public class ComparatorsInTreeSetTest extends BlankDatafileTestCase
 		while (eI.hasNext()) {
 			Entry e = (Entry) eI.next();
 
+			Amount a = e.getAmount();
+			assertNotNull(a);
+			assertTrue(a.getNumber() != 0);
+
 			if (e instanceof Debit) {
-				totalDebits.incrementBy(e.getAmount());
+				totalDebits.incrementBy(a);
 			} else if (e instanceof Credit) {
-				totalCredits.incrementBy(e.getAmount());
+				totalCredits.incrementBy(a);
 			} else {
 				fail("Retrieved an Entry neither Credit nor Debit");
 			}

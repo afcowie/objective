@@ -6,14 +6,13 @@
  */
 package accounts.domain;
 
+import generic.persistence.NotActivatedException;
 import generic.util.DebugException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import accounts.persistence.NotActivatedException;
 
 /**
  * The date of a transaction. An object is used both to wrap representation, and
@@ -73,11 +72,15 @@ public class Datestamp implements Comparable
 		try {
 			setDate(System.currentTimeMillis());
 		} catch (ParseException pe) {
-			throw new DebugException("ParseException thrown when using setDate on System.currentTimeMillis()!");
+			throw new DebugException(
+				"ParseException thrown when using setDate on System.currentTimeMillis()!");
 		}
 	}
 
 	public boolean isSet() {
+		if (timestamp == 0) {
+			throw new NotActivatedException();
+		}
 		return (!(timestamp == UNSET));
 	}
 
@@ -86,7 +89,7 @@ public class Datestamp implements Comparable
 	 */
 	public String toString() {
 		if (timestamp == 0) {
-			throw new NotActivatedException();
+			return "NOTACTIVE";
 		}
 		if (timestamp == UNSET) {
 			return "  UNSET  ";
@@ -188,6 +191,9 @@ public class Datestamp implements Comparable
 	}
 
 	public Date getDate() {
+		if (timestamp == 0) {
+			throw new NotActivatedException();
+		}
 		return new Date(timestamp);
 	}
 
@@ -219,6 +225,9 @@ public class Datestamp implements Comparable
 		}
 		if (!(x instanceof Datestamp)) {
 			throw new IllegalArgumentException("Can only compare Datestamp objects");
+		}
+		if (timestamp == 0) {
+			throw new NotActivatedException();
 		}
 		Datestamp d = (Datestamp) x;
 

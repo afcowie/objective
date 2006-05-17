@@ -50,7 +50,8 @@ public class BlankDatafileTestCase extends TestCase
 			}
 		} else {
 			if (DATAFILE == null) {
-				throw new Error("You must define DATAFILE in a static {...} block in a BlankDatafileTestCase sublcass");
+				throw new Error(
+					"You must define DATAFILE in a static {...} block in a BlankDatafileTestCase sublcass");
 			}
 
 			new File(DATAFILE).delete();
@@ -64,5 +65,15 @@ public class BlankDatafileTestCase extends TestCase
 	public void tearDown() {
 		Engine.releaseClient(rw);
 		Engine.shutdown();
+
+		/*
+		 * Since db4o is multithreaded, give, it a chance to catch up. This shouldn't ever be an issue
+		 * but unit tests are pretty fast and CPU intensive, so deliberately take a brief pause.
+		 */
+		try {
+			Thread.sleep(20);
+		} catch (InterruptedException e) {
+			// ignore
+		}
 	}
 }

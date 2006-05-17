@@ -4,7 +4,7 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005 Operational Dynamics
  */
-package accounts.persistence;
+package generic.persistence;
 
 /**
  * A failure of the persistence mechanism to reach sufficient activation depth.
@@ -18,10 +18,18 @@ public class NotActivatedException extends RuntimeException
 {
 	private static final long	serialVersionUID	= 1L;
 
+	/**
+	 * Indicate a failure of the persistence mechanism to reach sufficient
+	 * activation depth.
+	 */
 	public NotActivatedException() {
 		super();
 	}
 
+	/**
+	 * Indicate a failure of the persistence mechanism to reach sufficient
+	 * activation depth, with a message explaining why.
+	 */
 	public NotActivatedException(String msg) {
 		super(msg);
 	}
