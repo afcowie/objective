@@ -2,9 +2,11 @@
  * Account.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005-2006 Operational Dynamics
  */
 package accounts.domain;
+
+import generic.domain.Cascade;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -16,7 +18,7 @@ import java.util.Set;
  * 
  * @author Andrew Cowie
  */
-public class Account
+public class Account implements Cascade
 {
 	/*
 	 * Instance variables ---------------------------------

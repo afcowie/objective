@@ -6,6 +6,8 @@
  */
 package accounts.domain;
 
+import generic.domain.Cascade;
+import generic.domain.DomainObject;
 import generic.util.DebugException;
 
 import java.util.Iterator;
@@ -17,7 +19,7 @@ import java.util.Set;
  * 
  * @author Andrew Cowie
  */
-public class Ledger
+public class Ledger extends DomainObject implements Cascade
 {
 	/*
 	 * Instance variables ---------------------------------
@@ -93,7 +95,7 @@ public class Ledger
 		if (entry == null) {
 			throw new IllegalArgumentException("Can't remove a null Entry!");
 		}
-		if (!(entries.contains(entry))) {
+		if ((entries == null) || (!(entries.contains(entry)))) {
 			throw new IllegalStateException("You've asked to remove an Entry that isn't in this Ledger");
 		}
 		if (balance == null) {
@@ -225,6 +227,10 @@ public class Ledger
 
 	public String getClassString() {
 		return "Ledger";
+	}
+
+	public String toString() {
+		return getClassString() + ": " + name + " [" + entries.size() + "]";
 	}
 
 	/**

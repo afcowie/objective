@@ -6,6 +6,7 @@
  */
 package country.au.domain;
 
+import generic.domain.Cascade;
 import generic.util.DebugException;
 import accounts.domain.Datestamp;
 
@@ -25,7 +26,7 @@ import accounts.domain.Datestamp;
  * @author Andrew Cowie
  * @see country.au.services.AustralianPayrollTaxCalculator
  */
-public class AustralianPayrollTaxTable
+public class AustralianPayrollTaxTable implements Cascade
 {
 	protected AustralianPayrollTaxIdentifier	scale;
 	protected Datestamp							effective;
@@ -45,9 +46,11 @@ public class AustralianPayrollTaxTable
 	 *            Used to size the arrays and to check you've filled in as many
 	 *            as you expect to fill in.
 	 */
-	public AustralianPayrollTaxTable(AustralianPayrollTaxIdentifier identifier, Datestamp effective, int size) {
+	public AustralianPayrollTaxTable(AustralianPayrollTaxIdentifier identifier, Datestamp effective,
+		int size) {
 		if (size < 1) {
-			throw new IllegalArgumentException("Coefficients must be constructed to have at least one row");
+			throw new IllegalArgumentException(
+				"Coefficients must be constructed to have at least one row");
 		}
 		this.scale = identifier;
 		this.effective = effective;
@@ -71,14 +74,16 @@ public class AustralianPayrollTaxTable
 	 */
 	public void addCoefficients(double ceiling, double a, double b) {
 		if (i == -1) {
-			throw new DebugException("Wrong constructor was used - can't addCoefficients() to a search prototype");
+			throw new DebugException(
+				"Wrong constructor was used - can't addCoefficients() to a search prototype");
 		}
 		if (i == size) {
 			throw new IllegalStateException("Can't add a row - this Coefficients is full");
 		}
 		if (i > 0) {
 			if (ceiling < data[i - 1][0]) {
-				throw new IllegalArgumentException("You must add coefficients in ascending ceiling order");
+				throw new IllegalArgumentException(
+					"You must add coefficients in ascending ceiling order");
 			}
 		}
 		data[i] = new double[] {
@@ -103,5 +108,9 @@ public class AustralianPayrollTaxTable
 
 	public String getClassString() {
 		return "Australian Payroll Tax Scales";
+	}
+
+	public String toString() {
+		return scale.getName() + " " + effective;
 	}
 }

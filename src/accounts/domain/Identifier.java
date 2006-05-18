@@ -6,6 +6,8 @@
  */
 package accounts.domain;
 
+import generic.domain.Leaf;
+
 /**
  * A class representing "constants" in the database. The archtypical cases for
  * this are taxation codes - the identifier used in the database needs to
@@ -16,7 +18,7 @@ package accounts.domain;
  * 
  * @author Andrew Cowie
  */
-public class Identifier implements Comparable
+public class Identifier implements Comparable, Leaf
 {
 	/**
 	 * Human readable (proper case, spaces) version of the Identifier constant.

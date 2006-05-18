@@ -6,6 +6,8 @@
  */
 package accounts.domain;
 
+import generic.domain.Cascade;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +21,7 @@ import accounts.persistence.IdentifierAlreadyExistsException;
  * 
  * @author Andrew Cowie
  */
-public class IdentifierGroup
+public class IdentifierGroup implements Cascade
 {
 	private String	label	= null;
 	private List	group	= null;
@@ -41,7 +43,8 @@ public class IdentifierGroup
 	 */
 	public void setLabel(String label) {
 		if ((label == null) || (label.equals(""))) {
-			throw new IllegalArgumentException("Can't use null or an empty string as the label for a group");
+			throw new IllegalArgumentException(
+				"Can't use null or an empty string as the label for a group");
 		}
 		this.label = label;
 	}
@@ -68,7 +71,8 @@ public class IdentifierGroup
 		while (iter.hasNext()) {
 			Identifier i = (Identifier) iter.next();
 			if ((i == identifier) || (i.compareTo(identifier) == 0)) {
-				throw new IdentifierAlreadyExistsException("Identifier " + identifier + " is already in this group");
+				throw new IdentifierAlreadyExistsException("Identifier " + identifier
+					+ " is already in this group");
 			}
 		}
 

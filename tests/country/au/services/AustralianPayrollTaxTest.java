@@ -54,14 +54,30 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		 * So if that threw, then we have an error condition that needs to stop
 		 * the show; tax data should have been initialized already.
 		 */
+		try {
+			double[][] coefficients = f.getCoefficients();
+			assertNotNull(coefficients);
+
+			int NO_TAXFREE_THRESHOLD_length = 4;
+			assertEquals(
+				"If this failed, simply make sure that the NO_TAXFREE_THRESHOLD_length variable is the length of the NO_TAXFREE_THRESHOLD data for "
+					+ KNOWN_GOOD_DATE + "; we were expecting " + NO_TAXFREE_THRESHOLD_length, 4,
+				coefficients.length);
+			for (int i = 0; i < NO_TAXFREE_THRESHOLD_length; i++) {
+				assertEquals(3, coefficients[i].length);
+			}
+		} catch (NotFoundException nfe) {
+			fail("Huh? This was supposed to be good data.");
+		}
+
 	}
 
 	public final void testTaxDataFinderNotFinding() {
 		/*
 		 * Try it with a bogus identifier. This only needs to try query().
 		 */
-		AustralianPayrollTaxTableFinder bogus = new AustralianPayrollTaxTableFinder(new AustralianPayrollTaxIdentifier(
-			"Bogus"), KNOWN_GOOD_DATE);
+		AustralianPayrollTaxTableFinder bogus = new AustralianPayrollTaxTableFinder(
+			new AustralianPayrollTaxIdentifier("Bogus"), KNOWN_GOOD_DATE);
 		try {
 			bogus.query(rw);
 			fail("Running the tax tables finder against a bogus Identifier didn't throw like it should have.");
@@ -72,6 +88,8 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		 * Try to find appropriate tax data for a date so clearly far in tha
 		 * past that it predates our software.
 		 */
+		assertNotNull(AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD);
+
 		AustralianPayrollTaxTableFinder badDate = new AustralianPayrollTaxTableFinder(
 			AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD, new Datestamp("5 May 91"));
 		try {
@@ -254,7 +272,8 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		calc.calculateGivenSalary();
 		assertEquals("571.00", calc.getWithhold().getValue());
 
-		calc = new AustralianPayrollTaxCalculator(rw, AustralianPayrollTaxIdentifier.NO_TFN_PROVIDED, KNOWN_GOOD_DATE);
+		calc = new AustralianPayrollTaxCalculator(rw, AustralianPayrollTaxIdentifier.NO_TFN_PROVIDED,
+			KNOWN_GOOD_DATE);
 		calc.setWithhold(new Amount());
 		calc.setPaycheck(new Amount());
 

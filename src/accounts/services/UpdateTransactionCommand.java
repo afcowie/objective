@@ -8,6 +8,7 @@ package accounts.services;
 
 import generic.persistence.DataClient;
 import generic.persistence.Selector;
+import generic.util.Debug;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import accounts.domain.Entry;
+import accounts.domain.Ledger;
 import accounts.domain.Transaction;
 
 /**
@@ -67,25 +69,26 @@ public class UpdateTransactionCommand extends TransactionCommand
 
 		Set liveEntries = transaction.getEntries();
 		List missingEntries = new ArrayList();
+		List changedLedgers = new ArrayList();
 
-		class EntrySelector extends Selector
+		class EntryContainsTransaction extends Selector
 		{
-			private Transaction	target;
+			private long	targetId;
 
-			EntrySelector(Transaction t) {
-				this.target = t;
+			EntryContainsTransaction(Transaction t) {
+				this.targetId = t.getID();
 			}
 
 			public boolean match(Entry entry) {
 				Transaction parent = entry.getParentTransaction();
 
-				if (parent.equals(target)) {
+				if (parent.getID() == targetId) {
 					return true;
 				}
 				return false;
 			}
 		}
-		List storedEntries = store.nativeQuery(new EntrySelector(transaction));
+		List storedEntries = store.nativeQuery(new EntryContainsTransaction(transaction));
 
 		Iterator iter = storedEntries.iterator();
 		while (iter.hasNext()) {
@@ -95,13 +98,47 @@ public class UpdateTransactionCommand extends TransactionCommand
 			 * Remove the Entry from the parent Ledger to reduce it's balance,
 			 * and if it's "missing" from the current Set, delete the Entry.
 			 */
-			ref.getParentLedger().removeEntry(ref);
+
+			class LedgerContainingEntry extends Selector
+			{
+				private Entry	target;
+
+				LedgerContainingEntry(Entry e) {
+					this.target = e;
+				}
+
+				public boolean match(Ledger ledger) {
+					Set entries = ledger.getEntries();
+					Iterator iter = entries.iterator();
+					while (iter.hasNext()) {
+						Entry entry = (Entry) iter.next();
+						if (entry.congruent(target)) {
+							return true;
+						}
+					}
+					return false;
+				}
+			}
+
+			List ledgerContainingEntry = store.nativeQuery(new LedgerContainingEntry(ref));
+
+			Debug.print("debug", "Removing "
+				+ ref.toString()
+				+ " from Ledger \""
+				+ (ledgerContainingEntry.size() == 1
+					? ((Ledger) ledgerContainingEntry.get(0)).getName()
+					: "[no! (" + ledgerContainingEntry.size() + ")]") + "\"");
+
+			Ledger ledger = (Ledger) ledgerContainingEntry.get(0);
+
+			ledger.removeEntry(ref);
 
 			if (liveEntries.contains(ref)) {
-				// the subsequent save() will update it.
+				// persisted below
 			} else {
 				missingEntries.add(ref);
 			}
+			store.save(ledger);
 		}
 
 		/*
@@ -114,7 +151,11 @@ public class UpdateTransactionCommand extends TransactionCommand
 		Iterator eI = liveEntries.iterator();
 		while (eI.hasNext()) {
 			Entry e = (Entry) eI.next();
+			Debug.print("debug", "Adding " + e.toString() + " to Ledger \""
+				+ e.getParentLedger().getName() + "\"");
 			e.getParentLedger().addEntry(e);
+			// store.save(e);
+			// store.save(e.getParentLedger());
 		}
 
 		store.save(transaction);
@@ -137,5 +178,4 @@ public class UpdateTransactionCommand extends TransactionCommand
 	public String getClassString() {
 		return "Update Transaction";
 	}
-
 }

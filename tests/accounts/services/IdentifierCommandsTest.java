@@ -96,6 +96,7 @@ public class IdentifierCommandsTest extends BlankDatafileTestCase
 		} catch (CommandNotReadyException cnre) {
 			fail("Should not have thrown exception");
 		}
+		rw.save(found);
 		rw.commit();
 
 		/*

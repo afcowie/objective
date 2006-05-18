@@ -29,6 +29,10 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 {
 	static {
 		DATAFILE = "tmp/unittests/TransactionCommandsTest.yap";
+
+		// Debug.init("debug");
+		// Debug.register("debug");
+		// Debug.setProgname("tct");
 	}
 
 	/*
@@ -68,7 +72,7 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 		 * happened originally.
 		 */
 		Ledger cashLedger = new DebitPositiveLedger("Petty Cash");
-		Ledger blahExpense = new DebitPositiveLedger("Blah Expense");
+		Ledger blahExpense = new DebitPositiveLedger("Telephone Expense");
 		Ledger gstPayable = new CreditPositiveLedger("GST Payable");
 
 		price.setParentLedger(cashLedger);
@@ -279,8 +283,8 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 		result = another.queryByExample(Transaction.class);
 		assertEquals(1, result.size());
 
-		t = (Transaction) result.get(0);
-		entries = t.getEntries();
+		Transaction at = (Transaction) result.get(0);
+		entries = at.getEntries();
 		assertEquals(2, entries.size());
 		Iterator iter = entries.iterator();
 		assertTrue(iter.hasNext());
@@ -289,7 +293,7 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 
 		assertTrue(iter.hasNext());
 		Entry second = (Entry) iter.next();
-		assertEquals(220000, first.getAmount().getNumber());
+		assertEquals(220000, second.getAmount().getNumber());
 		assertFalse(iter.hasNext());
 
 		/*
@@ -299,6 +303,55 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 		result = another.queryByExample(Entry.class);
 		assertEquals("If there are 3 Entry objects, then UpdateTransactionCommand didn't do its job", 2,
 			result.size());
+
+		Engine.releaseClient(another);
+
+		/*
+		 * Next problem: changing the Ledger that an Entry is in
+		 */
+
+		Ledger revenueBlah = new CreditPositiveLedger("Revenue Blah");
+		expense.setParentLedger(revenueBlah);
+
+		utc = new UpdateTransactionCommand(t);
+		utc.execute(rw);
+
+		rw.commit();
+
+		another = Engine.gainClient();
+		result = another.queryByExample(Transaction.class);
+		assertEquals(1, result.size());
+
+		at = (Transaction) result.get(0);
+		entries = at.getEntries();
+		assertEquals(2, entries.size());
+		iter = entries.iterator();
+		assertTrue(iter.hasNext());
+		first = (Entry) iter.next();
+		assertEquals(220000, first.getAmount().getNumber());
+		assertTrue(first instanceof Credit);
+		Ledger firstParent = first.getParentLedger();
+		assertTrue(firstParent instanceof DebitPositiveLedger);
+		assertEquals("Petty Cash", firstParent.getName());
+
+		assertTrue(iter.hasNext());
+		second = (Entry) iter.next();
+		assertTrue(second instanceof Debit);
+		assertEquals(220000, second.getAmount().getNumber());
+		Ledger secondParent = second.getParentLedger();
+
+		// another.reload(secondParent);
+
+		/*
+		 * Hello. If you're running unit tests, and they fail here, then you've
+		 * probably run into an activation problem related to the fact that
+		 * "another" didn't actually have it's stale data cleared after all.
+		 * Damn and other comments.
+		 */
+		assertTrue(secondParent instanceof CreditPositiveLedger);
+		assertEquals("Revenue Blah", secondParent.getName());
+
+		assertFalse(iter.hasNext());
 
 		Engine.releaseClient(another);
 	}

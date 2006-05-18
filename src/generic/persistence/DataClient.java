@@ -11,6 +11,7 @@ package generic.persistence;
 
 import generic.domain.Root;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -94,10 +95,8 @@ public final class DataClient
 	 * method does this.
 	 */
 	public void reload(Object obj) {
-		synchronized (obj) {
-			container.deactivate(obj, 2);
-			container.activate(obj, 2);
-		}
+		container.deactivate(obj, 6);
+		container.activate(obj, 6);
 	}
 
 	/**
@@ -152,6 +151,11 @@ public final class DataClient
 	/**
 	 * Get the root object, and in doing so verify the version of the datafile.
 	 * Note that DataClient caches this lookup once performed.
+	 */
+	/*
+	 * The use of the passed Class object ensures that the application specific
+	 * activation and cascade settings will apply when (ie Books.class) is
+	 * queried, whereas (Root.class) would not.
 	 */
 	public Root getRoot() {
 		if (root == null) {
@@ -214,8 +218,23 @@ public final class DataClient
 	 */
 	public List queryByExample(Object example) {
 		ObjectSet os = container.get(example);
-		dirty.addAll(os);
+
+		activateAndDirty(os);
 		return os;
+	}
+
+	private void activateAndDirty(ObjectSet os) {
+		Iterator iter = os.iterator();
+		while (os.hasNext()) {
+			Object obj = os.next();
+
+			// if (obj instanceof Cascade) {
+			// Cascade cascade = (Cascade) obj; ...
+
+			dirty.add(obj);
+			// container.refresh(obj, 15);
+		}
+
 	}
 
 	/**
@@ -245,7 +264,8 @@ public final class DataClient
 	 */
 	public List nativeQuery(Selector predicate) {
 		ObjectSet os = container.query(predicate);
-		dirty.addAll(os);
+
+		activateAndDirty(os);
 		return os;
 	}
 
@@ -343,5 +363,15 @@ public final class DataClient
 		container.activate(target, 5);
 		dirty.add(target);
 		return target;
+	}
+
+	/**
+	 * Allow DataServer to tell this Client to discard any cached references it
+	 * might be carrying. [This is at user level, not db4o level]
+	 */
+	void clearCachedReferences() {
+		// container.deactivate(root,100);
+		root = null;
+		dirty.clear();
 	}
 }

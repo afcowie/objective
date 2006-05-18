@@ -73,6 +73,7 @@ public class AustralianPayrollTaxTableFinder extends Finder
 		if (l.size() == 0) {
 			throw new NotFoundException();
 		}
+
 		this.result = l;
 		return l;
 	}

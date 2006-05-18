@@ -31,6 +31,11 @@ import com.db4o.config.ObjectClass;
  */
 public abstract class Root
 {
+	static {
+		markCascade(Cascade.class);
+		markNormal(Normal.class);
+		markLeaf(Leaf.class);
+	}
 	/**
 	 * Mark the specified class as one to which cascade behaviour is to apply.
 	 * By turning cascade on (particularly for the Collection classes included
@@ -48,8 +53,19 @@ public abstract class Root
 
 		db4oObjectClass.cascadeOnActivate(true);
 		db4oObjectClass.cascadeOnUpdate(true);
-		db4oObjectClass.minimumActivationDepth(5);
-		db4oObjectClass.updateDepth(5);
+		db4oObjectClass.minimumActivationDepth(15);
+		db4oObjectClass.updateDepth(15);
+	}
+
+	protected static final void markNormal(Class standard) {
+		Configuration config = Db4o.configure();
+
+		ObjectClass db4oObjectClass = config.objectClass(standard);
+
+		db4oObjectClass.cascadeOnActivate(true);
+		db4oObjectClass.cascadeOnUpdate(true);
+		db4oObjectClass.minimumActivationDepth(6);
+		db4oObjectClass.updateDepth(6);
 	}
 
 	/**
@@ -64,8 +80,10 @@ public abstract class Root
 
 		db4oObjectClass.cascadeOnActivate(false);
 		db4oObjectClass.cascadeOnUpdate(false);
-		db4oObjectClass.minimumActivationDepth(0);
-		db4oObjectClass.updateDepth(0);
+		db4oObjectClass.minimumActivationDepth(1);
+		db4oObjectClass.updateDepth(1);
 	}
+
+	public abstract void configure();
 
 }

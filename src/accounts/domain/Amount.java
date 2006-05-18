@@ -6,6 +6,8 @@
  */
 package accounts.domain;
 
+import generic.domain.Leaf;
+
 import java.math.BigDecimal;
 
 /**
@@ -28,7 +30,7 @@ import java.math.BigDecimal;
  * @author Andrew Cowie
  * 
  */
-public class Amount implements Comparable
+public class Amount implements Comparable, Leaf
 {
 	/*
 	 * Instance variables ---------------------------------

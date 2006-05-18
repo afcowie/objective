@@ -46,6 +46,7 @@ public class PostTransactionCommand extends TransactionCommand
 			Entry e = (Entry) iter.next();
 			Ledger l = e.getParentLedger();
 			l.addEntry(e);
+			store.save(l);
 		}
 
 		/*

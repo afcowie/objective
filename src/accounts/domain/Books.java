@@ -6,10 +6,17 @@
  */
 package accounts.domain;
 
+import generic.domain.Cascade;
+import generic.domain.Leaf;
+import generic.domain.Normal;
 import generic.domain.Root;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
+
+import accounts.services.AddCurrencyCommand;
+import accounts.services.InitBooksCommand;
 
 /**
  * Root object of a set of accounts.
@@ -26,7 +33,7 @@ import java.util.Set;
  */
 public class Books extends Root
 {
-	static {
+	public void configure() {
 		/*
 		 * The classes for which we want to turn on cascade {update,activate}
 		 * behaviour (these static methods are inherited from root)
@@ -38,9 +45,9 @@ public class Books extends Root
 		 */
 		markCascade(Books.class);
 		markCascade(LinkedHashSet.class);
-		markLeaf(Datestamp.class);
-		markLeaf(Amount.class);
+		markCascade(LinkedList.class);
 	}
+
 	/*
 	 * Instance variables ---------------------------------
 	 */

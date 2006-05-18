@@ -55,6 +55,7 @@ public final class DataServer
 	 * specified database file.
 	 */
 	private ObjectServer		objectServer	= null;
+	private Class				rootObjectType	= null;
 
 	private static LinkedList	poolAvailable;
 	private static Set			poolInUse;
@@ -69,7 +70,7 @@ public final class DataServer
 
 		Configuration config = Db4o.configure();
 		// config.messageLevel(3);
-		config.callbacks(false);
+		config.callbacks(true);
 
 		/*
 		 * This is so stupid - why on earth _wouldn't_ you blow an exception if
@@ -78,9 +79,9 @@ public final class DataServer
 		config.exceptionsOnNotStorable(true);
 
 		/*
-		 * Apparently the default activation depth is five. Good. Set it anyway.
+		 * The default activation depth is only five. Pump this up considerably.
 		 */
-		config.activationDepth(5);
+		config.activationDepth(15);
 
 		/*
 		 * But it needs to be further tweaked in a few key places, which is done
@@ -131,7 +132,8 @@ public final class DataServer
 				if (!Root.class.isAssignableFrom(rootType)) {
 					throw new ClassCastException("WTF?");
 				}
-				rootType.newInstance();
+				Root root = (Root) rootType.newInstance();
+				root.configure();
 			} catch (Exception e) {
 				/*
 				 * We just ignore exceptions. The whole point of this is to do
@@ -252,9 +254,10 @@ public final class DataServer
 		Iterator dI = dS.iterator();
 		while (dI.hasNext()) {
 			Object dirty = dI.next();
-			ext.refresh(dirty, 5);
+			ext.deactivate(dirty, 30);
 			dI.remove();
 		}
+		client.clearCachedReferences();
 
 		synchronized (poolInUse) {
 			Debug.print("pool", "Returning client to pool");

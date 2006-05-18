@@ -5,6 +5,7 @@
  * Copyright (c) 2005-2006 Operational Dynamics
  */
 
+import generic.domain.DomainObjectTest;
 import generic.junit.VerboseTestRunner;
 import generic.persistence.BasicDb4oTest;
 import generic.persistence.EngineTest;
@@ -51,6 +52,7 @@ public class UnitTests
 		suite.addTestSuite(ExposeDb4oInterfaceTest.class);
 
 		// domain
+		suite.addTestSuite(DomainObjectTest.class);
 		suite.addTestSuite(BasicAccountTest.class);
 		suite.addTestSuite(BasicLedgerTest.class);
 		suite.addTestSuite(BasicTransactionTest.class);

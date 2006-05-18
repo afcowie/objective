@@ -6,6 +6,9 @@
  */
 package accounts.domain;
 
+import generic.domain.Cascade;
+import generic.domain.DomainObject;
+
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -21,7 +24,7 @@ import java.util.Set;
  * 
  * @author Andrew Cowie
  */
-public class Transaction
+public class Transaction extends DomainObject implements Cascade
 {
 	/*
 	 * Instance variables ---------------------------------
@@ -232,81 +235,16 @@ public class Transaction
 		}
 	}
 
-	/**
-	 * Compare two Transaction objects. This does <b>not</b> use any reference
-	 * equality so it should come up with a true result if two objects are the
-	 * same but in different DataClients. Note also that this does not compare
-	 * entries sets.
-	 */
-	public boolean equals(Object x) {
-		/*
-		 * If it's the same object, return true
-		 */
-		if (x == this) {
-			return true;
-		}
-
-		if (x == null) {
-			return false;
-		}
-
-		if (x instanceof Transaction) {
-			Transaction t = (Transaction) x;
-
-			// if they're both null, fine
-			if (t.date != this.date) {
-				// otherwise, if one is null, can't compare
-				if ((t.date == null) || (this.date == null)) {
-					return false;
-				}
-				// compare timestamps
-				if (t.date.getInternalTimestamp() != this.date.getInternalTimestamp()) {
-					return false;
-				}
-			}
-
-			/*
-			 * For the String fields: if they're the same object, fine,
-			 * otherwise compare the two with String.equals()
-			 */
-			if (t.description != this.description) {
-				if ((t.description == null) || (this.description == null)) {
-					return false;
-				}
-				if (!(t.description.equals(this.description))) {
-					return false;
-				}
-			}
-			if (t.reference != this.reference) {
-				if ((t.reference == null) || (this.reference == null)) {
-					return false;
-				}
-				if (!(t.reference.equals(this.reference))) {
-					return false;
-				}
-			}
-
-			/*
-			 * Quick way to find out if the fully derived classes are the same.
-			 */
-			if (t.getClass() != this.getClass()) {
-				return false;
-			}
-
-			/*
-			 * WARNING: we don't compare entries.
-			 */
-			// FUTURE switch checking database ID?
-			return true;
-		}
-		return false;
-	}
-
 	/*
 	 * Output ---------------------------------------------
 	 */
 
 	public String getClassString() {
 		return "Transaction";
+	}
+
+	public String toString() {
+		return getClassString() + ": " + date + " " + description + " (" + reference + ") ["
+			+ entries.size() + "]";
 	}
 }

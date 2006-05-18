@@ -6,6 +6,7 @@
  */
 package accounts.domain;
 
+import generic.domain.Leaf;
 import generic.persistence.NotActivatedException;
 import generic.util.DebugException;
 
@@ -21,7 +22,7 @@ import java.util.Date;
  * 
  * @author Andrew Cowie
  */
-public class Datestamp implements Comparable
+public class Datestamp implements Comparable, Leaf
 {
 	/**
 	 * We use -1 for uninitialized, to guard against lacking activation, and to
