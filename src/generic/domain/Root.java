@@ -53,19 +53,19 @@ public abstract class Root
 
 		db4oObjectClass.cascadeOnActivate(true);
 		db4oObjectClass.cascadeOnUpdate(true);
-		db4oObjectClass.minimumActivationDepth(15);
-		db4oObjectClass.updateDepth(15);
+		db4oObjectClass.minimumActivationDepth(6);
+		db4oObjectClass.updateDepth(6);
 	}
 
-	protected static final void markNormal(Class standard) {
+	protected static final void markNormal(Class normal) {
 		Configuration config = Db4o.configure();
 
-		ObjectClass db4oObjectClass = config.objectClass(standard);
+		ObjectClass db4oObjectClass = config.objectClass(normal);
 
 		db4oObjectClass.cascadeOnActivate(true);
 		db4oObjectClass.cascadeOnUpdate(true);
-		db4oObjectClass.minimumActivationDepth(6);
-		db4oObjectClass.updateDepth(6);
+		db4oObjectClass.minimumActivationDepth(2);
+		db4oObjectClass.updateDepth(1);
 	}
 
 	/**

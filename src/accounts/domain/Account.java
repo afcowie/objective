@@ -6,7 +6,7 @@
  */
 package accounts.domain;
 
-import generic.domain.Cascade;
+import generic.domain.Normal;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -18,7 +18,7 @@ import java.util.Set;
  * 
  * @author Andrew Cowie
  */
-public class Account implements Cascade
+public class Account implements Normal
 {
 	/*
 	 * Instance variables ---------------------------------

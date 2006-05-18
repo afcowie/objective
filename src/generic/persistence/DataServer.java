@@ -81,7 +81,7 @@ public final class DataServer
 		/*
 		 * The default activation depth is only five. Pump this up considerably.
 		 */
-		config.activationDepth(15);
+		config.activationDepth(5);
 
 		/*
 		 * But it needs to be further tweaked in a few key places, which is done
@@ -254,7 +254,7 @@ public final class DataServer
 		Iterator dI = dS.iterator();
 		while (dI.hasNext()) {
 			Object dirty = dI.next();
-			ext.deactivate(dirty, 30);
+			ext.deactivate(dirty, 6);
 			dI.remove();
 		}
 		client.clearCachedReferences();

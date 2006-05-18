@@ -6,8 +6,8 @@
  */
 package accounts.domain;
 
-import generic.domain.Cascade;
 import generic.domain.DomainObject;
+import generic.domain.Normal;
 import generic.util.DebugException;
 
 import java.util.Iterator;
@@ -19,7 +19,7 @@ import java.util.Set;
  * 
  * @author Andrew Cowie
  */
-public class Ledger extends DomainObject implements Cascade
+public class Ledger extends DomainObject implements Normal
 {
 	/*
 	 * Instance variables ---------------------------------
