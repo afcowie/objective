@@ -9,6 +9,7 @@ package accounts.ui;
 import generic.client.Master;
 import generic.persistence.DataClient;
 import generic.ui.Text;
+import generic.ui.UpdateListener;
 import generic.util.Debug;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 
 import org.gnu.gtk.CellRendererText;
 import org.gnu.gtk.DataColumn;
+import org.gnu.gtk.DataColumnBoolean;
 import org.gnu.gtk.DataColumnInt;
 import org.gnu.gtk.DataColumnObject;
 import org.gnu.gtk.DataColumnString;
@@ -48,9 +50,10 @@ import accounts.domain.Ledger;
 import accounts.domain.Transaction;
 import accounts.services.EntryComparator;
 
-public class TransactionListView extends TreeView
+public class TransactionListView extends TreeView implements UpdateListener
 {
 	private transient Currency	home	= null;
+	private DataClient			db;
 
 	DataColumnString			typeMarkup_DataColumn;
 	DataColumnString			typeSort_DataColumn;
@@ -62,13 +65,24 @@ public class TransactionListView extends TreeView
 	DataColumnInt				debitAmountsSort_DataColumn;
 	DataColumnString			creditAmountsText_DataColumn;
 	DataColumnInt				creditAmountsSort_DataColumn;
+	/**
+	 * The Transaction object that this row represents. This must be set before
+	 * calling {@link #populate(TreeIter)}
+	 */
 	DataColumnObject			transactionObject_DataColumn;
-	ListStore					listStore;
+	/**
+	 * Whether the row is to be rendered with bright colours. Set this as true
+	 * if the row is selected and you want it to show up in "reverse video",
+	 * otherwise use false for normal colouring.
+	 */
+	DataColumnBoolean			active_DataColumn;
+	ListStore					model;
 
 	TreeView					view;
 
-	public TransactionListView(final DataClient db, List transactions) {
+	public TransactionListView(DataClient db, List transactions) {
 		super();
+		this.db = db;
 
 		Books root = (Books) db.getRoot();
 		home = root.getHomeCurrency();
@@ -84,8 +98,9 @@ public class TransactionListView extends TreeView
 		creditAmountsText_DataColumn = new DataColumnString();
 		creditAmountsSort_DataColumn = new DataColumnInt();
 		transactionObject_DataColumn = new DataColumnObject();
+		active_DataColumn = new DataColumnBoolean();
 
-		listStore = new ListStore(new DataColumn[] {
+		model = new ListStore(new DataColumn[] {
 			typeMarkup_DataColumn,
 			typeSort_DataColumn,
 			dateText_DataColumn,
@@ -96,7 +111,8 @@ public class TransactionListView extends TreeView
 			debitAmountsSort_DataColumn,
 			creditAmountsText_DataColumn,
 			creditAmountsSort_DataColumn,
-			transactionObject_DataColumn
+			transactionObject_DataColumn,
+			active_DataColumn
 		});
 
 		populate(transactions);
@@ -104,7 +120,7 @@ public class TransactionListView extends TreeView
 		// since this might change away from a direct subclass
 		view = this;
 
-		view.setModel(listStore);
+		view.setModel(model);
 
 		/*
 		 * Type
@@ -242,13 +258,14 @@ public class TransactionListView extends TreeView
 				Debug.print("listeners", "TreeViewEvent: " + event.getType().getName());
 				if (event.getType() == TreeViewEvent.Type.ROW_ACTIVATED) {
 					TreeIter pointer = event.getTreeIter();
-					Transaction t = (Transaction) listStore.getValue(pointer,
-						transactionObject_DataColumn);
+					Transaction t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);
 
-					Master.ui.launch(db, t);
+					Master.ui.launchEditor(t);
 				}
 			}
 		});
+
+		Master.ui.registerListener(this);
 	}
 
 	private static final Pattern	regexAmp	= Pattern.compile("&");
@@ -268,7 +285,7 @@ public class TransactionListView extends TreeView
 		Iterator tI = transactions.iterator();
 		while (tI.hasNext()) {
 			Transaction t = (Transaction) tI.next();
-			TreeIter pointer = listStore.appendRow();
+			TreeIter pointer = model.appendRow();
 
 			/*
 			 * Populate is geared to be re-used and extracts its Transaction
@@ -276,9 +293,10 @@ public class TransactionListView extends TreeView
 			 * TransactionListView for the first time, set that DataColumn
 			 * before calling populate().
 			 */
-			listStore.setValue(pointer, transactionObject_DataColumn, t);
+			model.setValue(pointer, transactionObject_DataColumn, t);
+			model.setValue(pointer, active_DataColumn, false);
 
-			populate(pointer, false);
+			populate(pointer);
 		}
 	}
 
@@ -294,27 +312,25 @@ public class TransactionListView extends TreeView
 	 *            you want to indicate as active.
 	 */
 	private void showAsActive(TreePath path) {
-		TreeIter pointer = listStore.getIter(path);
-		Transaction t = (Transaction) listStore.getValue(pointer, transactionObject_DataColumn);
-		populate(pointer, true);
+		TreeIter pointer = model.getIter(path);
+
+		model.setValue(pointer, active_DataColumn, true);
+		populate(pointer);
 
 		if ((previous != null) && (previous != path)) {
-			pointer = listStore.getIter(previous);
-			populate(pointer, false);
+			pointer = model.getIter(previous);
+			model.setValue(pointer, active_DataColumn, false);
+			populate(pointer);
 		}
 		previous = path;
 	}
 
 	/**
-	 * Populate a given row with data marked up for presentation and data
-	 * normalized for sorting purposes.
+	 * Populate a given row with data marked up for presentation and with meta
+	 * data normalized for sorting purposes.
 	 * 
 	 * @param pointer
-	 *            a TreeIter indicating which row you are interested in.
-	 * @param active
-	 *            whether the row is to be rendered with bright colours. Call
-	 *            this as true if the row is selected, otherwise use false for
-	 *            normal colouring.
+	 *            a TreeIter indicating which row you want to [re]populate.
 	 */
 	/*
 	 * This is moderately hideous, but then what presentation code ever is NOT
@@ -323,8 +339,9 @@ public class TransactionListView extends TreeView
 	 * ones are where the pango mush goes (which is why we can't sort on them -
 	 * it'd sort by colour!)
 	 */
-	private void populate(TreeIter pointer, boolean active) {
-		Transaction t = (Transaction) listStore.getValue(pointer, transactionObject_DataColumn);
+	private void populate(TreeIter pointer) {
+		Transaction t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);
+		boolean active = model.getValue(pointer, active_DataColumn);
 
 		StringBuffer type = new StringBuffer();
 
@@ -336,16 +353,16 @@ public class TransactionListView extends TreeView
 		type.append(Text.wrap(t.getClassString(), 5));
 		type.append("</span>");
 
-		listStore.setValue(pointer, typeMarkup_DataColumn, type.toString());
-		listStore.setValue(pointer, typeSort_DataColumn, t.getClassString());
+		model.setValue(pointer, typeMarkup_DataColumn, type.toString());
+		model.setValue(pointer, typeSort_DataColumn, t.getClassString());
 
-		listStore.setValue(pointer, dateText_DataColumn, "<span font_desc='Mono'>"
-			+ t.getDate().toString() + "</span>");
+		model.setValue(pointer, dateText_DataColumn, "<span font_desc='Mono'>" + t.getDate().toString()
+			+ "</span>");
 
 		final long timestamp = t.getDate().getInternalTimestamp();
 		final long smaller = timestamp / 1000;
 		final int datei = Integer.valueOf(Long.toString(smaller)).intValue();
-		listStore.setValue(pointer, dateSort_DataColumn, datei);
+		model.setValue(pointer, dateSort_DataColumn, datei);
 
 		StringBuffer titleName = new StringBuffer();
 		final String OPEN = "<b>";
@@ -504,17 +521,17 @@ public class TransactionListView extends TreeView
 		/*
 		 * Now add the data for the Entries related columns:
 		 */
-		listStore.setValue(pointer, descriptionAccountLedgerText_DataColumn, titleName.toString());
-		listStore.setValue(pointer, descriptionSort_DataColumn, t.getDescription());
+		model.setValue(pointer, descriptionAccountLedgerText_DataColumn, titleName.toString());
+		model.setValue(pointer, descriptionSort_DataColumn, t.getDescription());
 
-		listStore.setValue(pointer, debitAmountsText_DataColumn, debitVal.toString());
-		listStore.setValue(pointer, creditAmountsText_DataColumn, creditVal.toString());
+		model.setValue(pointer, debitAmountsText_DataColumn, debitVal.toString());
+		model.setValue(pointer, creditAmountsText_DataColumn, creditVal.toString());
 
 		final int dri = Integer.valueOf(Long.toString(largestDebitNumber)).intValue();
-		listStore.setValue(pointer, debitAmountsSort_DataColumn, dri);
+		model.setValue(pointer, debitAmountsSort_DataColumn, dri);
 
 		final int cri = Integer.valueOf(Long.toString(largestCreditNumber)).intValue();
-		listStore.setValue(pointer, creditAmountsSort_DataColumn, cri);
+		model.setValue(pointer, creditAmountsSort_DataColumn, cri);
 	}
 
 	/**
@@ -522,7 +539,26 @@ public class TransactionListView extends TreeView
 	 * with a new Set.
 	 */
 	public void setTransactions(List transactions) {
-		listStore.clear();
+		model.clear();
 		populate(transactions);
+	}
+
+	public void redisplayObject(long id) {
+		Transaction t = (Transaction) db.fetchByID(id);
+		db.reload(t);
+
+		TreeIter pointer = model.getFirstIter();
+		while (pointer != null) {
+			if (model.getValue(pointer, transactionObject_DataColumn) == t) {
+				populate(pointer);
+				return;
+			}
+			pointer = pointer.getNextIter();
+		}
+
+		/*
+		 * Well, not here. No biggie, unless we start registering ID to Window
+		 * mappings up at UserInterface.
+		 */
 	}
 }

@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.ui.EditorWindow;
 import generic.ui.ModalDialog;
 import generic.util.Debug;
 

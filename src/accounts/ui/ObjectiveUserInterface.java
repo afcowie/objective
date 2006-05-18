@@ -6,13 +6,9 @@
  */
 package accounts.ui;
 
-import generic.persistence.DataClient;
+import generic.ui.EditorWindow;
 import generic.ui.PrimaryWindow;
 import generic.ui.UserInterface;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import accounts.domain.Currency;
 import accounts.domain.GenericTransaction;
 import accounts.domain.PayrollTransaction;
@@ -28,12 +24,9 @@ import country.au.ui.AustralianPayrollEditorWindow;
  */
 public class ObjectiveUserInterface extends UserInterface
 {
-	private Map	idsToEditors;
-	private Map	editorsToIds;
 
 	public ObjectiveUserInterface() {
-		idsToEditors = new HashMap();
-		editorsToIds = new HashMap();
+		super();
 	}
 
 	/**
@@ -43,12 +36,6 @@ public class ObjectiveUserInterface extends UserInterface
 	 * super implementation.
 	 */
 	protected void deregisterWindow(PrimaryWindow w) {
-		if (w instanceof EditorWindow) {
-			if (editorsToIds.containsKey(w)) {
-				Long ID = (Long) editorsToIds.remove(w);
-				idsToEditors.remove(ID);
-			}
-		}
 		super.deregisterWindow(w);
 	}
 
@@ -59,57 +46,30 @@ public class ObjectiveUserInterface extends UserInterface
 	 * overrides) generic.ui.UserInterface to provide functionality specific to
 	 * ObjectiveAccounts.
 	 * 
-	 * @param store
-	 *            the DataClient which target resides in
-	 * @param target
-	 *            the object wish determines what UI element is to be launched.
-	 */
-	public void launch(DataClient store, Object target) {
-		long id = store.getID(target);
-
-		if (target instanceof Transaction) {
-			launch(id, (Transaction) target);
-		} else if (target instanceof Currency) {
-			throw new UnsupportedOperationException("This here just for kicks");
-		}
-	}
-
-	/**
-	 * Transactions are assumed to have EditorWindows to view them; this version
-	 * of launch() selects the approriate window type and instantiates it for
-	 * editing. Along the way it keeps a reference to the editor by both
-	 * EditorWindow and id, so that a subsequent call to launch an editor for
-	 * that id will present the already open editor.
-	 * 
 	 * @param id
 	 *            database id of the target object
 	 * @param target
-	 *            the Transaction object you are editing. This is NOT passed to
-	 *            launched editors, but is used to discriminate between
+	 *            the object you are editing. This is NOT passed to launched
+	 *            editors, but is used to discriminate between
 	 *            PayrollTransaction, GenericTransaction, etc.
 	 */
-	private void launch(long id, Transaction target) {
+	protected EditorWindow launchEditor(long id, Object target) {
 		EditorWindow editor = null;
 
-		Long ID = new Long(id);
+		if (target instanceof Transaction) {
 
-		if (idsToEditors.containsKey(ID)) {
-			editor = (EditorWindow) idsToEditors.get(ID);
-			editor.present();
-			return;
+			if (target instanceof PayrollTransaction) {
+				editor = new AustralianPayrollEditorWindow(id);
+			} else if (target instanceof ReimbursableExpensesTransaction) {
+				editor = new ReimbursableExpensesEditorWindow(id);
+			} else if (target instanceof GenericTransaction) {
+				throw new UnsupportedOperationException("No editor for GenericTransaction yet");
+			}
+
+		} else if (target instanceof Currency) {
+			throw new UnsupportedOperationException("This here just for kicks");
 		}
 
-		if (target instanceof PayrollTransaction) {
-			editor = new AustralianPayrollEditorWindow(id);
-		} else if (target instanceof ReimbursableExpensesTransaction) {
-			editor = new ReimbursableExpensesEditorWindow(id);
-		} else if (target instanceof GenericTransaction) {
-			throw new UnsupportedOperationException("No editor for GenericTransaction yet");
-		}
-
-		idsToEditors.put(ID, editor);
-		editorsToIds.put(editor, ID);
-
-		editor.present();
+		return editor;
 	}
 }

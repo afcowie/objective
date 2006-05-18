@@ -7,6 +7,7 @@
 package country.au.ui;
 
 import generic.ui.Align;
+import generic.ui.EditorWindow;
 import generic.ui.ModalDialog;
 import generic.ui.TwoColumnTable;
 import generic.util.Debug;
@@ -37,7 +38,6 @@ import accounts.ui.AmountDisplay;
 import accounts.ui.AmountEntry;
 import accounts.ui.ChangeListener;
 import accounts.ui.DatePicker;
-import accounts.ui.EditorWindow;
 import accounts.ui.IdentifierSelector;
 import accounts.ui.WorkerPicker;
 import country.au.domain.AustralianPayrollTaxIdentifier;

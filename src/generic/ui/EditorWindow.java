@@ -4,12 +4,10 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2005-2006 Operational Dynamics
  */
-package accounts.ui;
+package generic.ui;
 
 import generic.persistence.DataClient;
 import generic.persistence.Engine;
-import generic.ui.AbstractWindow;
-import generic.ui.PrimaryWindow;
 import generic.util.Debug;
 
 import org.gnu.gtk.Button;
@@ -21,9 +19,9 @@ import org.gnu.gtk.event.ButtonEvent;
 import org.gnu.gtk.event.ButtonListener;
 
 /**
- * A great number of UI windows [will] follow the pattern of being either
- * editors or complementary viewers, named in parallel. This branch of
- * sublcasses from AbstractWindow denote the editors.
+ * A great number of UI windows follow the pattern of being either editors or
+ * complementary viewers, named in parallel. This branch of sublcasses from
+ * AbstractWindow denote the editors.
  * <p>
  * EditorWindow subclasses must implement cancel() and ok(), corresponding to
  * the actions taken when buttons by those names are pressed. The default

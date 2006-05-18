@@ -8,11 +8,13 @@ package generic.ui;
 
 import generic.client.Hooks;
 import generic.client.Master;
-import generic.persistence.DataClient;
+import generic.domain.DomainObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,6 +31,11 @@ public abstract class UserInterface
 {
 	private static Set	windows	= new LinkedHashSet();
 
+	private Map			idsToEditors;
+	private Map			editorsToIds;
+
+	private Set			updateListeners;
+
 	/**
 	 * Register a window as ready for display to the user. While one of our
 	 * Window subclasses can, of course, call present on itself perfectly well,
@@ -43,6 +50,15 @@ public abstract class UserInterface
 
 	protected void deregisterWindow(PrimaryWindow w) {
 		windows.remove(w);
+
+		if (w instanceof EditorWindow) {
+			if (editorsToIds.containsKey(w)) {
+				Long ID = (Long) editorsToIds.remove(w);
+				idsToEditors.remove(ID);
+
+				propegateUpdate(ID.longValue());
+			}
+		}
 	}
 
 	/**
@@ -50,6 +66,11 @@ public abstract class UserInterface
 	 * on shutdown.
 	 */
 	protected UserInterface() {
+		idsToEditors = new HashMap();
+		editorsToIds = new HashMap();
+
+		updateListeners = new LinkedHashSet();
+
 		Master.registerCallback(new Hooks() {
 			public void shutdown() {
 				try {
@@ -77,6 +98,15 @@ public abstract class UserInterface
 					}
 				} catch (Exception e) {
 				}
+
+				/*
+				 * Give the everything else a change to settle, ie for the
+				 * DataClients released to Engine to be cleaned up.
+				 */
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+				}
 			}
 		});
 	}
@@ -95,9 +125,66 @@ public abstract class UserInterface
 	 *            the DataClient which target resides in, used to look up the
 	 *            target objects database id.
 	 * @param target
-	 *            the object wish determines what UI element is to be launched.
+	 *            the object which determines what UI element is to be launched.
 	 *            target <i>must</i> be an object activated out of the db
 	 *            database connection.
 	 */
-	public abstract void launch(DataClient db, Object target);
+	public void launchEditor(DomainObject target) {
+		EditorWindow ew;
+
+		long id = target.getID();
+		Long ID = new Long(id);
+
+		if (idsToEditors.containsKey(ID)) {
+			ew = (EditorWindow) idsToEditors.get(ID);
+			ew.present();
+			return;
+		}
+
+		ew = launchEditor(id, target);
+
+		if (ew == null) {
+			return;
+		}
+		ew.present();
+
+		idsToEditors.put(ID, ew);
+		editorsToIds.put(ew, ID);
+	}
+
+	/**
+	 * This is what you implement to carry out application specific behaviour.
+	 * 
+	 * @param id
+	 *            the database ID of the Object you want to edit.
+	 * @param target
+	 *            the object congruent to that which you wish to edit, allowing
+	 *            you to determine the right kind of window to launch.
+	 * @return The EditorWindow that you launch (so we can keep track of it and
+	 *         relaunch if necessary).
+	 */
+	protected abstract EditorWindow launchEditor(long id, Object target);
+
+	/**
+	 * The complement of what happens to launch an EditorWindow - propegate the
+	 * result to any Widget which has registered an UpdateListener.
+	 * 
+	 * @param id
+	 *            the database id of the object which has changed.
+	 */
+	protected void propegateUpdate(long id) {
+		Iterator iter = updateListeners.iterator();
+		while (iter.hasNext()) {
+			UpdateListener u = (UpdateListener) iter.next();
+			u.redisplayObject(id);
+		}
+	}
+
+	public void registerListener(UpdateListener listener) {
+		updateListeners.add(listener);
+	}
+
+	public void deregisterListener(UpdateListener listener) {
+		updateListeners.remove(listener);
+	}
 }
