@@ -216,5 +216,7 @@ public class IdentifierCommandsTest extends BlankDatafileTestCase
 		Identifier proto = new Identifier("Two");
 		l = rw.queryByExample(proto);
 		assertEquals(1, l.size());
+
+		last = true;
 	}
 }

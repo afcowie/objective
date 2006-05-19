@@ -121,5 +121,7 @@ public class BooksSetByCommandsTest extends BlankDatafileTestCase
 		Books another = (Books) rw.getRoot();
 		assertNotNull(another);
 		Engine.releaseClient(fresh);
+
+		last = true;
 	}
 }

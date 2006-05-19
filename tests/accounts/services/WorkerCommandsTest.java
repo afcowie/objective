@@ -113,5 +113,7 @@ public class WorkerCommandsTest extends BlankDatafileTestCase
 			// good
 		}
 		rw.rollback();
+
+		last = true;
 	}
 }

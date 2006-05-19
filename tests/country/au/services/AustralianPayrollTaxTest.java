@@ -305,5 +305,7 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		calc.setSalary(new Amount("10000.00"));
 		calc.calculateGivenSalary();
 		assertEquals("4850.00", calc.getWithhold().getValue());
+
+		last = true;
 	}
 }

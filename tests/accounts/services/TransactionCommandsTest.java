@@ -354,5 +354,7 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 		assertFalse(iter.hasNext());
 
 		Engine.releaseClient(another);
+
+		last = true;
 	}
 }

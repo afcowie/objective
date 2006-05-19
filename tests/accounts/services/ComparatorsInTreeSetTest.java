@@ -206,6 +206,8 @@ public class ComparatorsInTreeSetTest extends BlankDatafileTestCase
 		aS.addAll(aL);
 
 		assertEquals("EntryComparator reduced the number of Entries", expected, aS.size());
+
+		last = true;
 	}
 
 	/**

@@ -6,8 +6,8 @@
  */
 package accounts.domain;
 
-import generic.domain.Cascade;
 import generic.domain.DomainObject;
+import generic.domain.Normal;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -24,7 +24,7 @@ import java.util.Set;
  * 
  * @author Andrew Cowie
  */
-public class Transaction extends DomainObject implements Cascade
+public class Transaction extends DomainObject implements Normal
 {
 	/*
 	 * Instance variables ---------------------------------

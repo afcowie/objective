@@ -150,6 +150,8 @@ public class Db4oActivationTest extends BlankDatafileTestCase
 
 		assertEquals(Integer.toString(NUM_ACCOUNTS) + ".00", totalDebits.getValue());
 		assertEquals(Integer.toString(NUM_ACCOUNTS) + ".00", totalCredits.getValue());
+
+		last = true;
 	}
 
 	public static void main(String[] args) {

@@ -82,5 +82,7 @@ public class BasicFinderTest extends BlankDatafileTestCase
 		} catch (NotFoundException nfe) {
 			fail(nfe.getMessage());
 		}
+
+		last = true;
 	}
 }

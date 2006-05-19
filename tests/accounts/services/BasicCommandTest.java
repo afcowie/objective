@@ -24,7 +24,7 @@ public class BasicCommandTest extends BlankDatafileTestCase
 	static {
 		DATAFILE = "tmp/unittests/BasicCommandTest.yap";
 	}
-	
+
 	public final void testInitBooksCommand() {
 		try {
 			Books one = (Books) rw.getRoot();
@@ -67,7 +67,8 @@ public class BasicCommandTest extends BlankDatafileTestCase
 
 	public final void testPersistenceCascade() {
 		Books root = (Books) rw.getRoot();
-		assertNotNull("Should be a Books object, established by previous test, available for retrieval", root);
+		assertNotNull("Should be a Books object, established by previous test, available for retrieval",
+			root);
 
 		Set accounts = root.getAccountsSet();
 		assertNotNull("Should be an Account Set stored and retreivable", accounts);
@@ -119,7 +120,6 @@ public class BasicCommandTest extends BlankDatafileTestCase
 		Ledger ledger = (Ledger) ledgersIter.next();
 		assertEquals("The Ledger should be the one we expect!", "Manly Office", ledger.getName());
 	}
-	
 
 	/**
 	 * Not much to this one; its just a wrapper around DataClient.save()
@@ -141,5 +141,7 @@ public class BasicCommandTest extends BlankDatafileTestCase
 
 		Datestamp slut = (Datestamp) l.get(0);
 		assertSame(slut, virgin);
+
+		last = true;
 	}
 }

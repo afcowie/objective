@@ -263,5 +263,7 @@ public class EntityCommandTest extends BlankDatafileTestCase
 			fail("Shouldn't have thrown an CommandNotReadyException at this point either");
 		}
 		rw.commit();
+
+		last = true;
 	}
 }

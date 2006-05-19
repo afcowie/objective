@@ -6,8 +6,8 @@
  */
 package accounts.domain;
 
-import generic.domain.Cascade;
 import generic.domain.DomainObject;
+import generic.domain.Normal;
 import generic.util.DebugException;
 
 /**
@@ -21,7 +21,7 @@ import generic.util.DebugException;
  * 
  * @author Andrew Cowie
  */
-public class Entry extends DomainObject implements Cascade
+public class Entry extends DomainObject implements Normal
 {
 	/*
 	 * Instance variables ---------------------------------

@@ -27,6 +27,10 @@ public abstract class DomainObject
 		}
 	}
 
+	public void objectOnNew(ObjectContainer container) {
+		this.databaseId = container.ext().getID(this);
+	}
+
 	public long getID() {
 		if (databaseId == 0) {
 			throw new NotActivatedException();
