@@ -7,6 +7,7 @@
 package country.au.services;
 
 import generic.persistence.DataClient;
+import generic.persistence.NotActivatedException;
 
 import java.math.BigDecimal;
 
@@ -44,6 +45,9 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 		throws NotFoundException {
 
 		super(asAtDate);
+		if (scale == null) {
+			throw new NotActivatedException();
+		}
 
 		AustralianPayrollTaxTableFinder finder = new AustralianPayrollTaxTableFinder(scale, asAtDate);
 		finder.query(store);

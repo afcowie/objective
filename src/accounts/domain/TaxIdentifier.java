@@ -13,8 +13,12 @@ package accounts.domain;
  */
 public class TaxIdentifier extends Identifier
 {
-	public TaxIdentifier(String description) {
-		super(description);
+	public TaxIdentifier(String description, int index) {
+		super(description, index);
+	}
+
+	protected TaxIdentifier() {
+		super();
 	}
 
 	public String getClassString() {

@@ -6,6 +6,8 @@
  */
 package generic.persistence;
 
+import generic.domain.DomainObject;
+
 import com.db4o.query.Predicate;
 
 /**
@@ -24,6 +26,24 @@ import com.db4o.query.Predicate;
  */
 public abstract class Selector extends Predicate
 {
+	protected DomainObject	target	= null;
+
+	public Selector() {
+		// default
+	}
+
+	/**
+	 * Create a Selector with a query parameter.
+	 * 
+	 * @param target
+	 *            a DomainObject which will be set to protected field
+	 *            {@link Selector#target target} which you can then use as the
+	 *            argument in a match() method to a call to congruent().
+	 */
+	public Selector(DomainObject target) {
+		this.target = target;
+	}
+
 	/*
 	 * boolean match(Type t);
 	 */

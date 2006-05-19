@@ -49,7 +49,7 @@ public class IdentifierCommandsTest extends BlankDatafileTestCase
 		 * Now make sure adding a third one actually works
 		 */
 
-		PayrollTaxIdentifier i3 = new PayrollTaxIdentifier("Three, PTI");
+		PayrollTaxIdentifier i3 = new PayrollTaxIdentifier("Three, PTI", 3);
 		grp.addIdentifier(i3);
 
 		sigc = new StoreIdentifierGroupCommand(grp);
@@ -138,7 +138,7 @@ public class IdentifierCommandsTest extends BlankDatafileTestCase
 		 * Now add one more object, checking that the retrieved IdentifierGroup
 		 * is [still] mutable
 		 */
-		AustralianPayrollTaxIdentifier i4 = new AustralianPayrollTaxIdentifier("Four, APTI");
+		AustralianPayrollTaxIdentifier i4 = new AustralianPayrollTaxIdentifier("Four, APTI", 4);
 		grp.addIdentifier(i4);
 		try {
 			sigc = new StoreIdentifierGroupCommand(grp);

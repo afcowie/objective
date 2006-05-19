@@ -29,6 +29,9 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		DATAFILE = "tmp/unittests/AustralianPayrollTaxTest.yap";
 	}
 
+	/**
+	 * First setup a demo database with PAYG tax data, and verify it was stored.
+	 */
 	public final void testEnsureTableDataInitialized() {
 		/*
 		 * Initialize a set of books with some identifiers in it already.
@@ -69,15 +72,15 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		} catch (NotFoundException nfe) {
 			fail("Huh? This was supposed to be good data.");
 		}
-
 	}
 
 	public final void testTaxDataFinderNotFinding() {
+		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
 		/*
 		 * Try it with a bogus identifier. This only needs to try query().
 		 */
 		AustralianPayrollTaxTableFinder bogus = new AustralianPayrollTaxTableFinder(
-			new AustralianPayrollTaxIdentifier("Bogus"), KNOWN_GOOD_DATE);
+			new AustralianPayrollTaxIdentifier("Bogus", 0), KNOWN_GOOD_DATE);
 		try {
 			bogus.query(rw);
 			fail("Running the tax tables finder against a bogus Identifier didn't throw like it should have.");
@@ -104,6 +107,8 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 	}
 
 	public final void testGettersSetters() throws NotFoundException {
+		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
+
 		Amount positiveOne = new Amount("640.22");
 		Amount zero = new Amount("0.00");
 		Amount negative = new Amount("-0.01");
@@ -171,6 +176,8 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 	 * setValue()
 	 */
 	public final void testCalculatorAllFactorsSet() throws NotFoundException {
+		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
+
 		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
 			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
 		try {
@@ -217,6 +224,8 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 	}
 
 	public final void testCalculateWithholdGivenSalary() throws NotFoundException {
+		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
+
 		Amount weeklyEarnings = new Amount("409.00");
 
 		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
@@ -233,6 +242,8 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 	}
 
 	public final void testCalculateWithholdGivenPayable() throws NotFoundException {
+		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
+
 		Amount weeklyPaycheck = new Amount("231.00");
 
 		PayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
@@ -249,6 +260,8 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 	}
 
 	public final void testAgainstOfficialSampleData() throws NotFoundException {
+		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
+
 		PayrollTaxCalculator calc;
 
 		calc = new AustralianPayrollTaxCalculator(rw,

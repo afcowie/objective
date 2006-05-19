@@ -17,19 +17,25 @@ import accounts.domain.PayrollTaxIdentifier;
  */
 public class AustralianPayrollTaxIdentifier extends PayrollTaxIdentifier
 {
-	public AustralianPayrollTaxIdentifier(String description) {
-		super(description);
+	public AustralianPayrollTaxIdentifier(String description, int index) {
+		super(description, index);
+	}
+
+	/**
+	 * For searches
+	 */
+	public AustralianPayrollTaxIdentifier() {
+		super();
 	}
 
 	/**
 	 * A set of useful "constants" indicating previsualized uses of this class.
-	 * They are NOT instantiated here; rather, they are TODO populated if the
-	 * appropriate Finder runs.
+	 * They are NOT instantiated here. For any given DataClient, you can always
+	 * initialize these with country.au.services.AustralianPayrollTaxConstants
 	 */
-	public static AustralianPayrollTaxIdentifier	TAXFREE_THRESHOLD_WITH_LEAVE_LOADING	= null;
-	public static AustralianPayrollTaxIdentifier	TAXFREE_THRESHOLD_NO_LEAVE_LOADING		= null;
 	public static AustralianPayrollTaxIdentifier	NO_TAXFREE_THRESHOLD					= null;
-	public static AustralianPayrollTaxIdentifier	NO_TFN_PROVIDED							= null;
+	public static AustralianPayrollTaxIdentifier	TAXFREE_THRESHOLD_WITH_LEAVE_LOADING	= null;
 	public static AustralianPayrollTaxIdentifier	FOREIGN_RESIDENT						= null;
-
+	public static AustralianPayrollTaxIdentifier	NO_TFN_PROVIDED							= null;
+	public static AustralianPayrollTaxIdentifier	TAXFREE_THRESHOLD_NO_LEAVE_LOADING		= null;
 }

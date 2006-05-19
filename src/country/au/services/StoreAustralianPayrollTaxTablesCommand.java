@@ -47,8 +47,8 @@ public class StoreAustralianPayrollTaxTablesCommand extends Command
 		 * coefficients a and b to be used at or below that point.
 		 */
 		// Scale 1
-		table = new AustralianPayrollTaxTable(AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD, new Datestamp(
-			"1 Jul 05"), 4);
+		table = new AustralianPayrollTaxTable(AustralianPayrollTaxIdentifier.NO_TAXFREE_THRESHOLD,
+			new Datestamp("1 Jul 05"), 4);
 		table.addCoefficients(98.0, 0.1650, 0.1650);
 		table.addCoefficients(894, 0.3150, 14.8765);
 		table.addCoefficients(1509, 0.4340, 122.1842);
@@ -57,8 +57,9 @@ public class StoreAustralianPayrollTaxTablesCommand extends Command
 		data.add(table);
 
 		// Scale 2
-		table = new AustralianPayrollTaxTable(AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING,
-			new Datestamp("1 Jul 05"), 7);
+		table = new AustralianPayrollTaxTable(
+			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, new Datestamp(
+				"1 Jul 05"), 7);
 		table.addCoefficients(109, 0, 0);
 		table.addCoefficients(301, 0.1522, 16.7186);
 		table.addCoefficients(325, 0.3553, 77.8907);
@@ -77,7 +78,8 @@ public class StoreAustralianPayrollTaxTablesCommand extends Command
 		data.add(table);
 
 		// Scale 7
-		table = new AustralianPayrollTaxTable(AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_NO_LEAVE_LOADING,
+		table = new AustralianPayrollTaxTable(
+			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_NO_LEAVE_LOADING,
 			new Datestamp("1 Jul 05"), 7);
 		table.addCoefficients(111, 0, 0);
 		table.addCoefficients(305, 0.1500, 16.7308);

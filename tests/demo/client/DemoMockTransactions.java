@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import country.au.domain.AustralianPayrollTaxIdentifier;
+import country.au.services.AustralianPayrollTaxConstants;
 
 import accounts.domain.Amount;
 import accounts.domain.Books;
@@ -190,13 +191,9 @@ public class DemoMockTransactions
 			cur = null;
 
 			/*
-			 * Get an AustralianPayrollTaxIdentifier. TODO this sucks.
-			 * Generalize to Finder
+			 * Set the AustralianPayrollTaxIdentifiers.
 			 */
-			AustralianPayrollTaxIdentifier proto = new AustralianPayrollTaxIdentifier(
-				"Tax-free threshold and leave loading claimed");
-			result = rw.queryByExample(proto);
-			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING = (AustralianPayrollTaxIdentifier) result.get(0);
+			new AustralianPayrollTaxConstants(rw).loadIdentifiers();
 
 			/*
 			 * Now start storing some transactions

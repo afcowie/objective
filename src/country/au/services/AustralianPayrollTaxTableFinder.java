@@ -7,6 +7,7 @@
 package country.au.services;
 
 import generic.persistence.DataClient;
+import generic.persistence.Selector;
 import generic.util.DebugException;
 
 import java.util.Iterator;
@@ -67,9 +68,20 @@ public class AustralianPayrollTaxTableFinder extends Finder
 	 * query() returns a list but also caches a reference internally.
 	 */
 	public List query(DataClient store) throws NotFoundException {
-		AustralianPayrollTaxTable proto = new AustralianPayrollTaxTable(scale);
-
-		List l = store.queryByExample(proto);
+		/*
+		 * Although a queryByExample() would work here, guard against the
+		 * possibility that an object from a different DataClient is being used
+		 * by using DomainObject.congruent()
+		 */
+		List l = store.nativeQuery(new Selector(scale) {
+			public boolean match(AustralianPayrollTaxTable table) {
+				if (table.getScale().congruent(target)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
 		if (l.size() == 0) {
 			throw new NotFoundException();
 		}

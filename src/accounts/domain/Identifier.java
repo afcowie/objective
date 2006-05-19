@@ -6,6 +6,7 @@
  */
 package accounts.domain;
 
+import generic.domain.DomainObject;
 import generic.domain.Leaf;
 
 /**
@@ -18,13 +19,18 @@ import generic.domain.Leaf;
  * 
  * @author Andrew Cowie
  */
-public class Identifier implements Comparable, Leaf
+public class Identifier extends DomainObject implements Comparable, Leaf
 {
 	/**
 	 * Human readable (proper case, spaces) version of the Identifier constant.
 	 * Default null value gives an unactivated defence.
 	 */
 	private String	name	= null;
+
+	/**
+	 * A numerical index for debugging convenience only.
+	 */
+	private int		index	= 0;
 
 	/**
 	 * Constructs a new constant
@@ -35,6 +41,26 @@ public class Identifier implements Comparable, Leaf
 	 */
 	public Identifier(String name) {
 		setName(name);
+	}
+
+	/**
+	 * Construct a new constant with a name and number.
+	 * 
+	 * @param name
+	 *            String The human readable string that goes with this
+	 *            identifier.
+	 * @param index
+	 *            A number to help select this Identifier. Set this as 0 if
+	 *            you're required to provide it and don't actually care about
+	 *            it.
+	 */
+	public Identifier(String name, int index) {
+		setName(name);
+		setIndex(index);
+	}
+
+	protected Identifier() {
+		// for searches
 	}
 
 	public final String getName() {
@@ -51,8 +77,29 @@ public class Identifier implements Comparable, Leaf
 		this.name = name;
 	}
 
+	public int getIndex() {
+		return index;
+	}
+
+	/**
+	 * Set an index to help pick out this Identifier. This is <b>not</b>
+	 * guarunteed to be unique across Identifier space; nor is it enforced as
+	 * unique across the space of a given subclass.
+	 * 
+	 * @param index
+	 *            set as 0 if you're required to provide it and don't actually
+	 *            care about it.
+	 */
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
 	public String toString() {
-		return name;
+		if (index == 0) {
+			return name;
+		} else {
+			return name + " (" + index + ")";
+		}
 	}
 
 	/**
@@ -76,6 +123,17 @@ public class Identifier implements Comparable, Leaf
 		}
 		Identifier i = (Identifier) x;
 
-		return this.name.compareTo(i.name);
+		int nameCmp = this.name.compareTo(i.name);
+		if (nameCmp != 0) {
+			return nameCmp;
+		} else {
+			if (this.index > i.index) {
+				return +1;
+			} else if (this.index < i.index) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
 	}
 }
