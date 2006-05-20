@@ -447,17 +447,17 @@ if ($os eq "gentoo") {
 
 	check_prereq(@javagnome_jars,
 		"LibGlade Java bindings",
-		"libglade2-java",
+		"libglade-java",
 		"$javagnome_home/share/java/glade2.12.jar",
 		"/usr/share/java/glade2.12.jar");
 	check_prereq(@javagnome_jars,
 		"GTK+ Java bindings",
-		"libgtk2-java",
+		"libgtk-java",
 		"$javagnome_home/share/java/gtk2.8.jar",
 		"/usr/share/java/gtk2.8.jar");
 	check_prereq(@javagnome_jars,
 		"glib Java bindings",
-		"glib-java",
+		"libgtk-java",
 		"$javagnome_home/share/java/glib0.2.jar",
 		"/usr/share/java/glib0.2.jar");
 
