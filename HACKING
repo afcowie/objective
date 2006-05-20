@@ -73,22 +73,22 @@ and subsequently included by the top level Makefile.
 You can override the choices configure makes by listing parameters on the
 command line, like this:
 
-	./configure compiler=gcj runtime=gij
+	./configure compiler=jikes runtime=jamvm
 
 This facilitates easily switching between runtimes and compilers for testing.
 At the moment, the available selections are:
 
 * compiler ->	javac, jikes, gcj
 
-* runtime  ->	java, gij, kaffe
+* runtime  ->	java, cacao, jamvm, cacao, gij, kaffe
 
 * quiet		(don't output anything)
 
-Right now, Gentoo Linux and Fedora Core 4 are fully configured, and Debian is
-getting there. If you are running a different operating system or distribution,
-please contact us and we'll add it - it's just a matter of identifying the
-location of a few things. Better yet, look in the configure Perl script - the
-places where OS is switched are obvious, and just add what you need to add.
+Right now, Gentoo Linux, Debian, and Fedora Core 5 are fully configured. If
+you are running a different operating system or distribution, please contact us
+and we'll add it - it's just a matter of identifying the location of a few
+things. Better yet, look in the configure Perl script - the places where OS is
+switched are obvious, and just add what you need to add.
 
 The whole point of configure is to figure things out for you, but if it can't
 quite figure out where Java is, you can override it by specifying an alternate
@@ -103,7 +103,7 @@ location to find a JDK and/or GCJ, using either of the following:
 
 For example:
 
-	./configure jdk=/opt/sun-jdk-1.4.2.04 java-gnome=/opt/gnome2
+	./configure jdk=/opt/sun-jdk-bin-1.4.2.04 java-gnome=/opt/gnome2
 
 If you're having trouble with something as Make runs and need to debug it, you
 can try:

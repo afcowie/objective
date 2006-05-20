@@ -157,7 +157,7 @@ sub check_compiler (\$$$$) {
 		print HELLO <<HERE ;
 public class Hello {
 	public static void main(String[] args) {
-		System.out.print("Hello");
+		System.out.println("Hello");
 	}
 }
 HERE
@@ -205,6 +205,7 @@ sub check_runtime (\$$$$) {
 #	}
 
 	$output = `$program $args Hello 2>/dev/null`;
+	chomp $output;
 
 	if (($? != 0) || ($output ne "Hello")) {
 		output "doesn't work\n";
@@ -346,6 +347,10 @@ print CONFIG <<HERE ;
 
 HERE
 
+output "equivalence, v0.2\n";
+output "...configuring Java projects to build and run on Linux\n";
+output "\n";
+
 output "Identify operating system:";
 
 if (( -f "/etc/gentoo-release" ) || ( -f "/etc/make.conf" )) {
@@ -359,6 +364,7 @@ if (( -f "/etc/gentoo-release" ) || ( -f "/etc/make.conf" )) {
 	output "Fedora Core";
 	$os = "fedora";
 }
+
 
 if ($os) {
 	print CONFIG "OS=$os\n";
@@ -584,13 +590,8 @@ if ($os eq "gentoo") {
 	# paths, or...? `which` is lame
 
 	# check jikes. Since Jikes isn't a JRE of its own, it needs to be told
-	# about where to find the Java system classes. (java.lang, etc) The
-	# only way they'll be present is if a real Java VM is installed FIXME:
-	# How to find those on a Debian system? See the Gentoo block above for
-	# ideas. (at last report, libgcj's version of the GNU CLASSPATH
-	# libraries won't work here)
-	# Needs -bootclasspath argument in order to actually work!
-	check_compiler($jikes, "IBM jikes", "/usr/bin/jikes", "");
+	# about where to find the Java system classes. (java.lang, etc).
+	check_compiler($jikes, "IBM jikes", "/usr/bin/jikes", "-bootclasspath /usr/share/classpath/glibj.zip");
 
 	# check for a proper "real" JDK's javac as installed (and maybe
 	# selected in the alternatives system) by the user. In other words,
@@ -732,6 +733,8 @@ if ($os eq "gentoo") {
 	# *may* work, so we do check for it  - we just don't pick it by
 	# preference.
 	check_runtime($kaffe, "Kaffe VM", "/usr/lib/kaffe/bin/java", "");
+	check_runtime($cacao, "CACAO VM", "/usr/bin/cacao", "");
+	check_runtime($jamvm, "JamVM VM", "/usr/bin/jamvm", "");
 
 } elsif ($os eq "fedora") {
 	# check for a proper JDK/JRE java Virtual Machine. Red Hat is using
@@ -767,30 +770,30 @@ output "\n";
 # Check GCJ native compiler
 # --------------------------------------------------------------------
 
-output "Check native compiler:\n";
-
-# these are initialized as, unlike javac which is populated with *something*,
-# even if gcj is not found we still need a variable for it.
-my $gcj;
-my $gcj_lib_path;
-
-if ($os) {
-	my $gcj_candidate;
-
-	if ($gcj_home) {
-		$gcj_candidate = "$gcj_home/bin/gcj";
-		$gcj_lib_path = "$gcj_home/lib";
-	} else {
-		$gcj_candidate = which("gcj");
-		# this is pretty rough
-		$gcj_lib_path = "$gcj_candidate";
-		$gcj_lib_path =~ s/bin\/gcj$/lib/;
-	}
-
-	check_native($gcj, "GNU gcj", $gcj_candidate, "-g", $gcj_lib_path);
-}
-
-output "\n";
+# NATIVE output "Check native compiler:\n";
+# NATIVE 
+# NATIVE # these are initialized as, unlike javac which is populated with *something*,
+# NATIVE # even if gcj is not found we still need a variable for it.
+# NATIVE my $gcj;
+# NATIVE my $gcj_lib_path;
+# NATIVE 
+# NATIVE if ($os) {
+# NATIVE 	my $gcj_candidate;
+# NATIVE 
+# NATIVE 	if ($gcj_home) {
+# NATIVE 		$gcj_candidate = "$gcj_home/bin/gcj";
+# NATIVE 		$gcj_lib_path = "$gcj_home/lib";
+# NATIVE 	} else {
+# NATIVE 		$gcj_candidate = which("gcj");
+# NATIVE 		# this is pretty rough
+# NATIVE 		$gcj_lib_path = "$gcj_candidate";
+# NATIVE 		$gcj_lib_path =~ s/bin\/gcj$/lib/;
+# NATIVE 	}
+# NATIVE 
+# NATIVE 	check_native($gcj, "GNU gcj", $gcj_candidate, "-g", $gcj_lib_path);
+# NATIVE }
+# NATIVE 
+# NATIVE output "\n";
 
 # --------------------------------------------------------------------
 # Choose between java compilers and VMs, reviewing overrides
@@ -799,7 +802,7 @@ output "\n";
 # if gij isn't sufficient version, then knock out gcj
 if (!$gij) {
 	undef $gcjC;
-	undef $gcj;
+# NATIVE 	undef $gcj;
 	output "Can't use GCJ, insufficiently recent version\n\n";
 }
 
@@ -920,23 +923,23 @@ if ($runtime eq "java") {
 }
 output "$runtime\n";
 
-# --------------------------------------------------------------------
-# Output native build information
-# --------------------------------------------------------------------
-print CONFIG <<HERE ;
-
-# if present, the GCJ variable contains the path to the GCC native java
-# builder. GCJ_LIB_PATH contains an argument suitable for use with -Wl,-rpath
-# so that the linker can find the relevent libgcj.so class library.
-
-HERE
-
-if ($gcj) {
-	print CONFIG "GCJ=$gcj\n";
-	print CONFIG "GCJ_CMD=GCJ      \n";
-	print CONFIG "GCJ_LINK_CMD=LINK     \n";
-	print CONFIG "GCJ_LIB_PATH=$gcj_lib_path\n";
-}
+# NATIVE # --------------------------------------------------------------------
+# NATIVE # Output native build information
+# NATIVE # --------------------------------------------------------------------
+# NATIVE print CONFIG <<HERE ;
+# NATIVE 
+# NATIVE # if present, the GCJ variable contains the path to the GCC native java
+# NATIVE # builder. GCJ_LIB_PATH contains an argument suitable for use with -Wl,-rpath
+# NATIVE # so that the linker can find the relevent libgcj.so class library.
+# NATIVE 
+# NATIVE HERE
+# NATIVE 
+# NATIVE if ($gcj) {
+# NATIVE 	print CONFIG "GCJ=$gcj\n";
+# NATIVE 	print CONFIG "GCJ_CMD=GCJ      \n";
+# NATIVE 	print CONFIG "GCJ_LINK_CMD=LINK     \n";
+# NATIVE 	print CONFIG "GCJ_LIB_PATH=$gcj_lib_path\n";
+# NATIVE }
 
 
 `rm -f Hello.java Hello.class Hello.o Hello`;
