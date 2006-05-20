@@ -33,6 +33,8 @@ import org.gnu.gtk.TreePath;
 import org.gnu.gtk.TreeSelection;
 import org.gnu.gtk.TreeView;
 import org.gnu.gtk.TreeViewColumn;
+import org.gnu.gtk.event.LifeCycleEvent;
+import org.gnu.gtk.event.LifeCycleListener;
 import org.gnu.gtk.event.TreeSelectionEvent;
 import org.gnu.gtk.event.TreeSelectionListener;
 import org.gnu.gtk.event.TreeViewEvent;
@@ -265,7 +267,27 @@ public class TransactionListView extends TreeView implements UpdateListener
 			}
 		});
 
-		Master.ui.registerListener(this);
+		/*
+		 * Listen for updates to the DomainObjects we represent:
+		 */
+		final TransactionListView me = this;
+		Master.ui.registerListener(me);
+
+		/*
+		 * And when the widget gets deleted, stop listening. This probably needs
+		 * further testing; does unrealize always get sent?
+		 */
+		this.addListener(new LifeCycleListener() {
+			public void lifeCycleEvent(LifeCycleEvent event) {
+				if (event.getType() == LifeCycleEvent.Type.UNREALIZE) {
+					Master.ui.deregisterListener(me);
+				}
+			}
+
+			public boolean lifeCycleQuery(LifeCycleEvent event) {
+				return false;
+			}
+		});
 	}
 
 	private static final Pattern	regexAmp	= Pattern.compile("&");
