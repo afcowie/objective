@@ -30,6 +30,7 @@ public class DemoWindowRunner
 		Debug.register("events");
 		Debug.register("listeners");
 		Debug.register("threads");
+		Debug.register("memory");
 
 		args = Debug.init(args);
 		Debug.print("main", "Starting DemoWindowRunner");

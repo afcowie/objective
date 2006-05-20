@@ -209,4 +209,22 @@ public class Debug
 		Debug.progname = progname;
 	}
 
+//	new Thread() {
+//		public void run() {
+//			while (true) {
+//				Runtime r = Runtime.getRuntime();
+//
+//				long total = r.totalMemory();
+//				long free = r.freeMemory();
+//
+//				Debug.print("memory", Text.padComma(total) + " alloc, "
+//					+ Text.padComma(total - free) + " used.");
+//
+//				try {
+//					Thread.sleep(2000);
+//				} catch (InterruptedException ie) {
+//				}
+//			}
+//		}
+//	}.start();
 }

@@ -6,8 +6,14 @@
  * 
  * Word wrap algorithm GPL code imported from xseq.ui.OverviewWindow
  * Copyright (c) 2004-2005 Operational Dynamics
+ * 
+ * Comma padding algorithm imported from pulseSession.session.cmdHandler of 
+ * SINS (SINS Is Not ShadNet) codebase, redistributable under the GNU GPL v2.
+ * Copyright (c) 1997-1998 Andrew Cowie
  */
 package generic.ui;
+
+import java.text.DecimalFormat;
 
 /**
  * This class also has numerous static methods with useful routines for doing
@@ -145,5 +151,30 @@ public abstract class Text
 		}
 
 		return buf.toString();
+	}
+
+	/**
+	 * Pad and justify a long. This is useful for displaying the memory usage
+	 * numbers from Runtime.freeMemory() and Runtime.totalMemory()
+	 * 
+	 * @param num
+	 *            a number to render as a comma padded string.
+	 * @return a 25 character wide string with the number right justified wnd
+	 *         with comma characters at thousand marks.
+	 */
+	/*
+	 * from pulseSession.session.cmdHandler
+	 */
+	public static String padComma(long num) {
+		DecimalFormat df = new DecimalFormat("#,###,###,###,###,###,###");
+
+		StringBuffer comma = new StringBuffer(df.format(num));
+
+		int pad = 25 - comma.length();
+		for (int i = 0; i < pad; i++) {
+			comma.insert(0, ' ');
+		}
+
+		return comma.toString();
 	}
 }
