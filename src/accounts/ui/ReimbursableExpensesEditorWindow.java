@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.client.Master;
 import generic.ui.EditorWindow;
 import generic.ui.ModalDialog;
 import generic.util.Debug;
@@ -142,8 +143,8 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 		 * freeze up.
 		 */
 
-		// window.getRootWindow().setCursor(new Cursor(CursorType.WATCH));
 		window.hide();
+		Master.ui.showAsWorking(true);
 
 		final ReimbursableExpensesEditorWindow me = this;
 
@@ -201,8 +202,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
 					CustomEvents.addEvent(new Runnable() {
 						public void run() {
-							// window.getRootWindow().setCursor(new
-							// Cursor(CursorType.LEFT_PTR));
+							Master.ui.showAsWorking(false);
 							me.deleteHook();
 						}
 					});

@@ -9,14 +9,14 @@ package demo.ui;
 import generic.client.Master;
 import generic.persistence.DataClient;
 import generic.persistence.Engine;
-import generic.ui.AbstractWindow;
+import generic.ui.PrimaryWindow;
 
 import java.util.List;
 
 import accounts.domain.Transaction;
 import accounts.ui.TransactionListView;
 
-public class TransactionListViewHolder extends AbstractWindow
+public class TransactionListViewHolder extends PrimaryWindow
 {
 	public TransactionListViewHolder() {
 		super();

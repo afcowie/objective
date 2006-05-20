@@ -17,6 +17,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.gnu.gdk.Cursor;
+import org.gnu.gdk.CursorType;
+import org.gnu.gtk.Gtk;
+
 /**
  * Central touch point to cause user interface wide actions to occur. An
  * application with a GTK based graphical user interface should extend this
@@ -29,12 +33,15 @@ import java.util.Set;
  */
 public abstract class UserInterface
 {
-	private static Set	windows	= new LinkedHashSet();
+	private Set		windows	= new LinkedHashSet();
 
-	private Map			idsToEditors;
-	private Map			editorsToIds;
+	private Map		idsToEditors;
+	private Map		editorsToIds;
 
-	private Set			updateListeners;
+	private Set		updateListeners;
+
+	private Cursor	normalPointer;
+	private Cursor	workingPointer;
 
 	/**
 	 * Register a window as ready for display to the user. While one of our
@@ -109,6 +116,9 @@ public abstract class UserInterface
 				}
 			}
 		});
+
+		normalPointer = new Cursor(CursorType.LEFT_PTR);
+		workingPointer = new Cursor(CursorType.WATCH);
 	}
 
 	/**
@@ -186,5 +196,37 @@ public abstract class UserInterface
 
 	public void deregisterListener(UpdateListener listener) {
 		updateListeners.remove(listener);
+	}
+
+	/**
+	 * Show the application as being in a busy state. Call this with
+	 * <code>true</code> when before you fire off a worker thread from an OK
+	 * button and then call it <code>false</code> when you are done. <i>This
+	 * is GTK code so make sure you call it from within the main thread only.</i>
+	 * <p>
+	 * Showing as working:
+	 * <ul>
+	 * <li>sets the cursor (pointer) to a watch symbol over any showing
+	 * {@link PrimaryWindows}.
+	 * </ul>
+	 * 
+	 * @param working
+	 *            true if the app is busy working away at something.
+	 */
+	public void showAsWorking(boolean working) {
+		if (!Gtk.isGtkThread()) {
+			System.err.println("You must only call showAsWorking() from within the GTK main Thread");
+			return;
+		}
+		Iterator wI = windows.iterator();
+
+		while (wI.hasNext()) {
+			PrimaryWindow w = (PrimaryWindow) wI.next();
+			if (working == true) {
+				w.window.getWindow().setCursor(workingPointer);
+			} else {
+				w.window.getWindow().setCursor(normalPointer);
+			}
+		}
 	}
 }
