@@ -13,6 +13,7 @@ import generic.util.Debug;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.gnu.glib.CustomEvents;
 import org.gnu.gtk.Entry;
 import org.gnu.gtk.MessageType;
 import org.gnu.gtk.Table;
@@ -107,7 +108,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	}
 
 	protected void ok() {
-		Worker person = person_WorkerPicker.getWorker();
+		final Worker person = person_WorkerPicker.getWorker();
 
 		if (person == null) {
 			ModalDialog dialog = new ModalDialog("Select someone!",
@@ -136,79 +137,94 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 			return;
 		}
 
-		try {
-			Ledger expensesPayable = person.getExpensesPayable();
+		/*
+		 * Guards passed. Fork the processing off in a Thread so the UI doesn't
+		 * freeze up.
+		 */
 
-			ReimbursableExpensesTransaction t;
-			if (existing == null) {
-				t = new ReimbursableExpensesTransaction();
+		// window.getRootWindow().setCursor(new Cursor(CursorType.WATCH));
+		window.hide();
 
-				t.setWorker(person);
-				t.setDate(datePicker.getDate());
-				t.setDescription(descriptionEntry.getText());
+		final ReimbursableExpensesEditorWindow me = this;
 
-				ForeignAmount fa = amountEntryBox.getForeignAmount();
+		new Thread() {
+			public void run() {
+				Debug.print("threads", "Carrying out update");
+				try {
+					Ledger expensesPayable = person.getExpensesPayable();
 
-				Debit left = new Debit(fa, accountPicker.getLedger());
-				t.addEntry(left);
+					ReimbursableExpensesTransaction t;
+					if (existing == null) {
+						t = new ReimbursableExpensesTransaction();
 
-				Credit right = new Credit(new Amount(fa.getValue()), expensesPayable);
-				t.addEntry(right);
+						t.setWorker(person);
+						t.setDate(datePicker.getDate());
+						t.setDescription(descriptionEntry.getText());
 
-				PostTransactionCommand ptc = new PostTransactionCommand(t);
-				ptc.execute(store);
-			} else {
-				t = existing;
-				t.setDescription(descriptionEntry.getText());
+						ForeignAmount fa = amountEntryBox.getForeignAmount();
 
-				Set entries = t.getEntries();
-				Iterator iter = entries.iterator();
-				while (iter.hasNext()) {
-					accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
-					Ledger l = e.getParentLedger();
-					ForeignAmount fa = amountEntryBox.getForeignAmount();
+						Debit left = new Debit(fa, accountPicker.getLedger());
+						t.addEntry(left);
 
-					if (l == t.getWorker().getExpensesPayable()) {
-						// the Credit
-						Amount ha = e.getAmount();
-						ha.setValue(fa);
+						Credit right = new Credit(new Amount(fa.getValue()), expensesPayable);
+						t.addEntry(right);
+
+						PostTransactionCommand ptc = new PostTransactionCommand(t);
+						ptc.execute(store);
 					} else {
-						// the Debit
-						e.setAmount(fa);
-						e.setParentLedger(accountPicker.getLedger());
+						t = existing;
+						t.setDescription(descriptionEntry.getText());
+
+						Set entries = t.getEntries();
+						Iterator iter = entries.iterator();
+						while (iter.hasNext()) {
+							accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
+							Ledger l = e.getParentLedger();
+							ForeignAmount fa = amountEntryBox.getForeignAmount();
+
+							if (l == t.getWorker().getExpensesPayable()) {
+								// the Credit
+								Amount ha = e.getAmount();
+								ha.setValue(fa);
+							} else {
+								// the Debit
+								e.setAmount(fa);
+								e.setParentLedger(accountPicker.getLedger());
+							}
+						}
+
+						UpdateTransactionCommand utc = new UpdateTransactionCommand(t);
+						utc.execute(store);
 					}
+
+					store.commit();
+
+					CustomEvents.addEvent(new Runnable() {
+						public void run() {
+							// window.getRootWindow().setCursor(new
+							// Cursor(CursorType.LEFT_PTR));
+							me.deleteHook();
+						}
+					});
+
+				} catch (final CommandNotReadyException cnre) {
+					Debug.print("events", "Command not ready: " + cnre.getMessage());
+					CustomEvents.addEvent(new Runnable() {
+						public void run() {
+							ModalDialog dialog = new ModalDialog("Command Not Ready!",
+								cnre.getMessage(), MessageType.ERROR);
+							dialog.run();
+
+							/*
+							 * Leave the Window open so user can fix, as opposed
+							 * to calling cancel()
+							 */
+							window.present();
+						}
+					});
 				}
 
-				UpdateTransactionCommand utc = new UpdateTransactionCommand(t);
-				utc.execute(store);
 			}
-
-			store.commit();
-			super.ok();
-		} catch (CommandNotReadyException cnre) {
-			Debug.print("events", "Command not ready: " + cnre.getMessage());
-			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(),
-				MessageType.ERROR);
-			dialog.run();
-
-			/*
-			 * Leave the Window open so user can fix, as opposed to calling
-			 * cancel()
-			 */
-		}
-
-		// final ForeignAmount fa = amountEntryBox.getForeignAmount();
-		// out.print("Amount:\t\t" + fa.getCurrency().getSymbol() +
-		// fa.toString() + " " + fa.getCurrency().getCode());
-		//
-		// final Books root = store.getBooks();
-		// final Currency home = root.getHomeCurrency();
-		//
-		// if (fa.getCurrency() != home) {
-		// out.println(" [" + fa.getRate() + " -> " + home.getSymbol() +
-		// fa.getValue() + " " + home.getCode() + "]");
-		// } else {
-		// out.println();
-		// }
+		}.start();
 	}
 }
