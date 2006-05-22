@@ -30,6 +30,7 @@ import org.gnu.gtk.ListStore;
 import org.gnu.gtk.SelectionMode;
 import org.gnu.gtk.TreeIter;
 import org.gnu.gtk.TreePath;
+import org.gnu.gtk.TreeRowReference;
 import org.gnu.gtk.TreeSelection;
 import org.gnu.gtk.TreeView;
 import org.gnu.gtk.TreeViewColumn;
@@ -322,7 +323,14 @@ public class TransactionListView extends TreeView implements UpdateListener
 		}
 	}
 
-	private TreePath	previous	= null;
+	/**
+	 * A stable reference to the previous row selected, if any. This allows the
+	 * TreeSelectionListener to restore the data in that row to "normal" when
+	 * the selection changes. Note that this is a TreeRowReference rather than a
+	 * TreePath so that it is stable across things that invalidate TreeIters
+	 * (sorting on a different column, for instance).
+	 */
+	private TreeRowReference	previous	= null;
 
 	/**
 	 * Set a given row of the ListStore as as "active" (ie, selected) by
@@ -339,12 +347,14 @@ public class TransactionListView extends TreeView implements UpdateListener
 		model.setValue(pointer, active_DataColumn, true);
 		populate(pointer);
 
-		if ((previous != null) && (previous != path)) {
-			pointer = model.getIter(previous);
-			model.setValue(pointer, active_DataColumn, false);
-			populate(pointer);
+		if (previous != null) {
+			if (!(previous.getPath().equals(path))) {
+				pointer = model.getIter(previous.getPath());
+				model.setValue(pointer, active_DataColumn, false);
+				populate(pointer);
+			}
 		}
-		previous = path;
+		previous = new TreeRowReference(model, path);
 	}
 
 	/**
@@ -572,8 +582,8 @@ public class TransactionListView extends TreeView implements UpdateListener
 		TreeIter pointer = model.getFirstIter();
 		while (pointer != null) {
 			if (model.getValue(pointer, transactionObject_DataColumn) == t) {
-				Debug.print("listeners", "redisplayObject(" + id
-					+ ") called; repopulating TreeIter " + pointer);
+				Debug.print("listeners", "redisplayObject(" + id + ") called; repopulating TreeIter "
+					+ pointer);
 				populate(pointer);
 				return;
 			}
