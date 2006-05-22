@@ -24,8 +24,7 @@ public class TwoColumnTable extends Table
 {
 	private int		rowCount;
 	private int		rowCapacity;
-	private Align	lastSide	= null;
-	private boolean	rowComplete;
+	private Align	last	= null;
 
 	/**
 	 * 
@@ -52,7 +51,6 @@ public class TwoColumnTable extends Table
 
 		this.rowCount = 1; // first attach goes into this first row.
 		this.rowCapacity = initialNumberOfRows;
-		this.rowComplete = false;
 	}
 
 	/**
@@ -62,23 +60,30 @@ public class TwoColumnTable extends Table
 	 * 
 	 * @param widget
 	 *            the Widget to add to the Table.
-	 * @param leftOrRight
+	 * @param side
 	 *            which side of the Table widget should go on. Use the public
 	 *            constants {@link Align.LEFT} and {@link Align.RIGHT}, or
 	 *            {@link Align.CENTER} to indicate you want it to span both
 	 *            columns.
 	 */
-	public void attach(Widget widget, Align leftOrRight) {
-		if ((widget == null) || (leftOrRight == null)) {
+	public void attach(Widget widget, Align side) {
+		if ((widget == null) || (side == null)) {
 			throw new IllegalArgumentException("Can't use null as an argument");
 		}
 
-		if ((leftOrRight == lastSide) || (leftOrRight == Align.CENTER)) {
-			rowCount++;
-			rowComplete = false;
-		} else if (rowComplete) {
-			rowCount++;
-			rowComplete = false;
+		/*
+		 * Start a new row if it's a repeat of the same side:
+		 */
+		if (last == side) {
+			nextRow();
+		}
+		/*
+		 * If there's an incomplete row, and we get a CENTER, we need a new row:
+		 */
+		if ((last == Align.LEFT) || (last == Align.RIGHT)) {
+			if (side == Align.CENTER) {
+				nextRow();
+			}
 		}
 
 		if (rowCount > rowCapacity) {
@@ -95,21 +100,32 @@ public class TwoColumnTable extends Table
 		 * boundaries is the whole point of this subclass.
 		 */
 
-		if (leftOrRight == Align.LEFT) {
+		if (side == Align.LEFT) {
 			super.attach(widget, 0, 1, rowCount - 1, rowCount);
-		} else if (leftOrRight == Align.RIGHT) {
+		} else if (side == Align.RIGHT) {
 			super.attach(widget, 1, 2, rowCount - 1, rowCount);
-		} else if (leftOrRight == Align.CENTER) {
+		} else if (side == Align.CENTER) {
 			super.attach(widget, 0, 2, rowCount - 1, rowCount);
 		} else {
 			throw new IllegalArgumentException("Specified alignment not valid here");
 		}
 
-		if ((lastSide != null) && (leftOrRight != lastSide)) {
-			lastSide = null;
-			rowComplete = true;
+		if ((last == Align.LEFT) && (side == Align.RIGHT)) {
+			// row filled
+			nextRow();
+		} else if ((last == Align.RIGHT) && (side == Align.LEFT)) {
+			// row filled
+			nextRow();
+		} else if (side == Align.CENTER) {
+			// we're done
+			nextRow();
 		} else {
-			lastSide = leftOrRight;
+			last = side;
 		}
+	}
+
+	private void nextRow() {
+		last = null;
+		rowCount++;
 	}
 }
