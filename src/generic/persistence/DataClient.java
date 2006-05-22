@@ -10,6 +10,7 @@
 package generic.persistence;
 
 import generic.domain.Root;
+import generic.util.Debug;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -74,7 +75,20 @@ public final class DataClient
 		if (readOnly) {
 			throw new UnsupportedOperationException("Can't commit on a read-only client!");
 		}
+		Debug.print("debug", "commit() called");
 		container.commit();
+		/*
+		 * WARNING: By brute force testing, this yield() seems critical to force
+		 * the Gtk main loop to take a break and allow the database threads to
+		 * do their thing. When this doesn't happen, the main thread can get to
+		 * UserInterface.propegateUpdate() before a commit has propegated and is
+		 * available to a db4o refresh() under READ_COMMITTED isolation.
+		 */
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException ie) {
+			Thread.yield();
+		}
 	}
 
 	/**
@@ -95,8 +109,9 @@ public final class DataClient
 	 * method does this.
 	 */
 	public void reload(Object obj) {
-		container.deactivate(obj, 6);
-		container.activate(obj, 6);
+		// container.deactivate(obj, 6);
+		container.refresh(obj, 6);
+		// container.activate(obj, 6);
 	}
 
 	/**
@@ -130,6 +145,7 @@ public final class DataClient
 		}
 		try {
 			container.set(obj);
+			dirty.add(obj);
 		} catch (Exception e) {
 			System.err.println("FIXME! Uncaught exception when trying to set()");
 			e.printStackTrace();
@@ -232,9 +248,7 @@ public final class DataClient
 			// Cascade cascade = (Cascade) obj; ...
 
 			dirty.add(obj);
-			// container.refresh(obj, 15);
 		}
-
 	}
 
 	/**

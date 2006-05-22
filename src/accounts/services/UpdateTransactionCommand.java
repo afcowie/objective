@@ -122,15 +122,15 @@ public class UpdateTransactionCommand extends TransactionCommand
 
 			List ledgerContainingEntry = store.nativeQuery(new LedgerContainingEntry(ref));
 
-			Debug.print("debug", "Removing "
-				+ ref.toString()
-				+ " from Ledger \""
-				+ (ledgerContainingEntry.size() == 1
-					? ((Ledger) ledgerContainingEntry.get(0)).getName()
-					: "[no! (" + ledgerContainingEntry.size() + ")]") + "\"");
+			if (ledgerContainingEntry.size() != 1) {
+				throw new CommandNotReadyException("Querying for the Ledger containing " + ref
+					+ " returned " + ledgerContainingEntry.size() + " Entries");
+			}
+
+			Debug.print("debug", "Removing " + ref.toString() + " from Ledger \""
+				+ ((Ledger) ledgerContainingEntry.get(0)).getName() + "\"");
 
 			Ledger ledger = (Ledger) ledgerContainingEntry.get(0);
-
 			ledger.removeEntry(ref);
 
 			if (liveEntries.contains(ref)) {
@@ -154,8 +154,8 @@ public class UpdateTransactionCommand extends TransactionCommand
 			Debug.print("debug", "Adding " + e.toString() + " to Ledger \""
 				+ e.getParentLedger().getName() + "\"");
 			e.getParentLedger().addEntry(e);
-			// store.save(e);
-			// store.save(e.getParentLedger());
+			store.save(e);
+			store.save(e.getParentLedger());
 		}
 
 		store.save(transaction);

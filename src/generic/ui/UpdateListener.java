@@ -19,5 +19,12 @@ package generic.ui;
  */
 public interface UpdateListener
 {
+	/**
+	 * @param id
+	 *            The database ID of the object that is has been signalled as
+	 *            updated. You <i>really</i> want to call
+	 *            {@link generic.persistence.DataClient#reload(Object)} once you
+	 *            look it up.
+	 */
 	public void redisplayObject(long id);
 }

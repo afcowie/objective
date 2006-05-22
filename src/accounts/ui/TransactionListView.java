@@ -572,6 +572,8 @@ public class TransactionListView extends TreeView implements UpdateListener
 		TreeIter pointer = model.getFirstIter();
 		while (pointer != null) {
 			if (model.getValue(pointer, transactionObject_DataColumn) == t) {
+				Debug.print("listeners", "redisplayObject(" + id
+					+ ") called; repopulating TreeIter " + pointer);
 				populate(pointer);
 				return;
 			}

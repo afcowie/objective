@@ -97,7 +97,7 @@ public final class DataServer
 		 * performance tuning, but only commit a change to this value after
 		 * extensive testing!
 		 */
-		config.updateDepth(5);
+		config.updateDepth(2);
 	}
 
 	/**
@@ -254,7 +254,7 @@ public final class DataServer
 		Iterator dI = dS.iterator();
 		while (dI.hasNext()) {
 			Object dirty = dI.next();
-			ext.deactivate(dirty, 6);
+			ext.deactivate(dirty, 5);
 			dI.remove();
 		}
 		client.clearCachedReferences();
