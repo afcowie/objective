@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import org.gnu.gtk.CellRendererText;
 import org.gnu.gtk.DataColumn;
 import org.gnu.gtk.DataColumnBoolean;
-import org.gnu.gtk.DataColumnInt;
+import org.gnu.gtk.DataColumnLong;
 import org.gnu.gtk.DataColumnObject;
 import org.gnu.gtk.DataColumnString;
 import org.gnu.gtk.ListStore;
@@ -61,13 +61,13 @@ public class TransactionListView extends TreeView implements UpdateListener
 	DataColumnString			typeMarkup_DataColumn;
 	DataColumnString			typeSort_DataColumn;
 	DataColumnString			dateText_DataColumn;
-	DataColumnInt				dateSort_DataColumn;
+	DataColumnLong				dateSort_DataColumn;
 	DataColumnString			descriptionAccountLedgerText_DataColumn;
 	DataColumnString			descriptionSort_DataColumn;
 	DataColumnString			debitAmountsText_DataColumn;
-	DataColumnInt				debitAmountsSort_DataColumn;
+	DataColumnLong				debitAmountsSort_DataColumn;
 	DataColumnString			creditAmountsText_DataColumn;
-	DataColumnInt				creditAmountsSort_DataColumn;
+	DataColumnLong				creditAmountsSort_DataColumn;
 	/**
 	 * The Transaction object that this row represents. This must be set before
 	 * calling {@link #populate(TreeIter)}
@@ -93,13 +93,13 @@ public class TransactionListView extends TreeView implements UpdateListener
 		typeMarkup_DataColumn = new DataColumnString();
 		typeSort_DataColumn = new DataColumnString();
 		dateText_DataColumn = new DataColumnString();
-		dateSort_DataColumn = new DataColumnInt();
+		dateSort_DataColumn = new DataColumnLong();
 		descriptionAccountLedgerText_DataColumn = new DataColumnString();
 		descriptionSort_DataColumn = new DataColumnString();
 		debitAmountsText_DataColumn = new DataColumnString();
-		debitAmountsSort_DataColumn = new DataColumnInt();
+		debitAmountsSort_DataColumn = new DataColumnLong();
 		creditAmountsText_DataColumn = new DataColumnString();
-		creditAmountsSort_DataColumn = new DataColumnInt();
+		creditAmountsSort_DataColumn = new DataColumnLong();
 		transactionObject_DataColumn = new DataColumnObject();
 		active_DataColumn = new DataColumnBoolean();
 
@@ -366,7 +366,7 @@ public class TransactionListView extends TreeView implements UpdateListener
 	 */
 	/*
 	 * This is moderately hideous, but then what presentation code ever is NOT
-	 * ugly? Note that all the Sort_DataColums fields are nice clean Strings
+	 * ugly? Note that many of the Sort_DataColums fields are nice clean Strings
 	 * generally directly being the underlying text data, whereas the Markup
 	 * ones are where the pango mush goes (which is why we can't sort on them -
 	 * it'd sort by colour!)
@@ -390,11 +390,7 @@ public class TransactionListView extends TreeView implements UpdateListener
 
 		model.setValue(pointer, dateText_DataColumn, "<span font_desc='Mono'>" + t.getDate().toString()
 			+ "</span>");
-
-		final long timestamp = t.getDate().getInternalTimestamp();
-		final long smaller = timestamp / 1000;
-		final int datei = Integer.valueOf(Long.toString(smaller)).intValue();
-		model.setValue(pointer, dateSort_DataColumn, datei);
+		model.setValue(pointer, dateSort_DataColumn, t.getDate().getInternalTimestamp());
 
 		StringBuffer titleName = new StringBuffer();
 		final String OPEN = "<b>";
@@ -557,13 +553,10 @@ public class TransactionListView extends TreeView implements UpdateListener
 		model.setValue(pointer, descriptionSort_DataColumn, t.getDescription());
 
 		model.setValue(pointer, debitAmountsText_DataColumn, debitVal.toString());
+		model.setValue(pointer, debitAmountsSort_DataColumn, largestDebitNumber);
+
 		model.setValue(pointer, creditAmountsText_DataColumn, creditVal.toString());
-
-		final int dri = Integer.valueOf(Long.toString(largestDebitNumber)).intValue();
-		model.setValue(pointer, debitAmountsSort_DataColumn, dri);
-
-		final int cri = Integer.valueOf(Long.toString(largestCreditNumber)).intValue();
-		model.setValue(pointer, creditAmountsSort_DataColumn, cri);
+		model.setValue(pointer, creditAmountsSort_DataColumn, largestCreditNumber);
 	}
 
 	/**
