@@ -55,7 +55,7 @@ public class PayrollTransaction extends Transaction
 	 *            withholding, paycheck</b>
 	 */
 	public PayrollTransaction(Employee employee, PayrollTaxIdentifier identifier, Datestamp date,
-		Entry[] entries) {
+		Datestamp fromDate, Datestamp endDate, Entry[] entries) {
 		/*
 		 * The super call runs addEntries() over the array; the setters below
 		 * set PayrollTransaction's fields.
@@ -63,7 +63,10 @@ public class PayrollTransaction extends Transaction
 		super("Paycheck to " + employee.getName(), date, entries);
 		setEmployee(employee);
 		setTaxIdentifier(identifier);
-		setEndDate(date);
+		setDate(date);
+
+		setFromDate(fromDate);
+		setEndDate(endDate);
 
 		setSalaryEntry(entries[0]);
 		setWithholdingEntry(entries[1]);

@@ -91,10 +91,8 @@ public class DatePicker extends HBox
 
 		_entry.addListener(new EntryListener() {
 			public void entryEvent(EntryEvent event) {
-				Datestamp eval = (Datestamp) _date.clone();
 				try {
-					eval.setDate(_entry.getText());
-					_date = eval;
+					_date.setDate(_entry.getText());
 				} catch (ParseException pe) {
 					return;
 				}

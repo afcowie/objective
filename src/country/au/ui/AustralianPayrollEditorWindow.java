@@ -14,8 +14,10 @@ import generic.util.Debug;
 
 import java.util.List;
 
+import org.gnu.gtk.HSeparator;
 import org.gnu.gtk.Label;
 import org.gnu.gtk.MessageType;
+import org.gnu.gtk.VBox;
 import org.gnu.gtk.Widget;
 import org.gnu.gtk.event.ComboBoxEvent;
 import org.gnu.gtk.event.ComboBoxListener;
@@ -65,7 +67,9 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 	private AustralianPayrollTaxCalculator	calc;
 
 	private WorkerPicker					employee_WorkerPicker;
+	private DatePicker						payDate_Picker;
 	private IdentifierSelector				payg_IdentifierSelector;
+	private DatePicker						startDate_Picker;
 	private DatePicker						endDate_Picker;
 	private AmountEntry						salary_AmountEntry;
 	private AmountDisplay					withholding_AmountDisplay;
@@ -130,12 +134,19 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 * Pick employee.
 		 */
 
-		final Label employeeName_Label = new Label("Pick employee:");
+		final Label employeeName_Label = new Label("Pay employee:");
 		employeeName_Label.setAlignment(1.0, 0.5);
 		table.attach(employeeName_Label, LEFT);
 
 		employee_WorkerPicker = new WorkerPicker(store, Employee.class);
 		table.attach(employee_WorkerPicker, RIGHT);
+
+		final Label payDate_Label = new Label("On date:");
+		payDate_Label.setAlignment(1.0, 0.5);
+		table.attach(payDate_Label, LEFT);
+
+		payDate_Picker = new DatePicker();
+		table.attach(payDate_Picker, RIGHT);
 
 		/*
 		 * Pick withholding type Identifier
@@ -157,16 +168,37 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		table.attach(payg_IdentifierSelector, BOTH);
 
 		/*
-		 * Date picker
+		 * Date pickers
 		 */
 
-		final Label endDate_Label = new Label("Ending at date:");
-		endDate_Label.setAlignment(1.0, 0.5);
+		final VBox spacer1 = new VBox(false, 0);
+		final HSeparator sep1 = new HSeparator();
+		spacer1.packStart(sep1, false, false, 5);
+		table.attach(spacer1, BOTH);
 
-		table.attach(endDate_Label, LEFT);
+		final Label for_Label = new Label("<b>For work:</b>");
+		for_Label.setUseMarkup(true);
+		for_Label.setAlignment(0.0, 0.5);
+		table.attach(for_Label, LEFT);
+
+		final Label startDate_Label = new Label("From...");
+		startDate_Label.setAlignment(0.0, 0.5);
+		table.attach(startDate_Label, LEFT);
+
+		final Label endDate_Label = new Label("Through...");
+		endDate_Label.setAlignment(0.0, 0.5);
+		table.attach(endDate_Label, RIGHT);
+
+		startDate_Picker = new DatePicker();
+		table.attach(startDate_Picker, LEFT);
 
 		endDate_Picker = new DatePicker();
 		table.attach(endDate_Picker, RIGHT);
+
+		final VBox spacer2 = new VBox(false, 0);
+		final HSeparator sep2 = new HSeparator();
+		spacer2.packStart(sep2, false, false, 5);
+		table.attach(spacer2, BOTH);
 
 		/*
 		 * The salary entry
@@ -215,7 +247,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			public void comboBoxEvent(ComboBoxEvent event) {
 				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
 					AustralianPayrollTaxIdentifier payg = (AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection();
-					Datestamp date = endDate_Picker.getDate();
+					Datestamp date = startDate_Picker.getDate();
 					try {
 						calc = new AustralianPayrollTaxCalculator(store, payg, date);
 
@@ -289,6 +321,10 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			salary = t.getSalaryEntry().getAmount();
 			withholding = t.getWithholdingEntry().getAmount();
 			paycheck = t.getPaycheckEntry().getAmount();
+
+			payDate_Picker.setDate(t.getDate());
+			startDate_Picker.setDate(t.getFromDate());
+			endDate_Picker.setDate(t.getEndDate());
 
 			employee_WorkerPicker.setWorker(t.getEmployee());
 			payg_IdentifierSelector.setIdentifier(t.getTaxIdentifier());
@@ -436,7 +472,10 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 				 */
 				PayrollTransaction t = new PayrollTransaction(employee,
 					(AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection());
-				t.setDate(endDate_Picker.getDate());
+				t.setDate(payDate_Picker.getDate());
+
+				t.setFromDate(startDate_Picker.getDate());
+				t.setEndDate(endDate_Picker.getDate());
 
 				Entry e;
 				e = new Credit(calc.getPaycheck(), bankAccount);
