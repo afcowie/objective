@@ -69,7 +69,14 @@ public class BlankDatafileTestCase extends TestCase
 			initialized = this.getClass();
 			last = false;
 		}
-		rw = Engine.gainClient();
+
+		try {
+			rw = Engine.gainClient();
+		} catch (IllegalStateException ise) {
+			throw new IllegalStateException(
+				"You forgot to move the `last = true` setting to the final test fixture in "
+					+ this.getClass().getName());
+		}
 	}
 
 	public void tearDown() {
