@@ -255,8 +255,8 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		calc.setWithhold(new Amount());
 
 		calc.calculateGivenPayable();
-		assertEquals("22.00", calc.getWithhold().toString());
-		assertEquals("253.00", calc.getSalary().toString());
+		assertEquals("22.00", calc.getWithhold().getValue());
+		assertEquals("253.00", calc.getSalary().getValue());
 	}
 
 	public final void testAgainstOfficialSampleData() throws NotFoundException {
@@ -305,6 +305,49 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		calc.setSalary(new Amount("10000.00"));
 		calc.calculateGivenSalary();
 		assertEquals("4850.00", calc.getWithhold().getValue());
+	}
+
+	/**
+	 * When all the above tests were written, they were built around the ATO's
+	 * tables' normalization of pay amounts to 1 week. Now weadd a parameter to
+	 * the calculator to specify the number of weeks involved, which should
+	 * simply scale the returned results.
+	 */
+	public final void testCalculateWithWeeks() throws NotFoundException {
+		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
+
+		Amount knownSalary = new Amount("6572.00");
+
+		AustralianPayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
+			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
+		calc.setWeeks(26);
+		calc.setSalary(knownSalary);
+
+		// mock
+		calc.setPaycheck(new Amount());
+		calc.setWithhold(new Amount());
+
+		calc.calculateGivenSalary();
+		assertEquals("572.00", calc.getWithhold().getValue());
+		assertEquals("6000.00", calc.getPaycheck().getValue());
+
+		/*
+		 * Now try a month
+		 */
+		knownSalary = new Amount("1096.33");
+
+		calc = new AustralianPayrollTaxCalculator(rw,
+			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
+		calc.setWeeks(52.0f / 12.0f);
+		calc.setSalary(knownSalary);
+
+		// mock
+		calc.setPaycheck(new Amount());
+		calc.setWithhold(new Amount());
+
+		calc.calculateGivenSalary();
+		assertEquals("95.33", calc.getWithhold().getValue());
+		assertEquals("1001.00", calc.getPaycheck().getValue());
 
 		last = true;
 	}

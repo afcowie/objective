@@ -29,6 +29,7 @@ import accounts.services.ComparatorsDetailedTest;
 import accounts.services.ComparatorsInTreeSetTest;
 import accounts.services.EntityCommandTest;
 import accounts.services.IdentifierCommandsTest;
+import accounts.services.RangeCalculatorTest;
 import accounts.services.TransactionCommandsTest;
 import accounts.services.WorkerCommandsTest;
 import country.au.services.AustralianPayrollTaxTest;
@@ -71,6 +72,7 @@ public class UnitTests
 		suite.addTestSuite(BasicFinderTest.class);
 		suite.addTestSuite(EntityCommandTest.class);
 		suite.addTestSuite(IdentifierCommandsTest.class);
+		suite.addTestSuite(RangeCalculatorTest.class);
 		suite.addTestSuite(AustralianPayrollTaxTest.class);
 		suite.addTestSuite(WorkerCommandsTest.class);
 

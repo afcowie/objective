@@ -34,6 +34,7 @@ import accounts.domain.PayrollTransaction;
 import accounts.services.CommandNotReadyException;
 import accounts.services.NotFoundException;
 import accounts.services.PostTransactionCommand;
+import accounts.services.RangeCalculator;
 import accounts.services.SpecificLedgerFinder;
 import accounts.services.UpdateTransactionCommand;
 import accounts.ui.AmountDisplay;
@@ -41,6 +42,7 @@ import accounts.ui.AmountEntry;
 import accounts.ui.ChangeListener;
 import accounts.ui.DatePicker;
 import accounts.ui.IdentifierSelector;
+import accounts.ui.RangePicker;
 import accounts.ui.WorkerPicker;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 import country.au.services.AustralianPayrollTaxCalculator;
@@ -69,8 +71,8 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 	private WorkerPicker					employee_WorkerPicker;
 	private DatePicker						payDate_Picker;
 	private IdentifierSelector				payg_IdentifierSelector;
-	private DatePicker						startDate_Picker;
-	private DatePicker						endDate_Picker;
+	private RangePicker						payPeriod_RangePicker;
+
 	private AmountEntry						salary_AmountEntry;
 	private AmountDisplay					withholding_AmountDisplay;
 	private AmountEntry						paycheck_AmountEntry;
@@ -181,19 +183,8 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		for_Label.setAlignment(0.0, 0.5);
 		table.attach(for_Label, LEFT);
 
-		final Label startDate_Label = new Label("From...");
-		startDate_Label.setAlignment(0.0, 0.5);
-		table.attach(startDate_Label, LEFT);
-
-		final Label endDate_Label = new Label("Through...");
-		endDate_Label.setAlignment(0.0, 0.5);
-		table.attach(endDate_Label, RIGHT);
-
-		startDate_Picker = new DatePicker();
-		table.attach(startDate_Picker, LEFT);
-
-		endDate_Picker = new DatePicker();
-		table.attach(endDate_Picker, RIGHT);
+		payPeriod_RangePicker = new RangePicker();
+		table.attach(payPeriod_RangePicker, BOTH);
 
 		final VBox spacer2 = new VBox(false, 0);
 		final HSeparator sep2 = new HSeparator();
@@ -247,9 +238,10 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			public void comboBoxEvent(ComboBoxEvent event) {
 				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
 					AustralianPayrollTaxIdentifier payg = (AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection();
-					Datestamp date = startDate_Picker.getDate();
+					Datestamp date = payPeriod_RangePicker.getStartDate();
 					try {
 						calc = new AustralianPayrollTaxCalculator(store, payg, date);
+						calc.setWeeks(payPeriod_RangePicker.getRangeCalculator().calculateWeeks());
 
 						// make sure new calc has the appropriate references
 						calc.setSalary(salary);
@@ -323,8 +315,8 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			paycheck = t.getPaycheckEntry().getAmount();
 
 			payDate_Picker.setDate(t.getDate());
-			startDate_Picker.setDate(t.getFromDate());
-			endDate_Picker.setDate(t.getEndDate());
+			payPeriod_RangePicker.setStartDate(t.getFromDate());
+			payPeriod_RangePicker.setEndDate(t.getEndDate());
 
 			employee_WorkerPicker.setWorker(t.getEmployee());
 			payg_IdentifierSelector.setIdentifier(t.getTaxIdentifier());
@@ -406,6 +398,37 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			}
 		});
 
+		payPeriod_RangePicker.addListener(new ChangeListener() {
+			public void userChangedData() {
+				RangeCalculator period = payPeriod_RangePicker.getRangeCalculator();
+				float num = period.calculateWeeks();
+				calc.setWeeks(num);
+
+				/*
+				 * Now recalculate given the existing values...
+				 */
+
+				if (last == null) {
+					return;
+				} else if (last == salary_AmountEntry) {
+					Debug.print("listeners", "Recalculating given salary");
+
+					calc.calculateGivenSalary();
+
+					withholding_AmountDisplay.setAmount(withholding);
+					paycheck_AmountEntry.setAmount(paycheck);
+
+				} else if (last == paycheck_AmountEntry) {
+					Debug.print("listeners", "Recalculating given paycheck");
+
+					calc.calculateGivenPayable();
+
+					salary_AmountEntry.setAmount(salary);
+					withholding_AmountDisplay.setAmount(withholding);
+				}
+			}
+		});
+
 		/*
 		 * TODO: if we implement PrimaryTransaction then use its value to point
 		 * to which Entry is last:
@@ -474,8 +497,8 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 					(AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection());
 				t.setDate(payDate_Picker.getDate());
 
-				t.setFromDate(startDate_Picker.getDate());
-				t.setEndDate(endDate_Picker.getDate());
+				t.setFromDate(payPeriod_RangePicker.getStartDate());
+				t.setEndDate(payPeriod_RangePicker.getEndDate());
 
 				Entry e;
 				e = new Credit(calc.getPaycheck(), bankAccount);

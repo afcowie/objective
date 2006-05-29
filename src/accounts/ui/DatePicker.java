@@ -52,6 +52,8 @@ public class DatePicker extends HBox
 	private Button				_pick				= null;
 	private DatePickerPopup		_popup				= null;
 
+	private ChangeListener		changeListener;
+
 	public DatePicker() {
 		super(false, 3);
 		_date = (Datestamp) _lastSelectedDate.clone();
@@ -102,6 +104,10 @@ public class DatePicker extends HBox
 				} else if (event.getType() == EntryEvent.Type.ACTIVATE) {
 					_entry.setText(_date.toString());
 					_entry.setCursorPosition(9);
+
+					if (changeListener != null) {
+						changeListener.userChangedData();
+					}
 				}
 			};
 		});
@@ -189,6 +195,19 @@ public class DatePicker extends HBox
 			window.hide();
 			return true;
 		}
+	}
+
+	/**
+	 * Attach a ChangeListener to this DatePicker.
+	 * 
+	 * @see AmountEntry#addListener(ChangeListener) for a full description
+	 */
+	public void addListener(ChangeListener listener) {
+		if (changeListener != null) {
+			throw new IllegalStateException(
+				"You can't have more than one ChangeListener on a DatePicker");
+		}
+		changeListener = listener;
 	}
 
 	/*

@@ -29,8 +29,11 @@ import country.au.domain.AustralianPayrollTaxIdentifier;
 public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 {
 	double[][]	coefficients;
+	float		weeks;
 
 	/**
+	 * Sets 1 as a default number of weeks.
+	 * 
 	 * @param store
 	 *            the DataClient from which to fetch tax Identifiers and tax
 	 *            table data.
@@ -41,8 +44,8 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 	 *             thorwn from the Finder if you've managed to ask for tax data
 	 *             that isn't there.
 	 */
-	public AustralianPayrollTaxCalculator(DataClient store, AustralianPayrollTaxIdentifier scale, Datestamp asAtDate)
-		throws NotFoundException {
+	public AustralianPayrollTaxCalculator(DataClient store, AustralianPayrollTaxIdentifier scale,
+		Datestamp asAtDate) throws NotFoundException {
 
 		super(asAtDate);
 		if (scale == null) {
@@ -52,6 +55,28 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 		AustralianPayrollTaxTableFinder finder = new AustralianPayrollTaxTableFinder(scale, asAtDate);
 		finder.query(store);
 		this.coefficients = finder.getCoefficients();
+		this.weeks = 1.0f;
+	}
+
+	/**
+	 * @return the number of weeks that are currently in use to make this
+	 *         calculation.
+	 */
+	public float getWeeks() {
+		return weeks;
+	}
+
+	/**
+	 * Set the number of weeks this pay encompasses. This is used to normalize
+	 * the salary or paycheck to the magnitude of single weeks, which is the
+	 * basis on which the ATO PAYG tables are defined.
+	 */
+
+	public void setWeeks(float weeks) {
+		if (weeks <= 0.0) {
+			throw new IllegalArgumentException("The number of weeks must be positive and non-zero");
+		}
+		this.weeks = weeks;
 	}
 
 	/**
@@ -105,7 +130,8 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 				"To use a Calculator you need to have all the parameter values set with instantiated objects");
 		}
 
-		BigDecimal weekly = salary.getBigDecimal();
+		BigDecimal num = new BigDecimal(weeks);
+		BigDecimal weekly = salary.getBigDecimal().divide(num, 3, BigDecimal.ROUND_HALF_UP);
 
 		/*
 		 * The Australian PAYG formula is the linear equation y = ax - b, where
@@ -136,7 +162,14 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 
 		long rounded = Math.round(y);
 
-		withhold.setValue(Long.toString(rounded) + ".00");
+		/*
+		 * And that ends the ATO tax algorithm. Now we have to de-normalize the
+		 * value scaling it up by the number of weeks, and passing that to be
+		 * the value of the withheld Amount:
+		 */
+
+		float denormalized = rounded * weeks;
+		withhold.setValue(Float.toString(denormalized));
 
 		/*
 		 * And now reset the paycheck amount.
