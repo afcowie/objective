@@ -648,6 +648,10 @@ public class AccountPicker extends HBox
 			throw new IllegalArgumentException("null invalid argument for setLedger()");
 		}
 		selectedLedger = ledger;
+		Account a = ledger.getParentAccount();
+		if (a != null) {
+			selectedAccount = a;
+		}
 		setEntryText();
 	}
 
