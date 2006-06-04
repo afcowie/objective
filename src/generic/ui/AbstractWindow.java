@@ -81,7 +81,7 @@ public abstract class AbstractWindow
 	/**
 	 * Setup common to both types of window:
 	 * <ul>
-	 * <li>set me variable
+	 * <li>set <code>me</code> String (for debug output)
 	 * <li>establish the default listener
 	 * </ul>
 	 */

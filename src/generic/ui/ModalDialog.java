@@ -27,7 +27,8 @@ import org.gnu.gtk.WindowPosition;
  * Example of use:
  * 
  * <pre>
- * ModalDialog error = new ModalDialog(&quot;File not found&quot;, e.getMessage() + &quot;\n&quot; + &quot;Try again?&quot;, MessageType.WARNING);
+ * ModalDialog error = new ModalDialog(&quot;File not found&quot;, e.getMessage() + &quot;\n&quot; + &quot;Try again?&quot;,
+ * 	MessageType.WARNING);
  * error.run();
  * </pre>
  * 
@@ -41,6 +42,10 @@ public class ModalDialog
 	 * Pop a MessageDialog. Parameters message and subtext are Pango markup
 	 * enabled.
 	 * 
+	 * @param parentWindow
+	 *            the GTK Window from which you launched this dialog. This is
+	 *            passed to MessageDialog as the window that will be returned to
+	 *            focus after the Dialog is dismissed.
 	 * @param message
 	 *            Will be rendered in a larger font as the main [error] message
 	 *            text; This will be presented as big and bold by GTK.
@@ -53,7 +58,7 @@ public class ModalDialog
 	 *            MessageType.{ERROR, WARNING, INFO, and QUESTION}. We don't do
 	 *            anything special with QUESTION for the time being.
 	 */
-	public ModalDialog(String message, String subtext, MessageType type) {
+	public ModalDialog(Window parentWindow, String message, String subtext, MessageType type) {
 		ButtonsType buttons;
 
 		if (type == MessageType.INFO) {
@@ -62,9 +67,8 @@ public class ModalDialog
 			buttons = ButtonsType.CLOSE;
 		}
 
-		Window[] windows = Window.listToplevelWindows();
-
-		dialog = new MessageDialog(windows[0], DialogFlags.DESTROY_WITH_PARENT, type, buttons, message, false);
+		dialog = new MessageDialog(parentWindow, DialogFlags.DESTROY_WITH_PARENT, type, buttons,
+			message, false);
 		dialog.hide();
 		/*
 		 * According to the documentation, setting secondary markup takes care

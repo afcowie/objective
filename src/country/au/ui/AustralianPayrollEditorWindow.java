@@ -276,6 +276,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 						}
 					} catch (NotFoundException nfe) {
 						ModalDialog dialog = new ModalDialog(
+							window,
 							"Not found",
 							"Can't find tax data for identifier <b>"
 								+ payg
@@ -444,14 +445,14 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 */
 
 		if (employee == null) {
-			ModalDialog dialog = new ModalDialog("Select an employee!",
+			ModalDialog dialog = new ModalDialog(window, "Select an employee!",
 				"You need to select the person you're trying to pay first.", MessageType.WARNING);
 			dialog.run();
 			return;
 		}
 
 		if (salary.getNumber() == 0) {
-			ModalDialog dialog = new ModalDialog("Enter some numbers!",
+			ModalDialog dialog = new ModalDialog(window, "Enter some numbers!",
 				"Not much point in trying to commit a paycheck for 0.00, is there?", MessageType.WARNING);
 			dialog.run();
 			/*
@@ -531,7 +532,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 			Debug.print("events", "Can't find Ledger " + nfe.getMessage());
 		} catch (CommandNotReadyException cnre) {
 			Debug.print("events", "Command not ready: " + cnre.getMessage());
-			ModalDialog dialog = new ModalDialog("Command Not Ready!", cnre.getMessage(),
+			ModalDialog dialog = new ModalDialog(window, "Command Not Ready!", cnre.getMessage(),
 				MessageType.ERROR);
 			dialog.run();
 

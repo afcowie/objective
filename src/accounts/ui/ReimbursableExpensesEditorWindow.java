@@ -41,15 +41,17 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	/*
 	 * Cached widgets
 	 */
-	protected Table							table;
+	protected Table								table;
 
-	protected WorkerPicker					person_WorkerPicker;
-	protected DatePicker					datePicker;
-	protected AccountPicker					accountPicker;
-	protected Entry							descriptionEntry;
-	protected ForeignAmountEntryBox			amountEntryBox;
+	protected WorkerPicker						person_WorkerPicker;
+	protected DatePicker						datePicker;
+	protected AccountPicker						accountPicker;
+	protected Entry								descriptionEntry;
+	protected ForeignAmountEntryBox				amountEntryBox;
 
-	private ReimbursableExpensesTransaction	existing	= null;
+	private ReimbursableExpensesTransaction		existing	= null;
+
+	private ReimbursableExpensesEditorWindow	self;
 
 	/**
 	 * Construct a window to create a new ReimbursableExpensesTransaction.
@@ -64,6 +66,8 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 	 */
 	public ReimbursableExpensesEditorWindow(long id) {
 		super("reimbursable", "share/ReimbursableExpensesEditorWindow.glade");
+
+		self = this;
 
 		datePicker = new DatePicker();
 
@@ -112,7 +116,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 		final Worker person = person_WorkerPicker.getWorker();
 
 		if (person == null) {
-			ModalDialog dialog = new ModalDialog("Select someone!",
+			ModalDialog dialog = new ModalDialog(window, "Select someone!",
 				"You need to select the person you're trying to pay first.", MessageType.WARNING);
 			dialog.run();
 			person_WorkerPicker.grabFocus();
@@ -121,6 +125,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
 		if (descriptionEntry.getText().equals("")) {
 			ModalDialog dialog = new ModalDialog(
+				window,
 				"Enter a description!",
 				"It's really a good idea for each Transaction to have an appropriate description."
 					+ " Try to be a bit more specific than '<i>Expenses reimbursable to Joe Smith</i>' as that won't facilitate identifying this Transaction in future searches and reports."
@@ -131,7 +136,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 		}
 
 		if (accountPicker.getAccount() == null) {
-			ModalDialog dialog = new ModalDialog("Select an Account!",
+			ModalDialog dialog = new ModalDialog(window, "Select an Account!",
 				"You need to select the account to which these expenses apply.", MessageType.WARNING);
 			dialog.run();
 			accountPicker.grabFocus();
@@ -145,8 +150,6 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
 		window.hide();
 		Master.ui.showAsWorking(true);
-
-		final ReimbursableExpensesEditorWindow me = this;
 
 		new Thread() {
 			public void run() {
@@ -203,7 +206,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 					CustomEvents.addEvent(new Runnable() {
 						public void run() {
 							Master.ui.showAsWorking(false);
-							me.deleteHook();
+							self.deleteHook();
 						}
 					});
 
@@ -211,7 +214,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 					Debug.print("events", "Command not ready: " + cnre.getMessage());
 					CustomEvents.addEvent(new Runnable() {
 						public void run() {
-							ModalDialog dialog = new ModalDialog("Command Not Ready!",
+							ModalDialog dialog = new ModalDialog(window, "Command Not Ready!",
 								cnre.getMessage(), MessageType.ERROR);
 							dialog.run();
 

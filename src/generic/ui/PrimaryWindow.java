@@ -44,9 +44,9 @@ public abstract class PrimaryWindow extends AbstractWindow
 
 	/**
 	 * Quietly expose hide() so that Master can silence them while shutting
-	 * down.
+	 * down. You could just as easily access window's hide()
 	 */
-	void hide() {
+	protected void hide() {
 		window.hide();
 	}
 }
