@@ -63,7 +63,7 @@ public class ObjectiveUserInterface extends UserInterface
 			} else if (target instanceof ReimbursableExpensesTransaction) {
 				editor = new ReimbursableExpensesEditorWindow(id);
 			} else if (target instanceof GenericTransaction) {
-				throw new UnsupportedOperationException("No editor for GenericTransaction yet");
+				editor = new GenericTransactionEditorWindow(id);
 			}
 
 		} else if (target instanceof Currency) {
