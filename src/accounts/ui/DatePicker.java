@@ -7,6 +7,7 @@
 package accounts.ui;
 
 import generic.ui.AbstractWindow;
+import generic.ui.ChangeListener;
 
 import java.text.ParseException;
 

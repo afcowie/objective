@@ -4,7 +4,7 @@
  * See LICENCE file for usage and redistribution terms
  * Copyright (c) 2006 Operational Dynamics
  */
-package accounts.ui;
+package generic.ui;
 
 /**
  * Report a change in one of our mutator Widgets that occured as a result of

@@ -9,6 +9,7 @@ package accounts.ui;
 import generic.ui.Align;
 import generic.ui.EditorWindow;
 import generic.ui.ModalDialog;
+import generic.ui.TextEntry;
 import generic.ui.TwoColumnTable;
 
 import java.util.Iterator;

@@ -7,6 +7,7 @@
 package accounts.ui;
 
 import generic.ui.Align;
+import generic.ui.ChangeListener;
 import generic.ui.TwoColumnTable;
 
 import org.gnu.gtk.HBox;

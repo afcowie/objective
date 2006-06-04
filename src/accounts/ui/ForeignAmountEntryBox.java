@@ -7,6 +7,7 @@
 package accounts.ui;
 
 import generic.persistence.DataClient;
+import generic.ui.ChangeListener;
 import generic.util.Debug;
 
 import java.util.ArrayList;

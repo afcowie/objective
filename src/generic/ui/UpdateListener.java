@@ -12,7 +12,7 @@ package generic.ui;
  * action). The argument to the interface's method, a long, is the database ID
  * of the Object which has changed.
  * <p>
- * Note that this is <i>not</i> {@link accounts.ui.ChangeListener}, which is
+ * Note that this is <i>not</i> {@link generic.ui.ChangeListener}, which is
  * there for inter-Widget communication.
  * 
  * @author Andrew Cowie

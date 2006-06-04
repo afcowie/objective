@@ -6,6 +6,7 @@
  */
 package accounts.ui;
 
+import generic.ui.ChangeListener;
 import generic.util.Debug;
 
 import org.gnu.gdk.Color;

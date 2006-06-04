@@ -7,6 +7,7 @@
 package country.au.ui;
 
 import generic.ui.Align;
+import generic.ui.ChangeListener;
 import generic.ui.EditorWindow;
 import generic.ui.ModalDialog;
 import generic.ui.TwoColumnTable;
@@ -39,7 +40,6 @@ import accounts.services.SpecificLedgerFinder;
 import accounts.services.UpdateTransactionCommand;
 import accounts.ui.AmountDisplay;
 import accounts.ui.AmountEntry;
-import accounts.ui.ChangeListener;
 import accounts.ui.DatePicker;
 import accounts.ui.IdentifierSelector;
 import accounts.ui.RangePicker;
