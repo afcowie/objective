@@ -573,7 +573,7 @@ if ($os eq "gentoo") {
 	} else {
 		$vendor = "System";
 	}
-	check_compiler($javac, "$vendor javac", $javac_candidate, "");
+	check_compiler($javac, "$vendor javac", $javac_candidate, "-source 1.4 -target 1.4");
 
 	# check gcj. -C means generate .class files, not .o files (which are
 	# for linking into native executables.
@@ -605,7 +605,7 @@ if ($os eq "gentoo") {
 	} else {
 		$javac_candidate = which("javac");
 	}
-	check_compiler($javac, "Real javac", $javac_candidate, "");
+	check_compiler($javac, "Real javac", $javac_candidate, "-source 1.4 -target 1.4");
 
 	# check gcj. The moniker $gcjC referes to `gcj -C`. See HACKING.
 	my $gcj_candidate;
@@ -633,7 +633,7 @@ if ($os eq "gentoo") {
 	} else {
 		$javac_candidate = "/usr/lib/jvm/java-ibm/bin/javac";
 	}
-	check_compiler($javac, "IBM javac", $javac_candidate, "");
+	check_compiler($javac, "IBM javac", $javac_candidate, "-source 1.4 -target 1.4");
 
 	# check for gcj
 	my $gcj_candidate;
