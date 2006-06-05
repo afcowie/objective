@@ -85,8 +85,6 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 	public GenericTransactionEditorWindow(long id) {
 		super(id);
 
-		TwoColumnTable table = new TwoColumnTable(2);
-
 		if (id == 0) {
 			t = new GenericTransaction();
 			transaction = t;
@@ -94,6 +92,8 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		} else {
 			t = (GenericTransaction) transaction;
 		}
+
+		TwoColumnTable table = new TwoColumnTable(2);
 
 		/*
 		 * We use block to hide all the silly variables (especially the Labels),
@@ -140,24 +140,21 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			Label faL = new Label("Amount");
 			faL.setAlignment(0.0, 0.5);
 
-			Label drL = new Label("Debits");
-			Label crL = new Label("Credits");
+			Label sideL = new Label(" Debits  Credits ");
 			Label bL = new Label("");
 
 			accountSizeGroup.addWidget(aL);
 			amountSizeGroup.addWidget(faL);
-			flopSizeGroup.addWidget(drL);
-			flopSizeGroup.addWidget(crL);
+			flopSizeGroup.addWidget(sideL);
+			;
 			addRemoveSizeGroup.addWidget(bL);
 			headings.packStart(aL, true, true, 0);
 			headings.packStart(faL, false, false, 0);
-			headings.packStart(drL, false, false, 0);
-			headings.packStart(crL, false, false, 0);
+			headings.packStart(sideL, false, false, 0);
 			headings.packStart(bL, false, false, 0);
 
 			top.packStart(headings, false, false, 0);
 		}
-
 		{
 			eB = new VBox(true, 3);
 
@@ -191,7 +188,6 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 			top.packStart(eB, false, false, 0);
 		}
-
 		{
 			HBox tailings;
 
@@ -248,6 +244,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		// private AmountEntry amountEntry = null;
 		private ForeignAmountEntryBox	amountEntry		= null;
 		private Button					flopButton		= null;
+		private HBox					flopBox			= null;
 		private Label					sideLabel		= null;
 		private Button					deleteButton	= null;
 
@@ -296,9 +293,13 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 			flopButton = new Button();
 			flopButton.setRelief(ReliefStyle.NONE);
+
+			flopBox = new HBox(false, 0);
+			flopButton.add(flopBox);
+			box.packStart(flopButton, false, false, 3);
+
 			sideLabel = new Label("");
 
-			flopSizeGroup.addWidget(sideLabel);
 			flopSizeGroup.addWidget(flopButton);
 
 			flipFlop();
@@ -306,8 +307,6 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			flopButton.addListener(new ButtonListener() {
 				public void buttonEvent(ButtonEvent event) {
 					if (event.getType() == ButtonEvent.Type.CLICK) {
-						box.remove(sideLabel);
-						box.remove(flopButton);
 
 						if (state == original) {
 							state = alternate;
@@ -336,12 +335,12 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		private void flipFlop() {
 			if (state instanceof Debit) {
 				sideLabel.setMarkup("<span color='" + Debit.COLOR_NORMAL + "'>Debit</span>");
-				box.packStart(sideLabel, false, false, 3);
-				box.packStart(flopButton, false, false, 3);
+				flopBox.remove(sideLabel);
+				flopBox.packStart(sideLabel, false, false, 3);
 			} else if (state instanceof Credit) {
 				sideLabel.setMarkup("<span color='" + Credit.COLOR_NORMAL + "'>Credit</span>");
-				box.packStart(flopButton, false, false, 3);
-				box.packStart(sideLabel, false, false, 3);
+				flopBox.remove(sideLabel);
+				flopBox.packEnd(sideLabel, false, false, 3);
 			} else {
 				throw new IllegalStateException("Trying to flip flop but Entry not directional");
 			}
@@ -387,11 +386,11 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		 */
 
 		if (!t.isBalanced()) {
-			ModalDialog dialog = new ModalDialog(
-				window,
-				"Transaction not balanced!",
-				"Any accounting Transaction must have have an equal Debit and Credit value. You must either change the amounts you've entered, or add another Entry to bring the Transaction into balance.",
-				MessageType.WARNING);
+			ModalDialog dialog = new ModalDialog(window, "Transaction not balanced!",
+				"Any accounting Transaction must have have an equal Debit and Credit value. "
+					+ "You must either change the Amounts you've entered, "
+					+ "change a Debit to a Credit (or vice versa), "
+					+ "or add another Entry to bring the Transaction into balance.", MessageType.WARNING);
 			dialog.run();
 			/*
 			 * re-clear the Entries set.
