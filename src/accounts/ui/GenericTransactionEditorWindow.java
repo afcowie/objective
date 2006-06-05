@@ -7,7 +7,6 @@
 package accounts.ui;
 
 import generic.ui.Align;
-import generic.ui.EditorWindow;
 import generic.ui.ModalDialog;
 import generic.ui.TextEntry;
 import generic.ui.TwoColumnTable;
@@ -35,10 +34,6 @@ import accounts.domain.Debit;
 import accounts.domain.Entry;
 import accounts.domain.ForeignAmount;
 import accounts.domain.GenericTransaction;
-import accounts.services.Command;
-import accounts.services.CommandNotReadyException;
-import accounts.services.PostTransactionCommand;
-import accounts.services.UpdateTransactionCommand;
 
 /**
  * Create or Edit a GenericTransaction (often known in other accounting programs
@@ -54,17 +49,12 @@ import accounts.services.UpdateTransactionCommand;
  * we go and using its methods to store data, rather than instantiating it in
  * ok().
  */
-public class GenericTransactionEditorWindow extends EditorWindow
+public class GenericTransactionEditorWindow extends TransactionEditorWindow
 {
 	/**
 	 * The transaction object we are building up or editing.
 	 */
 	private GenericTransaction	t					= null;
-
-	/**
-	 * Is this a Transaction object being edited?
-	 */
-	private boolean				editing				= false;
 
 	/*
 	 * UI elements
@@ -93,17 +83,16 @@ public class GenericTransactionEditorWindow extends EditorWindow
 	 *            the database ID of the Transaction you intend to edit.
 	 */
 	public GenericTransactionEditorWindow(long id) {
-		super();
+		super(id);
 
 		TwoColumnTable table = new TwoColumnTable(2);
 
 		if (id == 0) {
 			t = new GenericTransaction();
+			transaction = t;
 			setTitle("Enter a new Generic Transaction");
 		} else {
-			t = (GenericTransaction) store.fetchByID(id);
-			setTitle(t.getDescription());
-			editing = true;
+			t = (GenericTransaction) transaction;
 		}
 
 		/*
@@ -373,7 +362,7 @@ public class GenericTransactionEditorWindow extends EditorWindow
 		}
 	}
 
-	public void ok() {
+	protected void ok() {
 		/*
 		 * Basic data guards.
 		 */
@@ -415,27 +404,6 @@ public class GenericTransactionEditorWindow extends EditorWindow
 		/*
 		 * Carry on:
 		 */
-		hide();
-
-		Command c = null;
-		if (editing) {
-			c = new UpdateTransactionCommand(t);
-		} else {
-			c = new PostTransactionCommand(t);
-		}
-
-		try {
-			c.execute(store);
-		} catch (CommandNotReadyException cnre) {
-			ModalDialog dialog = new ModalDialog(window, "Command Not Ready!", cnre.getMessage(),
-				MessageType.ERROR);
-			dialog.run();
-
-			/*
-			 * Leave the Window open so user can fix, as opposed to calling
-			 * cancel()
-			 */
-			present();
-		}
+		super.ok();
 	}
 }

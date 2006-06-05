@@ -127,7 +127,8 @@ public class UpdateTransactionCommand extends TransactionCommand
 					+ " returned " + ledgerContainingEntry.size() + " Entries");
 			}
 
-			Debug.print("debug", "Removing " + ref.toString() + " from Ledger \""
+			Entry committed = (Entry) store.peek(ref);
+			Debug.print("debug", "Removing " + committed.toString() + " from Ledger \""
 				+ ((Ledger) ledgerContainingEntry.get(0)).getName() + "\"");
 
 			Ledger ledger = (Ledger) ledgerContainingEntry.get(0);
