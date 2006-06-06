@@ -151,4 +151,23 @@ public class BasicLedgerTest extends TestCase
 		assertEquals(0, ledger.getBalance().getNumber());
 		assertEquals(0, entries.size());
 	}
+
+	public final void testUpdateEntry() {
+		Debit one = new Debit(new Amount("50"), null);
+		DebitPositiveLedger pos = new DebitPositiveLedger();
+
+		pos.addEntry(one);
+		assertEquals(5000, pos.getBalance().getNumber());
+
+		Amount a = one.getAmount();
+		a.setValue("42");
+
+		/*
+		 * ie, not 42, because we haven't told the Ledger to reset itself
+		 */
+		assertEquals(5000, pos.getBalance().getNumber());
+
+		pos.updateEntry(one);
+		assertEquals(4200, pos.getBalance().getNumber());
+	}
 }

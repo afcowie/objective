@@ -86,6 +86,20 @@ public class Ledger extends DomainObject implements Normal
 	}
 
 	/**
+	 * Tell the ledger than an Entry has changed. Somewhat artificial; all this
+	 * does is zero out the cached balance value forcing it to be recalculated
+	 * next time is is requested.
+	 */
+	public void updateEntry(Entry one) {
+		/*
+		 * TODO How can we possibly figure out what the old value of the Entry
+		 * was? If we could, it would surely be better to subtract that and then
+		 * add the current value, rather than forcing a full recalculation.
+		 */
+		balance = null;
+	}
+
+	/**
 	 * Remove an Entry from this ledger, adjusting the balance accordingly. We
 	 * don't set the Entry's parentLedger to null; that's the business of
 	 * whoever is removing this Entry; it'll either be deleted or reused
@@ -110,8 +124,13 @@ public class Ledger extends DomainObject implements Normal
 	 * balance. Used to set an initial value for a Ledger's balance if not
 	 * currently set.
 	 */
-	protected void calculateBalance() {
-		balance = new Amount("0");
+	public void calculateBalance() {
+		if (balance == null) {
+			balance = new Amount("0");
+		} else {
+			balance.setValue("0");
+		}
+
 		if (entries == null) {
 			return;
 		}
