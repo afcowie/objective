@@ -135,6 +135,8 @@ public class Entry extends DomainObject implements Normal
 		} else {
 			throw new DebugException("huh?");
 		}
+		buf.append(' ');
+		buf.append(super.toString());
 		return buf.toString();
 	}
 }

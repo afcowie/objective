@@ -10,7 +10,6 @@
 package generic.persistence;
 
 import generic.domain.Root;
-import generic.util.Debug;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -75,7 +74,6 @@ public final class DataClient
 		if (readOnly) {
 			throw new UnsupportedOperationException("Can't commit on a read-only client!");
 		}
-		Debug.print("debug", "commit() called");
 		container.commit();
 		/*
 		 * WARNING: By brute force testing, this yield() seems critical to force

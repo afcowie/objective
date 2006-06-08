@@ -67,4 +67,15 @@ public abstract class DomainObject
 		}
 		throw new IllegalArgumentException("obj is not a DomainObject");
 	}
+
+	/**
+	 * Return a String with the databaseId (if set) or "new".
+	 */
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("(");
+		buf.append(databaseId);
+		buf.append(")");
+		return buf.toString();
+	}
 }
