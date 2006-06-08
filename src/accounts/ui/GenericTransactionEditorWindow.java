@@ -22,6 +22,7 @@ import org.gnu.gtk.MessageType;
 import org.gnu.gtk.ReliefStyle;
 import org.gnu.gtk.SizeGroup;
 import org.gnu.gtk.SizeGroupMode;
+import org.gnu.gtk.Table;
 import org.gnu.gtk.VBox;
 import org.gnu.gtk.Widget;
 import org.gnu.gtk.event.ButtonEvent;
@@ -69,8 +70,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 	private SizeGroup				accountSizeGroup	= null;
 	private SizeGroup				amountSizeGroup		= null;
-	private SizeGroup				leftSizeGroup		= null;
-	private SizeGroup				rightSizeGroup		= null;
+	private SizeGroup				columnSizeGroup		= null;
 	private SizeGroup				flopSizeGroup		= null;
 	private SizeGroup				addRemoveSizeGroup	= null;
 
@@ -141,17 +141,21 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 		accountSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
 		amountSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
-		leftSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
-		rightSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
+		columnSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
 		flopSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
 		addRemoveSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
 
 		/*
-		 * Now setup the UI for displaying the Entries.
+		 * Now setup the UI for displaying the Entries. The instantiation of the
+		 * artificial balance Ledgers and their respective Entries is here so
+		 * they are not null when ChangeListeners fire while populating the
+		 * EntryRows.
 		 */
 
 		debitPos = new DebitPositiveLedger();
 		creditPos = new CreditPositiveLedger();
+		debitBalance = new AmountDisplay();
+		creditBalance = new AmountDisplay();
 
 		{
 			HBox headings;
@@ -164,24 +168,29 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			faL.setAlignment(0.0, 0.5);
 
 			Label drL = new Label("Debits");
-			Label crL = new Label("Credits ");
-			HBox flopBox = new HBox(false, 0);
-			flopBox.packStart(drL, false, false, 0);
-			flopBox.packStart(crL, false, false, 0);
+			Label crL = new Label("Credits  ");
+			drL.setAlignment(1.0, 0.5);
+			crL.setAlignment(1.0, 0.5);
 
-			Label bL = new Label("");
+			/*
+			 * We put these two Labels into a Table so as to force the Widgets
+			 * to be wide, thus giving them the space to right align in.
+			 */
+			Table flopTable = new Table(1, 2, true);
+			flopTable.attach(drL, 0, 1, 0, 1);
+			flopTable.attach(crL, 1, 2, 0, 1);
+
+			Label blankL = new Label("");
 
 			accountSizeGroup.addWidget(aL);
 			amountSizeGroup.addWidget(faL);
-			leftSizeGroup.addWidget(drL);
-			rightSizeGroup.addWidget(crL);
-			flopSizeGroup.addWidget(flopBox);
+			flopSizeGroup.addWidget(flopTable);
 
-			addRemoveSizeGroup.addWidget(bL);
+			addRemoveSizeGroup.addWidget(blankL);
 			headings.packStart(aL, true, true, 0);
 			headings.packStart(faL, false, false, 0);
-			headings.packStart(flopBox, false, false, 0);
-			headings.packStart(bL, false, false, 0);
+			headings.packStart(flopTable, false, false, 0);
+			headings.packStart(blankL, false, false, 0);
 
 			top.packStart(headings, false, false, 0);
 		}
@@ -234,14 +243,12 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			addRemoveSizeGroup.addWidget(addButton);
 			tailings.packEnd(addButton, false, false, 0);
 
-			debitBalance = new AmountDisplay();
-			creditBalance = new AmountDisplay();
 			debitBalance.setAmount(debitPos.getBalance());
 			creditBalance.setAmount(creditPos.getBalance());
 			tailings.packEnd(creditBalance, false, false, 0);
 			tailings.packEnd(debitBalance, false, false, 0);
-			leftSizeGroup.addWidget(debitBalance);
-			rightSizeGroup.addWidget(creditBalance);
+			columnSizeGroup.addWidget(debitBalance);
+			columnSizeGroup.addWidget(creditBalance);
 
 			eB.packEnd(tailings, true, false, 0);
 		}
@@ -281,7 +288,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		private AccountPicker			accountPicker	= null;
 		private ForeignAmountEntryBox	amountEntry		= null;
 		private Button					flopButton		= null;
-		private HBox					flopBox			= null;
+		private Table					flopTable		= null;
 		private Label					sideLabel		= null;
 		private Button					deleteButton	= null;
 
@@ -351,12 +358,20 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			amountSizeGroup.addWidget(amountEntry);
 
 			sideLabel = new Label("");
-			flopBox = new HBox(false, 0);
-			flopBox.add(sideLabel);
+			sideLabel.setAlignment(1.0, 0.5);
+			columnSizeGroup.addWidget(sideLabel);
+
+			/*
+			 * Just put the sideLabel anywhere; it'll be moved by the forced
+			 * initial call to flipFlop() - it just needs to be present so
+			 * flipFlop() can remove it.
+			 */
+			flopTable = new Table(1, 2, true);
+			flopTable.attach(sideLabel, 0, 1, 0, 1);
 
 			flopButton = new Button();
 			flopButton.setRelief(ReliefStyle.NONE);
-			flopButton.add(flopBox);
+			flopButton.add(flopTable);
 
 			box.packStart(flopButton, false, false, 3);
 			flopSizeGroup.addWidget(flopButton);
@@ -420,12 +435,12 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		private void flipFlop() {
 			if (state instanceof Debit) {
 				sideLabel.setMarkup("<span color='" + Debit.COLOR_NORMAL + "'>Debit</span>");
-				flopBox.remove(sideLabel);
-				flopBox.packStart(sideLabel, false, false, 3);
+				flopTable.remove(sideLabel);
+				flopTable.attach(sideLabel, 0, 1, 0, 1);
 			} else if (state instanceof Credit) {
 				sideLabel.setMarkup("<span color='" + Credit.COLOR_NORMAL + "'>Credit</span>");
-				flopBox.remove(sideLabel);
-				flopBox.packEnd(sideLabel, false, false, 3);
+				flopTable.remove(sideLabel);
+				flopTable.attach(sideLabel, 1, 2, 0, 1);
 			} else {
 				throw new IllegalStateException("Trying to flip flop but Entry not directional");
 			}
