@@ -40,7 +40,7 @@ import accounts.domain.Datestamp;
  */
 public class DatePicker extends HBox
 {
-	private Datestamp			_date				= null;
+	private Datestamp			date				= null;
 
 	private static Datestamp	_lastSelectedDate	= null;
 
@@ -49,19 +49,19 @@ public class DatePicker extends HBox
 		_lastSelectedDate.setAsToday();
 	}
 
-	private Entry				_entry				= null;
-	private Button				_pick				= null;
-	private DatePickerPopup		_popup				= null;
+	private Entry				entry				= null;
+	private Button				pick				= null;
+	private DatePickerPopup		popup				= null;
 
 	private ChangeListener		changeListener;
 
 	public DatePicker() {
 		super(false, 3);
-		_date = (Datestamp) _lastSelectedDate.clone();
+		date = (Datestamp) _lastSelectedDate.clone();
 
-		_entry = new Entry();
-		_entry.setWidth(9);
-		_entry.setText(_date.toString());
+		entry = new Entry();
+		entry.setWidth(9);
+		entry.setText(date.toString());
 
 		// _pick = new Button("Pick", false);
 		// _pick = new Button(new GtkStockItem("stock_calendar-view-month"));
@@ -69,33 +69,33 @@ public class DatePicker extends HBox
 		// Image icon = new Image(stock, IconSize.BUTTON);
 		// _pick = new Button("stock_calendar-view-month");
 
-		_pick = new Button();
+		pick = new Button();
 		Image icon = new Image(GtkStockItem.INDEX, IconSize.BUTTON);
 		Label label = new Label("Pick", false);
 		HBox box = new HBox(false, 1);
 
 		box.packStart(icon, false, false, 0);
 		box.packStart(label, false, false, 0);
-		_pick.add(box);
+		pick.add(box);
 
-		packStart(_entry, false, false, 0);
-		packStart(_pick, false, false, 0);
+		packStart(entry, false, false, 0);
+		packStart(pick, false, false, 0);
 
-		_pick.addListener(new ButtonListener() {
+		pick.addListener(new ButtonListener() {
 			public void buttonEvent(ButtonEvent event) {
 				if (event.getType() == ButtonEvent.Type.CLICK) {
-					if (_popup == null) {
-						_popup = new DatePickerPopup("datepicker", "share/DatePickerPopup.glade");
+					if (popup == null) {
+						popup = new DatePickerPopup("datepicker", "share/DatePickerPopup.glade");
 					}
-					_popup.present();
+					popup.present();
 				}
 			}
 		});
 
-		_entry.addListener(new EntryListener() {
+		entry.addListener(new EntryListener() {
 			public void entryEvent(EntryEvent event) {
 				try {
-					_date.setDate(_entry.getText());
+					date.setDate(entry.getText());
 				} catch (ParseException pe) {
 					return;
 				}
@@ -103,8 +103,8 @@ public class DatePicker extends HBox
 				if (event.getType() == EntryEvent.Type.CHANGED) {
 					//
 				} else if (event.getType() == EntryEvent.Type.ACTIVATE) {
-					_entry.setText(_date.toString());
-					_entry.setCursorPosition(9);
+					entry.setText(date.toString());
+					entry.setCursorPosition(9);
 
 					if (changeListener != null) {
 						changeListener.userChangedData();
@@ -120,13 +120,13 @@ public class DatePicker extends HBox
 	 */
 	class DatePickerPopup extends AbstractWindow
 	{
-		private Calendar	_calendar	= null;
+		private Calendar	calendar	= null;
 
 		public DatePickerPopup(String which, String filename) {
 			super(which, filename);
 
-			_calendar = (org.gnu.gtk.Calendar) gladeParser.getWidget("calendar");
-			_calendar.addListener(new CalendarListener() {
+			calendar = (org.gnu.gtk.Calendar) gladeParser.getWidget("calendar");
+			calendar.addListener(new CalendarListener() {
 				public void calendarEvent(CalendarEvent event) {
 					if (event.getType() == CalendarEvent.Type.DAY_SELECTED_DOUBLE_CLICK) {
 						applySelection();
@@ -141,7 +141,7 @@ public class DatePicker extends HBox
 						window.hide();
 						return true;
 					} else if (key == KeyValue.Home || key == KeyValue.t) {
-						_date.setAsToday();
+						date.setAsToday();
 						present();
 						return true;
 					} else if (key == KeyValue.Return) {
@@ -156,10 +156,14 @@ public class DatePicker extends HBox
 		}
 
 		private void applySelection() {
-			java.util.Calendar cal = _calendar.getDate();
+			java.util.Calendar cal = calendar.getDate();
 			window.hide();
-			_date.setDate(cal);
-			_entry.setText(_date.toString());
+			date.setDate(cal);
+			entry.setText(date.toString());
+
+			if (changeListener != null) {
+				changeListener.userChangedData();
+			}
 		}
 
 		/*
@@ -168,10 +172,18 @@ public class DatePicker extends HBox
 
 		public void present() {
 			java.util.Calendar cal = java.util.Calendar.getInstance();
-			cal.setTime(_date.getDate());
+			cal.setTime(date.getDate());
 
-			_calendar.selectDay(cal.get(java.util.Calendar.DAY_OF_MONTH));
-			_calendar.selectMonth(cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.YEAR));
+			int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+			int month = cal.get(java.util.Calendar.MONTH);
+			int year = cal.get(java.util.Calendar.YEAR);
+
+			/*
+			 * Set the month first, otherwise we get a glitch if the previously
+			 * set month doesn't have the requested day.
+			 */
+			calendar.selectMonth(month, year);
+			calendar.selectDay(day);
 
 			super.present();
 		}
@@ -184,7 +196,7 @@ public class DatePicker extends HBox
 			 * So annoying. You'd think you should be able to cast from Widget
 			 * to Window here, but it blows ClassCastException.
 			 */
-			Window top = (Window) _entry.getToplevel();
+			Window top = (Window) entry.getToplevel();
 			top.present();
 		}
 
@@ -215,12 +227,12 @@ public class DatePicker extends HBox
 	 * Getters and Setters --------------------------------
 	 */
 	public Datestamp getDate() {
-		return _date;
+		return date;
 	}
 
 	public void setDate(Datestamp date) {
-		_date = date;
-		_entry.setText(_date.toString());
-		_entry.setCursorPosition(9);
+		this.date = date;
+		entry.setText(date.toString());
+		entry.setCursorPosition(9);
 	}
 }

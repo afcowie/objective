@@ -191,6 +191,9 @@ public class Datestamp implements Comparable, Leaf
 		this.timestamp = d.getTime();
 	}
 
+	/**
+	 * Returns a java.util.Date that is equivalent to this Datestamp.
+	 */
 	public Date getDate() {
 		if (timestamp == 0) {
 			throw new NotActivatedException();
