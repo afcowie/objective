@@ -47,6 +47,8 @@ public class ForeignAmountEntryBox extends HBox
 	private AmountEntry			homeValue_AmountEntry;
 	private CurrencySelector	foreign_CurrencySelector;
 
+	private ChangeListener		changeListener;
+
 	/*
 	 * These are just Strings, so ok to be cross-Container.
 	 */
@@ -111,6 +113,10 @@ public class ForeignAmountEntryBox extends HBox
 
 				rate_Entry.setText(foreignAmount.getRate());
 				homeValue_AmountEntry.setAmount(foreignAmount);
+
+				if (changeListener != null) {
+					changeListener.userChangedData();
+				}
 			}
 
 		});
@@ -132,6 +138,10 @@ public class ForeignAmountEntryBox extends HBox
 					homeValue_AmountEntry.setAmount(foreignAmount);
 
 					grayOut();
+
+					if (changeListener != null) {
+						changeListener.userChangedData();
+					}
 				}
 			}
 		});
@@ -157,6 +167,10 @@ public class ForeignAmountEntryBox extends HBox
 					}
 					homeValue_AmountEntry.setAmount(foreignAmount);
 					lastRates.put(foreign_CurrencySelector.getCurrency(), foreignAmount.getRate());
+
+					if (changeListener != null) {
+						changeListener.userChangedData();
+					}
 				}
 
 				if (event.getType() == EntryEvent.Type.ACTIVATE) {
@@ -194,6 +208,10 @@ public class ForeignAmountEntryBox extends HBox
 				 * No need to set faceValue - after all, changing the home value
 				 * manually only imacts the effective exchange rate.
 				 */
+
+				if (changeListener != null) {
+					changeListener.userChangedData();
+				}
 			}
 		});
 
@@ -258,5 +276,13 @@ public class ForeignAmountEntryBox extends HBox
 		homeValue_AmountEntry.setAmount(foreignAmount);
 
 		grayOut();
+	}
+
+	public void addListener(ChangeListener listener) {
+		if (changeListener != null) {
+			throw new IllegalStateException(
+				"You can't have more than one ChangeListener on a ForeignAmountEntryBox");
+		}
+		changeListener = listener;
 	}
 }
