@@ -7,6 +7,7 @@
 package accounts.ui;
 
 import generic.ui.Align;
+import generic.ui.ChangeListener;
 import generic.ui.ModalDialog;
 import generic.ui.TextEntry;
 import generic.ui.TwoColumnTable;
@@ -29,8 +30,10 @@ import org.gnu.gtk.event.ButtonListener;
 import accounts.domain.Amount;
 import accounts.domain.Books;
 import accounts.domain.Credit;
+import accounts.domain.CreditPositiveLedger;
 import accounts.domain.Currency;
 import accounts.domain.Debit;
+import accounts.domain.DebitPositiveLedger;
 import accounts.domain.Entry;
 import accounts.domain.ForeignAmount;
 import accounts.domain.GenericTransaction;
@@ -54,20 +57,31 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 	/**
 	 * The transaction object we are building up or editing.
 	 */
-	private GenericTransaction	t					= null;
+	private GenericTransaction		t					= null;
 
 	/*
 	 * UI elements
 	 */
 
-	private DatePicker			dP					= null;
-	private VBox				eB					= null;
-	private TextEntry			dE					= null;
+	private DatePicker				dP					= null;
+	private VBox					eB					= null;
+	private TextEntry				dE					= null;
 
-	private SizeGroup			accountSizeGroup	= null;
-	private SizeGroup			amountSizeGroup		= null;
-	private SizeGroup			flopSizeGroup		= null;
-	private SizeGroup			addRemoveSizeGroup	= null;
+	private SizeGroup				accountSizeGroup	= null;
+	private SizeGroup				amountSizeGroup		= null;
+	private SizeGroup				leftSizeGroup		= null;
+	private SizeGroup				rightSizeGroup		= null;
+	private SizeGroup				flopSizeGroup		= null;
+	private SizeGroup				addRemoveSizeGroup	= null;
+
+	/*
+	 * We already have all the logic for adding up Debits and Credits in Ledger.
+	 * So use one to calculate the sum of each column.
+	 */
+	private DebitPositiveLedger		debitPos;
+	private CreditPositiveLedger	creditPos;
+	private AmountDisplay			debitBalance		= null;
+	private AmountDisplay			creditBalance		= null;
 
 	/**
 	 * Instantiate a new GenericTransaction so the user can start filling it in.
@@ -127,8 +141,17 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 		accountSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
 		amountSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
+		leftSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
+		rightSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
 		flopSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
 		addRemoveSizeGroup = new SizeGroup(SizeGroupMode.HORIZONTAL);
+
+		/*
+		 * Now setup the UI for displaying the Entries.
+		 */
+
+		debitPos = new DebitPositiveLedger();
+		creditPos = new CreditPositiveLedger();
 
 		{
 			HBox headings;
@@ -140,17 +163,24 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			Label faL = new Label("Amount");
 			faL.setAlignment(0.0, 0.5);
 
-			Label sideL = new Label(" Debits  Credits ");
+			Label drL = new Label("Debits");
+			Label crL = new Label("Credits ");
+			HBox flopBox = new HBox(false, 0);
+			flopBox.packStart(drL, false, false, 0);
+			flopBox.packStart(crL, false, false, 0);
+
 			Label bL = new Label("");
 
 			accountSizeGroup.addWidget(aL);
 			amountSizeGroup.addWidget(faL);
-			flopSizeGroup.addWidget(sideL);
-			;
+			leftSizeGroup.addWidget(drL);
+			rightSizeGroup.addWidget(crL);
+			flopSizeGroup.addWidget(flopBox);
+
 			addRemoveSizeGroup.addWidget(bL);
 			headings.packStart(aL, true, true, 0);
 			headings.packStart(faL, false, false, 0);
-			headings.packStart(sideL, false, false, 0);
+			headings.packStart(flopBox, false, false, 0);
 			headings.packStart(bL, false, false, 0);
 
 			top.packStart(headings, false, false, 0);
@@ -165,7 +195,6 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 					addRow(e);
 				}
 
-				eI = t.getEntries().iterator();
 				/*
 				 * Somewhat unusually, we remove the Entris from the Transaction
 				 * as we add them to this EditorWindow This allows us to rebuild
@@ -197,15 +226,24 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			addButton.addListener(new ButtonListener() {
 				public void buttonEvent(ButtonEvent event) {
 					if (event.getType() == ButtonEvent.Type.CLICK) {
-						addRow(new Debit());
+						addRow(new Debit(new Amount("0"), null));
 						eB.showAll();
 					}
 				}
 			});
-
-			tailings.packEnd(addButton, false, false, 0);
-			eB.packEnd(tailings, true, false, 0);
 			addRemoveSizeGroup.addWidget(addButton);
+			tailings.packEnd(addButton, false, false, 0);
+
+			debitBalance = new AmountDisplay();
+			creditBalance = new AmountDisplay();
+			debitBalance.setAmount(debitPos.getBalance());
+			creditBalance.setAmount(creditPos.getBalance());
+			tailings.packEnd(creditBalance, false, false, 0);
+			tailings.packEnd(debitBalance, false, false, 0);
+			leftSizeGroup.addWidget(debitBalance);
+			rightSizeGroup.addWidget(creditBalance);
+
+			eB.packEnd(tailings, true, false, 0);
 		}
 	}
 
@@ -241,7 +279,6 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		 */
 
 		private AccountPicker			accountPicker	= null;
-		// private AmountEntry amountEntry = null;
 		private ForeignAmountEntryBox	amountEntry		= null;
 		private Button					flopButton		= null;
 		private HBox					flopBox			= null;
@@ -259,13 +296,22 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			this.original = e;
 			this.state = e;
 
+			/*
+			 * Setup the state tracking references and add the Entry to the
+			 * appropriate balance tracker.
+			 */
+
 			if (state instanceof Debit) {
 				alternate = new Credit();
+				debitPos.addEntry(e);
 			} else if (state instanceof Credit) {
 				alternate = new Debit();
+				creditPos.addEntry(e);
 			} else {
 				throw new IllegalArgumentException("Supplied Entry must be Debit or Credit");
 			}
+			alternate.setParentLedger(e.getParentLedger());
+
 			box = this;
 
 			accountPicker = new AccountPicker(store);
@@ -278,6 +324,19 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			accountSizeGroup.addWidget(accountPicker);
 
 			amountEntry = new ForeignAmountEntryBox(store);
+			amountEntry.addListener(new ChangeListener() {
+				public void userChangedData() {
+					state.setAmount(amountEntry.getForeignAmount());
+					if (state instanceof Debit) {
+						debitPos.updateEntry(state);
+						debitBalance.setAmount(debitPos.getBalance());
+					} else if (state instanceof Credit) {
+						creditPos.updateEntry(state);
+						creditBalance.setAmount(creditPos.getBalance());
+					}
+
+				}
+			});
 
 			Amount a = e.getAmount();
 			if (a instanceof ForeignAmount) {
@@ -291,15 +350,15 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 			box.packStart(amountEntry, false, false, 0);
 			amountSizeGroup.addWidget(amountEntry);
 
+			sideLabel = new Label("");
+			flopBox = new HBox(false, 0);
+			flopBox.add(sideLabel);
+
 			flopButton = new Button();
 			flopButton.setRelief(ReliefStyle.NONE);
-
-			flopBox = new HBox(false, 0);
 			flopButton.add(flopBox);
+
 			box.packStart(flopButton, false, false, 3);
-
-			sideLabel = new Label("");
-
 			flopSizeGroup.addWidget(flopButton);
 
 			flipFlop();
@@ -308,13 +367,30 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 				public void buttonEvent(ButtonEvent event) {
 					if (event.getType() == ButtonEvent.Type.CLICK) {
 
+						if (state instanceof Debit) {
+							debitPos.removeEntry(state);
+						} else if (state instanceof Credit) {
+							creditPos.removeEntry(state);
+						}
+
 						if (state == original) {
 							state = alternate;
+							state.setAmount(original.getAmount());
 						} else {
 							state = original;
+							state.setAmount(alternate.getAmount());
 						}
 
 						flipFlop();
+
+						if (state instanceof Debit) {
+							debitPos.addEntry(state);
+						} else if (state instanceof Credit) {
+							creditPos.addEntry(state);
+						}
+
+						debitBalance.setAmount(debitPos.getBalance());
+						creditBalance.setAmount(creditPos.getBalance());
 					}
 				}
 			});
@@ -324,6 +400,15 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 				public void buttonEvent(ButtonEvent event) {
 					if (event.getType() == ButtonEvent.Type.CLICK) {
 						eB.remove(box);
+
+						if (state instanceof Debit) {
+							debitPos.removeEntry(state);
+						} else if (state instanceof Credit) {
+							creditPos.removeEntry(state);
+						}
+
+						debitBalance.setAmount(debitPos.getBalance());
+						creditBalance.setAmount(creditPos.getBalance());
 					}
 				}
 			});
@@ -354,7 +439,6 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		 * @return the (possibly new) Entry.
 		 */
 		Entry getEntry() {
-			state.setAmount(amountEntry.getForeignAmount());
 			state.setParentLedger(accountPicker.getLedger());
 
 			return state;
@@ -374,7 +458,32 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		for (int i = 0; i < children.length; i++) {
 			if (children[i] instanceof EntryRow) {
 				EntryRow row = (EntryRow) children[i];
-				t.addEntry(row.getEntry());
+				Entry e = row.getEntry();
+
+				if (e.getAmount().getNumber() == 0) {
+					ModalDialog dialog = new ModalDialog(window, "Amount blank",
+						"It doesn't make much sense for there to be an Entry in a Transaction with a 0.00 Amount. "
+							+ "Either set the Entry to the appropriate value, or remove the Entry.",
+						MessageType.WARNING);
+					dialog.run();
+					t.getEntries().clear();
+					row.amountEntry.grabFocus();
+					return;
+				}
+
+				if (e.getParentLedger() == null) {
+					ModalDialog dialog = new ModalDialog(
+						window,
+						"Account not set",
+						"You need to pick the Account and Ledger to which each Entry in the Transaction belongs.",
+						MessageType.WARNING);
+					dialog.run();
+					t.getEntries().clear();
+					row.accountPicker.grabFocus();
+					return;
+				}
+
+				t.addEntry(e);
 			}
 		}
 
