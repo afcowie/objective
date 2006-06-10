@@ -67,6 +67,14 @@ public abstract class TransactionEditorWindow extends EditorWindow
 			 */
 		} else {
 			transaction = (Transaction) store.fetchByID(id);
+			store.reload(transaction);
+
+//			List lL = store.queryByExample(Ledger.class);
+//			Ledger[] ledgers = (Ledger[]) lL.toArray(new Ledger[lL.size()]);
+//			for (int i = 0; i < ledgers.length ; i++) {
+//				store.reload(ledgers[i]);
+//			}
+
 			setTitle(transaction.getDescription());
 			editing = true;
 		}

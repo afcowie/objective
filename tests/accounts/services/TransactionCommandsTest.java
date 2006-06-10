@@ -352,8 +352,57 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
 		assertEquals("Revenue Blah", secondParent.getName());
 
 		assertFalse(iter.hasNext());
-
 		Engine.releaseClient(another);
+
+		/*
+		 * Third variation: remove all the Transaction's entries, then add one
+		 * back, and a new one aside.
+		 */
+
+		t.getEntries().clear();
+		t.addEntry(expense);
+
+		Debit antiPrice = new Debit();
+		antiPrice.setParentLedger(price.getParentLedger());
+		antiPrice.setAmount(new Amount("-" + price.getAmount().getValue()));
+		t.addEntry(antiPrice);
+
+		utc = new UpdateTransactionCommand(t);
+		utc.execute(rw);
+
+		rw.commit();
+
+		/*
+		 * And now the same series of checks: one Transaction, two Entries, both
+		 * Debit now.
+		 */
+		another = Engine.gainClient();
+		result = another.queryByExample(Transaction.class);
+		assertEquals(1, result.size());
+
+		at = (Transaction) result.get(0);
+		entries = at.getEntries();
+		assertEquals(2, entries.size());
+		iter = entries.iterator();
+		boolean f1 = false;
+		boolean f2 = false;
+		while (iter.hasNext()) {
+			Entry ref = (Entry) iter.next();
+			assertTrue(ref instanceof Debit);
+			Ledger parent = ref.getParentLedger();
+			assertNotNull(parent);
+			if (ref.getAmount().getNumber() == 220000) {
+				assertTrue(!f1);
+				assertTrue(parent instanceof CreditPositiveLedger);
+				assertEquals("Revenue Blah", secondParent.getName());
+				f1 = true;
+			} else if (ref.getAmount().getNumber() == -220000) {
+				assertTrue(!f2);
+				assertTrue(firstParent instanceof DebitPositiveLedger);
+				assertEquals("Petty Cash", firstParent.getName());
+				f2 = true;
+			}
+		}
 
 		last = true;
 	}

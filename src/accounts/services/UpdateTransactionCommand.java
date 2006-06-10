@@ -10,8 +10,8 @@ import generic.persistence.DataClient;
 import generic.persistence.Selector;
 import generic.util.Debug;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -61,85 +61,69 @@ public class UpdateTransactionCommand extends TransactionCommand
 		}
 
 		/*
-		 * We do a native query to pull up the committed list of stored Entries
-		 * as presently committed under this Transaction object. We then can
-		 * test each Entry see if it's present in the live entries Set and act
-		 * accordingly.
+		 * Get the entries who claim this Transaction is their parent. Some will
+		 * actually still be in the Transaction, and some will have faded into
+		 * the sunset.
 		 */
-
-		Set liveEntries = transaction.getEntries();
-		List missingEntries = new ArrayList();
-		List changedLedgers = new ArrayList();
-
-		class EntryContainsTransaction extends Selector
-		{
-			private long	targetId;
-
-			EntryContainsTransaction(Transaction t) {
-				this.targetId = t.getID();
-			}
-
+		List storedEntries = store.nativeQuery(new Selector(transaction) {
 			public boolean match(Entry entry) {
 				Transaction parent = entry.getParentTransaction();
 
-				if (parent.getID() == targetId) {
+				if (parent.congruent(target)) {
 					return true;
 				}
 				return false;
 			}
-		}
-		List storedEntries = store.nativeQuery(new EntryContainsTransaction(transaction));
+		});
 
-		Iterator iter = storedEntries.iterator();
-		while (iter.hasNext()) {
-			Entry ref = (Entry) iter.next();
+		/*
+		 * For each one, we query for the Ledger currently containing it. If one
+		 * is found (as should be for any pre-existing objects) so, we remove it
+		 * from that Ledger. We do it this way because the parentLedger field
+		 * may have been changed.
+		 */
 
-			/*
-			 * Remove the Entry from the parent Ledger to reduce it's balance,
-			 * and if it's "missing" from the current Set, delete the Entry.
-			 */
+		Set affectedLedgers = new LinkedHashSet();
 
-			class LedgerContainingEntry extends Selector
-			{
-				private Entry	target;
+		Iterator cI = storedEntries.iterator();
+		while (cI.hasNext()) {
+			Entry c = (Entry) cI.next();
 
-				LedgerContainingEntry(Entry e) {
-					this.target = e;
+			Ledger ledgerContainingEntry = null;
+
+			List ledgers = store.queryByExample(Ledger.class);
+			Iterator lI = ledgers.iterator();
+			while (lI.hasNext()) {
+				Ledger l = (Ledger) lI.next();
+				Set eS = l.getEntries();
+				if (eS == null) {
+					continue;
 				}
-
-				public boolean match(Ledger ledger) {
-					Set entries = ledger.getEntries();
-					Iterator iter = entries.iterator();
-					while (iter.hasNext()) {
-						Entry entry = (Entry) iter.next();
-						if (entry.congruent(target)) {
-							return true;
-						}
-					}
-					return false;
+				if (eS.contains(c)) {
+					ledgerContainingEntry = l;
+					break;
 				}
 			}
 
-			List ledgerContainingEntry = store.nativeQuery(new LedgerContainingEntry(ref));
+			if (ledgerContainingEntry != null) {
+				Entry committed = (Entry) store.peek(c);
+				Debug.print("debug", "Removing " + committed.toString() + " from Ledger \""
+					+ ledgerContainingEntry.getName() + "\"");
 
-			if (ledgerContainingEntry.size() != 1) {
-				throw new CommandNotReadyException("Querying for the Ledger containing " + ref
-					+ " returned " + ledgerContainingEntry.size() + " Entries");
-			}
+				long revised = c.getAmount().getNumber();
+				c.getAmount().setValue(committed.getAmount());
+				ledgerContainingEntry.removeEntry(c);
+				c.getAmount().setNumber(revised);
 
-			Entry committed = (Entry) store.peek(ref);
-			Debug.print("debug", "Removing " + committed.toString() + " from Ledger \""
-				+ ((Ledger) ledgerContainingEntry.get(0)).getName() + "\"");
-
-			Ledger ledger = (Ledger) ledgerContainingEntry.get(0);
-			ledger.removeEntry(ref);
-
-			if (liveEntries.contains(ref)) {
-				// persisted below
+				affectedLedgers.add(ledgerContainingEntry);
 			} else {
-				missingEntries.add(ref);
+				/*
+				 * Huh? How can there be a committed Entry without its
+				 * parentLedger viable?
+				 */
+				throw new IllegalStateException(
+					"Huh? How can there be a committed Entry that doesn't belong to a Ledger?");
 			}
-			store.save(ledger);
 		}
 
 		/*
@@ -149,26 +133,53 @@ public class UpdateTransactionCommand extends TransactionCommand
 		 * ones.
 		 */
 
+		Set liveEntries = transaction.getEntries();
+
 		Iterator eI = liveEntries.iterator();
 		while (eI.hasNext()) {
 			Entry e = (Entry) eI.next();
-			Debug.print("debug", "Adding " + e.toString() + " to Ledger \""
-				+ e.getParentLedger().getName() + "\"");
-			e.getParentLedger().addEntry(e);
-			store.save(e);
-			store.save(e.getParentLedger());
+			Ledger l = e.getParentLedger();
+
+			Debug.print("debug", "Adding " + e.toString() + " to Ledger \"" + l.getName() + "\"");
+			l.addEntry(e);
+
+			affectedLedgers.add(l);
 		}
 
+		/*
+		 * And now persist the objects: the Transaction, its Entries, and all
+		 * the Ledgers affected.
+		 */
 		store.save(transaction);
+
+		eI = liveEntries.iterator();
+		while (eI.hasNext()) {
+			Entry e = (Entry) eI.next();
+			store.save(e);
+		}
+
+		Iterator alI = affectedLedgers.iterator();
+		while (alI.hasNext()) {
+			Ledger al = (Ledger) alI.next();
+			store.save(al);
+		}
 
 		/*
 		 * With that taken care of, we now clean up our mess by deleting the
-		 * Entries which are no longer in use.
+		 * Entries which are no longer in use. We do this by fetching up Entries
+		 * that have this Transaction marked as their parent, then deleting any
+		 * which are not in the live Transaction's entries Set.
 		 */
-		Iterator mI = missingEntries.iterator();
-		while (mI.hasNext()) {
-			Entry m = (Entry) mI.next();
-			store.delete(m);
+
+		cI = storedEntries.iterator();
+		while (cI.hasNext()) {
+			Entry c = (Entry) cI.next();
+			if (!(liveEntries.contains(c))) {
+
+				Debug.print("debug", "Deleting " + c.toString());
+				store.delete(c);
+				// FIXME and delete Amount?
+			}
 		}
 	}
 

@@ -54,7 +54,7 @@ public abstract class DomainObject
 			 * activated:
 			 */
 			if ((this.databaseId == 0) || (x.databaseId == 0)) {
-				throw new NotActivatedException();
+				return false;
 			}
 			/*
 			 * Now evaluate the objects:
@@ -65,7 +65,7 @@ public abstract class DomainObject
 				return false;
 			}
 		}
-		throw new IllegalArgumentException("obj is not a DomainObject");
+		return false;
 	}
 
 	/**
