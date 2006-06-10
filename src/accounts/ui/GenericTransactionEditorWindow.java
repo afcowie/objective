@@ -83,6 +83,8 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 	private AmountDisplay			debitBalance		= null;
 	private AmountDisplay			creditBalance		= null;
 
+	private Button					addButton;
+
 	/**
 	 * Instantiate a new GenericTransaction so the user can start filling it in.
 	 */
@@ -231,7 +233,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 			tailings = new HBox(false, 3);
 
-			Button addButton = new Button(GtkStockItem.ADD);
+			addButton = new Button(GtkStockItem.ADD);
 			addButton.addListener(new ButtonListener() {
 				public void buttonEvent(ButtonEvent event) {
 					if (event.getType() == ButtonEvent.Type.CLICK) {
@@ -500,6 +502,18 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 				t.addEntry(e);
 			}
+		}
+
+		if (t.getEntries().size() == 0) {
+			ModalDialog dialog = new ModalDialog(
+				window,
+				"No Entries!",
+				"The whole point of a GenericTransaction is to let you enter Debits and Credits manually. "
+					+ "You must have at least two, and the net Debit and net Credit balance must be equal.",
+				MessageType.WARNING);
+			dialog.run();
+			addButton.grabFocus();
+			return;
 		}
 
 		/*
