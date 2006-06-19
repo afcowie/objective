@@ -22,11 +22,10 @@ import org.gnu.gtk.DataColumn;
 import org.gnu.gtk.DataColumnObject;
 import org.gnu.gtk.DataColumnString;
 import org.gnu.gtk.Entry;
-import org.gnu.gtk.GtkStockItem;
+import org.gnu.gtk.EventBox;
 import org.gnu.gtk.HBox;
-import org.gnu.gtk.IconSize;
-import org.gnu.gtk.Image;
 import org.gnu.gtk.ListStore;
+import org.gnu.gtk.ReliefStyle;
 import org.gnu.gtk.SelectionMode;
 import org.gnu.gtk.StatusBar;
 import org.gnu.gtk.TreeIter;
@@ -60,50 +59,39 @@ import accounts.domain.Ledger;
  */
 public class AccountPicker extends HBox
 {
-	private Account				selectedAccount	= null;
-	private Ledger				selectedLedger	= null;
+	private Account					selectedAccount	= null;
+	private Ledger					selectedLedger	= null;
 
-	// private static Account lastSelectedAccount;
-	// private static Ledger lastSelectedLedger;
-	//
-	// static {
-	// lastSelectedAccount = null;
-	// lastSelectedLedger = null;
-	// }
+	private AccountLedgerDisplay	display			= null;
+	private Button					wide			= null;
+	private AccountPickerPopup		popup			= null;
+	private EventBox				backing			= null;
 
-	private SearchEntry			entry			= null;
-	private Button				pick			= null;
-	private AccountPickerPopup	popup			= null;
-
-	private DataClient			db;
+	private DataClient				db;
 
 	public AccountPicker(DataClient store) {
 		super(false, 3);
 
 		db = store;
 
-		// selectedAccount = lastSelectedAccount;
-		// selectedLedger = lastSelectedLedger;
+		display = new AccountLedgerDisplay();
+		display.setMinimumSize(240, -1);
 
-		entry = new SearchEntry();
-		entry.setWidth(20);
+		/*
+		 * This box is a spacer so that the EventBox is as wide as the widget up
+		 * to but not including the pick button.
+		 */
 
-		pick = new Button();
-		Image icon = new Image(GtkStockItem.JUSTIFY_RIGHT, IconSize.BUTTON);
-		// Label label = new Label("Pick", false);
-		// HBox box = new HBox(false, 1);
-		//
-		// box.packStart(icon, false, false, 0);
-		// box.packStart(label, false, false, 0);
-		// _pick.add(box);
-		pick.add(icon);
+		wide = new Button();
+		wide.add(display);
+		wide.setRelief(ReliefStyle.NORMAL);
 
-		packStart(entry, true, true, 0);
-		packStart(pick, false, false, 0);
+		backing = new EventBox();
+		backing.add(wide);
 
 		popup = new AccountPickerPopup("accountpicker", "share/AccountPickerPopup.glade");
 
-		pick.addListener(new ButtonListener() {
+		wide.addListener(new ButtonListener() {
 			public void buttonEvent(ButtonEvent event) {
 				if (event.getType() == ButtonEvent.Type.CLICK) {
 					popup.present();
@@ -111,25 +99,7 @@ public class AccountPicker extends HBox
 			}
 		});
 
-		entry.setChangeListener(new EntryListener() {
-			public void entryEvent(EntryEvent event) {
-				Debug.print("listeners", "AccountPicker entry EntryEvent " + event.getType().getName());
-				if ((event.getType() == EntryEvent.Type.CHANGED)
-					|| (event.getType() == EntryEvent.Type.ACTIVATE)) {
-					/*
-					 * If we don't have a selected account, then the keystroke
-					 * or paste or whatever is the seed for the search filter.
-					 */
-					if (selectedAccount == null) {
-						popup.setSearch(entry.getText());
-					}
-
-					popup.present();
-
-					entry.clearText();
-				}
-			}
-		});
+		this.packStart(backing, true, true, 0);
 	}
 
 	/**
@@ -379,7 +349,7 @@ public class AccountPicker extends HBox
 				public boolean keyEvent(KeyEvent event) {
 					int key = event.getKeyval();
 					if (key == KeyValue.Escape) {
-						if ((selectedAccount == null) || (entry.getText().equals(""))) {
+						if (selectedAccount == null) {
 							clearEntry();
 						}
 						window.hide();
@@ -489,12 +459,8 @@ public class AccountPicker extends HBox
 		 * the parent as well.
 		 */
 		protected void hideHook() {
-			/*
-			 * So annoying. You'd think you should be able to cast from Widget
-			 * to Window here, but it blows ClassCastException.
-			 */
-			Window top = (Window) entry.getToplevel();
-			top.present();
+			Window parentTop = (Window) wide.getToplevel();
+			parentTop.present();
 		}
 
 		/**
@@ -521,7 +487,6 @@ public class AccountPicker extends HBox
 		}
 
 		private void clearEntry() {
-			entry.clearText();
 			selectedAccount = null;
 			selectedLedger = null;
 		}
@@ -540,7 +505,7 @@ public class AccountPicker extends HBox
 		 */
 
 		public void present() {
-			org.gnu.gdk.Window gdkWindow = entry.getWindow();
+			org.gnu.gdk.Window gdkWindow = backing.getWindow();
 
 			int x = gdkWindow.getOrigin().getX();
 			int y = gdkWindow.getOrigin().getY(); // + gdkWindow.getHeight();
@@ -549,6 +514,7 @@ public class AccountPicker extends HBox
 
 			super.present();
 			search.grabFocus();
+			refilter();
 		}
 
 	}
@@ -661,8 +627,7 @@ public class AccountPicker extends HBox
 	 */
 	private void setEntryText() {
 		if ((selectedAccount != null) && (selectedLedger != null)) {
-			String str = selectedAccount.getTitle() + " \u00bb " + selectedLedger.getName();
-			entry.setText(str);
+			display.setLedger(selectedLedger);
 		}
 	}
 
@@ -671,6 +636,6 @@ public class AccountPicker extends HBox
 	 */
 
 	public void grabFocus() {
-		entry.grabFocus();
+		wide.grabFocus();
 	}
 }
