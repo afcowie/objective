@@ -156,6 +156,7 @@ public class Debug
 	 *            the debug group to be activated
 	 */
 	public static void activate(String group) {
+		debugOn = true;
 		activeGroups.add(group);
 	}
 
