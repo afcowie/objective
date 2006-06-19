@@ -81,7 +81,7 @@ public class RangeCalculator
 	public float calculateMonths() {
 		checkReady();
 		int days = calculateDays();
-		float months = days / (365 / 12);
+		float months = days / (365f / 12f);
 		return months;
 	}
 
@@ -89,7 +89,7 @@ public class RangeCalculator
 		checkReady();
 		int days = calculateDays();
 
-		float weeks = days / (365 / 52);
+		float weeks = days / (365f / 52f);
 		return weeks;
 	}
 

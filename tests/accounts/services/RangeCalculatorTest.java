@@ -65,7 +65,7 @@ public class RangeCalculatorTest extends TestCase
 		assertEquals(52.0, calc.calculateWeeks(), 0.001);
 
 		second.setDate("28 Jan 03");
-		assertEquals(4.0, calc.calculateWeeks(), 0.001);
+		assertEquals(4.0, calc.calculateWeeks(), 0.1);
 	}
 
 	public final void testCalculateMonths() {
@@ -73,10 +73,20 @@ public class RangeCalculatorTest extends TestCase
 		Datestamp omega = new Datestamp("31 Dec 05");
 
 		RangeCalculator calc = new RangeCalculator(alpha, omega);
-		assertEquals(6.0, calc.calculateMonths(), 0.001);
+		assertEquals(6.0, calc.calculateMonths(), 0.1);
 
 		Datestamp one = new Datestamp("31 Jul 05");
 		calc.setEndDate(one);
-		assertEquals(1.0, calc.calculateMonths(), 0.001);
+		assertEquals(1.0, calc.calculateMonths(), 0.1);
+	}
+
+	public final void testCalculateSingleDay() {
+		Datestamp une = new Datestamp("19 Jun 06");
+		Datestamp deux = new Datestamp("19 Jun 06");
+
+		RangeCalculator calc = new RangeCalculator(une, deux);
+		assertEquals(1, calc.calculateDays());
+		assertEquals(0.142857, calc.calculateWeeks(), 0.01);
+		assertEquals(0.032876, calc.calculateMonths(), 0.01);
 	}
 }
