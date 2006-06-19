@@ -163,11 +163,11 @@ public class EntryTextOutput extends TextOutput
 			}
 
 			if (e instanceof Debit) {
-				out.print(pad(e.toString(), amountWidth, RIGHT));
+				out.print(pad(e.getAmount().toString() + " DR", amountWidth, RIGHT));
 				out.print(pad("", amountWidth, RIGHT));
 			} else if (e instanceof Credit) {
 				out.print(pad("", amountWidth, RIGHT));
-				out.print(pad(e.toString(), amountWidth, RIGHT));
+				out.print(pad(e.getAmount().toString() + " CR", amountWidth, RIGHT));
 			}
 			out.println();
 		}

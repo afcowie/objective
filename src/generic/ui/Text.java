@@ -73,9 +73,9 @@ public abstract class Text
 	 * If argument is longer than width, then trim it back and add three dots.
 	 */
 	public static String chomp(String str, int width) {
-		if (width < 4) {
+		if (width < 2) { // 4
 			throw new IllegalArgumentException(
-				"Can't chomp to less than a width of 4 because of adding three dots as an elipses");
+				"Can't chomp to less than a width of 2 because of adding elipses");
 		}
 		if (str == null) {
 			return "";
@@ -85,12 +85,13 @@ public abstract class Text
 		 */
 		int len = str.length();
 		if (len > width) {
-			StringBuffer buf = new StringBuffer(str.substring(0, width - 3));
+			StringBuffer buf = new StringBuffer(str.substring(0, width - 1)); // 3
 			final int end = buf.length() - 1;
 			if (buf.charAt(end) == ' ') {
 				buf.deleteCharAt(end);
 			}
-			buf.append("...");
+			// We now use an ellipsis, … instead of "..."
+			buf.append("\u2026");
 			return buf.toString();
 		} else {
 			return str;
