@@ -18,9 +18,9 @@ import java.util.Set;
  * are balanced double-entry accounting events. That also means that, per GAAP,
  * they have to have a source document somewhere.
  * <p>
- * We override {@link #equals()} so this can't be naturally used in TreeSets,
- * which is fine; see {@link accounts.services.TransactionComparator} if you
- * need a SortedSet of Transactions.
+ * We override {@link #equals(Object)} so this can't be naturally used in
+ * TreeSets, which is fine; see {@link accounts.services.TransactionComparator}
+ * if you need a SortedSet of Transactions.
  * 
  * @author Andrew Cowie
  */
@@ -42,6 +42,7 @@ public class Transaction extends DomainObject implements Normal
 	/*
 	 * Constructors ---------------------------------------
 	 */
+
 	public Transaction() {
 		/*
 		 * Default constructor to permit generic top level searches. We don't

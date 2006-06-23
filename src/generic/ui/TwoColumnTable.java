@@ -62,8 +62,8 @@ public class TwoColumnTable extends Table
 	 *            the Widget to add to the Table.
 	 * @param side
 	 *            which side of the Table widget should go on. Use the public
-	 *            constants {@link Align.LEFT} and {@link Align.RIGHT}, or
-	 *            {@link Align.CENTER} to indicate you want it to span both
+	 *            constants {@link Align#LEFT} and {@link Align#RIGHT}, or
+	 *            {@link Align#CENTER} to indicate you want it to span both
 	 *            columns.
 	 */
 	public void attach(Widget widget, Align side) {

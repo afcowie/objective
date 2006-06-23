@@ -36,10 +36,16 @@ public class Account implements Normal
 	 * Constructors ---------------------------------------
 	 */
 
+	/**
+	 * [For creating search prototypes]
+	 */
 	public Account() {
-		// only for creating search prototypes
+		//
 	}
 
+	/**
+	 * [For creating search prototypes]
+	 */
 	public Account(String title) {
 		setTitle(title);
 	}

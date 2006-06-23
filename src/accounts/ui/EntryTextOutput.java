@@ -45,8 +45,9 @@ public class EntryTextOutput extends TextOutput
 		// less one to keep off the edge
 		int remaining = COLUMNS - dateWidth - (2 * amountWidth) - 1;
 		if (remaining < FLEX_MIN) {
-			throw new IllegalStateException("Terminal too narrow for EntryTextOutput. Need width of at least "
-				+ (dateWidth + FLEX_MIN + (2 * amountWidth)) + " characters.");
+			throw new IllegalStateException(
+				"Terminal too narrow for EntryTextOutput. Need width of at least "
+					+ (dateWidth + FLEX_MIN + (2 * amountWidth)) + " characters.");
 		}
 		int piece = remaining / 4;
 		idWidth = piece;
@@ -73,9 +74,10 @@ public class EntryTextOutput extends TextOutput
 	}
 
 	/**
-	 * @param entries
-	 *            the Set of transactions to be output. It will be sorted by a
-	 *            new TreeSet during instantiation.
+	 * ... in Transaction context
+	 * 
+	 * @param t
+	 *            the Transactions whose Entries you are outputting.
 	 */
 	public EntryTextOutput(Transaction t) {
 		this.entries = new TreeSet(new EntryComparator(t));
@@ -86,7 +88,7 @@ public class EntryTextOutput extends TextOutput
 	/**
 	 * ... in Ledger context
 	 * 
-	 * @param ledger
+	 * @param l
 	 *            the Ledger whose Entries you are outputting.
 	 */
 	public EntryTextOutput(Ledger l) {
@@ -156,8 +158,8 @@ public class EntryTextOutput extends TextOutput
 				out.print(pad(chomp(desc, descWidth), descWidth, LEFT));
 			} else if (context instanceof Transaction) {
 				// skip Account reference
-				out.print(pad(e.getParentLedger().getParentAccount().getTitle() + "|" + e.getParentLedger().getName(),
-					idWidth + descWidth, LEFT));
+				out.print(pad(e.getParentLedger().getParentAccount().getTitle() + "|"
+					+ e.getParentLedger().getName(), idWidth + descWidth, LEFT));
 			} else {
 				throw new IllegalStateException("context is not set to either Ledger or Transaction");
 			}

@@ -17,17 +17,18 @@ import org.gnu.gtk.Window;
 import org.gnu.gtk.WindowPosition;
 
 /**
- * A simple wrapper, as the MessageDialog class (which is supposedly a
- * convenience) is a pain to use. Also, historically, Dialog.setSecondaryText()
+ * A simple wrapper, as the {@link org.gnu.gtk.MessageDialog} class (which is
+ * supposedly a convenience) is a pain to use. Also, historically,
+ * {@link org.gnu.gtk.MessageDialog#setSecondaryText(String) setSecondaryText()}
  * was not available.
  * <p>
- * Instantiate the dialog then call run() to show &amp; block, or present() just
- * to show it. It will center on Screen.
+ * Instantiate the dialog then call {@link #run()} to show &amp; block, or
+ * {@link #present()} just to show it. It will center on the screen.
  * <p>
  * Example of use:
  * 
  * <pre>
- * ModalDialog error = new ModalDialog(&quot;File not found&quot;, e.getMessage() + &quot;\n&quot; + &quot;Try again?&quot;,
+ * ModalDialog error = new ModalDialog(window, &quot;File not found&quot;, e.getMessage() + &quot;\n&quot; + &quot;Try again?&quot;,
  * 	MessageType.WARNING);
  * error.run();
  * </pre>
@@ -54,9 +55,12 @@ public class ModalDialog
 	 *            Pango markup here if you wish.
 	 * @param type
 	 *            Will control the icon used, and the text of the dismiss
-	 *            button. The constants (current at GTK 2.8) are
-	 *            MessageType.{ERROR, WARNING, INFO, and QUESTION}. We don't do
-	 *            anything special with QUESTION for the time being.
+	 *            button. The constants available (current as at GTK 2.8) are
+	 *            MessageType.{{@link MessageType#ERROR ERROR},
+	 *            {@link MessageType#WARNING WARNING},
+	 *            {@link MessageType#INFO INFO}, and
+	 *            {@link MessageType#QUESTION QUESTION}}. We don't do anything
+	 *            special with QUESTION for the time being.
 	 */
 	public ModalDialog(Window parentWindow, String message, String subtext, MessageType type) {
 		ButtonsType buttons;

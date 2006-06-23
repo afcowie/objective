@@ -25,7 +25,7 @@ public class InitBooksCommand extends Command
 	/**
 	 * The home (native) currency to be set by this Command.
 	 * 
-	 * @see Books#homeCurrency
+	 * @see Books#getHomeCurrency()
 	 */
 	protected transient Currency	home;
 

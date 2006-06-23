@@ -78,6 +78,10 @@ public class Datestamp implements Comparable, Leaf
 		}
 	}
 
+	/**
+	 * Quickly assert whether or not this Datestamp object has been set to
+	 * something.
+	 */
 	public boolean isSet() {
 		if (timestamp == 0) {
 			throw new NotActivatedException();
@@ -99,7 +103,19 @@ public class Datestamp implements Comparable, Leaf
 		return sdf.format(new Date(timestamp));
 	}
 
+	/**
+	 * A convenience method to allow you to quickly set the datestamp based on
+	 * previously generated Calendar objet.
+	 * 
+	 * @param cal
+	 *            a Calendar object (perhaps the result of having done a
+	 *            selection with a Gtk{@link org.gnu.gtk.Calendar}) which is
+	 *            aligned on date boundary.
+	 */
 	public void setDate(Calendar cal) {
+		/*
+		 * TODO validate that the cal object is in fact date aligned.
+		 */
 		this.timestamp = cal.getTimeInMillis();
 	}
 
@@ -219,9 +235,9 @@ public class Datestamp implements Comparable, Leaf
 	 * Compare two Datestamp objects. [This method implements Comparable
 	 * interface]
 	 * 
-	 * @returns 1 if this one is greater (newer, more recent) than the argument
-	 *          x, -1 if this Datestmap is less than (older) than x, and 0 if
-	 *          they are the same.
+	 * @return 1 if this one is greater (newer, more recent) than the argument
+	 *         x, -1 if this Datestmap is less than (older) than x, and 0 if
+	 *         they are the same.
 	 */
 	public int compareTo(Object x) {
 		if (x == null) {

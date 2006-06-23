@@ -10,9 +10,10 @@ import generic.client.Master;
 
 /**
  * Denote a window as being one of the primary ones which a user interacts with.
- * These windows will be registered with generic.ui.Master and thus be available
- * to be shown in drop down Window menu lists, etc. More importantly, they will
- * all be hidden immediately and asked to delete on a call to Master.shutdown().
+ * These windows will be registered with {@link generic.client.Master} and thus
+ * be available to be shown in drop down Window menu lists, etc. More
+ * importantly, they will all be hidden immediately and asked to delete on a
+ * call to {@link generic.client.Master#shutdown() Master.shutdown()}.
  * 
  * @author Andrew Cowie
  */
@@ -43,8 +44,9 @@ public abstract class PrimaryWindow extends AbstractWindow
 	}
 
 	/**
-	 * Quietly expose hide() so that Master can silence them while shutting
-	 * down. You could just as easily access window's hide()
+	 * Quietly expose <code>hide()</code> so that Master can silence them
+	 * while shutting down. You could just as easily access
+	 * <code>window.hide()</code>
 	 */
 	protected void hide() {
 		window.hide();

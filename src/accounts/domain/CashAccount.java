@@ -19,15 +19,15 @@ public class CashAccount extends AssetAccount implements SingleLedger
 	 */
 	private DebitPositiveLedger	ledger	= null;
 
+	/**
+	 * [For creating search prototypes]
+	 */
 	public CashAccount() {
 		super();
 	}
 
 	/**
 	 * Create a new asset account with a single ledger.
-	 * 
-	 * @param code
-	 * @param title
 	 */
 	public CashAccount(String accountTitle, String ledgerName) {
 		super(accountTitle);

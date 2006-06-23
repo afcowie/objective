@@ -53,36 +53,60 @@ import accounts.domain.Ledger;
 import accounts.domain.Transaction;
 import accounts.services.EntryComparator;
 
+/**
+ * Summarize a List of {@link accounts.domain.Transaction}s in
+ * {@link org.gnu.gtk.TreeView ListView} form. For each one, display its tye,
+ * date, description and then for each {@link accounts.domain.Entry} within,
+ * display the {@link accounts.domain.Account} and
+ * {@link accounts.domain.Ledger} to which the Entry belongs and the
+ * {@link accounts.domain.ForeignAmount [Foreign]}{@link Amount} of each one,
+ * presenting it in foreign currency terms.
+ * <p>
+ * Selecting and activating a row will cause the UI to launch an
+ * {@linkplain TransactionEditorWindow editor window} suitable to modify the
+ * Transaction.
+ * 
+ * @author Andrew Cowie
+ */
 public class TransactionListView extends TreeView implements UpdateListener
 {
 	private transient Currency	home	= null;
 	private DataClient			db;
 
-	DataColumnString			typeMarkup_DataColumn;
-	DataColumnString			typeSort_DataColumn;
-	DataColumnString			dateText_DataColumn;
-	DataColumnLong				dateSort_DataColumn;
-	DataColumnString			descriptionAccountLedgerText_DataColumn;
-	DataColumnString			descriptionSort_DataColumn;
-	DataColumnString			debitAmountsText_DataColumn;
-	DataColumnLong				debitAmountsSort_DataColumn;
-	DataColumnString			creditAmountsText_DataColumn;
-	DataColumnLong				creditAmountsSort_DataColumn;
+	private DataColumnString	typeMarkup_DataColumn;
+	private DataColumnString	typeSort_DataColumn;
+	private DataColumnString	dateText_DataColumn;
+	private DataColumnLong		dateSort_DataColumn;
+	private DataColumnString	descriptionAccountLedgerText_DataColumn;
+	private DataColumnString	descriptionSort_DataColumn;
+	private DataColumnString	debitAmountsText_DataColumn;
+	private DataColumnLong		debitAmountsSort_DataColumn;
+	private DataColumnString	creditAmountsText_DataColumn;
+	private DataColumnLong		creditAmountsSort_DataColumn;
 	/**
 	 * The Transaction object that this row represents. This must be set before
 	 * calling {@link #populate(TreeIter)}
 	 */
-	DataColumnObject			transactionObject_DataColumn;
+	private DataColumnObject	transactionObject_DataColumn;
 	/**
 	 * Whether the row is to be rendered with bright colours. Set this as true
 	 * if the row is selected and you want it to show up in "reverse video",
 	 * otherwise use false for normal colouring.
 	 */
-	DataColumnBoolean			active_DataColumn;
-	ListStore					model;
+	private DataColumnBoolean	active_DataColumn;
+	private ListStore			model;
 
-	TreeView					view;
+	private TreeView			view;
 
+	/**
+	 * Instantiate a new widget to view a list of Transactions.
+	 * 
+	 * @param db
+	 *            an open DataClient from which the Transactions, Ledgers,
+	 *            parent Accounts, and Currency information are to be queried.
+	 * @param transactions
+	 *            the Transactions that you wish to display.
+	 */
 	public TransactionListView(DataClient db, List transactions) {
 		super();
 		this.db = db;

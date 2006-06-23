@@ -30,6 +30,9 @@ public class AmountDisplay extends HBox
 
 	private Label				amount_Label;
 
+	/**
+	 * Instantiate a new Label widget to display an Amount.
+	 */
 	public AmountDisplay() {
 		super(false, 0);
 

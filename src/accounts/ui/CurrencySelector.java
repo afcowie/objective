@@ -35,6 +35,10 @@ public class CurrencySelector extends ComboBox
 	private DataColumnObject	currencyObject_DataColumn;
 	private ListStore			listStore;
 
+	/**
+	 * Instantiate a new CurrencySelector, specifying an open {@link DataClient}
+	 * from which the list of Currencies will be pulled.
+	 */
 	public CurrencySelector(DataClient store) {
 		/*
 		 * ComboBox is tricky - there are two normal constructors, one for text

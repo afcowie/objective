@@ -55,6 +55,10 @@ public class DatePicker extends HBox
 
 	private ChangeListener		changeListener;
 
+	/**
+	 * Instantiate a new DatePicker widget. The date will be (a clone of) the last one selected 
+	 * by [another] DatePicker, or today if none has been previously used. 
+	 */
 	public DatePicker() {
 		super(false, 3);
 		date = (Datestamp) _lastSelectedDate.clone();
@@ -122,7 +126,7 @@ public class DatePicker extends HBox
 	{
 		private Calendar	calendar	= null;
 
-		public DatePickerPopup(String which, String filename) {
+		private DatePickerPopup(String which, String filename) {
 			super(which, filename);
 
 			calendar = (org.gnu.gtk.Calendar) gladeParser.getWidget("calendar");

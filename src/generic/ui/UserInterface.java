@@ -131,13 +131,8 @@ public abstract class UserInterface
 	 * object is a Currency object, then launching a UI to edit the list of
 	 * currencies would be appropriate.
 	 * 
-	 * @param db
-	 *            the DataClient which target resides in, used to look up the
-	 *            target objects database id.
 	 * @param target
 	 *            the object which determines what UI element is to be launched.
-	 *            target <i>must</i> be an object activated out of the db
-	 *            database connection.
 	 */
 	public void launchEditor(DomainObject target) {
 		EditorWindow ew;
@@ -207,7 +202,7 @@ public abstract class UserInterface
 	 * Showing as working:
 	 * <ul>
 	 * <li>sets the cursor (pointer) to a watch symbol over any showing
-	 * {@link PrimaryWindows}.
+	 * {@link PrimaryWindow}s.
 	 * </ul>
 	 * 
 	 * @param working

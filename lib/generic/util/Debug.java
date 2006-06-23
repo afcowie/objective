@@ -2,9 +2,10 @@
  * Debug.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2004 Operational Dynamics
+ * Copyright (c) 2004, 2006 Operational Dynamics
  */
 package generic.util;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -12,13 +13,13 @@ import java.util.TreeSet;
 
 /**
  * Debug control (as used by the xseq program). Debugging output is synchronous
- * on purpose. It is frighteningly difficult to debug mutlithreaded applications,
- * and even tougher to diagnose problems in antonomous event driven GUI
- * programs. The price paid, however, is that actually writing the output will
- * block the program, and worse, if the output is going to a terminal which is
- * slow to scroll (ie gnome-terminal), then having excessive logging (ie that
- * which results in deubg statements being printed from any tight loop) will
- * destructively slow your program down.
+ * on purpose. It is frighteningly difficult to debug mutlithreaded
+ * applications, and even tougher to diagnose problems in antonomous event
+ * driven GUI programs. The price paid, however, is that actually writing the
+ * output will block the program, and worse, if the output is going to a
+ * terminal which is slow to scroll (ie gnome-terminal), then having excessive
+ * logging (ie that which results in deubg statements being printed from any
+ * tight loop) will destructively slow your program down.
  * 
  * <P>
  * So having gone on about the downside, here's the upside. You can activate
@@ -63,8 +64,8 @@ public class Debug
 
 	/**
 	 * Parse the command line for a debug argument and initialize Debug
-	 * subsystem if found. This calls {@link init(String)}to actually parse the
-	 * value of the debug argument if one is found on the command line.
+	 * subsystem if found. This calls {@link #init(String)} to actually parse
+	 * the value of the debug argument if one is found on the command line.
 	 * 
 	 * <P>
 	 * Obviously there is a little duplication here, because without a doubt the
@@ -72,8 +73,8 @@ public class Debug
 	 * 
 	 * @param args
 	 *            The command line args [ie from main()]
-	 * @returns A new String[] containing the command line without the debug arg
-	 *          that was parsed by this method.
+	 * @return A new String[] containing the command line without the debug arg
+	 *         that was parsed by this method.
 	 */
 	public static String[] init(String[] args) {
 		ArrayList newargs = new ArrayList(args.length);
@@ -102,7 +103,7 @@ public class Debug
 	 * This method is called from the static initializer of the Debug class
 	 * [which picks up java property "debug" (which you can specify with a
 	 * -Ddebug= option to a Java VM)]. It is also called by the other
-	 * {@link Debug.init(String[])}constructor if you choose to use that to
+	 * {@link Debug#init(String[])} constructor if you choose to use that to
 	 * process the command line arguments. You can also call it explicitly on
 	 * your own.
 	 * 
@@ -165,7 +166,12 @@ public class Debug
 	 * 
 	 * @param group
 	 *            A string specifying the group this message belongs to. Make
-	 *            sure you {@link activate}it if you want to see it!
+	 *            sure you {@link #register(String)} the group first. Don't
+	 *            forget that if you want to see the message you must either
+	 *            have activated the group at run time with a command line
+	 *            argument like {@link #init(String) --debug=main,listeners} or
+	 *            turned the group on programmatically with
+	 *            {@link #activate(String)}!
 	 * @param msg
 	 *            The message to be output
 	 */
@@ -176,26 +182,29 @@ public class Debug
 				// no formatting information for it.
 				if (groupText.get(group) == null) {
 					System.out.println(progname
-							+ ": PROGRAMMER ERROR: Debug.print was called with unregistered group \""
-							+ group + "\", message \"" + msg + "\"");
+						+ ": PROGRAMMER ERROR: Debug.print was called with unregistered group \""
+						+ group + "\", message \"" + msg + "\"");
 				} else {
-					System.out.println(progname + ": [" + groupText.get(group)
-							+ "] " + groupSpaces.get(group) + msg);
+					System.out.println(progname + ": [" + groupText.get(group) + "] "
+						+ groupSpaces.get(group) + msg);
 				}
 			}
 		}
 	}
 
 	/**
-	 * @param type
-	 *            A string name for the group of debug messages to be activated
+	 * Tell the Debug subsystem that you want to use a given referent. This call
+	 * is here largely so that the label can be preprocessed and formatted so
+	 * that debug output has a fixed prefix length.
+	 * 
+	 * @param group
+	 *            the name of the group of debug messages to be activated
 	 */
 	public static void register(String group) {
 		int len = MAX_GROUP_LENGTH - group.length();
-		String truncatedGroupName = group.substring(0,
-				(MAX_GROUP_LENGTH > group.length()
-						? group.length()
-				: MAX_GROUP_LENGTH));
+		String truncatedGroupName = group.substring(0, (MAX_GROUP_LENGTH > group.length()
+			? group.length()
+			: MAX_GROUP_LENGTH));
 
 		StringBuffer buf = new StringBuffer("");
 		for (int i = 0; i < len; i++) {
@@ -206,26 +215,30 @@ public class Debug
 		groupSpaces.put(group, buf.toString());
 	}
 
+	/**
+	 * Set the program name. This will be used as a prefix to the text of every
+	 * printed debug message.
+	 */
 	public static void setProgname(String progname) {
 		Debug.progname = progname;
 	}
 
-//	new Thread() {
-//		public void run() {
-//			while (true) {
-//				Runtime r = Runtime.getRuntime();
-//
-//				long total = r.totalMemory();
-//				long free = r.freeMemory();
-//
-//				Debug.print("memory", Text.padComma(total) + " alloc, "
-//					+ Text.padComma(total - free) + " used.");
-//
-//				try {
-//					Thread.sleep(2000);
-//				} catch (InterruptedException ie) {
-//				}
-//			}
-//		}
-//	}.start();
+	// new Thread() {
+	// public void run() {
+	// while (true) {
+	// Runtime r = Runtime.getRuntime();
+	//
+	// long total = r.totalMemory();
+	// long free = r.freeMemory();
+	//
+	// Debug.print("memory", Text.padComma(total) + " alloc, "
+	// + Text.padComma(total - free) + " used.");
+	//
+	// try {
+	// Thread.sleep(2000);
+	// } catch (InterruptedException ie) {
+	// }
+	// }
+	// }
+	// }.start();
 }

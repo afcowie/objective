@@ -54,9 +54,17 @@ import accounts.domain.Books;
 import accounts.domain.Ledger;
 
 /**
- * A widget to select an account.
+ * A widget to select an Account / Ledger combination. AccountPicker presents
+ * itself as a button containing a Label presenting the Account and Ledger in
+ * the appropriate Debit or Credit colour. When activated, a quick Window pops
+ * up displaying full the list of Accounts and Ledgers, allowing the user to
+ * select the one they are interested in. The user can narrowthe search with any
+ * characters entered and the search text will be used to filter both Account
+ * titles and Ledger names.
  * 
  * @author Andrew Cowie
+ * @see accounts.ui.AccountLedgerDisplay which is used to render the label on
+ *      the main button indicating the selected Account/Ledger pair.
  */
 public class AccountPicker extends HBox
 {
@@ -70,6 +78,13 @@ public class AccountPicker extends HBox
 
 	private DataClient				db;
 
+	/**
+	 * Instantiate a new AccountPicker widget.
+	 * 
+	 * @param store
+	 *            an open DataClient connection that will be used to pull the
+	 *            list Accounts and Ledgers.
+	 */
 	public AccountPicker(DataClient store) {
 		super(false, 3);
 
@@ -131,7 +146,7 @@ public class AccountPicker extends HBox
 		private StatusBar			status;
 		private int					lastID	= 0;
 
-		public AccountPickerPopup(String which, String filename) {
+		AccountPickerPopup(String which, String filename) {
 			super(which, filename);
 
 			/*
@@ -547,8 +562,12 @@ public class AccountPicker extends HBox
 	}
 
 	/**
-	 * An override of Entry which has a single EntryListener which is removed
-	 * before programatic changes to the Entry widget.
+	 * An override of {@link Entry} which has a single {@link EntryListener}
+	 * which is removed before programatic changes to the Entry widget.
+	 */
+	/*
+	 * FUTURE: We can probably replace this with a normal Entry that only takes
+	 * action if it has focus.
 	 */
 	class SearchEntry extends Entry
 	{
@@ -573,7 +592,7 @@ public class AccountPicker extends HBox
 		 *            events) that you will be toggled off when programatically
 		 *            setting the Entry is required.
 		 */
-		public void setChangeListener(EntryListener listener) {
+		void setChangeListener(EntryListener listener) {
 			if (listener == null) {
 				throw new IllegalArgumentException();
 			}
@@ -581,21 +600,21 @@ public class AccountPicker extends HBox
 			enableChangeListener();
 		}
 
-		public void disableChangeListener() {
+		void disableChangeListener() {
 			if (listener == null) {
 				return;
 			}
 			super.removeListener(listener);
 		}
 
-		public void enableChangeListener() {
+		void enableChangeListener() {
 			if (listener == null) {
 				return;
 			}
 			super.addListener(listener);
 		}
 
-		public void clearText() {
+		void clearText() {
 			disableChangeListener();
 			super.setText("");
 			enableChangeListener();
@@ -621,6 +640,10 @@ public class AccountPicker extends HBox
 		return selectedAccount;
 	}
 
+	/**
+	 * Inform the AccountPicker which Account it is to be currently
+	 * representing. Using {@link #setLedger(Ledger)} is probably easier.
+	 */
 	public void setAccount(Account account) {
 		if (account == null) {
 			throw new IllegalArgumentException("null invalid argument for setAccount()");
@@ -636,6 +659,11 @@ public class AccountPicker extends HBox
 		return selectedLedger;
 	}
 
+	/**
+	 * Inform the AccountPicker which Ledger it is to be currently representing.
+	 * If the Ledger's parentAccount is set, then that will be used as the
+	 * account which is currently selected.
+	 */
 	public void setLedger(Ledger ledger) {
 		if (ledger == null) {
 			throw new IllegalArgumentException("null invalid argument for setLedger()");

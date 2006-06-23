@@ -32,12 +32,13 @@ public class OpeningBalanceTransaction extends GenericTransaction
 	 * 
 	 * @param entries
 	 * @param date
-	 *            The date to use for the openning balance entries. Note that
-	 *            this should probably be related to
-	 *            {@link Books#dateOfInception}
+	 *            The date to use for the openning balance entries.
+	 */
+	/*
+	 * TODO this should probably be related to Books.dateOfInception
 	 */
 	public OpeningBalanceTransaction(Set entries, Datestamp date) {
-//		super(LABEL, entries);
+		// super(LABEL, entries);
 		super.setDate(date);
 	}
 

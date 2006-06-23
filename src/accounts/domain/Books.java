@@ -6,9 +6,6 @@
  */
 package accounts.domain;
 
-import generic.domain.Cascade;
-import generic.domain.Leaf;
-import generic.domain.Normal;
 import generic.domain.Root;
 
 import java.util.LinkedHashSet;
@@ -173,9 +170,8 @@ public class Books extends Root
 	}
 
 	/**
-	 * 
-	 * 
-	 * @param home
+	 * Set the Currency in which all underlying amounts in this set of Books
+	 * will be represented. This can only be set once.
 	 */
 	public void setHomeCurrency(Currency home) {
 		if (home == null) {

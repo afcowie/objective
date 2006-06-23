@@ -102,9 +102,7 @@ public class ExposeDb4oInterfaceTest extends TestCase
 	 * Make sure that peek() as implemented in DataClient returns committed
 	 * (persisted) Objects, not the current in flight ones. This just ensures
 	 * the basic behaviour. It's actually needed for
-	 * {@link UpdateTransactionCommand}, so
-	 * 
-	 * @see accounts.services.TransactionCommandsTest#testPeekOnTransaction()
+	 * {@link accounts.services.UpdateTransactionCommand}.
 	 */
 	public final void testPeekPersistedReturnsCommittedObject() {
 		DataClient store = Engine.gainClient();

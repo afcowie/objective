@@ -22,7 +22,7 @@ package generic.ui;
  * using this Listener is to work around the problem of multiple invokations
  * that happen when reacting to GTK events signals.
  * 
- * @see accounts.ui.AmountEntry, the first use of this class.
+ * @see accounts.ui.AmountEntry which was the first use of this class.
  * @author Andrew Cowie
  */
 public interface ChangeListener

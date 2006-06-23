@@ -95,7 +95,8 @@ public class VerboseTestRunner extends TestRunner
 				System.out.println();
 				System.exit(SUCCESS_EXIT);
 			} else {
-				System.out.println("; " + r.failureCount() + " tests failed, " + r.errorCount() + " unexpected errors.");
+				System.out.println("; " + r.failureCount() + " tests failed, " + r.errorCount()
+					+ " unexpected errors.");
 				System.exit(FAILURE_EXIT);
 			}
 		} catch (Exception e) {
@@ -115,10 +116,9 @@ public class VerboseTestRunner extends TestRunner
 	 * }
 	 * </pre>
 	 * 
-	 * @return a TestResult indicating the outcome of running the unit tests.
-	 * @throws Exception
-	 *             if an unexpected ("error" in JUnit speak) condition
-	 *             propegates.
+	 * @return a TestResult indicating the outcome of running the unit tests,
+	 *         unless an unexpected ("error" in JUnit speak) Exception
+	 *         propegates out of a test fixture.
 	 */
 	public static TestResult run(Test test) {
 		VerboseTestRunner runner = new VerboseTestRunner();

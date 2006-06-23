@@ -30,13 +30,14 @@ import java.util.Date;
  * The bulk of uses of this class will be of the form:
  * 
  * <pre>
- * Engine.openDatafile(&quot;blah.yap&quot;);
- * 
- * DataClient ro = Engine.primaryClient();
- * DataClient rw = Engine.gainClient();
- * Engine.releaseClient(rw);
- * 
- * Engine.shutdown();
+ *    Engine.openDatafile(&quot;blah.yap&quot;);
+ *    
+ *    DataClient ro = Engine.primaryClient();
+ *    DataClient rw = Engine.gainClient();
+ *    ...
+ *    Engine.releaseClient(rw);
+ *    
+ *    Engine.shutdown();
  * </pre>
  * 
  * The primary reference can be fetched out as often as you want. No need to
@@ -227,16 +228,18 @@ public final class Engine
 	}
 
 	/**
-	 * Initiate a backup of the live database.
+	 * Initiate a backup of the live database. For details about db4o's
+	 * capabilities in this regard, see
+	 * {@link com.db4o.ext.ExtObjectServer#backup(String)} (which we call
+	 * through DataServer's <code>backup()</code> method).
 	 * 
-	 * @param store
 	 * @param backupBaseFilename
 	 *            The fully qualified pathname used as the prefix for the backup
 	 *            file (ie, not just a directory, assumed not to end with a '/'
 	 *            character).
 	 * @return the full filename of the created backup.
 	 * @throws IOException
-	 * @see DataServer#backup(String)
+	 * 
 	 */
 	public static String backupToFile(String backupBaseFilename) throws IOException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");

@@ -23,14 +23,14 @@ public class BankAccount extends AssetAccount implements SingleLedger
 	 */
 	private DebitPositiveLedger	ledger	= null;
 
+	/**
+	 * [For creating search prototypes]
+	 */
 	public BankAccount() {
 		super();
 	}
 
 	/**
-	 * 
-	 * @param code
-	 *            the numerical account code.
 	 * @param institution
 	 *            the name of the bank of financial institution carrying the
 	 *            account. Becomes Account title.

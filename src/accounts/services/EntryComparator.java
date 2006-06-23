@@ -24,7 +24,7 @@ import accounts.domain.Transaction;
  * parentAccount.
  * 
  * @author Andrew Cowie
- * @see AccoutComparator
+ * @see AccountComparator
  */
 public class EntryComparator implements Comparator
 {
@@ -32,7 +32,7 @@ public class EntryComparator implements Comparator
 	private transient AccountComparator	cachedAccountComparator;
 
 	/**
-	 * @param orderWithinLedger
+	 * @param orderingWithin
 	 *            the object type you're ordering within. The two known use
 	 *            cases are Ledger and Transaction; just pass (this) -
 	 *            EntryComparator uses instanceof to discriminate.

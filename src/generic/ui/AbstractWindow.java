@@ -25,14 +25,15 @@ import org.gnu.gtk.event.LifeCycleListener;
  * file as created by Glade. However constucted, this class then maintains a
  * useful internal reference to:
  * <ul>
- * <li>the GTK Window itself
- * <li>the top GUI element (by design a Box called "top")
- * <li>the LibGlade parser, if applicable.
+ * <li>the GTK {@link org.gnu.gtk.Window} itself
+ * <li>the top GUI element (by design a {@link org.gnu.gtk.Box} called
+ * <code>top</code>)
+ * <li>the {@link org.gnu.glade.LibGlade} parser, if applicable.
  * </ul>
  * <p>
- * AbstractWindow installs a useful default LifeCycleHandler, which you can
- * leverage by overriding it or by overriding the implementations of hideHook()
- * and deleteHook()
+ * AbstractWindow installs a useful default {@link LifeCycleListener}, which
+ * you can leverage by overriding it completely, or by simply overriding the
+ * implementations of hideHook() and deleteHook() in your subclasses.
  * 
  * @author Andrew Cowie
  */
@@ -243,9 +244,13 @@ public abstract class AbstractWindow
 	}
 
 	/**
+	 * A somewhat customized rendition of getClassString() useful for debug
+	 * output.
+	 * 
 	 * @return a String with the package name trimmed off, any enclosing class
-	 *         name trimmed off (ie A$Inner will return Inner), and any trailing
-	 *         "Window" removed.
+	 *         name trimmed off (ie <code>Something$Inner</code> will return
+	 *         <code>Inner</code>), and any trailing "<code>Window</code>"
+	 *         removed.
 	 */
 	public String getClassString() {
 

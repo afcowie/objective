@@ -18,7 +18,7 @@ public class Entity
 	 * The name of the person, business or organization. Will be used to name
 	 * the Ledger associated with this entity.
 	 */
-	private String	name						= null;
+	private String	name					= null;
 
 	/**
 	 * A number (or whatever) that uniquely identifies the business or entity.
@@ -31,7 +31,7 @@ public class Entity
 	 * we use the term "reference" in association with String variables
 	 * describing these identifying numbers.
 	 * 
-	 * @see Transaction#reference
+	 * @see Transaction#getReference() Transaction's reference
 	 */
 	private String	singleBusinessReference	= null;
 
@@ -56,18 +56,22 @@ public class Entity
 	 */
 	public void setName(String name) {
 		if ((name == null) || (name.equals(""))) {
-			throw new IllegalArgumentException("Can't set null or an empty String to be the name of this Entity");
+			throw new IllegalArgumentException(
+				"Can't set null or an empty String to be the name of this Entity");
 		}
 		this.name = name;
 	}
 
+	/**
+	 * @see #setSingleBusinessReference(String)
+	 * @return the reference String associated with this Entity.
+	 */
 	public String getSingleBusinessReference() {
 		return singleBusinessReference;
 	}
 
 	/**
-	 * 
-	 * @param singleBusinessReference
+	 * @param reference
 	 *            Generally expected to be a number, nevertheless this is kept
 	 *            as a String so you can format it (spaces, leading
 	 *            alphanumeric, whatever) how you wish.

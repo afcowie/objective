@@ -57,7 +57,7 @@ public class SpecificLedgerFinder extends Finder
 	 *            not to be null, but can be either all or part of the Account
 	 *            title you are seeking. If it is blank, the Ledger name must be
 	 *            specific enough to result in the return of a single Ledger
-	 *            when {@link getLedger()} is run.
+	 *            when {@link #getLedger()} is run.
 	 */
 	public void setAccountTitle(String title) {
 		if (title == null) {
@@ -74,7 +74,7 @@ public class SpecificLedgerFinder extends Finder
 	 *            not null or blank, but can be either all or part of the Ledger
 	 *            name you are seeking. If it is blank, the Account title must
 	 *            be specific enough to result in the return of a single Ledger
-	 *            when {@link getLedger()} is run.
+	 *            when {@link #getLedger()} is run.
 	 */
 	public void setLedgerName(String name) {
 		if (name == null) {

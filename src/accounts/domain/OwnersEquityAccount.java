@@ -7,14 +7,15 @@
 package accounts.domain;
 
 /**
- * A single ledger account for use in sole proprietorships. (ie, we use this for testing :))
+ * A single ledger account for use in sole proprietorships. (ie, we use this for
+ * testing :))
  * 
  * @author Andrew Cowie
  */
 public class OwnersEquityAccount extends EquityAccount implements SingleLedger
 {
-	private CreditPositiveLedger ledger = null;
-	
+	private CreditPositiveLedger	ledger	= null;
+
 	/**
 	 * 
 	 */
@@ -23,8 +24,8 @@ public class OwnersEquityAccount extends EquityAccount implements SingleLedger
 	}
 
 	/**
-	 * @param code
-	 * @param title
+	 * @param accountTitle
+	 * @param ledgerName
 	 */
 	public OwnersEquityAccount(String accountTitle, String ledgerName) {
 		super(accountTitle);
@@ -32,9 +33,9 @@ public class OwnersEquityAccount extends EquityAccount implements SingleLedger
 		ledger.setName(ledgerName);
 		addLedger(ledger);
 	}
-	
+
 	/**
-	 * Add an entry to the single Ledger in this Account. 
+	 * Add an entry to the single Ledger in this Account.
 	 */
 	public void addEntry(Entry entry) {
 		ledger.addEntry(entry);
@@ -48,7 +49,8 @@ public class OwnersEquityAccount extends EquityAccount implements SingleLedger
 
 	public void setLedger(Ledger ledger) {
 		if (!(ledger instanceof CreditPositiveLedger)) {
-			throw new IllegalArgumentException("You must use a CreditPositiveLedger for an OwnersEquityAccount");
+			throw new IllegalArgumentException(
+				"You must use a CreditPositiveLedger for an OwnersEquityAccount");
 		}
 		this.ledger = (CreditPositiveLedger) ledger;
 	}

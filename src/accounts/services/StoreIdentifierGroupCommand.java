@@ -29,8 +29,8 @@ public class StoreIdentifierGroupCommand extends Command
 	private transient IdentifierGroup	group;
 
 	/**
-	 * @param identifier
-	 *            the Identifier subclass you wish to add to the DataClient
+	 * @param group
+	 *            the IdentifierGroup you wish to add to the DataClient
 	 */
 	public StoreIdentifierGroupCommand(IdentifierGroup group) {
 		if (group == null) {

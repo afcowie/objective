@@ -23,10 +23,11 @@ import org.gnu.gtk.event.ButtonListener;
  * complementary viewers, named in parallel. This branch of sublcasses from
  * AbstractWindow denote the editors.
  * <p>
- * EditorWindow subclasses must implement cancel() and ok(), corresponding to
- * the actions taken when buttons by those names are pressed. The default
- * methods here just call deleteHook(); calling super.ok() or super.cancel()
- * allows you to leverage this code.
+ * EditorWindow subclasses must implement <code>cancel()</code> and
+ * <code>ok()</code>, corresponding to the actions taken when buttons by
+ * those names are pressed. The default methods here just call
+ * <code>deleteHook()</code>; calling <code>super.ok()</code> or
+ * <code>super.cancel()</code> allows you to leverage this code.
  * 
  * @author Andrew Cowie
  */

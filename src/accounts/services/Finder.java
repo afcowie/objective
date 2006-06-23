@@ -50,7 +50,7 @@ public abstract class Finder
 	 * [re]use by the domain specific result methods; otherwise they can be the
 	 * thing that caches.
 	 * 
-	 * @param an
+	 * @param store
 	 *            open DataClient from which to retrieve Objects.
 	 * @throws NotFoundException
 	 *             in the event that zero objects are retrieved. This isn't a

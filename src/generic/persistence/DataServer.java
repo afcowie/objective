@@ -42,8 +42,9 @@ import com.db4o.ext.ExtObjectContainer;
  * and tuning of the db4o library engine is done here in a
  * <code>static {...}</code> block.
  * <p>
- * The expected use of this class is to use {@link Engine#newDatafile(String)}
- * or {@link Engine#openDatafile(String, Class)} to open a DataServer and from
+ * The expected use of this class is to use
+ * {@link Engine#newDatafile(String, Class)} or
+ * {@link Engine#openDatafile(String, Class)} to open a DataServer and from
  * there to use its static server reference to obtain clients.
  * 
  * @author Andrew Cowie
@@ -103,7 +104,7 @@ public final class DataServer
 	/**
 	 * Instantiate a new accounting database server object. Will create a new
 	 * datafile if it doesn't exist (per the behaviour of
-	 * {@link Db4o.openFile()}).
+	 * {@link Db4o#openFile(String)}).
 	 * <p>
 	 * <b>WARNING</b> This is assumed to be the first use of the Db4o engine,
 	 * so global configuration of Db4o needs to be complete before this is
@@ -319,7 +320,7 @@ public final class DataServer
 	 *            a fully qualified pathname.
 	 * 
 	 * @throws IOException
-	 * @see com.db4o.ext.ExtObjectServer#backup()
+	 * @see com.db4o.ext.ExtObjectServer#backup(String)
 	 */
 	void backup(String path) throws IllegalArgumentException, IOException {
 		/*

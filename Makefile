@@ -184,7 +184,48 @@ objective: build/native-libs build/native-dist
 		-fjni -O \
 		--main=accounts.ui.ObjectiveAccounts -o objective \
 		$(NATIVE_LIBS) $(NATIVE_DIST) $(NATIVE_TESTS)
-	
+
+#
+# JavaDoc. We only build API documentation for dist classes, not unit tests.
+#
+ifdef V
+JAVADOC=javadoc
+else
+JAVADOC=javadoc -quiet
+REDIRECT=>/dev/null
+endif
+
+doc: build/javadoc
+build/javadoc: build/classes-dist
+	@echo "JAVADOC   lib/generic src/*"
+	$(JAVADOC) \
+		-d doc/api \
+		-classpath tmp/classes:$(JAVAGNOME_JARS) \
+		-public \
+		-nodeprecated \
+		-source 1.4 \
+		-notree \
+		-noindex \
+		-nohelp \
+		-version \
+		-author \
+		-link http://java.sun.com/j2se/1.4.2/docs/api \
+		-link http://java-gnome.sourceforge.net/docs/javadoc \
+		-link http://www.db4o.com/community/ontheroad/apidocumentation \
+		-sourcepath lib:src \
+		-subpackages "generic:accounts:country" \
+		-exclude "com.db4o:generic.junit" \
+		-doctitle "<h1>ObjectiveAccounts</h1><p>An accounting program written for boutique consultancies, small businesses, and not-for-profit organizations</p>" \
+		-windowtitle "objective version $(VERSION)" \
+		-header "<span style=\"font-family: arial; font-size: small; font-style: normal; colour: gray;\">API documentation for <a class=\"black\" href="http://research.operationaldynamics.com/projects/objective/">ObjectiveAccounts</a>, an accounting program written for boutique consultancies, small businesses, and not-for-profit organizations running Linux and Open Source software.</span>" \
+		-footer "<img src=\"http://www.operationaldynamics.com/images/logo/logo-60x76.jpg\" style=\"float:left; padding-left:5px;\"><img src=\"http://www.operationaldynamics.com/images/logo/type-342x32.jpg\" align=\"right\"><br><p style=\"font-family: arial; font-size: small; font-style: normal; colour: gray; clear: right;\">Copyright &copy; 2004-2006 <a class=\"black\" href=\"http://www.operationaldynamics.com/\">Operational Dynamics</a> Consulting Pty Ltd and others. This code is made available under the terms of the GPL, and patches are accepted. On the other hand, if you wish to see a specific feature developed, we would be happy to discuss your needs and prepare a quote.</p>" \
+		-group "Generic and reusable code" "generic.*" \
+		-group "Main accounting program and country specific implementations" "accounts.*:country.*" \
+		-breakiterator $(REDIRECT)
+	touch $@
+
+#		$(SOURCES_LIBS) $(SOURCES_DIST) $(REDIRECT)
+
 
 # --------------------------------------------------------------------
 # Runtime convenience targets

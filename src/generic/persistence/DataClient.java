@@ -56,7 +56,7 @@ public final class DataClient
 
 	/**
 	 * Mark this DataClient as read-only. This is enforced here by preventing
-	 * {@link #save()} and {@link #commit()}.
+	 * {@link #save(Object)} and {@link #commit()}.
 	 */
 	/*
 	 * Enforced here rather than using db4o's read-only configuration option as
@@ -131,8 +131,8 @@ public final class DataClient
 	}
 
 	/**
-	 * Wraps {@link ObjectContainer#set(java.lang.Object)}. I prefer
-	 * Hibernate's term for this, so "save" it is.
+	 * Wraps {@link ObjectContainer#set(java.lang.Object) ObjectContainer.set()}.
+	 * I prefer Hibernate's term for this, so "save" it is.
 	 */
 	public void save(Object obj) {
 		if (readOnly) {
@@ -303,7 +303,8 @@ public final class DataClient
 	/**
 	 * The default db4o behaviour is that deletes are NOT recursive (cascading
 	 * in their parleance). You can change that on a per class or per field
-	 * basis by making settings in the static block of {@link DataStore}.
+	 * basis by making settings in the static block of {@link DataServer} or
+	 * {@link Root}.
 	 * 
 	 * @param target
 	 *            the Object to be deleted from the database. Only target will
@@ -378,8 +379,11 @@ public final class DataClient
 	}
 
 	/**
-	 * Allow DataServer to tell this Client to discard any cached references it
-	 * might be carrying. [This is at user level, not db4o level]
+	 * Allow {@link DataServer} to tell this Client to discard any cached
+	 * references it might be carrying. [This is at user level, not within db4o]
+	 */
+	/*
+	 * TODO needs serious tuning improvement.
 	 */
 	void clearCachedReferences() {
 		// container.deactivate(root,100);

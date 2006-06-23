@@ -28,6 +28,15 @@ public class Master
 
 	private static boolean		goingDown	= false;
 
+	/**
+	 * Global re-entry point to reach the application's UI. A common use case is
+	 * 
+	 * <pre>
+	 *     Transaction t = ...
+	 *     
+	 *     Master.ui.launchEditor(t);
+	 * </pre>
+	 */
 	public static UserInterface	ui;
 
 	/**
@@ -41,8 +50,8 @@ public class Master
 	/**
 	 * Go down hard. Concludes with System.exit(1)!
 	 * 
-	 * @param string
-	 *            Message to display on abort
+	 * @param message
+	 *            Message to display on the console when aborting.
 	 */
 	public static void abort(String message) {
 		if (goingDown) {
@@ -69,9 +78,9 @@ public class Master
 
 	/**
 	 * Go down gracefully, fist closing any open windows, and then calling each
-	 * registered Hooks shutdown() method. Concludes with Gtk.mainQuit(),
-	 * returning execution control to the main() method in the class the program
-	 * was invoked with.
+	 * registered Hooks {@link Hooks#shutdown() shutdown()} method. Concludes
+	 * with {@link Gtk#mainQuit() Gtk.mainQuit()}, returning execution control
+	 * to the main() method in the class the program was invoked with.
 	 */
 	public static void shutdown() {
 		/*

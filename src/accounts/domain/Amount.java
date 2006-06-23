@@ -44,8 +44,11 @@ public class Amount implements Comparable, Leaf
 	 * Constructors ---------------------------------------
 	 */
 
+	/**
+	 * [Only for creating search prototypes]
+	 */
 	public Amount() {
-		// only for creating search prototypes
+		//
 	}
 
 	/**
@@ -53,8 +56,9 @@ public class Amount implements Comparable, Leaf
 	 * zero.
 	 * 
 	 * @param value
-	 *            strictly, syntax is as per BigDecimal(String), but
-	 *            practically, "0.00" works, and is what is expected.
+	 *            strictly, syntax is as per
+	 *            {@link BigDecimal#BigDecimal(java.lang.String) BigDecimal(String)},
+	 *            but practically, "0.00" works, and is what is expected.
 	 * @throws NumberFormatException
 	 */
 	public Amount(String value) {
@@ -86,8 +90,9 @@ public class Amount implements Comparable, Leaf
 	 */
 
 	/**
-	 * @value the number to set as the Amount's value. We validate (and round to
-	 *        two decimal places) using BigDecimal.
+	 * @param value
+	 *            the number to set as the Amount's value. We validate (and
+	 *            round to two decimal places) using BigDecimal.
 	 * @throws NumberFormatException
 	 *             if value can't be parsed.
 	 */
@@ -118,7 +123,7 @@ public class Amount implements Comparable, Leaf
 	 * Internal method. Round the given value to two decimal places, and set the
 	 * internal instance variable with an appropriate long value.
 	 * 
-	 * @see BigDecimal#setScale(int, int);
+	 * @see BigDecimal#setScale(int, int)
 	 * @param str
 	 *            The String to be parsed into a ling representing the number of
 	 *            cents.
@@ -189,7 +194,7 @@ public class Amount implements Comparable, Leaf
 	 * This is mostly here so you can quickly zero, ie
 	 * <code>salary.setNumber(0)</code>
 	 * 
-	 * @param value
+	 * @param number
 	 *            The number of cents (ie dollars/100) you want this Amount to
 	 *            represent.
 	 */
@@ -214,8 +219,6 @@ public class Amount implements Comparable, Leaf
 	 * Strings, but is padded with commas as a thousands separator. For
 	 * instance, Amount 44423997.45 will be formatted as "44,423,997.45". Note
 	 * that no currency symbols are added.
-	 * 
-	 * @see Amount#padComma(String)
 	 */
 	public String toString() {
 		return padComma(getValue());

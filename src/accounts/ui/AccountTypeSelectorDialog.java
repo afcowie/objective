@@ -23,11 +23,17 @@ import accounts.domain.CashAccount;
 /**
  * A popup question dialog to find out what kind of new account is to be
  * created.
+ * <p>
+ * <b>THIS CLASS INCOMPLETE</b>. Marked package until ready.
  * 
  * @author Andrew Cowie
  */
-public class AccountTypeSelectorDialog extends AbstractWindow
+class AccountTypeSelectorDialog extends AbstractWindow
 {
+	/**
+	 * Instantiate a Dialog like Window to allow you to pick an Account type
+	 * (ie, a concrete class in the Account hierarchy).
+	 */
 	public AccountTypeSelectorDialog() {
 		super("typeselector", "share/AccountTypeSelectorDialog.glade");
 
@@ -65,6 +71,9 @@ public class AccountTypeSelectorDialog extends AbstractWindow
 		window.present();
 	}
 
+	/**
+	 * FIXME change to setAccount();
+	 */
 	public void preSelectType(Account type) {
 		String activate = null;
 		if (type instanceof AssetAccount) {

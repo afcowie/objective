@@ -8,6 +8,14 @@ package accounts.domain;
 
 import java.math.BigDecimal;
 
+/**
+ * An amount of money in a foreign currency. ForeignAmount encapsulates the
+ * notions of face value (the amount as demoninated in the foreign currency's
+ * terms), currency (which country's money the face value is in), and exchange
+ * rate.
+ * 
+ * @author Andrew Cowie
+ */
 public class ForeignAmount extends Amount
 {
 	/**
@@ -31,8 +39,6 @@ public class ForeignAmount extends Amount
 	}
 
 	/**
-	 * .
-	 * 
 	 * @param faceValue
 	 *            The amount denominated in the foreign (origin) currency
 	 * @param cur
@@ -41,8 +47,8 @@ public class ForeignAmount extends Amount
 	 *            The exchange rate between the foreign currency and the home
 	 *            currency.
 	 */
-	public ForeignAmount(String foreignValue, Currency cur, String rate) {
-		this.setForeignValue(foreignValue);
+	public ForeignAmount(String faceValue, Currency cur, String rate) {
+		this.setForeignValue(faceValue);
 		this.setCurrency(cur);
 		this.setRate(rate);
 	}
@@ -105,8 +111,6 @@ public class ForeignAmount extends Amount
 
 	/**
 	 * Get the Currency in which this ForeignAmount is denominated.
-	 * 
-	 * @return
 	 */
 	public Currency getCurrency() {
 		return currency;

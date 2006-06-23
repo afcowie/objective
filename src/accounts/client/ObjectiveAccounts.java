@@ -7,13 +7,10 @@
 package accounts.client;
 
 /**
- * The main reentry point for the whole framework. Holds a number of "global"
- * variables for use throughout the program. See the JavaDoc for the public
- * static members of this class. In particlar, note
- * <ul>
- * <li><code>ui</code>, a way to get to the top level UserInterface object
- * so you can cause program wide GUI effects.
- * </ul>
+ * A reentry point for the whole framework. Holds a number of "global" variables
+ * for use throughout the program. See the JavaDoc for the public static members
+ * of this class. See also {@link generic.client.Master} for the general reentry
+ * point for program wide actions (ie shutdown) and access to global UI actions.
  * 
  * @author Andrew Cowie
  */
@@ -23,10 +20,10 @@ public class ObjectiveAccounts
 	 * A String constant expressing the current version of the overall released
 	 * codebase. Used by equivalence (the top level ./configure program) to find
 	 * out the version to use in the names of release and snapshot tarballs.
-	 * Small helper programs making use of this class (ie to access
-	 * {@link ObjectiveAccounts.store}) do not need to override this constant.
+	 * Small helper programs making use of this class do not need to override
+	 * this constant.
 	 */
-	public static final String		VERSION		= "0.1.16";
+	public static final String		VERSION		= "0.1.17";
 
 	/**
 	 * The copyright statement for this code and a pointer to the top level
@@ -38,21 +35,6 @@ public class ObjectiveAccounts
 		"The LICENCE file included with these sources lists the terms under which",
 		"you may use and redistribute this code.",
 												};
-
-	// public static ObjectiveAccountsUserInterface ui = null;
-
-	/**
-	 * Go down hard. TODO Do we want to System.exit() here or elsewhere?
-	 * 
-	 * @param string
-	 *            Message to display on abort
-	 */
-	public static void abort(String message) {
-		System.err.println(message);
-		// if (ui != null) {
-		// ui.shutdown();
-		// }
-	}
 
 	/**
 	 * Get a statement about the copyright of the program code. [If you want to
