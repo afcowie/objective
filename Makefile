@@ -35,7 +35,7 @@ endif
 # [this  will be called by the above include if .config is missing.
 # we don't call ./configure automatically to allow scope for
 # manual configuration and overrides]
-.config:
+.config: src/accounts/client/ObjectiveAccounts.java
 	echo
 	echo "You need to run ./configure to check prerequisites"
 	echo "and setup preferences before you can build accounts."
@@ -218,7 +218,7 @@ build/javadoc: build/classes-dist
 		-doctitle "<h1>ObjectiveAccounts</h1><p>An accounting program written for boutique consultancies, small businesses, and not-for-profit organizations</p>" \
 		-windowtitle "objective version $(VERSION)" \
 		-header "<span style=\"font-family: arial; font-size: small; font-style: normal; colour: gray;\">API documentation for <a class=\"black\" href="http://research.operationaldynamics.com/projects/objective/">ObjectiveAccounts</a>, an accounting program written for boutique consultancies, small businesses, and not-for-profit organizations running Linux and Open Source software.</span>" \
-		-footer "<img src=\"http://www.operationaldynamics.com/images/logo/logo-60x76.jpg\" style=\"float:left; padding-left:5px;\"><img src=\"http://www.operationaldynamics.com/images/logo/type-342x32.jpg\" align=\"right\"><br><p style=\"font-family: arial; font-size: small; font-style: normal; colour: gray; clear: right;\">Copyright &copy; 2004-2006 <a class=\"black\" href=\"http://www.operationaldynamics.com/\">Operational Dynamics</a> Consulting Pty Ltd and others. This code is made available under the terms of the GPL, and patches are accepted. On the other hand, if you wish to see a specific feature developed, we would be happy to discuss your needs and prepare a quote.</p>" \
+		-footer "<img src=\"http://www.operationaldynamics.com/images/logo/logo-60x76.jpg\" style=\"float:left; padding-left:5px; padding-right:10px;\"><img src=\"http://www.operationaldynamics.com/images/logo/type-342x32.jpg\" align=\"right\"><br><p style=\"font-family: arial; font-size: small; font-style: normal; colour: gray; clear: right;\">Copyright &copy; 2004-2006 <a class=\"black\" href=\"http://www.operationaldynamics.com/\">Operational Dynamics</a> Consulting Pty Ltd and others. This code is made available under the terms of the GPL, and patches are accepted. On the other hand, if you wish to see a specific feature developed, we would be happy to discuss your needs and prepare a quote.</p>" \
 		-group "Generic and reusable code" "generic.*" \
 		-group "Main accounting program and country specific implementations" "accounts.*:country.*" \
 		-breakiterator $(REDIRECT)
