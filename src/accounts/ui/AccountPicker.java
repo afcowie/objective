@@ -33,6 +33,7 @@ import org.gnu.gtk.TreeModel;
 import org.gnu.gtk.TreeModelFilter;
 import org.gnu.gtk.TreeModelFilterVisibleMethod;
 import org.gnu.gtk.TreeModelSort;
+import org.gnu.gtk.TreePath;
 import org.gnu.gtk.TreeSelection;
 import org.gnu.gtk.TreeView;
 import org.gnu.gtk.TreeViewColumn;
@@ -120,6 +121,8 @@ public class AccountPicker extends HBox
 		private DataColumnObject	ledgerObject_DataColumn;
 
 		private TreeView			view;
+		TreeViewColumn				account_ViewColumn;
+
 		private SearchEntry			search;
 
 		private int					visibleRows;
@@ -171,7 +174,7 @@ public class AccountPicker extends HBox
 			 * aweful API since EJB"
 			 */
 			// Account column
-			TreeViewColumn account_ViewColumn = new TreeViewColumn();
+			account_ViewColumn = new TreeViewColumn();
 			account_ViewColumn.setResizable(true);
 			account_ViewColumn.setReorderable(false);
 
@@ -483,7 +486,25 @@ public class AccountPicker extends HBox
 			window.hide();
 			selectedAccount = (Account) sortedStore.getValue(pointer, accountObject_DataColumn);
 			selectedLedger = (Ledger) sortedStore.getValue(pointer, ledgerObject_DataColumn);
-			setEntryText();
+			setDisplayText();
+		}
+
+		/**
+		 * Select the line containing the indicated Ledger (and hence parent
+		 * Account) in the TreeView
+		 */
+		private void setSelection(Ledger ledger) {
+			TreeIter pointer = sortedStore.getFirstIter();
+			while (pointer != null) {
+				Ledger l = (Ledger) sortedStore.getValue(pointer, ledgerObject_DataColumn);
+
+				if (ledger == l) {
+					view.getSelection().select(pointer);
+					return;
+				}
+
+				pointer = pointer.getNextIter();
+			}
 		}
 
 		private void clearEntry() {
@@ -513,6 +534,12 @@ public class AccountPicker extends HBox
 			window.move(x, y);
 
 			super.present();
+
+			TreePath[] selected = view.getSelection().getSelectedRows();
+			if (selected.length == 1) {
+				view.scrollToCell(selected[0], account_ViewColumn, 0.5, 0.0);
+			}
+
 			search.grabFocus();
 			refilter();
 		}
@@ -599,7 +626,7 @@ public class AccountPicker extends HBox
 			throw new IllegalArgumentException("null invalid argument for setAccount()");
 		}
 		selectedAccount = account;
-		setEntryText();
+		setDisplayText();
 	}
 
 	/**
@@ -618,14 +645,15 @@ public class AccountPicker extends HBox
 		if (a != null) {
 			selectedAccount = a;
 		}
-		setEntryText();
+		setDisplayText();
+		popup.setSelection(ledger);
 	}
 
 	/**
 	 * If both an account and ledger have been selected when this is called,
 	 * then it will format up a string for display in the Entry.
 	 */
-	private void setEntryText() {
+	private void setDisplayText() {
 		if ((selectedAccount != null) && (selectedLedger != null)) {
 			display.setLedger(selectedLedger);
 		}
