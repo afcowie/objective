@@ -12,7 +12,7 @@ ifdef D
 DEBUG=--debug=all
 endif
 
-.PHONY: all run test clean distclean
+.PHONY: all run test clean distclean pop debug
 
 # --------------------------------------------------------------------
 # Variable setup. You may want to set your editor to wrap to see the
@@ -281,9 +281,11 @@ pop: build/classes-tests build/demo-setup
 		-classpath $(CLASSPATH):tmp/classes \
 		demo.ui.DemoWindowRunner $(DEBUG)
 
-run: build/classes-dist
-	@echo "target disabled... use `make pop`"
+run:
+	@echo "target disabled... use \`make pop\`"
 	@exit 1
+
+#run: build/classes-dist
 #	@echo "$(JAVA_CMD) ObjectiveAccounts $(DEBUG)"
 #	$(JAVA) \
 #		-Djava.library.path=$(JNI_PATH) \
