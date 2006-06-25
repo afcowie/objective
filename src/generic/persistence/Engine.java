@@ -30,14 +30,14 @@ import java.util.Date;
  * The bulk of uses of this class will be of the form:
  * 
  * <pre>
- *    Engine.openDatafile(&quot;blah.yap&quot;);
- *    
- *    DataClient ro = Engine.primaryClient();
- *    DataClient rw = Engine.gainClient();
- *    ...
- *    Engine.releaseClient(rw);
- *    
- *    Engine.shutdown();
+ * Engine.openDatafile(&quot;blah.yap&quot;);
+ * 
+ * DataClient ro = Engine.primaryClient();
+ * DataClient rw = Engine.gainClient();
+ * // ...
+ * Engine.releaseClient(rw);
+ * 
+ * Engine.shutdown();
  * </pre>
  * 
  * The primary reference can be fetched out as often as you want. No need to
@@ -153,6 +153,19 @@ public final class Engine
 	 */
 	public static DataClient primaryClient() {
 		if (primary == null) {
+			/**
+			 * FUTURE: An alternative possility is to use the ObjectServer's
+			 * ObjectContainer, via this code:
+			 * 
+			 * <pre>
+			 * ObjectContainer internal = server.getUnderlyingServer().ext().objectContainer();
+			 * primary = new DataClient(internal);
+			 * </pre>
+			 * 
+			 * The risk, however, is that changes (especially refresh() calls)
+			 * against this Container will result in catestrophic race
+			 * conditions in the server itself. Probably not such a good idea.
+			 */
 			primary = server.gainClient();
 			primary.setReadOnly();
 		}
