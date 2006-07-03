@@ -273,6 +273,8 @@ sub check_native (\$$$$$) {
 
 	# run
 	my $output = `./Hello 2>/dev/null`;
+	chomp $output;
+
 	if (($? != 0) || ($output ne "Hello")) {
 		output "executable doesn't work\n";
 		$$scalarref = "";
