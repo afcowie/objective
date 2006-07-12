@@ -295,6 +295,7 @@ my $jdk_home;
 my $gcj_home;
 my $javagnome_home = "/opt/local/java-gnome";
 my $jamvm_bin;
+my $cacao_bin;
 
 foreach my $arg (@ARGV) {
 	my ($key, $value) = split /=/, "$arg";
@@ -309,6 +310,8 @@ foreach my $arg (@ARGV) {
 		$jdk_home="$value";
 	} elsif ($key =~ /^gcj/) {
 		$gcj_home="$value";
+	} elsif ($key =~ /^cacao/) {
+		$cacao_bin="$value";
 	} elsif ($key =~ /^jamvm/) {
 		$jamvm_bin="$value";
 	} elsif ($key =~ /^java-gnome/) {
@@ -703,7 +706,6 @@ if ($os eq "gentoo") {
 
 	# check kaffe
 	check_runtime($kaffe, "kaffe VM", which("kaffe"), "");
-	check_runtime($cacao, "CACAO VM", "/usr/bin/cacao", "");
 
 	# check jamvm (an elegant bytecode interpreter used by many in the
 	# CLASSPATH project to test new releases)
@@ -713,7 +715,14 @@ if ($os eq "gentoo") {
 	} else {
 		$jamvm_candidate = "/usr/bin/jamvm";
 	}
-	check_runtime($jamvm, "JamVM VM", $jamvm_candidate, "");
+
+	my $cacao_candidate;
+	if ($cacao_bin) {
+		$cacao_candidate = "$cacao_bin";
+	} else {
+		$cacao_candidate = "/usr/bin/cacao";
+	}
+	check_runtime($cacao, "CACAO VM", $cacao_candidate, "");
 
 } elsif ($os eq "debian") {
 	# check for a proper JDK/JRE java Virtual Machine (presumably either
@@ -747,7 +756,6 @@ if ($os eq "gentoo") {
 	# *may* work, so we do check for it  - we just don't pick it by
 	# preference.
 	check_runtime($kaffe, "Kaffe VM", "/usr/lib/kaffe/bin/java", "");
-	check_runtime($cacao, "CACAO VM", "/usr/bin/cacao", "");
 
 	# check jamvm (an elegant bytecode interpreter used by many in the
 	# CLASSPATH project to test new releases)
@@ -758,6 +766,14 @@ if ($os eq "gentoo") {
 		$jamvm_candidate = "/usr/bin/jamvm";
 	}
 	check_runtime($jamvm, "JamVM VM", $jamvm_candidate, "");
+
+	my $cacao_candidate;
+	if ($cacao_bin) {
+		$cacao_candidate = "$cacao_bin";
+	} else {
+		$cacao_candidate = "/usr/bin/cacao";
+	}
+	check_runtime($cacao, "CACAO VM", $cacao_candidate, "");
 
 } elsif ($os eq "fedora") {
 	# check for a proper JDK/JRE java Virtual Machine. Red Hat is using
@@ -793,6 +809,14 @@ if ($os eq "gentoo") {
 		$jamvm_candidate = "/usr/bin/jamvm";
 	}
 	check_runtime($jamvm, "JamVM VM", $jamvm_candidate, "");
+
+	my $cacao_candidate;
+	if ($cacao_bin) {
+		$cacao_candidate = "$cacao_bin";
+	} else {
+		$cacao_candidate = "/usr/bin/cacao";
+	}
+	check_runtime($cacao, "CACAO VM", $cacao_candidate, "");
 } else {
 	bail "failed!", "This OS not configured with appropriate Java VM checks!\nTHIS IS AN INTERNAL ERROR, PLEASE FILE A BUG.";
 }

@@ -41,7 +41,7 @@ automatically mark scripts as executable. So you may have to
 first. You can avoid this if you use the --set-scripts-executable option with
 the `darcs get` command, or if you add "get --set-scripts-executable" to a file
 called ~/.darcs/defaults . I'm hoping upstream will change this to be the
-default behaviour]
+default behaviour someday]
 
 
 PREREQUISITES
@@ -103,6 +103,8 @@ location to find a JDK and/or GCJ, using either of the following:
 
 * jamvm			(path to the jamvm executable)
 
+* cacao			(path to the cacao executable)
+
 Examples:
 
 	./configure
@@ -127,42 +129,20 @@ thing about GCJ is that in addition to being able to generate class files (the
 distributing objective as a native executable using gcj.
 
 Linking gcj compiled java sources against other jars which are its prerequisite
-dependencies can be tricky.
-
-One other gotcha is that gcj doesn't have the same sophistication with respect
-to finding and automatically compiling source code that javac does. With javac,
-you can just list the top level class and, recursively, all of its dependencies
-will be scanned and if necessary compiled. This is a huge savings since you
-don't have to do an invocations of javac for each source file, thus avoiding
-the time penalty of firing up each javac (and more to the point, the Java VM it
-runs in)
-
-The implication of this, though, is that doing something straight forward like
-
-	find src -name '*.java'
-
-to get the list of source files to feed to GCJ doesn't work: it picks up *all*
-the source files, and so anything in the tree that is incomplete or worse has
-experimental dependencies on things that may not be available on your system
-will cause the native build step to fail.
-
+dependencies used to be very ticky. Now that GCJ can compile bytecode it is
+vastly improved, but there are still gotchas.
 
 In due course, make will automatically build both classes and native files; the
-command
-
-	make build/native
-
-will build the native code using GCJ.
+Makefile instructions for doing this is still on a branch that will be merged
+into the mainline shortly.
 
 
 RUNNING IN ECLIPSE
 ------------------
 
 One of the significant reasons to ensure that the program still builds and runs
-with a conventional Java VM is so that it can be worked on in Eclipse.
-
-To run in eclipse, I had to do LD_LIBRARY_PATH=/usr/lib /opt/eclipse/eclipse
-which is a touch annoying - not sure what I'm missing there.
+with a conventional Java VM is so that it can be worked on in Eclipse. The
+build system, equivalence, is designed with this in mind.
 
 
 CONTRIBUTING
@@ -201,16 +181,20 @@ the patch name) when darcs offers you the chance.
 DIRECTORY LAYOUT
 ----------------
 
-%	doc		Documentation, including user docs, programmer
-			APIs (javadocs) and examples.
+	doc		Documentation, including user docs, architectural notes
+			and examples.
+
+%	doc/examples	programmer APIs (javadocs)
 
 	share		Common files necessary for Client UI and/or Server
 			versions. Glade files, DTDs...
 
-	src		Source files. Java.
+	lib		Third party libraries' source code.
 
+	src		Main application source code.
 
-*	tests		Unit tests. Hierarchy of packages follows src/
+*	tests		Unit tests source code. Hierarchy of packages mirrors
+			that found in src/
 
 *+	build		stamp files and other artifacts of build process (the
 			name is used largely because it makes the top level
