@@ -190,13 +190,42 @@ objective: build/native-libs build/native-dist
 #
 ifdef V
 JAVADOC=javadoc
+WGET=wget
 else
 JAVADOC=javadoc -quiet
+WGET=wget --quiet
 REDIRECT=>/dev/null
 endif
 
+tmp/javadoc/classpath/package-list: build/dirs-javadoc
+	-test -d $(@D) || mkdir -p $(@D)
+	@echo "WGET      classpath package-list"
+	$(WGET) http://developer.classpath.org/doc/package-list -O $@
+	touch $@
+
+tmp/javadoc/java-gnome/package-list: build/dirs-javadoc
+	-test -d $(@D) || mkdir -p $(@D)
+	@echo "WGET      java-gnome package-list"
+	$(WGET) http://java-gnome.sourceforge.net/docs/javadoc/package-list -O $@
+	touch $@
+
+tmp/javadoc/db4o/package-list: build/dirs-javadoc
+	-test -d $(@D) || mkdir -p $(@D)
+	@echo "WGET      db4o package-list"
+	$(WGET) http://www.db4o.com/community/ontheroad/apidocumentation/package-list -O $@
+	touch $@
+
+build/dirs-javadoc:
+	@echo "MKDIR     preping javadoc output directories"
+	-test -d tmp/javadoc || mkdir -p tmp/javadoc
+	-test -d doc/api || mkdir -p doc/api
+	touch $@
+
 doc: build/javadoc
-build/javadoc: build/classes-dist
+build/javadoc: build/classes-dist build/dirs-javadoc \
+		tmp/javadoc/classpath/package-list \
+		tmp/javadoc/java-gnome/package-list \
+		tmp/javadoc/db4o/package-list
 	@echo "JAVADOC   lib/generic src/*"
 	$(JAVADOC) \
 		-d doc/api \
@@ -209,9 +238,9 @@ build/javadoc: build/classes-dist
 		-nohelp \
 		-version \
 		-author \
-		-link http://java.sun.com/j2se/1.4.2/docs/api \
-		-link http://java-gnome.sourceforge.net/docs/javadoc \
-		-link http://www.db4o.com/community/ontheroad/apidocumentation \
+		-linkoffline http://developer.classpath.org/doc tmp/javadoc/classpath \
+		-linkoffline http://java-gnome.sourceforge.net/docs/javadoc tmp/javadoc/java-gnome \
+		-linkoffline http://www.db4o.com/community/ontheroad/apidocumentation tmp/javadoc/db4o \
 		-sourcepath lib:src \
 		-subpackages "generic:accounts:country" \
 		-exclude "com.db4o:generic.junit" \
@@ -311,6 +340,8 @@ distclean: clean
 	-rm -f .config .config.tmp
 	@echo "RM        development artifacts"
 	-rm -f share/*.gladep share/*.glade.bak share/*.gladep.bak
+	@echo "RM        generated documentation"
+	-rm -f doc/api/*
 
 # --------------------------------------------------------------------
 # Distribution target

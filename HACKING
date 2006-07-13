@@ -51,6 +51,8 @@ ObjectiveAccounts is written in Java and uses uses:
 
 * java-gnome	Bindings around the GTK and GNOME libraries
 		http://java-gnome.sourceforge.net
+		In particular you need the most recent GTK binding,
+		that is libgtk-java >= 2.8.5
 
 * junit		Unit testing framework for Java
 		http://www.junit.org
