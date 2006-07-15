@@ -22,6 +22,12 @@ import accounts.domain.Supplier;
 import accounts.domain.SupplierLedger;
 import accounts.persistence.IdentifierAlreadyExistsException;
 
+/**
+ * Given a new Entity object, create the appropriate ClientLedger or
+ * SupplierLedger, then persist them to the database.
+ * 
+ * @author Andrew Cowie
+ */
 public class AddEntityCommand extends Command
 {
 	private transient Entity	entity	= null;
@@ -78,8 +84,8 @@ public class AddEntityCommand extends Command
 		found = store.queryByExample(protoLedger);
 
 		if (found.size() > 0) {
-			throw new IdentifierAlreadyExistsException("There is already an ItemsLedger with " + entity.getName()
-				+ " as its name");
+			throw new IdentifierAlreadyExistsException("There is already an ItemsLedger with "
+				+ entity.getName() + " as its name");
 		}
 
 		/*
@@ -97,7 +103,8 @@ public class AddEntityCommand extends Command
 		}
 
 		if (found.size() > 1) {
-			throw new DebugException("As coded, we only allow for there being one Accounts{Receivable|Payable} account");
+			throw new DebugException(
+				"As coded, we only allow for there being one Accounts{Receivable|Payable} account");
 		} else if (found.size() == 0) {
 			throw new IllegalStateException("Where is the Accounts{Receivable|Payable} account?");
 		}

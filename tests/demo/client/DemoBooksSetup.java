@@ -55,6 +55,10 @@ import country.au.services.AustralianInitBooksCommand;
  */
 public class DemoBooksSetup
 {
+	/**
+	 * Location of the Demo accounts database used as mockup for trials and
+	 * evaluations.
+	 */
 	public final static String	DEMO_DATABASE	= "tmp/demo.yap";
 
 	public static void main(String[] args) {
