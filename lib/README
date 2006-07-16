@@ -3,7 +3,7 @@ Their source code is shipped in exploded form (as individual files, organized in
 the standard Java hierarchical namespace) to faciliate optimal compilation for
 your plaform. Individual licence terms are as follows:
 
-com/db4o, version 5.0.018
+com/db4o, version 5.4.012
 --------
 
 db4o is the open source object database engine supplied by:
@@ -19,3 +19,23 @@ http://www.db4o.com/
 db4o may be used under the GNU General Public License, GPL, version 2.
 Alternately, a non-GPL commercial licence is available. Contact db4objects if
 your requirements preclude use of the GPL.
+
+
+edu/purdue/cs/bloat, version 1.0+
+-------------------
+
+BLOAT is the Bytecode-Level Optimizer and Analysis Tool, from the Programming
+for Persistent Systems research group at Purdue University.  Copyright
+1997-2001 by the Purdue Research Foundation of Purdue University.
+
+http://www.cs.purdue.edu/s3/projects/bloat/
+http://purduebloat.sourceforge.net/
+
+At present, BLOAT is licenced under an original-BSD-style license containing
+both the obnoxious advertising clause and even worse a clause saying that no
+charges may be made for derivative works. See any source file.
+
+As such this is non-free, and therefore it (and features that depend on it)
+will not be shipped alongside public releases of ObjectiveAccounts. The code is
+included here only to support research & development. The authors claim to have
+the intention of relicencing BLOAT under the LGPL.
