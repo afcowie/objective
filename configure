@@ -715,6 +715,7 @@ if ($os eq "gentoo") {
 	} else {
 		$jamvm_candidate = "/usr/bin/jamvm";
 	}
+	check_runtime($jamvm, "JamVM VM", $jamvm_candidate, "");
 
 	my $cacao_candidate;
 	if ($cacao_bin) {
