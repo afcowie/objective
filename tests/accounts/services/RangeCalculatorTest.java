@@ -89,4 +89,31 @@ public class RangeCalculatorTest extends TestCase
 		assertEquals(0.142857, calc.calculateWeeks(), 0.01);
 		assertEquals(0.032876, calc.calculateMonths(), 0.01);
 	}
+
+	public final void testQuirksWithSpecificIntervals() {
+		RangeCalculator range;
+
+		/*
+		 * A 7 day week!
+		 */
+		range = new RangeCalculator(new Datestamp("1 Jul 05"), new Datestamp("7 Jul 05"));
+		int days = range.calculateDays();
+
+		assertEquals(7, days);
+		float weeks = range.calculateWeeks();
+		assertEquals(1, weeks, 0.1);
+
+		/*
+		 * Half a year in calendar terms is actually a bit longer. From 1 Jul to
+		 * 31 Dec is 184 days and thus 26.2 weeks, not the 26.0 you might
+		 * expect. Alas.
+		 */
+
+		range = new RangeCalculator(new Datestamp("1 Jul 05"), new Datestamp("31 Dec 05"));
+		days = range.calculateDays();
+
+		assertEquals(184, days);
+		weeks = range.calculateWeeks();
+		assertEquals(26.2, weeks, 0.1);
+	}
 }

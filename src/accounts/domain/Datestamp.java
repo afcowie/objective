@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * The date of a transaction. An object is used both to wrap representation, and
@@ -150,6 +151,7 @@ public class Datestamp implements Comparable, Leaf
 	public void setDate(String user) throws ParseException {
 		SimpleDateFormat fullsdf = new SimpleDateFormat("dd MMM yy");
 		java.util.Calendar cal = java.util.Calendar.getInstance();
+		fullsdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		Date d = null;
 		try {

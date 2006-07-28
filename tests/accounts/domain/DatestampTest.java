@@ -102,4 +102,17 @@ public class DatestampTest extends TestCase
 		} catch (IllegalArgumentException iae) {
 		}
 	}
+
+	public final void testUnbiasedByTimezones() {
+		Datestamp one;
+		one = new Datestamp("1 Jul 05");
+
+		long internal = one.getInternalTimestamp();
+
+		double hours = ((double) internal) / 3600;
+		assertTrue(Math.round(hours) == hours);
+
+		double days = hours / 24;
+		assertTrue(Math.round(days) == days);
+	}
 }
