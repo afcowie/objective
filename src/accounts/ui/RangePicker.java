@@ -65,6 +65,8 @@ public class RangePicker extends HBox
 
 		ChangeListener dateChanged = new ChangeListener() {
 			public void userChangedData() {
+				// System.out.println(calc.calculateDays() + " days, " +
+				// calc.calculateWeeks() + " weeks");
 				changeListener.userChangedData();
 			}
 		};

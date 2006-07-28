@@ -8,9 +8,6 @@ package country.au.services;
 
 import generic.persistence.DataClient;
 import generic.persistence.NotActivatedException;
-
-import java.math.BigDecimal;
-
 import accounts.domain.Amount;
 import accounts.domain.Datestamp;
 import accounts.services.NotFoundException;
@@ -130,8 +127,7 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 				"To use a Calculator you need to have all the parameter values set with instantiated objects");
 		}
 
-		BigDecimal num = new BigDecimal(weeks);
-		BigDecimal weekly = salary.getBigDecimal().divide(num, 3, BigDecimal.ROUND_HALF_UP);
+		double weekly = salary.getNumber() / 100 / weeks;
 
 		/*
 		 * The Australian PAYG formula is the linear equation y = ax - b, where
@@ -139,7 +135,7 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 		 * nearest whole dollar.
 		 */
 
-		int nocents = weekly.intValue();
+		double nocents = Math.floor(weekly);
 		double x = nocents + 0.99;
 
 		/*
@@ -165,10 +161,11 @@ public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 		/*
 		 * And that ends the ATO tax algorithm. Now we have to de-normalize the
 		 * value scaling it up by the number of weeks, and passing that to be
-		 * the value of the withheld Amount:
+		 * the value of the withheld Amount. We again round the denormalized
+		 * value.
 		 */
 
-		float denormalized = rounded * weeks;
+		float denormalized = Math.round(rounded * weeks);
 		withhold.setValue(Float.toString(denormalized));
 
 		/*

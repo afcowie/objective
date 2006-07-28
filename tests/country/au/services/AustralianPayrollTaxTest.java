@@ -11,6 +11,7 @@ import accounts.domain.Datestamp;
 import accounts.persistence.BlankDatafileTestCase;
 import accounts.services.NotFoundException;
 import accounts.services.PayrollTaxCalculator;
+import accounts.services.RangeCalculator;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 
 /**
@@ -307,12 +308,6 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		assertEquals("4850.00", calc.getWithhold().getValue());
 	}
 
-	/**
-	 * When all the above tests were written, they were built around the ATO's
-	 * tables' normalization of pay amounts to 1 week. Now weadd a parameter to
-	 * the calculator to specify the number of weeks involved, which should
-	 * simply scale the returned results.
-	 */
 	public final void testCalculateWithWeeks() throws NotFoundException {
 		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
 
@@ -346,8 +341,98 @@ public class AustralianPayrollTaxTest extends BlankDatafileTestCase
 		calc.setWithhold(new Amount());
 
 		calc.calculateGivenSalary();
-		assertEquals("95.33", calc.getWithhold().getValue());
-		assertEquals("1001.00", calc.getPaycheck().getValue());
+		assertEquals("95.00", calc.getWithhold().getValue());
+		assertEquals("1001.33", calc.getPaycheck().getValue());
+	}
+
+	/**
+	 * Test a bug that crept in when we added the normalization to weeks.
+	 */
+	public final void testCalculateCorrectSalaryWithoutCentsBug() throws NotFoundException {
+		RangeCalculator range;
+
+		new AustralianPayrollTaxConstants(rw).loadIdentifiers();
+
+		AustralianPayrollTaxCalculator calc = new AustralianPayrollTaxCalculator(rw,
+			AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, KNOWN_GOOD_DATE);
+
+		/*
+		 * We have trouble because, again non-zero cents:
+		 */
+		range = new RangeCalculator();
+		range.setStartDate(new Datestamp("1 Jul 05"));
+		range.setEndDate(new Datestamp("7 Jul 05"));
+
+		float weeks = range.calculateWeeks();
+		assertEquals(1.0f, weeks, 0.01);
+		calc.setWeeks(weeks);
+
+		calc.setSalary(new Amount("252.00"));
+		calc.setWithhold(new Amount());
+		calc.setPaycheck(new Amount());
+
+		calc.calculateGivenSalary();
+		assertEquals(0, calc.getSalary().getNumber() - 25200);
+		assertEquals(0, calc.getWithhold().getNumber() - 2200);
+		assertEquals(0, calc.getPaycheck().getNumber() - 23000);
+
+		/*
+		 * Now try given payable:
+		 */
+
+		calc.setPaycheck(new Amount("230.00"));
+		calc.setSalary(new Amount());
+		calc.setWithhold(new Amount());
+		calc.calculateGivenPayable();
+
+		assertEquals(0, calc.getSalary().getNumber() - 25200);
+		assertEquals(0, calc.getWithhold().getNumber() - 2200);
+		assertEquals(0, calc.getPaycheck().getNumber() - 23000);
+
+		/*
+		 * Now test the known values case of $6000 paycheck in 6 months. It
+		 * turns out that approximating 26 as the number of weeks in 6 months is
+		 * wrong and leads to a different answer than with 1 Jul - 31 Dec.
+		 */
+
+		range = new RangeCalculator();
+		range.setStartDate(new Datestamp("1 Jul 05"));
+		range.setEndDate(new Datestamp("31 Dec 05"));
+
+		weeks = range.calculateWeeks();
+		assertEquals(26.2, weeks, 0.1);
+		calc.setWeeks(weeks);
+
+		calc.setSalary(new Amount("6550.00"));
+		// mock
+		calc.setWithhold(new Amount());
+		calc.setPaycheck(new Amount());
+
+		calc.calculateGivenSalary();
+
+		assertEquals("6550.00", calc.getSalary().getValue());
+		assertEquals("550.00", calc.getWithhold().getValue());
+		assertEquals("6000.00", calc.getPaycheck().getValue());
+
+		/*
+		 * Now try the reverse direction
+		 */
+
+		calc.setPaycheck(new Amount("6000.00"));
+		// mock
+		calc.setSalary(new Amount());
+		calc.setWithhold(new Amount());
+
+		calc.calculateGivenPayable();
+
+		/*
+		 * And evaluate the results. The bug is that we aren't getting the value
+		 * back for payable that we put in, manifesting itself as nonzero
+		 * cents...
+		 */
+		assertEquals("6000.00", calc.getPaycheck().getValue());
+		assertEquals("550.00", calc.getWithhold().getValue());
+		assertEquals("6550.00", calc.getSalary().getValue());
 
 		last = true;
 	}

@@ -254,8 +254,8 @@ public class DemoMockTransactions
 					AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING, new Datestamp(
 						"13 Dec 05"), new Datestamp("1 Jul 05"), new Datestamp("31 Dec 05"),
 					new Entry[] {
-						new Debit(new Amount("6572.00"), salaryExpense),
-						new Credit(new Amount("572.00"), paygCollected),
+						new Debit(new Amount("6550.00"), salaryExpense),
+						new Credit(new Amount("550.00"), paygCollected),
 						new Credit(new Amount("6000.00"), bankAccount)
 					}),
 
