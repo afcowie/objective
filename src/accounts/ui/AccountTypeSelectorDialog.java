@@ -6,14 +6,13 @@
  */
 package accounts.ui;
 
+import org.gnome.gtk.Button;
+import org.gnome.gtk.Gtk;
+import org.gnome.gtk.RadioButton;
+
 import generic.ui.AbstractWindow;
 import generic.util.Debug;
 
-import org.gnu.gtk.Button;
-import org.gnu.gtk.Gtk;
-import org.gnu.gtk.RadioButton;
-import org.gnu.gtk.event.ButtonEvent;
-import org.gnu.gtk.event.ButtonListener;
 
 import accounts.domain.Account;
 import accounts.domain.AssetAccount;
@@ -93,7 +92,7 @@ class AccountTypeSelectorDialog extends AbstractWindow
 		}
 		if (activate != null) {
 			RadioButton rb = (RadioButton) gladeParser.getWidget(activate);
-			rb.click();
+			rb.clicked();
 		}
 	}
 

@@ -11,12 +11,11 @@ import generic.util.Debug;
 
 import java.io.FileNotFoundException;
 
-import org.gnu.glade.LibGlade;
-import org.gnu.gtk.Box;
-import org.gnu.gtk.VBox;
-import org.gnu.gtk.Window;
-import org.gnu.gtk.event.LifeCycleEvent;
-import org.gnu.gtk.event.LifeCycleListener;
+import org.gnome.glade.Glade;
+import org.gnome.glade.XML;
+import org.gnome.gtk.Box;
+import org.gnome.gtk.VBox;
+import org.gnome.gtk.Window;
 
 /**
  * The base class in our Window hierarchy, providing default behaviour common to
@@ -59,7 +58,7 @@ public abstract class AbstractWindow
 	 * need for a getter. A subclass should be smart enough to know whether or
 	 * not it used the Glade form before trying to use gladeParser.getWidget()!
 	 */
-	protected LibGlade			gladeParser;
+	protected XML			gladeParser;
 
 	/**
 	 * As a convention, our standard windows all have a top level Box (usually a
@@ -182,7 +181,7 @@ public abstract class AbstractWindow
 		 */
 
 		try {
-			gladeParser = new LibGlade(gladeFilename, this);
+			gladeParser = Glade.parse(gladeFilename, "FIXME" ); // FIXME
 		} catch (FileNotFoundException e) {
 			// If it can't find that glade file, we have an app
 			// configuration problem or worse some UI bug, and need to abort.

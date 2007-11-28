@@ -16,18 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.gnu.gdk.Color;
-import org.gnu.gtk.Entry;
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.Label;
-import org.gnu.gtk.StateType;
-import org.gnu.gtk.Widget;
-import org.gnu.gtk.event.ComboBoxEvent;
-import org.gnu.gtk.event.ComboBoxListener;
-import org.gnu.gtk.event.EntryEvent;
-import org.gnu.gtk.event.EntryListener;
-import org.gnu.gtk.event.FocusEvent;
-import org.gnu.gtk.event.FocusListener;
+import org.gnome.gtk.Entry;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.Widget;
 
 import accounts.domain.Amount;
 import accounts.domain.Books;

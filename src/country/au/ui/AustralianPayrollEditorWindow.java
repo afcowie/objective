@@ -15,13 +15,11 @@ import generic.util.Debug;
 
 import java.util.List;
 
-import org.gnu.gtk.HSeparator;
-import org.gnu.gtk.Label;
-import org.gnu.gtk.MessageType;
-import org.gnu.gtk.VBox;
-import org.gnu.gtk.Widget;
-import org.gnu.gtk.event.ComboBoxEvent;
-import org.gnu.gtk.event.ComboBoxListener;
+import org.gnome.gtk.HSeparator;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.VBox;
+import org.gnome.gtk.Widget;
+
 
 import accounts.domain.Amount;
 import accounts.domain.Credit;
@@ -117,7 +115,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 
 		final Label title_Label = new Label("<big><b>Pay an (Australian) Employee</b></big>");
 		title_Label.setUseMarkup(true);
-		title_Label.setAlignment(0.0, 0.5);
+		title_Label.setAlignment(0.0f, 0.5f);
 
 		top.packStart(title_Label, false, false, 3);
 
@@ -180,7 +178,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 
 		final Label for_Label = new Label("<b>For work:</b>");
 		for_Label.setUseMarkup(true);
-		for_Label.setAlignment(0.0, 0.5);
+		for_Label.setAlignment(0.0f, 0.5f);
 		table.attach(for_Label, LEFT);
 
 		payPeriod_RangePicker = new RangePicker();
@@ -196,7 +194,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 */
 
 		final Label salary_Label = new Label("Salary:");
-		salary_Label.setAlignment(1.0, 0.5);
+		salary_Label.setAlignment(1.0f, 0.5f);
 		table.attach(salary_Label, LEFT);
 
 		salary_AmountEntry = new AmountEntry();
@@ -207,7 +205,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 * directly; it's calculated.
 		 */
 		final Label withholding_Label = new Label("Withholding:");
-		withholding_Label.setAlignment(1.0, 0.5);
+		withholding_Label.setAlignment(1.0f, 0.5f);
 		table.attach(withholding_Label, LEFT);
 
 		withholding_AmountDisplay = new AmountDisplay();
@@ -217,7 +215,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
 		 * The paycheck entry
 		 */
 		final Label paycheck_Label = new Label("Paycheck:");
-		paycheck_Label.setAlignment(1.0, 0.5);
+		paycheck_Label.setAlignment(1.0f, 0.5f);
 		table.attach(paycheck_Label, LEFT);
 
 		paycheck_AmountEntry = new AmountEntry();

@@ -11,13 +11,13 @@ import generic.persistence.DataClient;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.gnu.gtk.CellRendererText;
-import org.gnu.gtk.ComboBox;
-import org.gnu.gtk.DataColumn;
-import org.gnu.gtk.DataColumnObject;
-import org.gnu.gtk.DataColumnString;
-import org.gnu.gtk.ListStore;
-import org.gnu.gtk.TreeIter;
+import org.gnome.gtk.CellRendererText;
+import org.gnome.gtk.ComboBox;
+import org.gnome.gtk.DataColumn;
+import org.gnome.gtk.DataColumnReference;
+import org.gnome.gtk.DataColumnString;
+import org.gnome.gtk.ListStore;
+import org.gnome.gtk.TreeIter;
 
 import accounts.domain.Books;
 import accounts.domain.Currency;
@@ -32,7 +32,7 @@ import accounts.domain.Currency;
 public class CurrencySelector extends ComboBox
 {
 	private DataColumnString	codeDisplay_DataColumn;
-	private DataColumnObject	currencyObject_DataColumn;
+	private DataColumnReference currencyObject_DataColumn;
 	private ListStore			listStore;
 
 	/**
@@ -58,7 +58,7 @@ public class CurrencySelector extends ComboBox
 		 * we can store a reference to the Currency object that is being picked.
 		 */
 		codeDisplay_DataColumn = new DataColumnString();
-		currencyObject_DataColumn = new DataColumnObject();
+		currencyObject_DataColumn = new DataColumnReference();
 
 		DataColumn[] currencySelector_DataColumnArray = {
 			codeDisplay_DataColumn,

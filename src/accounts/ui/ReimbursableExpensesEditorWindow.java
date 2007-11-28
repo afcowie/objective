@@ -14,10 +14,9 @@ import generic.util.Debug;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.gnu.glib.CustomEvents;
-import org.gnu.gtk.Entry;
-import org.gnu.gtk.MessageType;
-import org.gnu.gtk.Table;
+import org.gnome.gtk.Entry;
+import org.gnome.gtk.MessageType;
+import org.gnome.gtk.Table;
 
 import accounts.domain.Amount;
 import accounts.domain.Credit;

@@ -9,12 +9,10 @@
  */
 package generic.ui;
 
-import org.gnu.gtk.ButtonsType;
-import org.gnu.gtk.DialogFlags;
-import org.gnu.gtk.MessageDialog;
-import org.gnu.gtk.MessageType;
-import org.gnu.gtk.Window;
-import org.gnu.gtk.WindowPosition;
+import org.gnome.gtk.ButtonsType;
+import org.gnome.gtk.MessageDialog;
+import org.gnome.gtk.Window;
+import org.gnome.gtk.WindowPosition;
 
 /**
  * A simple wrapper, as the {@link org.gnu.gtk.MessageDialog} class (which is
@@ -91,7 +89,7 @@ public class ModalDialog
 	public void run() {
 		dialog.showAll();
 		dialog.run();
-		dialog.destroy();
+		dialog.hide();
 	}
 
 	/**

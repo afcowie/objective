@@ -11,18 +11,15 @@ import generic.persistence.DataClient;
 import java.util.Iterator;
 import java.util.List;
 
-import org.gnu.gdk.Color;
-import org.gnu.gtk.ComboBoxEntry;
-import org.gnu.gtk.DataColumn;
-import org.gnu.gtk.DataColumnObject;
-import org.gnu.gtk.DataColumnString;
-import org.gnu.gtk.Entry;
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.ListStore;
-import org.gnu.gtk.StateType;
-import org.gnu.gtk.TreeIter;
-import org.gnu.gtk.event.ComboBoxEvent;
-import org.gnu.gtk.event.ComboBoxListener;
+import org.gnome.gtk.ComboBoxEntry;
+import org.gnome.gtk.DataColumn;
+import org.gnome.gtk.DataColumnReference;
+import org.gnome.gtk.DataColumnString;
+import org.gnome.gtk.Entry;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.ListStore;
+import org.gnome.gtk.TreeIter;
+
 
 import accounts.domain.Employee;
 import accounts.domain.Worker;
@@ -43,7 +40,7 @@ public class WorkerPicker extends HBox
 	private transient Worker	worker;
 
 	private DataColumnString	nameDisplay_DataColumn;
-	private DataColumnObject	workerObject_DataColumn;
+	private DataColumnReference 	workerObject_DataColumn;
 	private ListStore			listStore;
 
 	private ComboBoxEntry		worker_ComboBoxEntry;
@@ -72,7 +69,7 @@ public class WorkerPicker extends HBox
 		 * we can store a reference to the Worker object that is being picked.
 		 */
 		nameDisplay_DataColumn = new DataColumnString();
-		workerObject_DataColumn = new DataColumnObject();
+		workerObject_DataColumn = new DataColumnReference();
 
 		DataColumn[] workerPicker_DataColumnArray = {
 			nameDisplay_DataColumn,

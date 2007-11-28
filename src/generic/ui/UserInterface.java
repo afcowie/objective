@@ -17,9 +17,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.gnu.gdk.Cursor;
-import org.gnu.gdk.CursorType;
-import org.gnu.gtk.Gtk;
+import org.gnome.gtk.Gtk;
+
+
 
 /**
  * Central touch point to cause user interface wide actions to occur. An

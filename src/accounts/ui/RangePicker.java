@@ -6,12 +6,12 @@
  */
 package accounts.ui;
 
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Label;
+
 import generic.ui.Align;
 import generic.ui.ChangeListener;
 import generic.ui.TwoColumnTable;
-
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.Label;
 
 import accounts.domain.Datestamp;
 import accounts.services.RangeCalculator;
@@ -36,11 +36,11 @@ public class RangePicker extends HBox
 		final TwoColumnTable table = new TwoColumnTable(2);
 
 		final Label startDate_Label = new Label("From...");
-		startDate_Label.setAlignment(0.0, 0.5);
+		startDate_Label.setAlignment(0.0f, 0.5f);
 		table.attach(startDate_Label, Align.LEFT);
 
 		final Label endDate_Label = new Label("Through...");
-		endDate_Label.setAlignment(0.0, 0.5);
+		endDate_Label.setAlignment(0.0f, 0.5f);
 		table.attach(endDate_Label, Align.RIGHT);
 
 		startDate_Picker = new DatePicker();

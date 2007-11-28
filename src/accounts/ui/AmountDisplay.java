@@ -6,8 +6,8 @@
  */
 package accounts.ui;
 
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.Label;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Label;
 
 import accounts.domain.Amount;
 
@@ -37,7 +37,7 @@ public class AmountDisplay extends HBox
 		super(false, 0);
 
 		amount_Label = new Label("");
-		amount_Label.setAlignment(1.0, 0.5);
+		amount_Label.setAlignment(1.0f, 0.5f);
 		amount_Label.setWidthChars(10);
 		amount_Label.setMaxWidthChars(10);
 

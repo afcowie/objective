@@ -14,19 +14,17 @@ import generic.ui.TwoColumnTable;
 
 import java.util.Iterator;
 
-import org.gnu.gtk.Button;
-import org.gnu.gtk.GtkStockItem;
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.Label;
-import org.gnu.gtk.MessageType;
-import org.gnu.gtk.ReliefStyle;
-import org.gnu.gtk.SizeGroup;
-import org.gnu.gtk.SizeGroupMode;
-import org.gnu.gtk.Table;
-import org.gnu.gtk.VBox;
-import org.gnu.gtk.Widget;
-import org.gnu.gtk.event.ButtonEvent;
-import org.gnu.gtk.event.ButtonListener;
+import org.gnome.gtk.Button;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.MessageType;
+import org.gnome.gtk.ReliefStyle;
+import org.gnome.gtk.SizeGroup;
+import org.gnome.gtk.SizeGroupMode;
+import org.gnome.gtk.Stock;
+import org.gnome.gtk.Table;
+import org.gnome.gtk.VBox;
+import org.gnome.gtk.Widget;
 
 import accounts.domain.Amount;
 import accounts.domain.Books;
@@ -124,7 +122,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		}
 		{
 			Label dL = new Label("Date:");
-			dL.setAlignment(1.0, 0.5);
+			dL.setAlignment(1.0f, 0.5f);
 			table.attach(dL, Align.LEFT);
 			dP = new DatePicker();
 			dP.setDate(t.getDate());
@@ -132,7 +130,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 		}
 		{
 			Label dL = new Label("Description");
-			dL.setAlignment(1.0, 0.5);
+			dL.setAlignment(1.0f, 0.5f);
 			table.attach(dL, Align.LEFT);
 			dE = new TextEntry();
 			dE.setText(t.getDescription());
@@ -164,15 +162,15 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 			headings = new HBox(false, 3);
 			Label aL = new Label("Account / Ledger");
-			aL.setAlignment(0.0, 0.5);
+			aL.setAlignment(0.0f, 0.5f);
 
 			Label faL = new Label("Amount");
-			faL.setAlignment(0.0, 0.5);
+			faL.setAlignment(0.0f, 0.5f);
 
 			Label drL = new Label("Debits");
 			Label crL = new Label("Credits  ");
-			drL.setAlignment(1.0, 0.5);
-			crL.setAlignment(1.0, 0.5);
+			drL.setAlignment(1.0f, 0.5f);
+			crL.setAlignment(1.0f, 0.5f);
 
 			/*
 			 * We put these two Labels into a Table so as to force the Widgets
@@ -233,7 +231,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
 			tailings = new HBox(false, 3);
 
-			addButton = new Button(GtkStockItem.ADD);
+			addButton = new Button(Stock.ADD);
 			addButton.addListener(new ButtonListener() {
 				public void buttonEvent(ButtonEvent event) {
 					if (event.getType() == ButtonEvent.Type.CLICK) {
@@ -412,7 +410,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 				}
 			});
 
-			deleteButton = new Button(GtkStockItem.DELETE);
+			deleteButton = new Button(Stock.DELETE);
 			deleteButton.addListener(new ButtonListener() {
 				public void buttonEvent(ButtonEvent event) {
 					if (event.getType() == ButtonEvent.Type.CLICK) {

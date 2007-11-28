@@ -12,8 +12,7 @@ import generic.util.Debug;
 
 import java.io.FileNotFoundException;
 
-import org.gnu.gtk.Gtk;
-import org.gnu.gtk.GtkInitException;
+import org.gnome.gtk.Gtk;
 
 import accounts.domain.Books;
 import accounts.ui.ObjectiveUserInterface;
@@ -47,11 +46,7 @@ public class DemoWindowRunner
 			System.exit(2);
 		}
 		Debug.print("main", "Initializing Gtk");
-		try {
-			Gtk.initCheck(args);
-		} catch (GtkInitException gie) {
-			Debug.print("main", "Gtk.initCheck() threw an excpetion. Ignoring.");
-		}
+		Gtk.init(args);
 
 		Master.ui = new ObjectiveUserInterface();
 

@@ -6,8 +6,8 @@
  */
 package generic.ui;
 
-import org.gnu.gtk.Table;
-import org.gnu.gtk.Widget;
+import org.gnome.gtk.Table;
+import org.gnome.gtk.Widget;
 
 /**
  * A Table container specialized to simply do two columns of aligned rows. GTK's

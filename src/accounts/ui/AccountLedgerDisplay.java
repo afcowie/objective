@@ -11,12 +11,11 @@ import generic.ui.Text;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.Label;
-import org.gnu.gtk.Requisition;
-import org.gnu.gtk.Widget;
-import org.gnu.gtk.event.ExposeEvent;
-import org.gnu.gtk.event.ExposeListener;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.Requisition;
+import org.gnome.gtk.Widget;
+
 
 import accounts.domain.Account;
 import accounts.domain.Ledger;
@@ -58,7 +57,7 @@ public class AccountLedgerDisplay extends HBox
 
 		label = new Label("");
 		label.setUseMarkup(true);
-		label.setAlignment(0.0, 0.5);
+		label.setAlignment(0.0f, 0.5f);
 
 		this.packStart(label, false, false, 0);
 

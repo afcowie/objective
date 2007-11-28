@@ -11,24 +11,15 @@ import generic.ui.ChangeListener;
 
 import java.text.ParseException;
 
-import org.gnu.gdk.KeyValue;
-import org.gnu.gtk.Button;
-import org.gnu.gtk.Calendar;
-import org.gnu.gtk.Entry;
-import org.gnu.gtk.GtkStockItem;
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.IconSize;
-import org.gnu.gtk.Image;
-import org.gnu.gtk.Label;
-import org.gnu.gtk.Window;
-import org.gnu.gtk.event.ButtonEvent;
-import org.gnu.gtk.event.ButtonListener;
-import org.gnu.gtk.event.CalendarEvent;
-import org.gnu.gtk.event.CalendarListener;
-import org.gnu.gtk.event.EntryEvent;
-import org.gnu.gtk.event.EntryListener;
-import org.gnu.gtk.event.KeyEvent;
-import org.gnu.gtk.event.KeyListener;
+import org.gnome.gtk.Button;
+import org.gnome.gtk.Calendar;
+import org.gnome.gtk.Entry;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Image;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.Stock;
+import org.gnome.gtk.Window;
+
 
 import accounts.domain.Datestamp;
 
@@ -74,7 +65,7 @@ public class DatePicker extends HBox
 		// _pick = new Button("stock_calendar-view-month");
 
 		pick = new Button();
-		Image icon = new Image(GtkStockItem.INDEX, IconSize.BUTTON);
+		Image icon = new Image(Stock.INDEX, IconSize.BUTTON);
 		Label label = new Label("Pick", false);
 		HBox box = new HBox(false, 1);
 
@@ -129,7 +120,7 @@ public class DatePicker extends HBox
 		private DatePickerPopup(String which, String filename) {
 			super(which, filename);
 
-			calendar = (org.gnu.gtk.Calendar) gladeParser.getWidget("calendar");
+			calendar = (Calendar) gladeParser.getWidget("calendar");
 			calendar.addListener(new CalendarListener() {
 				public void calendarEvent(CalendarEvent event) {
 					if (event.getType() == CalendarEvent.Type.DAY_SELECTED_DOUBLE_CLICK) {

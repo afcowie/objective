@@ -15,39 +15,23 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.gnu.gdk.KeyValue;
-import org.gnu.gtk.Button;
-import org.gnu.gtk.CellRendererText;
-import org.gnu.gtk.DataColumn;
-import org.gnu.gtk.DataColumnObject;
-import org.gnu.gtk.DataColumnString;
-import org.gnu.gtk.Entry;
-import org.gnu.gtk.EventBox;
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.ListStore;
-import org.gnu.gtk.ReliefStyle;
-import org.gnu.gtk.SelectionMode;
-import org.gnu.gtk.StatusBar;
-import org.gnu.gtk.TreeIter;
-import org.gnu.gtk.TreeModel;
-import org.gnu.gtk.TreeModelFilter;
-import org.gnu.gtk.TreeModelFilterVisibleMethod;
-import org.gnu.gtk.TreeModelSort;
-import org.gnu.gtk.TreePath;
-import org.gnu.gtk.TreeSelection;
-import org.gnu.gtk.TreeView;
-import org.gnu.gtk.TreeViewColumn;
-import org.gnu.gtk.Window;
-import org.gnu.gtk.event.ButtonEvent;
-import org.gnu.gtk.event.ButtonListener;
-import org.gnu.gtk.event.EntryEvent;
-import org.gnu.gtk.event.EntryListener;
-import org.gnu.gtk.event.FocusEvent;
-import org.gnu.gtk.event.FocusListener;
-import org.gnu.gtk.event.KeyEvent;
-import org.gnu.gtk.event.KeyListener;
-import org.gnu.gtk.event.TreeViewEvent;
-import org.gnu.gtk.event.TreeViewListener;
+import org.gnome.gtk.Button;
+import org.gnome.gtk.CellRendererText;
+import org.gnome.gtk.DataColumn;
+import org.gnome.gtk.DataColumnReference;
+import org.gnome.gtk.DataColumnString;
+import org.gnome.gtk.Entry;
+import org.gnome.gtk.EventBox;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.ListStore;
+import org.gnome.gtk.ReliefStyle;
+import org.gnome.gtk.Statusbar;
+import org.gnome.gtk.TreeIter;
+import org.gnome.gtk.TreePath;
+import org.gnome.gtk.TreeView;
+import org.gnome.gtk.TreeViewColumn;
+import org.gnome.gtk.Window;
+
 
 import accounts.domain.Account;
 import accounts.domain.Books;
@@ -130,10 +114,10 @@ public class AccountPicker extends HBox
 		private TreeModelSort		sortedStore;
 		private DataColumnString	accountDisplay_DataColumn;
 		private DataColumnString	accountTitle_DataColumn;
-		private DataColumnObject	accountObject_DataColumn;
+		private DataColumnReference	accountObject_DataColumn;
 		private DataColumnString	ledgerDisplay_DataColumn;
 		private DataColumnString	ledgerName_DataColumn;
-		private DataColumnObject	ledgerObject_DataColumn;
+		private DataColumnReference	ledgerObject_DataColumn;
 
 		private TreeView			view;
 		TreeViewColumn				account_ViewColumn;
@@ -143,7 +127,7 @@ public class AccountPicker extends HBox
 		private int					visibleRows;
 		private int					totalRows;
 
-		private StatusBar			status;
+		private Statusbar			status;
 		private int					lastID	= 0;
 
 		AccountPickerPopup(String which, String filename) {
@@ -160,11 +144,11 @@ public class AccountPicker extends HBox
 			 */
 			accountDisplay_DataColumn = new DataColumnString();
 			accountTitle_DataColumn = new DataColumnString();
-			accountObject_DataColumn = new DataColumnObject();
+			accountObject_DataColumn = new DataColumnReference();
 
 			ledgerDisplay_DataColumn = new DataColumnString();
 			ledgerName_DataColumn = new DataColumnString();
-			ledgerObject_DataColumn = new DataColumnObject();
+			ledgerObject_DataColumn = new DataColumnReference();
 
 			DataColumn[] accountsPicker_DataColumnsArray = new DataColumn[] {
 				accountDisplay_DataColumn,
@@ -541,7 +525,7 @@ public class AccountPicker extends HBox
 		 */
 
 		public void present() {
-			org.gnu.gdk.Window gdkWindow = backing.getWindow();
+			org.gnome.gdk.Window gdkWindow = backing.getWindow();
 
 			int x = gdkWindow.getOrigin().getX();
 			int y = gdkWindow.getOrigin().getY(); // + gdkWindow.getHeight();

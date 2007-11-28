@@ -6,17 +6,14 @@
  */
 package accounts.ui;
 
+import org.gnome.gdk.Color;
+import org.gnome.gtk.Entry;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.StateType;
+
 import generic.ui.ChangeListener;
 import generic.util.Debug;
 
-import org.gnu.gdk.Color;
-import org.gnu.gtk.Entry;
-import org.gnu.gtk.HBox;
-import org.gnu.gtk.StateType;
-import org.gnu.gtk.event.EntryEvent;
-import org.gnu.gtk.event.EntryListener;
-import org.gnu.gtk.event.FocusEvent;
-import org.gnu.gtk.event.FocusListener;
 
 import accounts.domain.Amount;
 

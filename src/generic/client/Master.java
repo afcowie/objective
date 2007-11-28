@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.gnu.gtk.Gtk;
+import org.gnome.gtk.Gtk;
 
 /**
  * A static class containing global callbacks that can be used from throughout

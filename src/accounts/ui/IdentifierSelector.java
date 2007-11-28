@@ -9,13 +9,13 @@ package accounts.ui;
 import java.util.Iterator;
 import java.util.List;
 
-import org.gnu.gtk.CellRendererText;
-import org.gnu.gtk.ComboBox;
-import org.gnu.gtk.DataColumn;
-import org.gnu.gtk.DataColumnObject;
-import org.gnu.gtk.DataColumnString;
-import org.gnu.gtk.ListStore;
-import org.gnu.gtk.TreeIter;
+import org.gnome.gtk.CellRendererText;
+import org.gnome.gtk.ComboBox;
+import org.gnome.gtk.DataColumn;
+import org.gnome.gtk.DataColumnReference;
+import org.gnome.gtk.DataColumnString;
+import org.gnome.gtk.ListStore;
+import org.gnome.gtk.TreeIter;
 
 import accounts.domain.Identifier;
 import accounts.domain.IdentifierGroup;
@@ -29,7 +29,7 @@ import accounts.domain.IdentifierGroup;
 public class IdentifierSelector extends ComboBox
 {
 	private DataColumnString	nameDisplay_DataColumn;
-	private DataColumnObject	identifierObject_DataColumn;
+	private DataColumnReference	identifierObject_DataColumn;
 	private ListStore			listStore;
 
 	/**
@@ -52,7 +52,7 @@ public class IdentifierSelector extends ComboBox
 		 * picked.
 		 */
 		nameDisplay_DataColumn = new DataColumnString();
-		identifierObject_DataColumn = new DataColumnObject();
+		identifierObject_DataColumn = new DataColumnReference();
 
 		DataColumn[] currencySelector_DataColumnArray = {
 			nameDisplay_DataColumn,

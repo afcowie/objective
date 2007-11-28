@@ -6,17 +6,16 @@
  */
 package generic.ui;
 
+import org.gnome.gtk.Button;
+import org.gnome.gtk.ButtonBoxStyle;
+import org.gnome.gtk.HButtonBox;
+import org.gnome.gtk.HSeparator;
+import org.gnome.gtk.Stock;
+
 import generic.persistence.DataClient;
 import generic.persistence.Engine;
 import generic.util.Debug;
 
-import org.gnu.gtk.Button;
-import org.gnu.gtk.ButtonBoxStyle;
-import org.gnu.gtk.GtkStockItem;
-import org.gnu.gtk.HButtonBox;
-import org.gnu.gtk.HSeparator;
-import org.gnu.gtk.event.ButtonEvent;
-import org.gnu.gtk.event.ButtonListener;
 
 /**
  * A great number of UI windows follow the pattern of being either editors or
@@ -75,7 +74,7 @@ public abstract class EditorWindow extends PrimaryWindow
 		HButtonBox buttonbox = new HButtonBox();
 		buttonbox.setLayout(ButtonBoxStyle.END);
 
-		cancel = new Button(GtkStockItem.CANCEL);
+		cancel = new Button(Stock.CANCEL);
 		cancel.addListener(new ButtonListener() {
 			public void buttonEvent(ButtonEvent event) {
 				if (event.getType() == ButtonEvent.Type.CLICK) {
@@ -85,7 +84,7 @@ public abstract class EditorWindow extends PrimaryWindow
 		});
 		buttonbox.add(cancel);
 
-		ok = new Button(GtkStockItem.OK);
+		ok = new Button(Stock.OK);
 		ok.addListener(new ButtonListener() {
 			public void buttonEvent(ButtonEvent event) {
 				if (event.getType() == ButtonEvent.Type.CLICK) {

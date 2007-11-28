@@ -6,9 +6,7 @@
  */
 package generic.ui;
 
-import org.gnu.gtk.Entry;
-import org.gnu.gtk.event.EntryEvent;
-import org.gnu.gtk.event.EntryListener;
+import org.gnome.gtk.Entry;
 
 /**
  * A simple wrapper aroung GTK's Entry. Hooks up its listeners and fires off our

@@ -20,26 +20,19 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.gnu.gtk.CellRendererText;
-import org.gnu.gtk.DataColumn;
-import org.gnu.gtk.DataColumnBoolean;
-import org.gnu.gtk.DataColumnLong;
-import org.gnu.gtk.DataColumnObject;
-import org.gnu.gtk.DataColumnString;
-import org.gnu.gtk.ListStore;
-import org.gnu.gtk.SelectionMode;
-import org.gnu.gtk.TreeIter;
-import org.gnu.gtk.TreePath;
-import org.gnu.gtk.TreeRowReference;
-import org.gnu.gtk.TreeSelection;
-import org.gnu.gtk.TreeView;
-import org.gnu.gtk.TreeViewColumn;
-import org.gnu.gtk.event.LifeCycleEvent;
-import org.gnu.gtk.event.LifeCycleListener;
-import org.gnu.gtk.event.TreeSelectionEvent;
-import org.gnu.gtk.event.TreeSelectionListener;
-import org.gnu.gtk.event.TreeViewEvent;
-import org.gnu.gtk.event.TreeViewListener;
+import org.gnome.gtk.CellRendererText;
+import org.gnome.gtk.DataColumn;
+import org.gnome.gtk.DataColumnBoolean;
+import org.gnome.gtk.DataColumnReference;
+import org.gnome.gtk.DataColumnString;
+import org.gnome.gtk.ListStore;
+import org.gnome.gtk.TreeIter;
+import org.gnome.gtk.TreePath;
+import org.gnome.gtk.TreeRowReference;
+import org.gnome.gtk.TreeSelection;
+import org.gnome.gtk.TreeView;
+import org.gnome.gtk.TreeViewColumn;
+
 
 import accounts.domain.Account;
 import accounts.domain.Amount;
@@ -87,7 +80,7 @@ public class TransactionListView extends TreeView implements UpdateListener
 	 * The Transaction object that this row represents. This must be set before
 	 * calling {@link #populate(TreeIter)}
 	 */
-	private DataColumnObject	transactionObject_DataColumn;
+	private DataColumnReference	transactionObject_DataColumn;
 	/**
 	 * Whether the row is to be rendered with bright colours. Set this as true
 	 * if the row is selected and you want it to show up in "reverse video",
@@ -124,7 +117,7 @@ public class TransactionListView extends TreeView implements UpdateListener
 		debitAmountsSort_DataColumn = new DataColumnLong();
 		creditAmountsText_DataColumn = new DataColumnString();
 		creditAmountsSort_DataColumn = new DataColumnLong();
-		transactionObject_DataColumn = new DataColumnObject();
+		transactionObject_DataColumn = new DataColumnReference();
 		active_DataColumn = new DataColumnBoolean();
 
 		model = new ListStore(new DataColumn[] {
@@ -256,11 +249,11 @@ public class TransactionListView extends TreeView implements UpdateListener
 		/*
 		 * overall properties
 		 */
-		view.setAlternateRowColor(true);
+		view.setRulesHint(true);
 		view.setEnableSearch(false);
 		view.setReorderable(false);
 
-		date_ViewColumn.click();
+		date_ViewColumn.clicked();
 
 		/*
 		 * repopulate [via showAsActive()] when a row is selected to cause

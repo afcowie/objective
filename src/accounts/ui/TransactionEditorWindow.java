@@ -12,9 +12,6 @@ import generic.ui.ModalDialog;
 import generic.util.Debug;
 import generic.util.DebugException;
 
-import org.gnu.glib.CustomEvents;
-import org.gnu.gtk.MessageType;
-
 import accounts.domain.Transaction;
 import accounts.services.Command;
 import accounts.services.CommandNotReadyException;
