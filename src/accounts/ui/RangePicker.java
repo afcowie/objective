@@ -23,102 +23,103 @@ import accounts.services.RangeCalculator;
  */
 public class RangePicker extends HBox
 {
-	private transient RangeCalculator	calc			= null;
+    private transient RangeCalculator calc = null;
 
-	private DatePicker					startDate_Picker;
-	private DatePicker					endDate_Picker;
+    private DatePicker startDate_Picker;
 
-	private ChangeListener				changeListener	= null;
+    private DatePicker endDate_Picker;
 
-	public RangePicker() {
-		super(false, 0);
+    private ChangeListener changeListener = null;
 
-		final TwoColumnTable table = new TwoColumnTable(2);
+    public RangePicker() {
+        super(false, 0);
 
-		final Label startDate_Label = new Label("From...");
-		startDate_Label.setAlignment(0.0f, 0.5f);
-		table.attach(startDate_Label, Align.LEFT);
+        final TwoColumnTable table = new TwoColumnTable(2);
 
-		final Label endDate_Label = new Label("Through...");
-		endDate_Label.setAlignment(0.0f, 0.5f);
-		table.attach(endDate_Label, Align.RIGHT);
+        final Label startDate_Label = new Label("From...");
+        startDate_Label.setAlignment(0.0f, 0.5f);
+        table.attach(startDate_Label, Align.LEFT);
 
-		startDate_Picker = new DatePicker();
-		table.attach(startDate_Picker, Align.LEFT);
+        final Label endDate_Label = new Label("Through...");
+        endDate_Label.setAlignment(0.0f, 0.5f);
+        table.attach(endDate_Label, Align.RIGHT);
 
-		endDate_Picker = new DatePicker();
-		table.attach(endDate_Picker, Align.RIGHT);
+        startDate_Picker = new DatePicker();
+        table.attach(startDate_Picker, Align.LEFT);
 
-		this.packStart(table, true, false, 0);
+        endDate_Picker = new DatePicker();
+        table.attach(endDate_Picker, Align.RIGHT);
 
-		/*
-		 * Now the code to handle changing data. Very simply, we propegate the
-		 * fact of a change upstream through our own ChangeListener. The Window
-		 * using this Widget can then either get the RangeCalculator, or
-		 * directly use the start and end Datestamps (which it may well already
-		 * have).
-		 */
+        this.packStart(table, true, false, 0);
 
-		calc = new RangeCalculator();
-		calc.setStartDate(startDate_Picker.getDate());
-		calc.setEndDate(endDate_Picker.getDate());
+        /*
+         * Now the code to handle changing data. Very simply, we propegate the
+         * fact of a change upstream through our own ChangeListener. The
+         * Window using this Widget can then either get the RangeCalculator,
+         * or directly use the start and end Datestamps (which it may well
+         * already have).
+         */
 
-		ChangeListener dateChanged = new ChangeListener() {
-			public void userChangedData() {
-				// System.out.println(calc.calculateDays() + " days, " +
-				// calc.calculateWeeks() + " weeks");
-				changeListener.userChangedData();
-			}
-		};
+        calc = new RangeCalculator();
+        calc.setStartDate(startDate_Picker.getDate());
+        calc.setEndDate(endDate_Picker.getDate());
 
-		startDate_Picker.addListener(dateChanged);
-		endDate_Picker.addListener(dateChanged);
-	}
+        ChangeListener dateChanged = new ChangeListener() {
+            public void userChangedData() {
+                // System.out.println(calc.calculateDays() + " days, " +
+                // calc.calculateWeeks() + " weeks");
+                changeListener.userChangedData();
+            }
+        };
 
-	/**
-	 * Get the Datestamp reresenting the beginning of the selected date range
-	 */
-	public Datestamp getStartDate() {
-		return startDate_Picker.getDate();
-	}
+        startDate_Picker.addListener(dateChanged);
+        endDate_Picker.addListener(dateChanged);
+    }
 
-	public void setStartDate(Datestamp startDate) {
-		if (startDate == null) {
-			throw new IllegalArgumentException();
-		}
-		startDate_Picker.setDate(startDate);
-		calc.setStartDate(startDate);
-	}
+    /**
+     * Get the Datestamp reresenting the beginning of the selected date range
+     */
+    public Datestamp getStartDate() {
+        return startDate_Picker.getDate();
+    }
 
-	/**
-	 * Get the Datestamp reresenting the end of the selected date range
-	 */
-	public Datestamp getEndDate() {
-		return endDate_Picker.getDate();
-	}
+    public void setStartDate(Datestamp startDate) {
+        if (startDate == null) {
+            throw new IllegalArgumentException();
+        }
+        startDate_Picker.setDate(startDate);
+        calc.setStartDate(startDate);
+    }
 
-	public void setEndDate(Datestamp endDate) {
-		if (endDate == null) {
-			throw new IllegalArgumentException();
-		}
-		endDate_Picker.setDate(endDate);
-		calc.setEndDate(endDate);
-	}
+    /**
+     * Get the Datestamp reresenting the end of the selected date range
+     */
+    public Datestamp getEndDate() {
+        return endDate_Picker.getDate();
+    }
 
-	/**
-	 * Get a RangeCalculator initialized with this picker's start and end
-	 * Datestamps. You can then use it's utility functions to calculate the
-	 * length of the range in various useful scales
-	 */
-	public RangeCalculator getRangeCalculator() {
-		return calc;
-	}
+    public void setEndDate(Datestamp endDate) {
+        if (endDate == null) {
+            throw new IllegalArgumentException();
+        }
+        endDate_Picker.setDate(endDate);
+        calc.setEndDate(endDate);
+    }
 
-	public void addListener(ChangeListener listener) {
-		if (changeListener != null) {
-			throw new IllegalStateException(
-				"You can't have more than one ChangeListener on a Display Widget");
-		}
-		changeListener = listener;
-	}
+    /**
+     * Get a RangeCalculator initialized with this picker's start and end
+     * Datestamps. You can then use it's utility functions to calculate the
+     * length of the range in various useful scales
+     */
+    public RangeCalculator getRangeCalculator() {
+        return calc;
+    }
+
+    public void addListener(ChangeListener listener) {
+        if (changeListener != null) {
+            throw new IllegalStateException(
+                    "You can't have more than one ChangeListener on a Display Widget");
+        }
+        changeListener = listener;
+    }
 }

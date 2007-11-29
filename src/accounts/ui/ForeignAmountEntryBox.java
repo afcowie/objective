@@ -28,253 +28,259 @@ import accounts.domain.ForeignAmount;
 
 public class ForeignAmountEntryBox extends HBox
 {
-	private ForeignAmount		foreignAmount;
+    private ForeignAmount foreignAmount;
 
-	private Currency			home;
-	private Currency			lastCurrency;
+    private Currency home;
 
-	private List				grayWidgets;
-	private AmountEntry			faceValue_AmountEntry;
-	private Entry				rate_Entry;
-	private AmountEntry			homeValue_AmountEntry;
-	private CurrencySelector	foreign_CurrencySelector;
+    private Currency lastCurrency;
 
-	private ChangeListener		changeListener;
+    private List grayWidgets;
 
-	/*
-	 * These are just Strings, so ok to be cross-Container.
-	 */
-	private static Map			lastRates;
+    private AmountEntry faceValue_AmountEntry;
 
-	static {
-		lastRates = new WeakHashMap();
-	}
+    private Entry rate_Entry;
 
-	public ForeignAmountEntryBox(DataClient store) {
-		super(false, 3);
+    private AmountEntry homeValue_AmountEntry;
 
-		Books root = (Books) store.getRoot();
-		home = root.getHomeCurrency();
+    private CurrencySelector foreign_CurrencySelector;
 
-		if (lastCurrency == null) {
-			lastCurrency = home;
-		}
+    private ChangeListener changeListener;
 
-		grayWidgets = new ArrayList();
+    /*
+     * These are just Strings, so ok to be cross-Container.
+     */
+    private static Map lastRates;
 
-		foreignAmount = new ForeignAmount("0.00", lastCurrency, "1.0");
+    static {
+        lastRates = new WeakHashMap();
+    }
 
-		faceValue_AmountEntry = new AmountEntry();
-		faceValue_AmountEntry.setAmount(new Amount()); // dummy
-		packStart(faceValue_AmountEntry, true, true, 0);
+    public ForeignAmountEntryBox(DataClient store) {
+        super(false, 3);
 
-		foreign_CurrencySelector = new CurrencySelector(store);
-		foreign_CurrencySelector.setCurrency(lastCurrency);
-		packStart(foreign_CurrencySelector, false, false, 0);
+        Books root = (Books) store.getRoot();
+        home = root.getHomeCurrency();
 
-		// \u00d7 is ×
-		Label x_Label = new Label("\u00d7");
-		packStart(x_Label, false, false, 0);
-		grayWidgets.add(x_Label);
+        if (lastCurrency == null) {
+            lastCurrency = home;
+        }
 
-		rate_Entry = new Entry();
-		rate_Entry.setWidth(8);
-		packStart(rate_Entry, true, true, 0);
-		grayWidgets.add(rate_Entry);
+        grayWidgets = new ArrayList();
 
-		Label equals_Label = new Label("=");
-		packStart(equals_Label, false, false, 0);
-		grayWidgets.add(equals_Label);
+        foreignAmount = new ForeignAmount("0.00", lastCurrency, "1.0");
 
-		homeValue_AmountEntry = new AmountEntry();
-		packStart(homeValue_AmountEntry, true, true, 0);
-		grayWidgets.add(homeValue_AmountEntry);
+        faceValue_AmountEntry = new AmountEntry();
+        faceValue_AmountEntry.setAmount(new Amount()); // dummy
+        packStart(faceValue_AmountEntry, true, true, 0);
 
-		Label homeCode_Label = new Label(home.getCode());
-		packStart(homeCode_Label, false, false, 0);
-		grayWidgets.add(homeCode_Label);
+        foreign_CurrencySelector = new CurrencySelector(store);
+        foreign_CurrencySelector.setCurrency(lastCurrency);
+        packStart(foreign_CurrencySelector, false, false, 0);
 
-		faceValue_AmountEntry.addListener(new ChangeListener() {
-			public void userChangedData() {
-				/*
-				 * faceValue_AmountEntry's Amount is a dummy object; we just use
-				 * it as a placeholder to get a validated value String.
-				 */
-				foreignAmount.setForeignValue(faceValue_AmountEntry.getAmount());
-				Debug.print("listeners", "faceValueEntry changed() " + foreignAmount.toString());
+        // \u00d7 is ×
+        Label x_Label = new Label("\u00d7");
+        packStart(x_Label, false, false, 0);
+        grayWidgets.add(x_Label);
 
-				rate_Entry.setText(foreignAmount.getRate());
-				homeValue_AmountEntry.setAmount(foreignAmount);
+        rate_Entry = new Entry();
+        rate_Entry.setWidth(8);
+        packStart(rate_Entry, true, true, 0);
+        grayWidgets.add(rate_Entry);
 
-				if (changeListener != null) {
-					changeListener.userChangedData();
-				}
-			}
+        Label equals_Label = new Label("=");
+        packStart(equals_Label, false, false, 0);
+        grayWidgets.add(equals_Label);
 
-		});
+        homeValue_AmountEntry = new AmountEntry();
+        packStart(homeValue_AmountEntry, true, true, 0);
+        grayWidgets.add(homeValue_AmountEntry);
 
-		foreign_CurrencySelector.addListener(new ComboBoxListener() {
-			public void comboBoxEvent(ComboBoxEvent event) {
-				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
-					Currency cur = foreign_CurrencySelector.getCurrency();
-					foreignAmount.setCurrency(cur);
+        Label homeCode_Label = new Label(home.getCode());
+        packStart(homeCode_Label, false, false, 0);
+        grayWidgets.add(homeCode_Label);
 
-					String rate = (String) lastRates.get(cur);
-					if (rate == null) {
-						rate = "1.0";
-					}
-					Debug.print("listeners", "currencySelector CHANGED " + cur.getCode() + " @" + rate);
+        faceValue_AmountEntry.addListener(new ChangeListener() {
+            public void userChangedData() {
+                /*
+                 * faceValue_AmountEntry's Amount is a dummy object; we just
+                 * use it as a placeholder to get a validated value String.
+                 */
+                foreignAmount.setForeignValue(faceValue_AmountEntry.getAmount());
+                Debug.print("listeners", "faceValueEntry changed() " + foreignAmount.toString());
 
-					foreignAmount.setRate(rate);
-					rate_Entry.setText(foreignAmount.getRate());
-					homeValue_AmountEntry.setAmount(foreignAmount);
+                rate_Entry.setText(foreignAmount.getRate());
+                homeValue_AmountEntry.setAmount(foreignAmount);
 
-					grayOut();
+                if (changeListener != null) {
+                    changeListener.userChangedData();
+                }
+            }
 
-					if (changeListener != null) {
-						changeListener.userChangedData();
-					}
-				}
-			}
-		});
+        });
 
-		rate_Entry.addListener(new EntryListener() {
-			public void entryEvent(EntryEvent event) {
-				if (event.getType() == EntryEvent.Type.CHANGED) {
-					final String text = rate_Entry.getText();
-					Debug.print("listeners", "rateEntry CHANGED " + text);
-					if (!rate_Entry.hasFocus()) {
-						return;
-					}
-					if (text.equals("")) {
-						return;
-					}
+        foreign_CurrencySelector.addListener(new ComboBoxListener() {
+            public void comboBoxEvent(ComboBoxEvent event) {
+                if (event.getType() == ComboBoxEvent.Type.CHANGED) {
+                    Currency cur = foreign_CurrencySelector.getCurrency();
+                    foreignAmount.setCurrency(cur);
 
-					try {
-						foreignAmount.setRate(text);
-						rate_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
-					} catch (NumberFormatException nfe) {
-						rate_Entry.setTextColor(StateType.NORMAL, Color.RED);
-						return;
-					}
-					homeValue_AmountEntry.setAmount(foreignAmount);
-					lastRates.put(foreign_CurrencySelector.getCurrency(), foreignAmount.getRate());
+                    String rate = (String) lastRates.get(cur);
+                    if (rate == null) {
+                        rate = "1.0";
+                    }
+                    Debug.print("listeners", "currencySelector CHANGED " + cur.getCode() + " @" + rate);
 
-					if (changeListener != null) {
-						changeListener.userChangedData();
-					}
-				}
+                    foreignAmount.setRate(rate);
+                    rate_Entry.setText(foreignAmount.getRate());
+                    homeValue_AmountEntry.setAmount(foreignAmount);
 
-				if (event.getType() == EntryEvent.Type.ACTIVATE) {
-					final String original = rate_Entry.getText();
-					final String text = foreignAmount.getRate();
-					rate_Entry.setText(text);
-					rate_Entry.setPosition(original.length());
-				}
-			}
-		});
+                    grayOut();
 
-		/*
-		 * If focus leaves or user presses enter, then apply the formatting
-		 * inherent in ForeignAmount's rate String.
-		 */
-		rate_Entry.addListener(new FocusListener() {
-			public boolean focusEvent(FocusEvent event) {
-				if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
-					rate_Entry.setText(foreignAmount.getRate());
-					rate_Entry.selectRegion(0, 0);
-					rate_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
-				}
-				return false;
-			};
-		});
+                    if (changeListener != null) {
+                        changeListener.userChangedData();
+                    }
+                }
+            }
+        });
 
-		homeValue_AmountEntry.addListener(new ChangeListener() {
-			public void userChangedData() {
-				Debug.print("listeners", "homeValueEntry CHANGED " + foreignAmount.getValue());
+        rate_Entry.addListener(new EntryListener() {
+            public void entryEvent(EntryEvent event) {
+                if (event.getType() == EntryEvent.Type.CHANGED) {
+                    final String text = rate_Entry.getText();
+                    Debug.print("listeners", "rateEntry CHANGED " + text);
+                    if (!rate_Entry.hasFocus()) {
+                        return;
+                    }
+                    if (text.equals("")) {
+                        return;
+                    }
 
-				rate_Entry.setText(foreignAmount.getRate());
-				lastRates.put(foreign_CurrencySelector.getCurrency(), foreignAmount.getRate());
+                    try {
+                        foreignAmount.setRate(text);
+                        rate_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
+                    } catch (NumberFormatException nfe) {
+                        rate_Entry.setTextColor(StateType.NORMAL, Color.RED);
+                        return;
+                    }
+                    homeValue_AmountEntry.setAmount(foreignAmount);
+                    lastRates.put(foreign_CurrencySelector.getCurrency(), foreignAmount.getRate());
 
-				/*
-				 * No need to set faceValue - after all, changing the home value
-				 * manually only imacts the effective exchange rate.
-				 */
+                    if (changeListener != null) {
+                        changeListener.userChangedData();
+                    }
+                }
 
-				if (changeListener != null) {
-					changeListener.userChangedData();
-				}
-			}
-		});
+                if (event.getType() == EntryEvent.Type.ACTIVATE) {
+                    final String original = rate_Entry.getText();
+                    final String text = foreignAmount.getRate();
+                    rate_Entry.setText(text);
+                    rate_Entry.setPosition(original.length());
+                }
+            }
+        });
 
-		grayOut();
-	}
+        /*
+         * If focus leaves or user presses enter, then apply the formatting
+         * inherent in ForeignAmount's rate String.
+         */
+        rate_Entry.addListener(new FocusListener() {
+            public boolean focusEvent(FocusEvent event) {
+                if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
+                    rate_Entry.setText(foreignAmount.getRate());
+                    rate_Entry.selectRegion(0, 0);
+                    rate_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
+                }
+                return false;
+            };
+        });
 
-	/*
-	 * Utility methods ------------------------------------
-	 */
+        homeValue_AmountEntry.addListener(new ChangeListener() {
+            public void userChangedData() {
+                Debug.print("listeners", "homeValueEntry CHANGED " + foreignAmount.getValue());
 
-	/**
-	 * Toggle the sensitivity (grayed out out if not sensitive) of all the
-	 * Widgets that represent exchange rate and home value, as listed in the
-	 * grayWidgets List.
-	 */
-	private void grayOut() {
-		boolean state;
-		if (foreign_CurrencySelector.getCurrency() == home) {
-			state = false;
-		} else {
-			state = true;
-		}
-		Iterator wI = grayWidgets.iterator();
-		while (wI.hasNext()) {
-			Widget w = (Widget) wI.next();
-			w.setSensitive(state);
-		}
-	}
+                rate_Entry.setText(foreignAmount.getRate());
+                lastRates.put(foreign_CurrencySelector.getCurrency(), foreignAmount.getRate());
 
-	/*
-	 * Override inherited methods -------------------------
-	 */
+                /*
+                 * No need to set faceValue - after all, changing the home
+                 * value manually only imacts the effective exchange rate.
+                 */
 
-	public void grabFocus() {
-		faceValue_AmountEntry.grabFocus();
-	}
+                if (changeListener != null) {
+                    changeListener.userChangedData();
+                }
+            }
+        });
 
-	/*
-	 * Getters and Setters --------------------------------
-	 */
+        grayOut();
+    }
 
-	/**
-	 * The whole point of the Widget is, of course, to generate a ForeignAmount.
-	 * 
-	 * @return the ForeignAmount as specified by the user.
-	 */
-	public ForeignAmount getForeignAmount() {
-		return foreignAmount;
-	}
+    /*
+     * Utility methods ------------------------------------
+     */
 
-	public void setForeignAmount(ForeignAmount amount) {
-		this.foreignAmount = amount;
-		faceValue_AmountEntry.setValue(foreignAmount.getForeignValue());
+    /**
+     * Toggle the sensitivity (grayed out out if not sensitive) of all the
+     * Widgets that represent exchange rate and home value, as listed in the
+     * grayWidgets List.
+     */
+    private void grayOut() {
+        boolean state;
+        if (foreign_CurrencySelector.getCurrency() == home) {
+            state = false;
+        } else {
+            state = true;
+        }
+        Iterator wI = grayWidgets.iterator();
+        while (wI.hasNext()) {
+            Widget w = (Widget) wI.next();
+            w.setSensitive(state);
+        }
+    }
 
-		Currency cur = foreignAmount.getCurrency();
-		String rate = foreignAmount.getRate();
-		lastRates.put(cur, rate);
+    /*
+     * Override inherited methods -------------------------
+     */
 
-		foreign_CurrencySelector.setCurrency(cur);
+    public void grabFocus() {
+        faceValue_AmountEntry.grabFocus();
+    }
 
-		rate_Entry.setText(rate);
-		homeValue_AmountEntry.setAmount(foreignAmount);
+    /*
+     * Getters and Setters --------------------------------
+     */
 
-		grayOut();
-	}
+    /**
+     * The whole point of the Widget is, of course, to generate a
+     * ForeignAmount.
+     * 
+     * @return the ForeignAmount as specified by the user.
+     */
+    public ForeignAmount getForeignAmount() {
+        return foreignAmount;
+    }
 
-	public void addListener(ChangeListener listener) {
-		if (changeListener != null) {
-			throw new IllegalStateException(
-				"You can't have more than one ChangeListener on a ForeignAmountEntryBox");
-		}
-		changeListener = listener;
-	}
+    public void setForeignAmount(ForeignAmount amount) {
+        this.foreignAmount = amount;
+        faceValue_AmountEntry.setValue(foreignAmount.getForeignValue());
+
+        Currency cur = foreignAmount.getCurrency();
+        String rate = foreignAmount.getRate();
+        lastRates.put(cur, rate);
+
+        foreign_CurrencySelector.setCurrency(cur);
+
+        rate_Entry.setText(rate);
+        homeValue_AmountEntry.setAmount(foreignAmount);
+
+        grayOut();
+    }
+
+    public void addListener(ChangeListener listener) {
+        if (changeListener != null) {
+            throw new IllegalStateException(
+                    "You can't have more than one ChangeListener on a ForeignAmountEntryBox");
+        }
+        changeListener = listener;
+    }
 }

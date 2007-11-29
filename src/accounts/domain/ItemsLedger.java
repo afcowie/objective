@@ -9,8 +9,8 @@ package accounts.domain;
 import java.util.Set;
 
 /**
- * Marks a ledger as hosting indiviudal items to which negating payments must be
- * applied. Examples are:
+ * Marks a ledger as hosting indiviudal items to which negating payments must
+ * be applied. Examples are:
  * <UL>
  * <LI>Invoices in an AccountsReceivableLedger, which result from Revenue
  * transactions.
@@ -24,10 +24,10 @@ import java.util.Set;
  */
 public interface ItemsLedger
 {
-	/**
-	 * @return a Set of Item objects
-	 */
-	public Set getItems();
-	
-	public void setItems(Set items);
+    /**
+     * @return a Set of Item objects
+     */
+    public Set getItems();
+
+    public void setItems(Set items);
 }

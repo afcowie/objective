@@ -23,120 +23,123 @@ import generic.util.DebugException;
  */
 public class Entry extends DomainObject implements Normal
 {
-	/*
-	 * Instance variables ---------------------------------
-	 */
-	/**
-	 * The date of the Entry. This should be set by (or, at least, will
-	 * certainly be replaced by) the Transaction to which it belongs on commit
-	 * via a PostTransactionCommand.
-	 */
-	private Datestamp	date				= null;
-	/**
-	 * The value of the Entry
-	 */
-	private Amount		amount				= null;
-	/**
-	 * The ledger to which this entry [will be] added.
-	 */
-	private Ledger		parentLedger		= null;
-	/**
-	 * The Transaction which this entry is a part of.
-	 */
-	private Transaction	parentTransaction	= null;
+    /*
+     * Instance variables ---------------------------------
+     */
+    /**
+     * The date of the Entry. This should be set by (or, at least, will
+     * certainly be replaced by) the Transaction to which it belongs on commit
+     * via a PostTransactionCommand.
+     */
+    private Datestamp date = null;
 
-	public Entry() {
-		/*
-		 * default for searches...
-		 */
-	}
+    /**
+     * The value of the Entry
+     */
+    private Amount amount = null;
 
-	/**
-	 * Construct an Entry specifiying the amount and the Ledger to which it will
-	 * be applied. Note that the Ledger will not have it's addEntry() method
-	 * called until a PostTransactionCommand is executed for a transaction
-	 * holding this Entry object.
-	 * 
-	 * @param value
-	 *            The Amount (be it Debit or Credit) of this Entry.
-	 * @param ledger
-	 *            The Ledger (which, in turn is of an Account) to which this
-	 *            Entry [will be] assinged.
-	 */
-	public Entry(Amount value, Ledger ledger) {
-		this.amount = value;
-		this.parentLedger = ledger;
-	}
+    /**
+     * The ledger to which this entry [will be] added.
+     */
+    private Ledger parentLedger = null;
 
-	/*
-	 * Getters and Setters --------------------------------
-	 */
+    /**
+     * The Transaction which this entry is a part of.
+     */
+    private Transaction parentTransaction = null;
 
-	/**
-	 * Get the date of the entry (transaction).
-	 */
-	public Datestamp getDate() {
-		return date;
-	}
+    public Entry() {
+    /*
+     * default for searches...
+     */
+    }
 
-	/**
-	 * Set the datestamp of the entry (transaction).
-	 */
-	public void setDate(Datestamp date) {
-		this.date = date;
+    /**
+     * Construct an Entry specifiying the amount and the Ledger to which it
+     * will be applied. Note that the Ledger will not have it's addEntry()
+     * method called until a PostTransactionCommand is executed for a
+     * transaction holding this Entry object.
+     * 
+     * @param value
+     *            The Amount (be it Debit or Credit) of this Entry.
+     * @param ledger
+     *            The Ledger (which, in turn is of an Account) to which this
+     *            Entry [will be] assinged.
+     */
+    public Entry(Amount value, Ledger ledger) {
+        this.amount = value;
+        this.parentLedger = ledger;
+    }
 
-	}
+    /*
+     * Getters and Setters --------------------------------
+     */
 
-	/**
-	 * Get the amount (value) this entry describes.
-	 */
-	public Amount getAmount() {
-		return amount;
-	}
+    /**
+     * Get the date of the entry (transaction).
+     */
+    public Datestamp getDate() {
+        return date;
+    }
 
-	public void setAmount(Amount value) {
-		this.amount = value;
-	}
+    /**
+     * Set the datestamp of the entry (transaction).
+     */
+    public void setDate(Datestamp date) {
+        this.date = date;
 
-	public Ledger getParentLedger() {
-		return parentLedger;
-	}
+    }
 
-	public void setParentLedger(Ledger parent) {
-		this.parentLedger = parent;
-	}
+    /**
+     * Get the amount (value) this entry describes.
+     */
+    public Amount getAmount() {
+        return amount;
+    }
 
-	public Transaction getParentTransaction() {
-		return parentTransaction;
-	}
+    public void setAmount(Amount value) {
+        this.amount = value;
+    }
 
-	public void setParentTransaction(Transaction parent) {
-		parentTransaction = parent;
-	}
+    public Ledger getParentLedger() {
+        return parentLedger;
+    }
 
-	/*
-	 * Output ---------------------------------------------
-	 */
+    public void setParentLedger(Ledger parent) {
+        this.parentLedger = parent;
+    }
 
-	/**
-	 * Prints the value of this entry, with an indication of whether it is a
-	 * Debit or Credit value.
-	 */
-	public String toString() {
-		// TODO Are Entries only in native currency?
-		StringBuffer buf = new StringBuffer();
-		buf.append(amount.getValue());
-		buf.append(' ');
+    public Transaction getParentTransaction() {
+        return parentTransaction;
+    }
 
-		if (this instanceof Debit) {
-			buf.append("DR");
-		} else if (this instanceof Credit) {
-			buf.append("CR");
-		} else {
-			throw new DebugException("huh?");
-		}
-		buf.append(' ');
-		buf.append(super.toString());
-		return buf.toString();
-	}
+    public void setParentTransaction(Transaction parent) {
+        parentTransaction = parent;
+    }
+
+    /*
+     * Output ---------------------------------------------
+     */
+
+    /**
+     * Prints the value of this entry, with an indication of whether it is a
+     * Debit or Credit value.
+     */
+    public String toString() {
+        // TODO Are Entries only in native currency?
+        StringBuffer buf = new StringBuffer();
+        buf.append(amount.getValue());
+        buf.append(' ');
+
+        if (this instanceof Debit) {
+            buf.append("DR");
+        } else if (this instanceof Credit) {
+            buf.append("CR");
+        } else {
+            throw new DebugException("huh?");
+        }
+        buf.append(' ');
+        buf.append(super.toString());
+        return buf.toString();
+    }
 }

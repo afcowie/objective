@@ -13,27 +13,27 @@ package accounts.domain;
  */
 public class LoanPayableAccount extends LiabilityAccount
 {
-	public LoanPayableAccount() {
-		super();
-	}
+    public LoanPayableAccount() {
+        super();
+    }
 
-	public LoanPayableAccount(String title, LoanLedger[] loanLedgers) {
-		super(title);
+    public LoanPayableAccount(String title, LoanLedger[] loanLedgers) {
+        super(title);
 
-		for (int i = 0; i < loanLedgers.length; i++) {
-			addLedger(loanLedgers[i]);
-		}
-	}
+        for (int i = 0; i < loanLedgers.length; i++) {
+            addLedger(loanLedgers[i]);
+        }
+    }
 
-	public void addLedger(Ledger loanLedger) {
-		if (!(loanLedger instanceof LoanLedger)) {
-			throw new IllegalArgumentException(
-					"When using LoanPayableAccount.addLedger(), the argument must be a LoanLedger (not merely a CreditPositiveLedger one)");
-		}
-		super.addLedger(loanLedger);
-	}
+    public void addLedger(Ledger loanLedger) {
+        if (!(loanLedger instanceof LoanLedger)) {
+            throw new IllegalArgumentException(
+                    "When using LoanPayableAccount.addLedger(), the argument must be a LoanLedger (not merely a CreditPositiveLedger one)");
+        }
+        super.addLedger(loanLedger);
+    }
 
-	public String getClassString() {
-		return "Loan Payable";
-	}
+    public String getClassString() {
+        return "Loan Payable";
+    }
 }

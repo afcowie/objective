@@ -13,11 +13,11 @@ package accounts.domain;
  */
 public class Supplier extends Entity
 {
-	public Supplier() {
+    public Supplier() {
 
-	}
+    }
 
-	public Supplier(String name) {
-		super(name);
-	}
+    public Supplier(String name) {
+        super(name);
+    }
 }

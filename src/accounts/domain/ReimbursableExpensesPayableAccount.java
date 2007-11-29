@@ -14,15 +14,15 @@ package accounts.domain;
 public class ReimbursableExpensesPayableAccount extends LiabilityAccount
 {
 
-	public ReimbursableExpensesPayableAccount() {
-		super();
-	}
+    public ReimbursableExpensesPayableAccount() {
+        super();
+    }
 
-	public ReimbursableExpensesPayableAccount(String title) {
-		super(title);
-	}
+    public ReimbursableExpensesPayableAccount(String title) {
+        super(title);
+    }
 
-	public String getClassString() {
-		return "Reimbursable Expenses Payable";
-	}
+    public String getClassString() {
+        return "Reimbursable Expenses Payable";
+    }
 }

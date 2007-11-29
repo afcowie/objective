@@ -22,35 +22,35 @@ package generic.ui;
  */
 public final class Align
 {
-	private String	name;
+    private String name;
 
-	private Align(String name) {
-		this.name = name;
-	}
+    private Align(String name) {
+        this.name = name;
+    }
 
-	/**
-	 * Specify that you want to align whatever you are formatting or laying to
-	 * or on the left; or, use the left slot in a layout.
-	 */
-	public static final Align	LEFT	= new Align("LEFT");
+    /**
+     * Specify that you want to align whatever you are formatting or laying to
+     * or on the left; or, use the left slot in a layout.
+     */
+    public static final Align LEFT = new Align("LEFT");
 
-	/**
-	 * Indicate that you want to align whatever you are formatting with a
-	 * central tendancy, or, use the center slot in a layout (assuming, of
-	 * course that there is one).
-	 */
-	public static final Align	CENTER	= new Align("CENTER");
+    /**
+     * Indicate that you want to align whatever you are formatting with a
+     * central tendancy, or, use the center slot in a layout (assuming, of
+     * course that there is one).
+     */
+    public static final Align CENTER = new Align("CENTER");
 
-	/**
-	 * Specify that you want to align whatever you are formatting or laying to
-	 * or on the right; or, use the right slot in a layout.
-	 */
-	public static final Align	RIGHT	= new Align("RIGHT");
+    /**
+     * Specify that you want to align whatever you are formatting or laying to
+     * or on the right; or, use the right slot in a layout.
+     */
+    public static final Align RIGHT = new Align("RIGHT");
 
-	/*
-	 * Just for debugging
-	 */
-	public String toString() {
-		return "Align." + name;
-	}
+    /*
+     * Just for debugging
+     */
+    public String toString() {
+        return "Align." + name;
+    }
 }

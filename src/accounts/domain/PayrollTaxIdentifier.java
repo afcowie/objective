@@ -8,15 +8,15 @@ package accounts.domain;
 
 public class PayrollTaxIdentifier extends TaxIdentifier
 {
-	public PayrollTaxIdentifier(String description, int index) {
-		super(description, index);
-	}
+    public PayrollTaxIdentifier(String description, int index) {
+        super(description, index);
+    }
 
-	protected PayrollTaxIdentifier() {
-		super();
-	}
+    protected PayrollTaxIdentifier() {
+        super();
+    }
 
-	public String getClassString() {
-		return "Payroll Tax Scale Identifier";
-	}
+    public String getClassString() {
+        return "Payroll Tax Scale Identifier";
+    }
 }

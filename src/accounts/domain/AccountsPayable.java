@@ -16,28 +16,29 @@ package accounts.domain;
  */
 public class AccountsPayable extends LiabilityAccount
 {
-	public AccountsPayable() {
-		super();
-	}
+    public AccountsPayable() {
+        super();
+    }
 
-	/**
-	 * 
-	 * @param title
-	 *            a title for the Accounts Receivable account. Australians
-	 *            probably prefer something like "Trade Creditors"
-	 */
-	public AccountsPayable(String title) {
-		super(title);
-	}
+    /**
+     * 
+     * @param title
+     *            a title for the Accounts Receivable account. Australians
+     *            probably prefer something like "Trade Creditors"
+     */
+    public AccountsPayable(String title) {
+        super(title);
+    }
 
-	public void addLedger(Ledger ledger) {
-		if (!(ledger instanceof ItemsLedger)) {
-			throw new IllegalArgumentException("Ledgers added to AccountsPayable accounts need to be ItemLedgers");
-		}
-		super.addLedger(ledger);
-	}
+    public void addLedger(Ledger ledger) {
+        if (!(ledger instanceof ItemsLedger)) {
+            throw new IllegalArgumentException(
+                    "Ledgers added to AccountsPayable accounts need to be ItemLedgers");
+        }
+        super.addLedger(ledger);
+    }
 
-	public String getClassString() {
-		return "Accounts Payable";
-	}
+    public String getClassString() {
+        return "Accounts Payable";
+    }
 }

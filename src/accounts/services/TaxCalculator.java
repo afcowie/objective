@@ -17,24 +17,25 @@ import accounts.domain.Datestamp;
  */
 public abstract class TaxCalculator
 {
-	protected Datestamp	asAtDate	= null;
+    protected Datestamp asAtDate = null;
 
-	/**
-	 * @param asAtDate
-	 *            A Datestamp specifying which tax data to use.
-	 */
-	protected TaxCalculator(Datestamp asAtDate) {
-		if (asAtDate == null) {
-			throw new IllegalArgumentException("Can't use a null Datestamp as the asAtDate in a TaxCalculator");
-		}
-		this.asAtDate = asAtDate;
-	}
+    /**
+     * @param asAtDate
+     *            A Datestamp specifying which tax data to use.
+     */
+    protected TaxCalculator(Datestamp asAtDate) {
+        if (asAtDate == null) {
+            throw new IllegalArgumentException(
+                    "Can't use a null Datestamp as the asAtDate in a TaxCalculator");
+        }
+        this.asAtDate = asAtDate;
+    }
 
-	/**
-	 * Get the Datestamp describing when you're trying to calculate some taxes
-	 * due. This is used to select which tax tables are used, for instance.
-	 */
-	public Datestamp getAsAtDate() {
-		return asAtDate;
-	}
+    /**
+     * Get the Datestamp describing when you're trying to calculate some taxes
+     * due. This is used to select which tax tables are used, for instance.
+     */
+    public Datestamp getAsAtDate() {
+        return asAtDate;
+    }
 }

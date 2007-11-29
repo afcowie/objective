@@ -13,15 +13,15 @@ package accounts.domain;
  */
 public class TaxIdentifier extends Identifier
 {
-	public TaxIdentifier(String description, int index) {
-		super(description, index);
-	}
+    public TaxIdentifier(String description, int index) {
+        super(description, index);
+    }
 
-	protected TaxIdentifier() {
-		super();
-	}
+    protected TaxIdentifier() {
+        super();
+    }
 
-	public String getClassString() {
-		return "Tax Scale Identifier";
-	}
+    public String getClassString() {
+        return "Tax Scale Identifier";
+    }
 }

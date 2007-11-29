@@ -22,164 +22,165 @@ import accounts.services.InitBooksCommand;
  * for instance), and so rather than generically floundering, we have direct
  * references to them here.
  * 
- * Someday, subclassing this will allow RawBooks and CookedBooks! (credit to pd
- * for that one).
+ * Someday, subclassing this will allow RawBooks and CookedBooks! (credit to
+ * pd for that one).
  * 
  * @author Andrew Cowie
  * @author Paul Drain
  */
 public class Books extends Root
 {
-	public void configure() {
-		/*
-		 * The classes for which we want to turn on cascade {update,activate}
-		 * behaviour (these static methods are inherited from root)
-		 * 
-		 * At the moment, we leave out Account.class, Ledger.class, Entry.class,
-		 * Transaction.class because objects are activated by most resolved
-		 * subtype. (TODO: we need to find out how to change this behaviour so
-		 * we can tune it better)
-		 */
-		markCascade(Books.class);
-		markCascade(LinkedHashSet.class);
-		markCascade(LinkedList.class);
-	}
+    public void configure() {
+        /*
+         * The classes for which we want to turn on cascade {update,activate}
+         * behaviour (these static methods are inherited from root)
+         * 
+         * At the moment, we leave out Account.class, Ledger.class,
+         * Entry.class, Transaction.class because objects are activated by
+         * most resolved subtype. (TODO: we need to find out how to change
+         * this behaviour so we can tune it better)
+         */
+        markCascade(Books.class);
+        markCascade(LinkedHashSet.class);
+        markCascade(LinkedList.class);
+    }
 
-	/*
-	 * Instance variables ---------------------------------
-	 */
+    /*
+     * Instance variables ---------------------------------
+     */
 
-	/**
-	 * The date which these books were openned, used for bounds checking and
-	 * date acceleration. Should be used as the date of the Openning Balance
-	 * transaction? TODO
-	 */
-	protected Datestamp			dateOfInception		= null;
+    /**
+     * The date which these books were openned, used for bounds checking and
+     * date acceleration. Should be used as the date of the Openning Balance
+     * transaction? TODO
+     */
+    protected Datestamp dateOfInception = null;
 
-	/**
-	 * The entire Set of Account objects. At Books level, Accounts are all
-	 * treated in common, be they Assets, Liabilities, etc. Utility methods
-	 * (TODO which may move) are provided to pull accounts from those individual
-	 * subclasses.
-	 */
-	protected Set				accounts			= null;
+    /**
+     * The entire Set of Account objects. At Books level, Accounts are all
+     * treated in common, be they Assets, Liabilities, etc. Utility methods
+     * (TODO which may move) are provided to pull accounts from those
+     * individual subclasses.
+     */
+    protected Set accounts = null;
 
-	protected Set				workers				= null;
+    protected Set workers = null;
 
-	protected Set				currencies			= null;
+    protected Set currencies = null;
 
-	/*
-	 * Convenience references -----------------------------
-	 */
+    /*
+     * Convenience references -----------------------------
+     */
 
-	protected RevenueAccount	gainLoss			= null;
-	protected EquityAccount		retainedEarnings	= null;
+    protected RevenueAccount gainLoss = null;
 
-	/**
-	 * The home currency that the set of books is denomenated in.
-	 */
-	protected Currency			homeCurrency		= null;
+    protected EquityAccount retainedEarnings = null;
 
-	/**
-	 * @return Returns the entire Accounts Set.
-	 */
-	public Set getAccountsSet() {
-		return accounts;
-	}
+    /**
+     * The home currency that the set of books is denomenated in.
+     */
+    protected Currency homeCurrency = null;
 
-	public void setAccountsSet(Set accounts) {
-		if (accounts == null) {
-			throw new IllegalArgumentException(
-				"Can't make a null Set the accounts held by this Books object!");
-		}
-		this.accounts = accounts;
-	}
+    /**
+     * @return Returns the entire Accounts Set.
+     */
+    public Set getAccountsSet() {
+        return accounts;
+    }
 
-	/**
-	 * Get the currency gain/loss Account.
-	 */
-	public RevenueAccount getGainLossAccount() {
-		return gainLoss;
-	}
+    public void setAccountsSet(Set accounts) {
+        if (accounts == null) {
+            throw new IllegalArgumentException(
+                    "Can't make a null Set the accounts held by this Books object!");
+        }
+        this.accounts = accounts;
+    }
 
-	/**
-	 * Set the Account that will accumulate currency gains and currency losses.
-	 * We have arbitrarily (but somewhat in line with common practice) chosen to
-	 * represent this as a revenue account, ie, currency gain is possitive,
-	 * currency loss is negative.
-	 */
-	public void setGainLossAccount(RevenueAccount gainLoss) {
-		this.gainLoss = gainLoss;
-	}
+    /**
+     * Get the currency gain/loss Account.
+     */
+    public RevenueAccount getGainLossAccount() {
+        return gainLoss;
+    }
 
-	/**
-	 * Get the retained earnings Account.
-	 */
-	public EquityAccount getRetainedEarningsAccount() {
-		return retainedEarnings;
-	}
+    /**
+     * Set the Account that will accumulate currency gains and currency
+     * losses. We have arbitrarily (but somewhat in line with common practice)
+     * chosen to represent this as a revenue account, ie, currency gain is
+     * possitive, currency loss is negative.
+     */
+    public void setGainLossAccount(RevenueAccount gainLoss) {
+        this.gainLoss = gainLoss;
+    }
 
-	/**
-	 * Set the Account that will be used to hold the retained earnings of the
-	 * business.
-	 */
-	public void setRetainedEarningsAccount(EquityAccount retainedEarnings) {
-		this.retainedEarnings = retainedEarnings;
-	}
+    /**
+     * Get the retained earnings Account.
+     */
+    public EquityAccount getRetainedEarningsAccount() {
+        return retainedEarnings;
+    }
 
-	/**
-	 * Get the Set of Workers (Employees and Subcontractors) associated with the
-	 * business represetned by these Books.
-	 */
-	public Set getWorkers() {
-		return workers;
-	}
+    /**
+     * Set the Account that will be used to hold the retained earnings of the
+     * business.
+     */
+    public void setRetainedEarningsAccount(EquityAccount retainedEarnings) {
+        this.retainedEarnings = retainedEarnings;
+    }
 
-	/**
-	 * Set the Workers (Set of Employees and Subcontractors) associated with the
-	 * business represented by these Books.
-	 */
-	public void setWorkers(Set workers) {
-		this.workers = workers;
-	}
+    /**
+     * Get the Set of Workers (Employees and Subcontractors) associated with
+     * the business represetned by these Books.
+     */
+    public Set getWorkers() {
+        return workers;
+    }
 
-	/**
-	 * Get the Set of Currency objects, which was populated by
-	 * {@link AddCurrencyCommand}s
-	 */
-	public Set getCurrencySet() {
-		return currencies;
-	}
+    /**
+     * Set the Workers (Set of Employees and Subcontractors) associated with
+     * the business represented by these Books.
+     */
+    public void setWorkers(Set workers) {
+        this.workers = workers;
+    }
 
-	/**
-	 * Used to initialize the Set which holds Currency Objects for this set of
-	 * books.
-	 * 
-	 * @see InitBooksCommand
-	 */
-	public void setCurrencySet(Set currencies) {
-		this.currencies = currencies;
-	}
+    /**
+     * Get the Set of Currency objects, which was populated by
+     * {@link AddCurrencyCommand}s
+     */
+    public Set getCurrencySet() {
+        return currencies;
+    }
 
-	/*
-	 * Output ---------------------------------------------
-	 */
+    /**
+     * Used to initialize the Set which holds Currency Objects for this set of
+     * books.
+     * 
+     * @see InitBooksCommand
+     */
+    public void setCurrencySet(Set currencies) {
+        this.currencies = currencies;
+    }
 
-	public Currency getHomeCurrency() {
-		return homeCurrency;
-	}
+    /*
+     * Output ---------------------------------------------
+     */
 
-	/**
-	 * Set the Currency in which all underlying amounts in this set of Books
-	 * will be represented. This can only be set once.
-	 */
-	public void setHomeCurrency(Currency home) {
-		if (home == null) {
-			throw new IllegalArgumentException();
-		}
-		if (homeCurrency != null) {
-			throw new UnsupportedOperationException("Can't change the home currency once its set!");
-		}
-		homeCurrency = home;
-	}
+    public Currency getHomeCurrency() {
+        return homeCurrency;
+    }
+
+    /**
+     * Set the Currency in which all underlying amounts in this set of Books
+     * will be represented. This can only be set once.
+     */
+    public void setHomeCurrency(Currency home) {
+        if (home == null) {
+            throw new IllegalArgumentException();
+        }
+        if (homeCurrency != null) {
+            throw new UnsupportedOperationException("Can't change the home currency once its set!");
+        }
+        homeCurrency = home;
+    }
 }

@@ -10,112 +10,116 @@ import accounts.domain.Amount;
 import accounts.domain.Datestamp;
 
 /**
- * Work out the payroll tax or other emploment related deductions appropriate to
- * a given salary or paycheck receieved. Either salary or paycheck withholding
- * can be worked out given the other. There are two [abstract] use cases that
- * subclasses need to implement where the actual calculation work should be
- * done.
+ * Work out the payroll tax or other emploment related deductions appropriate
+ * to a given salary or paycheck receieved. Either salary or paycheck
+ * withholding can be worked out given the other. There are two [abstract] use
+ * cases that subclasses need to implement where the actual calculation work
+ * should be done.
  * 
  * @author Andrew Cowie
  */
 public abstract class PayrollTaxCalculator extends TaxCalculator
 {
-	protected transient Amount	salary;
-	protected transient Amount	withhold;
-	protected transient Amount	paycheck;
+    protected transient Amount salary;
 
-	/**
-	 * @param asAtDate
-	 *            see {@link TaxCalculator#TaxCalculator(Datestamp)}
-	 */
-	protected PayrollTaxCalculator(Datestamp asAtDate) {
-		super(asAtDate);
-	}
+    protected transient Amount withhold;
 
-	public Amount getSalary() {
-		return salary;
-	}
+    protected transient Amount paycheck;
 
-	/**
-	 * Set the salary the Employee was given.
-	 * 
-	 * @param salary
-	 *            The positive Amount from which the necessary deduction will be
-	 *            worked out.
-	 */
-	public void setSalary(Amount salary) {
-		if (salary == null) {
-			throw new IllegalArgumentException("Can't use null as the salary.");
-		}
-		if (salary.getNumber() < 0) {
-			throw new IllegalArgumentException("Can't set a negative value as the salary.");
-		}
-		if (salary == paycheck) {
-			throw new IllegalArgumentException("You can't use the same Amount object for paycheck and salary fields.");
-		}
+    /**
+     * @param asAtDate
+     *            see {@link TaxCalculator#TaxCalculator(Datestamp)}
+     */
+    protected PayrollTaxCalculator(Datestamp asAtDate) {
+        super(asAtDate);
+    }
 
-		this.salary = salary;
-	}
+    public Amount getSalary() {
+        return salary;
+    }
 
-	public Amount getPaycheck() {
-		return paycheck;
-	}
+    /**
+     * Set the salary the Employee was given.
+     * 
+     * @param salary
+     *            The positive Amount from which the necessary deduction will
+     *            be worked out.
+     */
+    public void setSalary(Amount salary) {
+        if (salary == null) {
+            throw new IllegalArgumentException("Can't use null as the salary.");
+        }
+        if (salary.getNumber() < 0) {
+            throw new IllegalArgumentException("Can't set a negative value as the salary.");
+        }
+        if (salary == paycheck) {
+            throw new IllegalArgumentException(
+                    "You can't use the same Amount object for paycheck and salary fields.");
+        }
 
-	/**
-	 * Set the paycheck the Employee actually received.
-	 * 
-	 * @param paid
-	 *            The positive Amount which is the result of subtracting
-	 *            neccessary withholding taxes from the salary an Employee is
-	 *            given. Note that this must be a different object from the
-	 *            salary Amount.
-	 */
-	public void setPaycheck(Amount paid) {
-		if (paid == null) {
-			throw new IllegalArgumentException("Can't use null as the paid amount.");
-		}
-		if (paid.getNumber() < 0) {
-			throw new IllegalArgumentException("Can't set a negative value as the paid amount.");
-		}
-		if (paid == salary) {
-			throw new IllegalArgumentException("You can't use the same Amount object for paycheck and salary fields.");
-		}
+        this.salary = salary;
+    }
 
-		this.paycheck = paid;
-	}
+    public Amount getPaycheck() {
+        return paycheck;
+    }
 
-	/**
-	 * Get the Amount to withhold, assuming it has been calculated.
-	 */
-	public Amount getWithhold() {
-		return withhold;
-	}
+    /**
+     * Set the paycheck the Employee actually received.
+     * 
+     * @param paid
+     *            The positive Amount which is the result of subtracting
+     *            neccessary withholding taxes from the salary an Employee is
+     *            given. Note that this must be a different object from the
+     *            salary Amount.
+     */
+    public void setPaycheck(Amount paid) {
+        if (paid == null) {
+            throw new IllegalArgumentException("Can't use null as the paid amount.");
+        }
+        if (paid.getNumber() < 0) {
+            throw new IllegalArgumentException("Can't set a negative value as the paid amount.");
+        }
+        if (paid == salary) {
+            throw new IllegalArgumentException(
+                    "You can't use the same Amount object for paycheck and salary fields.");
+        }
 
-	/**
-	 * For editing a transaction whose Entries were calculated using a
-	 * PayrollTaxCalculator you need to be able to set the withhold object as
-	 * well.
-	 * 
-	 * @param withhold
-	 *            the Amount object. An acceptable usage would be
-	 *            <code>new Amount()</code>.
-	 */
-	public void setWithhold(Amount withhold) {
-		if (withhold == null) {
-			throw new IllegalArgumentException("Can't use null as the withhold Amount.");
-		}
-		/*
-		 * don't need the -ve test
-		 */
-		if ((withhold == salary) || (withhold == paycheck)) {
-			throw new IllegalArgumentException(
-				"You can't use the same Amount object for withhold, paycheck and salary fields.");
-		}
-		this.withhold = withhold;
-	}
+        this.paycheck = paid;
+    }
 
-	public abstract void calculateGivenPayable();
+    /**
+     * Get the Amount to withhold, assuming it has been calculated.
+     */
+    public Amount getWithhold() {
+        return withhold;
+    }
 
-	public abstract void calculateGivenSalary();
+    /**
+     * For editing a transaction whose Entries were calculated using a
+     * PayrollTaxCalculator you need to be able to set the withhold object as
+     * well.
+     * 
+     * @param withhold
+     *            the Amount object. An acceptable usage would be
+     *            <code>new Amount()</code>.
+     */
+    public void setWithhold(Amount withhold) {
+        if (withhold == null) {
+            throw new IllegalArgumentException("Can't use null as the withhold Amount.");
+        }
+        /*
+         * don't need the -ve test
+         */
+        if ((withhold == salary) || (withhold == paycheck)) {
+            throw new IllegalArgumentException(
+                    "You can't use the same Amount object for withhold, paycheck and salary fields.");
+        }
+        this.withhold = withhold;
+    }
+
+    public abstract void calculateGivenPayable();
+
+    public abstract void calculateGivenSalary();
 
 }

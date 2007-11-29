@@ -20,14 +20,13 @@ import org.gnome.gtk.HBox;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.TreeIter;
 
-
 import accounts.domain.Employee;
 import accounts.domain.Worker;
 
 /**
- * A picker allowing you to choose from a list of Workers. This delegates to and
- * wraps a ComboBoxEntry. The prototype given to the constructor constrains the
- * list. For instance, for all the Employees, do
+ * A picker allowing you to choose from a list of Workers. This delegates to
+ * and wraps a ComboBoxEntry. The prototype given to the constructor
+ * constrains the list. For instance, for all the Employees, do
  * 
  * <pre>
  * picker = new WorkerPicker(Employee.class);
@@ -37,148 +36,150 @@ import accounts.domain.Worker;
  */
 public class WorkerPicker extends HBox
 {
-	private transient Worker	worker;
+    private transient Worker worker;
 
-	private DataColumnString	nameDisplay_DataColumn;
-	private DataColumnReference 	workerObject_DataColumn;
-	private ListStore			listStore;
+    private DataColumnString nameDisplay_DataColumn;
 
-	private ComboBoxEntry		worker_ComboBoxEntry;
+    private DataColumnReference workerObject_DataColumn;
 
-	/**
-	 * Construct a WorkerPicker.
-	 * 
-	 * @param proto
-	 *            a prototype to constrain the search for candidate Workers to
-	 *            include in the dropdown.
-	 */
-	public WorkerPicker(DataClient store, Object proto) {
-		/*
-		 * This class is a Box subclass only so the Entry doesn't swell
-		 * unnessarily if set in a Table or similar widget. Otherwise, the box
-		 * nature is transparent.
-		 */
-		super(false, 0);
+    private ListStore listStore;
 
-		if (!((proto instanceof Worker) || (proto instanceof Class))) {
-			throw new IllegalArgumentException();
-		}
+    private ComboBoxEntry worker_ComboBoxEntry;
 
-		/*
-		 * We go to the considerable effort of having a TreeModel here so that
-		 * we can store a reference to the Worker object that is being picked.
-		 */
-		nameDisplay_DataColumn = new DataColumnString();
-		workerObject_DataColumn = new DataColumnReference();
+    /**
+     * Construct a WorkerPicker.
+     * 
+     * @param proto
+     *            a prototype to constrain the search for candidate Workers to
+     *            include in the dropdown.
+     */
+    public WorkerPicker(DataClient store, Object proto) {
+        /*
+         * This class is a Box subclass only so the Entry doesn't swell
+         * unnessarily if set in a Table or similar widget. Otherwise, the box
+         * nature is transparent.
+         */
+        super(false, 0);
 
-		DataColumn[] workerPicker_DataColumnArray = {
-			nameDisplay_DataColumn,
-			workerObject_DataColumn
-		};
+        if (!((proto instanceof Worker) || (proto instanceof Class))) {
+            throw new IllegalArgumentException();
+        }
 
-		listStore = new ListStore(workerPicker_DataColumnArray);
+        /*
+         * We go to the considerable effort of having a TreeModel here so that
+         * we can store a reference to the Worker object that is being picked.
+         */
+        nameDisplay_DataColumn = new DataColumnString();
+        workerObject_DataColumn = new DataColumnReference();
 
-		/*
-		 * Poppulate.
-		 */
+        DataColumn[] workerPicker_DataColumnArray = {
+                nameDisplay_DataColumn, workerObject_DataColumn
+        };
 
-		List eL = store.queryByExample(proto);
+        listStore = new ListStore(workerPicker_DataColumnArray);
 
-		if (eL.size() == 0) {
-			// TODO replace with NotFoundException
-			throw new IllegalStateException(
-				"You've managed to try and instantiate a WorkerPicker with a prototype which resulted in no results. This may well be a valid state, but the application is going to need to deal with this.");
-		}
+        /*
+         * Poppulate.
+         */
 
-		Iterator eI = eL.iterator();
-		while (eI.hasNext()) {
-			Employee e = (Employee) eI.next();
-			TreeIter pointer = listStore.appendRow();
-			listStore.setValue(pointer, nameDisplay_DataColumn, e.getName());
-			listStore.setValue(pointer, workerObject_DataColumn, e);
-		}
+        List eL = store.queryByExample(proto);
 
-		/*
-		 * Build the UI that this Widget represnts. ComboBoxEntry automatically
-		 * hooks up and packs a CellRenderer for the nominated column.
-		 */
+        if (eL.size() == 0) {
+            // TODO replace with NotFoundException
+            throw new IllegalStateException(
+                    "You've managed to try and instantiate a WorkerPicker with a prototype which resulted in no results. This may well be a valid state, but the application is going to need to deal with this.");
+        }
 
-		worker_ComboBoxEntry = new ComboBoxEntry(listStore, 0);
+        Iterator eI = eL.iterator();
+        while (eI.hasNext()) {
+            Employee e = (Employee) eI.next();
+            TreeIter pointer = listStore.appendRow();
+            listStore.setValue(pointer, nameDisplay_DataColumn, e.getName());
+            listStore.setValue(pointer, workerObject_DataColumn, e);
+        }
 
-		this.packStart(worker_ComboBoxEntry, false, false, 0);
+        /*
+         * Build the UI that this Widget represnts. ComboBoxEntry
+         * automatically hooks up and packs a CellRenderer for the nominated
+         * column.
+         */
 
-		/*
-		 * Somewhat hardcoded, it turns out that GtkComboBoxEntry have only one
-		 * child, and it's a GtkEntry. Lovely. We can use that to play games
-		 * with the colour and what not.
-		 */
-		final Entry entry = (Entry) worker_ComboBoxEntry.getChild();
+        worker_ComboBoxEntry = new ComboBoxEntry(listStore, 0);
 
-		worker_ComboBoxEntry.addListener(new ComboBoxListener() {
-			public void comboBoxEvent(ComboBoxEvent event) {
-				if (event.getType() == ComboBoxEvent.Type.CHANGED) {
-					worker_ComboBoxEntry.popup();
+        this.packStart(worker_ComboBoxEntry, false, false, 0);
 
-					worker = getSelection();
+        /*
+         * Somewhat hardcoded, it turns out that GtkComboBoxEntry have only
+         * one child, and it's a GtkEntry. Lovely. We can use that to play
+         * games with the colour and what not.
+         */
+        final Entry entry = (Entry) worker_ComboBoxEntry.getChild();
 
-					if (worker == null) {
-						entry.setTextColor(StateType.NORMAL, Color.RED);
-					} else {
-						entry.setTextColor(StateType.NORMAL, Color.BLACK);
-					}
-				}
-			}
-		});
-	}
+        worker_ComboBoxEntry.addListener(new ComboBoxListener() {
+            public void comboBoxEvent(ComboBoxEvent event) {
+                if (event.getType() == ComboBoxEvent.Type.CHANGED) {
+                    worker_ComboBoxEntry.popup();
 
-	/**
-	 * Get the Worker currently selected in the ComboBoxEntry.
-	 * 
-	 * @return the Worker object that is stored in the row alongside the
-	 *         displayed text which the user used to pick, or null if there
-	 *         isn't anything selected.
-	 */
-	private Worker getSelection() {
-		TreeIter pointer = worker_ComboBoxEntry.getActiveIter();
-		if (pointer == null) {
-			return null;
-		}
-		return (Worker) listStore.getValue(pointer, workerObject_DataColumn);
-	}
+                    worker = getSelection();
 
-	/**
-	 * @return the Worker object currently selected (by user or
-	 *         programmatically) according to this Widget.
-	 */
-	public Worker getWorker() {
-		return worker;
-	}
+                    if (worker == null) {
+                        entry.setTextColor(StateType.NORMAL, Color.RED);
+                    } else {
+                        entry.setTextColor(StateType.NORMAL, Color.BLACK);
+                    }
+                }
+            }
+        });
+    }
 
-	/**
-	 * Set the specified Worker object as the one to be active in this Widget.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if you are so foolish as to tell it to programmatically tell
-	 *             it to select an Worker which isn't in the set of Workers
-	 *             represented by this widget as constrained.
-	 */
-	public void setWorker(Worker worker) {
-		this.worker = worker;
+    /**
+     * Get the Worker currently selected in the ComboBoxEntry.
+     * 
+     * @return the Worker object that is stored in the row alongside the
+     *         displayed text which the user used to pick, or null if there
+     *         isn't anything selected.
+     */
+    private Worker getSelection() {
+        TreeIter pointer = worker_ComboBoxEntry.getActiveIter();
+        if (pointer == null) {
+            return null;
+        }
+        return (Worker) listStore.getValue(pointer, workerObject_DataColumn);
+    }
 
-		TreeIter pointer = listStore.getFirstIter();
-		while (pointer != null) {
-			if (listStore.getValue(pointer, workerObject_DataColumn) == worker) {
-				worker_ComboBoxEntry.setActiveIter(pointer);
-				return;
-			}
-			pointer = pointer.getNextIter();
-		}
+    /**
+     * @return the Worker object currently selected (by user or
+     *         programmatically) according to this Widget.
+     */
+    public Worker getWorker() {
+        return worker;
+    }
 
-		throw new IllegalArgumentException(
-			"How did you manage to ask to activate a Worker object that isn't in the set of Workers represented by this picker?");
-	}
+    /**
+     * Set the specified Worker object as the one to be active in this Widget.
+     * 
+     * @throws IllegalArgumentException
+     *             if you are so foolish as to tell it to programmatically
+     *             tell it to select an Worker which isn't in the set of
+     *             Workers represented by this widget as constrained.
+     */
+    public void setWorker(Worker worker) {
+        this.worker = worker;
 
-	public void refresh() {
-		// BUG FIXME ?
-	}
+        TreeIter pointer = listStore.getFirstIter();
+        while (pointer != null) {
+            if (listStore.getValue(pointer, workerObject_DataColumn) == worker) {
+                worker_ComboBoxEntry.setActiveIter(pointer);
+                return;
+            }
+            pointer = pointer.getNextIter();
+        }
+
+        throw new IllegalArgumentException(
+                "How did you manage to ask to activate a Worker object that isn't in the set of Workers represented by this picker?");
+    }
+
+    public void refresh() {
+    // BUG FIXME ?
+    }
 }

@@ -27,87 +27,90 @@ import accounts.services.AccountComparator;
  */
 public class AccountTextOutput extends TextOutput
 {
-	protected static final int	descWidth;
-	protected static final int	idWidth	= 6;
-	protected static final int	typeWidth;
+    protected static final int descWidth;
 
-	static {
-		int piece = COLUMNS / 7;
-		typeWidth = piece * 3;
-		// desc gets the rest, less one to keep off the edge.
-		descWidth = COLUMNS - idWidth - typeWidth - 1;
-	}
+    protected static final int idWidth = 6;
 
-	private Set					accounts;
+    protected static final int typeWidth;
 
-	/**
-	 * @param store
-	 *            a DataClient from which to fetch all instances of Account.
-	 */
-	public AccountTextOutput(DataClient store) {
-		List aL = store.queryByExample(Account.class);
+    static {
+        int piece = COLUMNS / 7;
+        typeWidth = piece * 3;
+        // desc gets the rest, less one to keep off the edge.
+        descWidth = COLUMNS - idWidth - typeWidth - 1;
+    }
 
-		accounts = new TreeSet(new AccountComparator());
-		accounts.addAll(aL);
-	}
+    private Set accounts;
 
-	/**
-	 * @param accounts
-	 *            the Set of accounts to be output. It will be sorted by a new
-	 *            TreeSet during instantiation.
-	 */
-	public AccountTextOutput(Set accounts) {
-		this.accounts = new TreeSet(new AccountComparator());
+    /**
+     * @param store
+     *            a DataClient from which to fetch all instances of Account.
+     */
+    public AccountTextOutput(DataClient store) {
+        List aL = store.queryByExample(Account.class);
 
-		Iterator iter = accounts.iterator();
-		while (iter.hasNext()) {
-			Object o = iter.next();
-			if (!(o instanceof Account)) {
-				throw new IllegalArgumentException("The Set passed must only contain Account objects");
-			}
-			accounts.add(o);
-		}
-	}
+        accounts = new TreeSet(new AccountComparator());
+        accounts.addAll(aL);
+    }
 
-	/**
-	 * @param a
-	 *            a single Account to run the outputter over. Use for spot
-	 *            debugging only.
-	 */
-	public AccountTextOutput(Account a) {
-		accounts = Collections.singleton(a);
-	}
+    /**
+     * @param accounts
+     *            the Set of accounts to be output. It will be sorted by a new
+     *            TreeSet during instantiation.
+     */
+    public AccountTextOutput(Set accounts) {
+        this.accounts = new TreeSet(new AccountComparator());
 
-	/**
-	 * @param out
-	 *            the PrintWriter you want to send the output to.
-	 */
-	public void toOutput(PrintWriter out) {
-		if (accounts.size() == 0) {
-			return;
-		}
+        Iterator iter = accounts.iterator();
+        while (iter.hasNext()) {
+            Object o = iter.next();
+            if (!(o instanceof Account)) {
+                throw new IllegalArgumentException("The Set passed must only contain Account objects");
+            }
+            accounts.add(o);
+        }
+    }
 
-		Iterator aI = accounts.iterator();
-		while (aI.hasNext()) {
-			Account a = (Account) aI.next();
+    /**
+     * @param a
+     *            a single Account to run the outputter over. Use for spot
+     *            debugging only.
+     */
+    public AccountTextOutput(Account a) {
+        accounts = Collections.singleton(a);
+    }
 
-			out.print(pad("\"" + chomp(a.getTitle(), descWidth + idWidth - 3) + "\" ", descWidth + idWidth, LEFT));
-			// String codeText = a.getCode();
-			// codeText = ((codeText == null) ? "" : codeText);
-			// out.print(pad(codeText, idWidth, LEFT));
-			out.print(pad(chomp(a.getClassString(), typeWidth), typeWidth, RIGHT));
+    /**
+     * @param out
+     *            the PrintWriter you want to send the output to.
+     */
+    public void toOutput(PrintWriter out) {
+        if (accounts.size() == 0) {
+            return;
+        }
 
-			out.println();
+        Iterator aI = accounts.iterator();
+        while (aI.hasNext()) {
+            Account a = (Account) aI.next();
 
-			Set lS = a.getLedgers();
-			if (lS == null) {
-				// no ledgers...
-			} else {
-				LedgerTextOutput ledgerOutputter = new LedgerTextOutput(lS);
-				ledgerOutputter.toOutput(out);
-			}
-			// blank line after account is done
-			out.println();
-		}
-	}
+            out.print(pad("\"" + chomp(a.getTitle(), descWidth + idWidth - 3) + "\" ", descWidth
+                    + idWidth, LEFT));
+            // String codeText = a.getCode();
+            // codeText = ((codeText == null) ? "" : codeText);
+            // out.print(pad(codeText, idWidth, LEFT));
+            out.print(pad(chomp(a.getClassString(), typeWidth), typeWidth, RIGHT));
+
+            out.println();
+
+            Set lS = a.getLedgers();
+            if (lS == null) {
+                // no ledgers...
+            } else {
+                LedgerTextOutput ledgerOutputter = new LedgerTextOutput(lS);
+                ledgerOutputter.toOutput(out);
+            }
+            // blank line after account is done
+            out.println();
+        }
+    }
 }

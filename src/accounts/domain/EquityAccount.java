@@ -13,15 +13,15 @@ package accounts.domain;
  */
 public class EquityAccount extends CreditPositiveAccount
 {
-	public EquityAccount() {
-		super();
-	}
+    public EquityAccount() {
+        super();
+    }
 
-	public EquityAccount(String title) {
-		super(title);
-	}
+    public EquityAccount(String title) {
+        super(title);
+    }
 
-	public String getClassString() {
-		return "Equity";
-	}
+    public String getClassString() {
+        return "Equity";
+    }
 }

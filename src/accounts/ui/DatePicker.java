@@ -20,201 +20,205 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.Window;
 
-
 import accounts.domain.Datestamp;
 
 /**
  * A date picker widget, customized for use within the ObjectiveAccounts
- * application. Dates are converted to a Datestamp object which can be queried.
+ * application. Dates are converted to a Datestamp object which can be
+ * queried.
  * 
  * @author Andrew Cowie
  */
 public class DatePicker extends HBox
 {
-	private Datestamp			date				= null;
+    private Datestamp date = null;
 
-	private static Datestamp	_lastSelectedDate	= null;
+    private static Datestamp _lastSelectedDate = null;
 
-	static {
-		_lastSelectedDate = new Datestamp();
-		_lastSelectedDate.setAsToday();
-	}
+    static {
+        _lastSelectedDate = new Datestamp();
+        _lastSelectedDate.setAsToday();
+    }
 
-	private Entry				entry				= null;
-	private Button				pick				= null;
-	private DatePickerPopup		popup				= null;
+    private Entry entry = null;
 
-	private ChangeListener		changeListener;
+    private Button pick = null;
 
-	/**
-	 * Instantiate a new DatePicker widget. The date will be (a clone of) the last one selected 
-	 * by [another] DatePicker, or today if none has been previously used. 
-	 */
-	public DatePicker() {
-		super(false, 3);
-		date = (Datestamp) _lastSelectedDate.clone();
+    private DatePickerPopup popup = null;
 
-		entry = new Entry();
-		entry.setWidth(9);
-		entry.setText(date.toString());
+    private ChangeListener changeListener;
 
-		// _pick = new Button("Pick", false);
-		// _pick = new Button(new GtkStockItem("stock_calendar-view-month"));
-		// GtkStockItem stock = new GtkStockItem("stock_calendar-view-month");
-		// Image icon = new Image(stock, IconSize.BUTTON);
-		// _pick = new Button("stock_calendar-view-month");
+    /**
+     * Instantiate a new DatePicker widget. The date will be (a clone of) the
+     * last one selected by [another] DatePicker, or today if none has been
+     * previously used.
+     */
+    public DatePicker() {
+        super(false, 3);
+        date = (Datestamp) _lastSelectedDate.clone();
 
-		pick = new Button();
-		Image icon = new Image(Stock.INDEX, IconSize.BUTTON);
-		Label label = new Label("Pick", false);
-		HBox box = new HBox(false, 1);
+        entry = new Entry();
+        entry.setWidth(9);
+        entry.setText(date.toString());
 
-		box.packStart(icon, false, false, 0);
-		box.packStart(label, false, false, 0);
-		pick.add(box);
+        // _pick = new Button("Pick", false);
+        // _pick = new Button(new GtkStockItem("stock_calendar-view-month"));
+        // GtkStockItem stock = new GtkStockItem("stock_calendar-view-month");
+        // Image icon = new Image(stock, IconSize.BUTTON);
+        // _pick = new Button("stock_calendar-view-month");
 
-		packStart(entry, false, false, 0);
-		packStart(pick, false, false, 0);
+        pick = new Button();
+        Image icon = new Image(Stock.INDEX, IconSize.BUTTON);
+        Label label = new Label("Pick", false);
+        HBox box = new HBox(false, 1);
 
-		pick.connect(new Button.CLICKED() {
-			public void onClicked(Button source) {
-			    if (popup == null) {
-				popup = new DatePickerPopup("datepicker", "share/DatePickerPopup.glade");
-			}
-			popup.present();			}
-		});
+        box.packStart(icon, false, false, 0);
+        box.packStart(label, false, false, 0);
+        pick.add(box);
 
-		entry.connect(new Entry.ACTIVATE() {
-			public void onActivate(Entry source) {
-				entry.setText(date.toString());
-				entry.setPosition(9);
+        packStart(entry, false, false, 0);
+        packStart(pick, false, false, 0);
 
-				if (changeListener != null) {
-					changeListener.userChangedData();
-				}
-			};
-		});
-	}
+        pick.connect(new Button.CLICKED() {
+            public void onClicked(Button source) {
+                if (popup == null) {
+                    popup = new DatePickerPopup("datepicker", "share/DatePickerPopup.glade");
+                }
+                popup.present();
+            }
+        });
 
-	/**
-	 * A Window (constructed from a glade file) containing the Calendar Widget,
-	 * and listeners to catch appropriate keystrokes.
-	 */
-	class DatePickerPopup extends AbstractWindow
-	{
-		private Calendar	calendar	= null;
+        entry.connect(new Entry.ACTIVATE() {
+            public void onActivate(Entry source) {
+                entry.setText(date.toString());
+                entry.setPosition(9);
 
-		private DatePickerPopup(String which, String filename) {
-			super(which, filename);
+                if (changeListener != null) {
+                    changeListener.userChangedData();
+                }
+            };
+        });
+    }
 
-			calendar = (Calendar) gladeParser.getWidget("calendar");
-			calendar.addListener(new CalendarListener() {
-				public void calendarEvent(CalendarEvent event) {
-					if (event.getType() == CalendarEvent.Type.DAY_SELECTED_DOUBLE_CLICK) {
-						applySelection();
-					}
-				}
-			});
+    /**
+     * A Window (constructed from a glade file) containing the Calendar
+     * Widget, and listeners to catch appropriate keystrokes.
+     */
+    class DatePickerPopup extends AbstractWindow
+    {
+        private Calendar calendar = null;
 
-			window.addListener(new KeyListener() {
-				public boolean keyEvent(KeyEvent event) {
-					int key = event.getKeyval();
-					if (key == KeyValue.Escape) {
-						window.hide();
-						return true;
-					} else if (key == KeyValue.Home || key == KeyValue.t) {
-						date.setAsToday();
-						present();
-						return true;
-					} else if (key == KeyValue.Return) {
-						applySelection();
-						return true;
-					} else {
-						// pass through the keystroke
-						return false;
-					}
-				}
-			});
-		}
+        private DatePickerPopup(String which, String filename) {
+            super(which, filename);
 
-		private void applySelection() {
-			java.util.Calendar cal = calendar.getDate();
-			window.hide();
-			date.setDate(cal);
-			entry.setText(date.toString());
+            calendar = (Calendar) gladeParser.getWidget("calendar");
+            calendar.addListener(new CalendarListener() {
+                public void calendarEvent(CalendarEvent event) {
+                    if (event.getType() == CalendarEvent.Type.DAY_SELECTED_DOUBLE_CLICK) {
+                        applySelection();
+                    }
+                }
+            });
 
-			if (changeListener != null) {
-				changeListener.userChangedData();
-			}
-		}
+            window.addListener(new KeyListener() {
+                public boolean keyEvent(KeyEvent event) {
+                    int key = event.getKeyval();
+                    if (key == KeyValue.Escape) {
+                        window.hide();
+                        return true;
+                    } else if (key == KeyValue.Home || key == KeyValue.t) {
+                        date.setAsToday();
+                        present();
+                        return true;
+                    } else if (key == KeyValue.Return) {
+                        applySelection();
+                        return true;
+                    } else {
+                        // pass through the keystroke
+                        return false;
+                    }
+                }
+            });
+        }
 
-		/*
-		 * Overrides of inherited methods -----------------
-		 */
+        private void applySelection() {
+            java.util.Calendar cal = calendar.getDate();
+            window.hide();
+            date.setDate(cal);
+            entry.setText(date.toString());
 
-		public void present() {
-			java.util.Calendar cal = java.util.Calendar.getInstance();
-			cal.setTime(date.getDate());
+            if (changeListener != null) {
+                changeListener.userChangedData();
+            }
+        }
 
-			int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
-			int month = cal.get(java.util.Calendar.MONTH);
-			int year = cal.get(java.util.Calendar.YEAR);
+        /*
+         * Overrides of inherited methods -----------------
+         */
 
-			/*
-			 * Set the month first, otherwise we get a glitch if the previously
-			 * set month doesn't have the requested day.
-			 */
-			calendar.selectMonth(month, year);
-			calendar.selectDay(day);
+        public void present() {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(date.getDate());
 
-			super.present();
-		}
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int year = cal.get(java.util.Calendar.YEAR);
 
-		/**
-		 * Raise the window that popped the picker.
-		 */
-		protected void hideHook() {
-			/*
-			 * So annoying. You'd think you should be able to cast from Widget
-			 * to Window here, but it blows ClassCastException.
-			 */
-			Window top = (Window) entry.getToplevel();
-			top.present();
-		}
+            /*
+             * Set the month first, otherwise we get a glitch if the
+             * previously set month doesn't have the requested day.
+             */
+            calendar.selectMonth(month, year);
+            calendar.selectDay(day);
 
-		/**
-		 * Only hide, don't destroy. More to the point, override the default
-		 * return of false.
-		 */
-		public boolean deleteHook() {
-			window.hide();
-			return true;
-		}
-	}
+            super.present();
+        }
 
-	/**
-	 * Attach a ChangeListener to this DatePicker.
-	 * 
-	 * @see AmountEntry#addListener(ChangeListener) for a full description
-	 */
-	public void addListener(ChangeListener listener) {
-		if (changeListener != null) {
-			throw new IllegalStateException(
-				"You can't have more than one ChangeListener on a DatePicker");
-		}
-		changeListener = listener;
-	}
+        /**
+         * Raise the window that popped the picker.
+         */
+        protected void hideHook() {
+            /*
+             * So annoying. You'd think you should be able to cast from Widget
+             * to Window here, but it blows ClassCastException.
+             */
+            Window top = (Window) entry.getToplevel();
+            top.present();
+        }
 
-	/*
-	 * Getters and Setters --------------------------------
-	 */
-	public Datestamp getDate() {
-		return date;
-	}
+        /**
+         * Only hide, don't destroy. More to the point, override the default
+         * return of false.
+         */
+        public boolean deleteHook() {
+            window.hide();
+            return true;
+        }
+    }
 
-	public void setDate(Datestamp date) {
-		this.date = date;
-		entry.setText(date.toString());
-		entry.setPosition(9);
-	}
+    /**
+     * Attach a ChangeListener to this DatePicker.
+     * 
+     * @see AmountEntry#addListener(ChangeListener) for a full description
+     */
+    public void addListener(ChangeListener listener) {
+        if (changeListener != null) {
+            throw new IllegalStateException(
+                    "You can't have more than one ChangeListener on a DatePicker");
+        }
+        changeListener = listener;
+    }
+
+    /*
+     * Getters and Setters --------------------------------
+     */
+    public Datestamp getDate() {
+        return date;
+    }
+
+    public void setDate(Datestamp date) {
+        this.date = date;
+        entry.setText(date.toString());
+        entry.setPosition(9);
+    }
 }

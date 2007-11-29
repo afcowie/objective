@@ -22,45 +22,45 @@ import accounts.domain.Transaction;
  */
 public class PostTransactionCommand extends TransactionCommand
 {
-	/**
-	 * Create a new PostTransactionCommand, specifying:
-	 * 
-	 * @param t
-	 *            the Transaction to be persisted.
-	 */
-	public PostTransactionCommand(Transaction t) {
-		super(t);
-	}
+    /**
+     * Create a new PostTransactionCommand, specifying:
+     * 
+     * @param t
+     *            the Transaction to be persisted.
+     */
+    public PostTransactionCommand(Transaction t) {
+        super(t);
+    }
 
-	protected void action(DataClient store) throws CommandNotReadyException {
-		super.validate();
+    protected void action(DataClient store) throws CommandNotReadyException {
+        super.validate();
 
-		/*
-		 * Carry out the addition of the [values of the] Entries to the
-		 * [balances of the] Ledgers they bridge to.
-		 */
+        /*
+         * Carry out the addition of the [values of the] Entries to the
+         * [balances of the] Ledgers they bridge to.
+         */
 
-		Set entries = transaction.getEntries();
-		Iterator iter = entries.iterator();
-		while (iter.hasNext()) {
-			Entry e = (Entry) iter.next();
-			Ledger l = e.getParentLedger();
-			l.addEntry(e);
-			store.save(l);
-		}
+        Set entries = transaction.getEntries();
+        Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            Entry e = (Entry) iter.next();
+            Ledger l = e.getParentLedger();
+            l.addEntry(e);
+            store.save(l);
+        }
 
-		/*
-		 * Persist the Transaction.
-		 */
+        /*
+         * Persist the Transaction.
+         */
 
-		store.save(transaction);
-	}
+        store.save(transaction);
+    }
 
-	public void reverse(DataClient store) {
-		throw new UnsupportedOperationException();
-	}
+    public void reverse(DataClient store) {
+        throw new UnsupportedOperationException();
+    }
 
-	public String getClassString() {
-		return "Post Transaction";
-	}
+    public String getClassString() {
+        return "Post Transaction";
+    }
 }

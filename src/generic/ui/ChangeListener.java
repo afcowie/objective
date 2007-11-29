@@ -17,20 +17,20 @@ package generic.ui;
  * <li>has focus
  * <li>isn't blank/null
  * </ol>
- * There is no necessity for Widgets using this Listener to maintain a registry
- * of multiple sets of them. One is sufficient, especially as the whole point of
- * using this Listener is to work around the problem of multiple invokations
- * that happen when reacting to GTK events signals.
+ * There is no necessity for Widgets using this Listener to maintain a
+ * registry of multiple sets of them. One is sufficient, especially as the
+ * whole point of using this Listener is to work around the problem of
+ * multiple invokations that happen when reacting to GTK events signals.
  * 
  * @see accounts.ui.AmountEntry which was the first use of this class.
  * @author Andrew Cowie
  */
 public interface ChangeListener
 {
-	/**
-	 * There is no parameter to this method, strongly typed or otherwise. The
-	 * assumption is that any Window using this callback mechansim is going to
-	 * have an instance field pointing to the data anyway.
-	 */
-	public abstract void userChangedData();
+    /**
+     * There is no parameter to this method, strongly typed or otherwise. The
+     * assumption is that any Window using this callback mechansim is going to
+     * have an instance field pointing to the data anyway.
+     */
+    public abstract void userChangedData();
 }

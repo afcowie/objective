@@ -20,42 +20,42 @@ import accounts.domain.Books;
  */
 public class AddAccountCommand extends Command
 {
-	private Account	account	= null;
+    private Account account = null;
 
-	/**
-	 * Create a new AddAccountCommand, specifying:
-	 * 
-	 * @param account
-	 *            The Account to add. Must not already be persisted in the
-	 *            DataClient.
-	 */
-	public AddAccountCommand(Account account) {
-		if (account == null) {
-			throw new IllegalArgumentException("Can't add a null account");
-		}
-		this.account = account;
-	}
+    /**
+     * Create a new AddAccountCommand, specifying:
+     * 
+     * @param account
+     *            The Account to add. Must not already be persisted in the
+     *            DataClient.
+     */
+    public AddAccountCommand(Account account) {
+        if (account == null) {
+            throw new IllegalArgumentException("Can't add a null account");
+        }
+        this.account = account;
+    }
 
-	protected void action(DataClient store) {
-		Books root = (Books) store.getRoot();
-		Set accounts = root.getAccountsSet();
-		if (accounts.add(account) == false) { // dup!?!
-			throw new IllegalStateException("How did you add an account that's already in the system?");
-		}
+    protected void action(DataClient store) {
+        Books root = (Books) store.getRoot();
+        Set accounts = root.getAccountsSet();
+        if (accounts.add(account) == false) { // dup!?!
+            throw new IllegalStateException("How did you add an account that's already in the system?");
+        }
 
-		/*
-		 * Store the collection. Rely on cascading update depth to add the new
-		 * account object along the way.
-		 */
+        /*
+         * Store the collection. Rely on cascading update depth to add the new
+         * account object along the way.
+         */
 
-		store.save(accounts);
-	}
+        store.save(accounts);
+    }
 
-	protected void reverse(DataClient store) {
-		throw new UnsupportedOperationException();
-	}
+    protected void reverse(DataClient store) {
+        throw new UnsupportedOperationException();
+    }
 
-	public String getClassString() {
-		return "Add Account";
-	}
+    public String getClassString() {
+        return "Add Account";
+    }
 }

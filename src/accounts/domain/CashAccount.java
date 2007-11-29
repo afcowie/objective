@@ -13,54 +13,54 @@ package accounts.domain;
  */
 public class CashAccount extends AssetAccount implements SingleLedger
 {
-	/**
-	 * This is a convenience only for use in single ledger accounts, ie, this
-	 * one.
-	 */
-	private DebitPositiveLedger	ledger	= null;
+    /**
+     * This is a convenience only for use in single ledger accounts, ie, this
+     * one.
+     */
+    private DebitPositiveLedger ledger = null;
 
-	/**
-	 * [For creating search prototypes]
-	 */
-	public CashAccount() {
-		super();
-	}
+    /**
+     * [For creating search prototypes]
+     */
+    public CashAccount() {
+        super();
+    }
 
-	/**
-	 * Create a new asset account with a single ledger.
-	 */
-	public CashAccount(String accountTitle, String ledgerName) {
-		super(accountTitle);
-		ledger = new DebitPositiveLedger();
-		ledger.setName(ledgerName);
-		addLedger(ledger);
-	}
+    /**
+     * Create a new asset account with a single ledger.
+     */
+    public CashAccount(String accountTitle, String ledgerName) {
+        super(accountTitle);
+        ledger = new DebitPositiveLedger();
+        ledger.setName(ledgerName);
+        addLedger(ledger);
+    }
 
-	/**
-	 * Add an entry to the (single) Ledger of this CashAccount.
-	 */
-	public void addEntry(Entry entry) {
-		ledger.addEntry(entry);
-		entry.setParentLedger(ledger);
-		// TODO recalc account balance?
-	}
+    /**
+     * Add an entry to the (single) Ledger of this CashAccount.
+     */
+    public void addEntry(Entry entry) {
+        ledger.addEntry(entry);
+        entry.setParentLedger(ledger);
+        // TODO recalc account balance?
+    }
 
-	/*
-	 * Getters and Setters --------------------------------
-	 */
+    /*
+     * Getters and Setters --------------------------------
+     */
 
-	public Ledger getLedger() {
-		return ledger;
-	}
+    public Ledger getLedger() {
+        return ledger;
+    }
 
-	public void setLedger(Ledger ledger) {
-		if (!(ledger instanceof DebitPositiveLedger)) {
-			throw new IllegalArgumentException("You must use a DebitPositiveLedger for a CashAccount");
-		}
-		this.ledger = (DebitPositiveLedger) ledger;
-	}
+    public void setLedger(Ledger ledger) {
+        if (!(ledger instanceof DebitPositiveLedger)) {
+            throw new IllegalArgumentException("You must use a DebitPositiveLedger for a CashAccount");
+        }
+        this.ledger = (DebitPositiveLedger) ledger;
+    }
 
-	public String getClassString() {
-		return "Cash";
-	}
+    public String getClassString() {
+        return "Cash";
+    }
 }

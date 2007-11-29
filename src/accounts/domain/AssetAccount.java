@@ -11,15 +11,15 @@ package accounts.domain;
  */
 public class AssetAccount extends DebitPositiveAccount
 {
-	public AssetAccount() {
-		super();
-	}
+    public AssetAccount() {
+        super();
+    }
 
-	public AssetAccount(String title) {
-		super(title);
-	}
+    public AssetAccount(String title) {
+        super(title);
+    }
 
-	public String getClassString() {
-		return "Asset";
-	}
+    public String getClassString() {
+        return "Asset";
+    }
 }

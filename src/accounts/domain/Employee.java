@@ -8,18 +8,17 @@ package accounts.domain;
 
 public class Employee extends Worker
 {
-	/**
-	 * Proper constructor; use UI to build up fields.
-	 */
-	public Employee() {
-	}
+    /**
+     * Proper constructor; use UI to build up fields.
+     */
+    public Employee() {}
 
-	/**
-	 * Mockup constructor for use in unit tests and demos.
-	 * 
-	 * @see Worker#setName(String)
-	 */
-	public Employee(String name) {
-		setName(name);
-	}
+    /**
+     * Mockup constructor for use in unit tests and demos.
+     * 
+     * @see Worker#setName(String)
+     */
+    public Employee(String name) {
+        setName(name);
+    }
 }

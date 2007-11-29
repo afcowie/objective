@@ -31,99 +31,101 @@ import accounts.domain.Currency;
  */
 public class CurrencySelector extends ComboBox
 {
-	private DataColumnString	codeDisplay_DataColumn;
-	private DataColumnReference currencyObject_DataColumn;
-	private ListStore			listStore;
+    private DataColumnString codeDisplay_DataColumn;
 
-	/**
-	 * Instantiate a new CurrencySelector, specifying an open {@link DataClient}
-	 * from which the list of Currencies will be pulled.
-	 */
-	public CurrencySelector(DataClient store) {
-		/*
-		 * ComboBox is tricky - there are two normal constructors, one for text
-		 * mode and the other for using a TreeModel. The catch is that the
-		 * default no-arg constructor *is* text mode. We have to call a super
-		 * constructor, but that implied no-arg call would cause problems
-		 * becuase once a mode is picked it can't be changed. Solution is to use
-		 * the (TreeModel) constuctor, casting to get there. Note that this
-		 * introduces a dependency on libgtk-java 2.6.3, where this was fixed to
-		 * not throw a NullPointerException.
-		 * 
-		 */
-		super((ListStore) null);
+    private DataColumnReference currencyObject_DataColumn;
 
-		/*
-		 * We go to the considerable effort of having a TreeModel here so that
-		 * we can store a reference to the Currency object that is being picked.
-		 */
-		codeDisplay_DataColumn = new DataColumnString();
-		currencyObject_DataColumn = new DataColumnReference();
+    private ListStore listStore;
 
-		DataColumn[] currencySelector_DataColumnArray = {
-			codeDisplay_DataColumn,
-			currencyObject_DataColumn
-		};
+    /**
+     * Instantiate a new CurrencySelector, specifying an open
+     * {@link DataClient} from which the list of Currencies will be pulled.
+     */
+    public CurrencySelector(DataClient store) {
+        /*
+         * ComboBox is tricky - there are two normal constructors, one for
+         * text mode and the other for using a TreeModel. The catch is that
+         * the default no-arg constructor *is* text mode. We have to call a
+         * super constructor, but that implied no-arg call would cause
+         * problems becuase once a mode is picked it can't be changed.
+         * Solution is to use the (TreeModel) constuctor, casting to get
+         * there. Note that this introduces a dependency on libgtk-java 2.6.3,
+         * where this was fixed to not throw a NullPointerException.
+         * 
+         */
+        super((ListStore) null);
 
-		listStore = new ListStore(currencySelector_DataColumnArray);
+        /*
+         * We go to the considerable effort of having a TreeModel here so that
+         * we can store a reference to the Currency object that is being
+         * picked.
+         */
+        codeDisplay_DataColumn = new DataColumnString();
+        currencyObject_DataColumn = new DataColumnReference();
 
-		/*
-		 * populate
-		 */
-		Books root = (Books) store.getRoot();
+        DataColumn[] currencySelector_DataColumnArray = {
+                codeDisplay_DataColumn, currencyObject_DataColumn
+        };
 
-		Set currencies = root.getCurrencySet();
-		Iterator iter = currencies.iterator();
-		while (iter.hasNext()) {
-			Currency cur = (Currency) iter.next();
-			TreeIter pointer = listStore.appendRow();
-			listStore.setValue(pointer, codeDisplay_DataColumn, cur.getCode());
-			listStore.setValue(pointer, currencyObject_DataColumn, cur);
-		}
+        listStore = new ListStore(currencySelector_DataColumnArray);
 
-		/*
-		 * Now the UI
-		 */
-		this.setModel(listStore);
+        /*
+         * populate
+         */
+        Books root = (Books) store.getRoot();
 
-		CellRendererText code_CellRenderer = new CellRendererText();
-		this.packStart(code_CellRenderer, true);
-		this.addAttributeMapping(code_CellRenderer, CellRendererText.Attribute.TEXT,
-			codeDisplay_DataColumn);
-	}
+        Set currencies = root.getCurrencySet();
+        Iterator iter = currencies.iterator();
+        while (iter.hasNext()) {
+            Currency cur = (Currency) iter.next();
+            TreeIter pointer = listStore.appendRow();
+            listStore.setValue(pointer, codeDisplay_DataColumn, cur.getCode());
+            listStore.setValue(pointer, currencyObject_DataColumn, cur);
+        }
 
-	/**
-	 * @return the currently selected Currency object, or null if nothing is
-	 *         selected. (TODO TEST!)
-	 */
-	public Currency getCurrency() {
-		TreeIter pointer = this.getActiveIter();
-		if (pointer == null) {
-			return null;
-		}
-		return (Currency) listStore.getValue(pointer, currencyObject_DataColumn);
-	}
+        /*
+         * Now the UI
+         */
+        this.setModel(listStore);
 
-	/**
-	 * Set the specified currency as active.
-	 * 
-	 * @param cur
-	 *            The Currency object to be set as active.
-	 * @throws IllegalArgumentException
-	 *             if you are so foolish as to tell it to select a Currency
-	 *             object which isn't in the system currency table.
-	 */
-	public void setCurrency(Currency cur) {
-		TreeIter pointer = listStore.getFirstIter();
+        CellRendererText code_CellRenderer = new CellRendererText();
+        this.packStart(code_CellRenderer, true);
+        this.addAttributeMapping(code_CellRenderer, CellRendererText.Attribute.TEXT,
+                codeDisplay_DataColumn);
+    }
 
-		while (pointer != null) {
-			if (listStore.getValue(pointer, currencyObject_DataColumn) == cur) {
-				this.setActiveIter(pointer);
-				return;
-			}
-			pointer = pointer.getNextIter();
-		}
-		throw new IllegalArgumentException(
-			"How did you manage to ask to activate a Currency object that isn't in the system?");
-	}
+    /**
+     * @return the currently selected Currency object, or null if nothing is
+     *         selected. (TODO TEST!)
+     */
+    public Currency getCurrency() {
+        TreeIter pointer = this.getActiveIter();
+        if (pointer == null) {
+            return null;
+        }
+        return (Currency) listStore.getValue(pointer, currencyObject_DataColumn);
+    }
+
+    /**
+     * Set the specified currency as active.
+     * 
+     * @param cur
+     *            The Currency object to be set as active.
+     * @throws IllegalArgumentException
+     *             if you are so foolish as to tell it to select a Currency
+     *             object which isn't in the system currency table.
+     */
+    public void setCurrency(Currency cur) {
+        TreeIter pointer = listStore.getFirstIter();
+
+        while (pointer != null) {
+            if (listStore.getValue(pointer, currencyObject_DataColumn) == cur) {
+                this.setActiveIter(pointer);
+                return;
+            }
+            pointer = pointer.getNextIter();
+        }
+        throw new IllegalArgumentException(
+                "How did you manage to ask to activate a Currency object that isn't in the system?");
+    }
 }

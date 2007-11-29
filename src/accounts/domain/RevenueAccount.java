@@ -13,15 +13,15 @@ package accounts.domain;
  */
 public class RevenueAccount extends CreditPositiveAccount
 {
-	public RevenueAccount() {
-		super();
-	}
+    public RevenueAccount() {
+        super();
+    }
 
-	public RevenueAccount(String title) {
-		super(title);
-	}
+    public RevenueAccount(String title) {
+        super(title);
+    }
 
-	public String getClassString() {
-		return "Revenue";
-	}
+    public String getClassString() {
+        return "Revenue";
+    }
 }

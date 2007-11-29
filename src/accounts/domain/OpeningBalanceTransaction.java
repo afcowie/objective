@@ -18,28 +18,28 @@ import java.util.Set;
  */
 public class OpeningBalanceTransaction extends GenericTransaction
 {
-	private final static String		LABEL				= "Opening Balance";
+    private final static String LABEL = "Opening Balance";
 
-	private transient EquityAccount	historicalBalance	= null;
+    private transient EquityAccount historicalBalance = null;
 
-	public OpeningBalanceTransaction() {
-		super();
-	}
+    public OpeningBalanceTransaction() {
+        super();
+    }
 
-	/**
-	 * Create a new Opening Balance Transaction. This constructor assumes you
-	 * have a Set of entries you wish to apply.
-	 * 
-	 * @param entries
-	 * @param date
-	 *            The date to use for the openning balance entries.
-	 */
-	/*
-	 * TODO this should probably be related to Books.dateOfInception
-	 */
-	public OpeningBalanceTransaction(Set entries, Datestamp date) {
-		// super(LABEL, entries);
-		super.setDate(date);
-	}
+    /**
+     * Create a new Opening Balance Transaction. This constructor assumes you
+     * have a Set of entries you wish to apply.
+     * 
+     * @param entries
+     * @param date
+     *            The date to use for the openning balance entries.
+     */
+    /*
+     * TODO this should probably be related to Books.dateOfInception
+     */
+    public OpeningBalanceTransaction(Set entries, Datestamp date) {
+        // super(LABEL, entries);
+        super.setDate(date);
+    }
 
 }

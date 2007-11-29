@@ -9,9 +9,9 @@ package generic.ui;
 import generic.client.Master;
 
 /**
- * Denote a window as being one of the primary ones which a user interacts with.
- * These windows will be registered with {@link generic.client.Master} and thus
- * be available to be shown in drop down Window menu lists, etc. More
+ * Denote a window as being one of the primary ones which a user interacts
+ * with. These windows will be registered with {@link generic.client.Master}
+ * and thus be available to be shown in drop down Window menu lists, etc. More
  * importantly, they will all be hidden immediately and asked to delete on a
  * call to {@link generic.client.Master#shutdown() Master.shutdown()}.
  * 
@@ -19,36 +19,37 @@ import generic.client.Master;
  */
 public abstract class PrimaryWindow extends AbstractWindow
 {
-	/**
-	 * Basic form of a PrimaryWindow. Calls AbstractWindow's no-arg constructor,
-	 * then registers this window with Master.
-	 */
-	public PrimaryWindow() {
-		super();
-		Master.ui.regsiterWindow(this);
-	}
+    /**
+     * Basic form of a PrimaryWindow. Calls AbstractWindow's no-arg
+     * constructor, then registers this window with Master.
+     */
+    public PrimaryWindow() {
+        super();
+        Master.ui.regsiterWindow(this);
+    }
 
-	/**
-	 * Glade form of a PrimaryWindow. Passes the parameters to AbstractWindow's
-	 * glade constructor, then registers this window with Master.
-	 */
-	public PrimaryWindow(String whichElement, String gladeFilename) {
-		super(whichElement, gladeFilename);
-		Master.ui.regsiterWindow(this);
-	}
+    /**
+     * Glade form of a PrimaryWindow. Passes the parameters to
+     * AbstractWindow's glade constructor, then registers this window with
+     * Master.
+     */
+    public PrimaryWindow(String whichElement, String gladeFilename) {
+        super(whichElement, gladeFilename);
+        Master.ui.regsiterWindow(this);
+    }
 
-	protected boolean deleteHook() {
-		super.deleteHook();
-		Master.ui.deregisterWindow(this);
-		return false;
-	}
+    protected boolean deleteHook() {
+        super.deleteHook();
+        Master.ui.deregisterWindow(this);
+        return false;
+    }
 
-	/**
-	 * Quietly expose <code>hide()</code> so that Master can silence them
-	 * while shutting down. You could just as easily access
-	 * <code>window.hide()</code>
-	 */
-	protected void hide() {
-		window.hide();
-	}
+    /**
+     * Quietly expose <code>hide()</code> so that Master can silence them
+     * while shutting down. You could just as easily access
+     * <code>window.hide()</code>
+     */
+    protected void hide() {
+        window.hide();
+    }
 }

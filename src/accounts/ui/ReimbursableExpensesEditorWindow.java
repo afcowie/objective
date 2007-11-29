@@ -37,196 +37,201 @@ import accounts.services.UpdateTransactionCommand;
  */
 public class ReimbursableExpensesEditorWindow extends EditorWindow
 {
-	/*
-	 * Cached widgets
-	 */
-	protected Table								table;
+    /*
+     * Cached widgets
+     */
+    protected Table table;
 
-	protected WorkerPicker						person_WorkerPicker;
-	protected DatePicker						datePicker;
-	protected AccountPicker						accountPicker;
-	protected Entry								descriptionEntry;
-	protected ForeignAmountEntryBox				amountEntryBox;
+    protected WorkerPicker person_WorkerPicker;
 
-	private ReimbursableExpensesTransaction		existing	= null;
+    protected DatePicker datePicker;
 
-	private ReimbursableExpensesEditorWindow	self;
+    protected AccountPicker accountPicker;
 
-	/**
-	 * Construct a window to create a new ReimbursableExpensesTransaction.
-	 * 
-	 */
-	public ReimbursableExpensesEditorWindow() {
-		this(0);
-	}
+    protected Entry descriptionEntry;
 
-	/**
-	 * Construct the Window. Uses the table from the glade file extensively.
-	 */
-	public ReimbursableExpensesEditorWindow(long id) {
-		super("reimbursable", "share/ReimbursableExpensesEditorWindow.glade");
+    protected ForeignAmountEntryBox amountEntryBox;
 
-		self = this;
+    private ReimbursableExpensesTransaction existing = null;
 
-		datePicker = new DatePicker();
+    private ReimbursableExpensesEditorWindow self;
 
-		table = (Table) gladeParser.getWidget("general_table");
-		table.attach(datePicker, 1, 2, 1, 2);
+    /**
+     * Construct a window to create a new ReimbursableExpensesTransaction.
+     * 
+     */
+    public ReimbursableExpensesEditorWindow() {
+        this(0);
+    }
 
-		descriptionEntry = new Entry();
-		table.attach(descriptionEntry, 1, 2, 2, 3);
+    /**
+     * Construct the Window. Uses the table from the glade file extensively.
+     */
+    public ReimbursableExpensesEditorWindow(long id) {
+        super("reimbursable", "share/ReimbursableExpensesEditorWindow.glade");
 
-		accountPicker = new AccountPicker(store);
+        self = this;
 
-		table.attach(accountPicker, 1, 2, 3, 4);
+        datePicker = new DatePicker();
 
-		person_WorkerPicker = new WorkerPicker(store, Employee.class);
-		table.attach(person_WorkerPicker, 1, 2, 0, 1);
+        table = (Table) gladeParser.getWidget("general_table");
+        table.attach(datePicker, 1, 2, 1, 2);
 
-		amountEntryBox = new ForeignAmountEntryBox(store);
-		table.attach(amountEntryBox, 1, 2, 4, 5);
+        descriptionEntry = new Entry();
+        table.attach(descriptionEntry, 1, 2, 2, 3);
 
-		ReimbursableExpensesTransaction t;
-		if (id == 0) {
-			t = new ReimbursableExpensesTransaction();
-		} else {
-			t = (ReimbursableExpensesTransaction) store.fetchByID(id);
-			datePicker.setDate(t.getDate());
-			person_WorkerPicker.setWorker(t.getWorker());
-			Set entries = t.getEntries();
-			Iterator iter = entries.iterator();
-			while (iter.hasNext()) {
-				accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
-				Ledger l = e.getParentLedger();
-				if (l == t.getWorker().getExpensesPayable()) {
-					// FIXME
-				} else {
-					accountPicker.setAccount(l.getParentAccount());
-					accountPicker.setLedger(l);
-					amountEntryBox.setForeignAmount((ForeignAmount) e.getAmount());
-				}
-			}
-			descriptionEntry.setText(t.getDescription());
-			existing = t;
-		}
-	}
+        accountPicker = new AccountPicker(store);
 
-	protected void ok() {
-		final Worker person = person_WorkerPicker.getWorker();
+        table.attach(accountPicker, 1, 2, 3, 4);
 
-		if (person == null) {
-			ModalDialog dialog = new ModalDialog(window, "Select someone!",
-				"You need to select the person you're trying to pay first.", MessageType.WARNING);
-			dialog.run();
-			person_WorkerPicker.grabFocus();
-			return;
-		}
+        person_WorkerPicker = new WorkerPicker(store, Employee.class);
+        table.attach(person_WorkerPicker, 1, 2, 0, 1);
 
-		if (descriptionEntry.getText().equals("")) {
-			ModalDialog dialog = new ModalDialog(
-				window,
-				"Enter a description!",
-				"It's really a good idea for each Transaction to have an appropriate description."
-					+ " Try to be a bit more specific than '<i>Expenses reimbursable to Joe Smith</i>' as that won't facilitate identifying this Transaction in future searches and reports."
-					+ " Perhaps '<i>Taxi from CDG to Paris Hotel</i>' instead.", MessageType.WARNING);
-			dialog.run();
-			descriptionEntry.grabFocus();
-			return;
-		}
+        amountEntryBox = new ForeignAmountEntryBox(store);
+        table.attach(amountEntryBox, 1, 2, 4, 5);
 
-		if (accountPicker.getAccount() == null) {
-			ModalDialog dialog = new ModalDialog(window, "Select an Account!",
-				"You need to select the account to which these expenses apply.", MessageType.WARNING);
-			dialog.run();
-			accountPicker.grabFocus();
-			return;
-		}
+        ReimbursableExpensesTransaction t;
+        if (id == 0) {
+            t = new ReimbursableExpensesTransaction();
+        } else {
+            t = (ReimbursableExpensesTransaction) store.fetchByID(id);
+            datePicker.setDate(t.getDate());
+            person_WorkerPicker.setWorker(t.getWorker());
+            Set entries = t.getEntries();
+            Iterator iter = entries.iterator();
+            while (iter.hasNext()) {
+                accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
+                Ledger l = e.getParentLedger();
+                if (l == t.getWorker().getExpensesPayable()) {
+                    // FIXME
+                } else {
+                    accountPicker.setAccount(l.getParentAccount());
+                    accountPicker.setLedger(l);
+                    amountEntryBox.setForeignAmount((ForeignAmount) e.getAmount());
+                }
+            }
+            descriptionEntry.setText(t.getDescription());
+            existing = t;
+        }
+    }
 
-		/*
-		 * Guards passed. Fork the processing off in a Thread so the UI doesn't
-		 * freeze up.
-		 */
+    protected void ok() {
+        final Worker person = person_WorkerPicker.getWorker();
 
-		window.hide();
-		Master.ui.showAsWorking(true);
+        if (person == null) {
+            ModalDialog dialog = new ModalDialog(window, "Select someone!",
+                    "You need to select the person you're trying to pay first.", MessageType.WARNING);
+            dialog.run();
+            person_WorkerPicker.grabFocus();
+            return;
+        }
 
-		new Thread() {
-			public void run() {
-				Debug.print("threads", "Carrying out update");
-				try {
-					Ledger expensesPayable = person.getExpensesPayable();
+        if (descriptionEntry.getText().equals("")) {
+            ModalDialog dialog = new ModalDialog(
+                    window,
+                    "Enter a description!",
+                    "It's really a good idea for each Transaction to have an appropriate description."
+                            + " Try to be a bit more specific than '<i>Expenses reimbursable to Joe Smith</i>' as that won't facilitate identifying this Transaction in future searches and reports."
+                            + " Perhaps '<i>Taxi from CDG to Paris Hotel</i>' instead.",
+                    MessageType.WARNING);
+            dialog.run();
+            descriptionEntry.grabFocus();
+            return;
+        }
 
-					ReimbursableExpensesTransaction t;
-					if (existing == null) {
-						t = new ReimbursableExpensesTransaction();
+        if (accountPicker.getAccount() == null) {
+            ModalDialog dialog = new ModalDialog(window, "Select an Account!",
+                    "You need to select the account to which these expenses apply.", MessageType.WARNING);
+            dialog.run();
+            accountPicker.grabFocus();
+            return;
+        }
 
-						t.setWorker(person);
-						t.setDate(datePicker.getDate());
-						t.setDescription(descriptionEntry.getText());
+        /*
+         * Guards passed. Fork the processing off in a Thread so the UI
+         * doesn't freeze up.
+         */
 
-						ForeignAmount fa = amountEntryBox.getForeignAmount();
+        window.hide();
+        Master.ui.showAsWorking(true);
 
-						Debit left = new Debit(fa, accountPicker.getLedger());
-						t.addEntry(left);
+        new Thread() {
+            public void run() {
+                Debug.print("threads", "Carrying out update");
+                try {
+                    Ledger expensesPayable = person.getExpensesPayable();
 
-						Credit right = new Credit(new Amount(fa.getValue()), expensesPayable);
-						t.addEntry(right);
+                    ReimbursableExpensesTransaction t;
+                    if (existing == null) {
+                        t = new ReimbursableExpensesTransaction();
 
-						PostTransactionCommand ptc = new PostTransactionCommand(t);
-						ptc.execute(store);
-					} else {
-						t = existing;
-						t.setDescription(descriptionEntry.getText());
+                        t.setWorker(person);
+                        t.setDate(datePicker.getDate());
+                        t.setDescription(descriptionEntry.getText());
 
-						Set entries = t.getEntries();
-						Iterator iter = entries.iterator();
-						while (iter.hasNext()) {
-							accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
-							Ledger l = e.getParentLedger();
-							ForeignAmount fa = amountEntryBox.getForeignAmount();
+                        ForeignAmount fa = amountEntryBox.getForeignAmount();
 
-							if (l == t.getWorker().getExpensesPayable()) {
-								// the Credit
-								Amount ha = e.getAmount();
-								ha.setValue(fa);
-							} else {
-								// the Debit
-								e.setAmount(fa);
-								e.setParentLedger(accountPicker.getLedger());
-							}
-						}
+                        Debit left = new Debit(fa, accountPicker.getLedger());
+                        t.addEntry(left);
 
-						UpdateTransactionCommand utc = new UpdateTransactionCommand(t);
-						utc.execute(store);
-					}
+                        Credit right = new Credit(new Amount(fa.getValue()), expensesPayable);
+                        t.addEntry(right);
 
-					store.commit();
+                        PostTransactionCommand ptc = new PostTransactionCommand(t);
+                        ptc.execute(store);
+                    } else {
+                        t = existing;
+                        t.setDescription(descriptionEntry.getText());
 
-					CustomEvents.addEvent(new Runnable() {
-						public void run() {
-							Master.ui.showAsWorking(false);
-							self.deleteHook();
-						}
-					});
+                        Set entries = t.getEntries();
+                        Iterator iter = entries.iterator();
+                        while (iter.hasNext()) {
+                            accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
+                            Ledger l = e.getParentLedger();
+                            ForeignAmount fa = amountEntryBox.getForeignAmount();
 
-				} catch (final CommandNotReadyException cnre) {
-					Debug.print("events", "Command not ready: " + cnre.getMessage());
-					CustomEvents.addEvent(new Runnable() {
-						public void run() {
-							ModalDialog dialog = new ModalDialog(window, "Command Not Ready!",
-								cnre.getMessage(), MessageType.ERROR);
-							dialog.run();
+                            if (l == t.getWorker().getExpensesPayable()) {
+                                // the Credit
+                                Amount ha = e.getAmount();
+                                ha.setValue(fa);
+                            } else {
+                                // the Debit
+                                e.setAmount(fa);
+                                e.setParentLedger(accountPicker.getLedger());
+                            }
+                        }
 
-							/*
-							 * Leave the Window open so user can fix, as opposed
-							 * to calling cancel()
-							 */
-							window.present();
-						}
-					});
-				}
+                        UpdateTransactionCommand utc = new UpdateTransactionCommand(t);
+                        utc.execute(store);
+                    }
 
-			}
-		}.start();
-	}
+                    store.commit();
+
+                    CustomEvents.addEvent(new Runnable() {
+                        public void run() {
+                            Master.ui.showAsWorking(false);
+                            self.deleteHook();
+                        }
+                    });
+
+                } catch (final CommandNotReadyException cnre) {
+                    Debug.print("events", "Command not ready: " + cnre.getMessage());
+                    CustomEvents.addEvent(new Runnable() {
+                        public void run() {
+                            ModalDialog dialog = new ModalDialog(window, "Command Not Ready!",
+                                    cnre.getMessage(), MessageType.ERROR);
+                            dialog.run();
+
+                            /*
+                             * Leave the Window open so user can fix, as
+                             * opposed to calling cancel()
+                             */
+                            window.present();
+                        }
+                    });
+                }
+
+            }
+        }.start();
+    }
 }

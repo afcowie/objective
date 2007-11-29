@@ -15,41 +15,41 @@ package accounts.domain;
  */
 public class CreditPositiveLedger extends Ledger
 {
-	public CreditPositiveLedger() {
-		super();
-	}
+    public CreditPositiveLedger() {
+        super();
+    }
 
-	public CreditPositiveLedger(String name) {
-		super();
-		super.setName(name);
-	}
+    public CreditPositiveLedger(String name) {
+        super();
+        super.setName(name);
+    }
 
-	/*
-	 * Overrides Ledger's addToBalance(). balance from Ledger.
-	 */
-	protected void addToBalance(Entry entry) {
-		if (entry == null) {
-			throw new IllegalArgumentException("Can't add null Entry to a Ledger");
-		}
-		if (entry instanceof Credit) {
-			balance.incrementBy(entry.getAmount());
-		} else {
-			balance.decrementBy(entry.getAmount());
-		}
-	}
+    /*
+     * Overrides Ledger's addToBalance(). balance from Ledger.
+     */
+    protected void addToBalance(Entry entry) {
+        if (entry == null) {
+            throw new IllegalArgumentException("Can't add null Entry to a Ledger");
+        }
+        if (entry instanceof Credit) {
+            balance.incrementBy(entry.getAmount());
+        } else {
+            balance.decrementBy(entry.getAmount());
+        }
+    }
 
-	protected void subtractFromBalance(Entry entry) {
-		if (entry == null) {
-			throw new IllegalArgumentException("Can't subtract null Entry from a Ledger");
-		}
-		if (entry instanceof Credit) {
-			balance.decrementBy(entry.getAmount());
-		} else {
-			balance.incrementBy(entry.getAmount());
-		}
-	}
+    protected void subtractFromBalance(Entry entry) {
+        if (entry == null) {
+            throw new IllegalArgumentException("Can't subtract null Entry from a Ledger");
+        }
+        if (entry instanceof Credit) {
+            balance.decrementBy(entry.getAmount());
+        } else {
+            balance.incrementBy(entry.getAmount());
+        }
+    }
 
-	public String getClassString() {
-		return "Credit Positive";
-	}
+    public String getClassString() {
+        return "Credit Positive";
+    }
 }

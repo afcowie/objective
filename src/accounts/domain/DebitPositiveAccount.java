@@ -13,28 +13,28 @@ package accounts.domain;
  */
 public class DebitPositiveAccount extends Account
 {
-	/*
-	 * Would have been abstract, except that having it concrete allows for
-	 * testing and searching with null prototypes.
-	 */
+    /*
+     * Would have been abstract, except that having it concrete allows for
+     * testing and searching with null prototypes.
+     */
 
-	public DebitPositiveAccount() {
-		super();
-	}
+    public DebitPositiveAccount() {
+        super();
+    }
 
-	public DebitPositiveAccount(String title) {
-		super(title);
-	}
+    public DebitPositiveAccount(String title) {
+        super(title);
+    }
 
-	public boolean isDebitPositive() {
-		return true;
-	}
+    public boolean isDebitPositive() {
+        return true;
+    }
 
-	public boolean isCreditPositive() {
-		return false;
-	}
+    public boolean isCreditPositive() {
+        return false;
+    }
 
-	public String getClassString() {
-		return "Debit Positive Account";
-	}
+    public String getClassString() {
+        return "Debit Positive Account";
+    }
 }

@@ -13,15 +13,15 @@ package accounts.domain;
  */
 public class LiabilityAccount extends CreditPositiveAccount
 {
-	public LiabilityAccount() {
-		super();
-	}
+    public LiabilityAccount() {
+        super();
+    }
 
-	public LiabilityAccount(String title) {
-		super(title);
-	}
+    public LiabilityAccount(String title) {
+        super(title);
+    }
 
-	public String getClassString() {
-		return "Liability";
-	}
+    public String getClassString() {
+        return "Liability";
+    }
 }

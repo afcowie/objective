@@ -7,13 +7,12 @@
 package accounts.domain;
 
 /**
- * Base class for things that need to be accounted for and repaid individually:
- * Invoices, Bills, and Loans.
+ * Base class for things that need to be accounted for and repaid
+ * individually: Invoices, Bills, and Loans.
  * 
  * @author Andrew Cowie
  */
 public abstract class Item
 {
-	public Item() {
-	}
+    public Item() {}
 }

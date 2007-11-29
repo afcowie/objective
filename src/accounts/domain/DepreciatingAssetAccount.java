@@ -15,17 +15,17 @@ package accounts.domain;
  */
 public class DepreciatingAssetAccount extends AssetAccount
 {
-	public DepreciatingAssetAccount() {
-		super();
-	}
+    public DepreciatingAssetAccount() {
+        super();
+    }
 
-	public DepreciatingAssetAccount(String title) {
-		super(title);
-		addLedger(new DebitPositiveLedger("At Cost"));
-		addLedger(new CreditPositiveLedger("Accumulated Depreciation"));
-	}
+    public DepreciatingAssetAccount(String title) {
+        super(title);
+        addLedger(new DebitPositiveLedger("At Cost"));
+        addLedger(new CreditPositiveLedger("Accumulated Depreciation"));
+    }
 
-	public String getClassString() {
-		return "Depreciating Asset";
-	}
+    public String getClassString() {
+        return "Depreciating Asset";
+    }
 }

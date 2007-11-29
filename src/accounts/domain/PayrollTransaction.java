@@ -13,166 +13,172 @@ package accounts.domain;
  */
 public class PayrollTransaction extends Transaction
 {
-	private Employee				employee;
-	private PayrollTaxIdentifier	taxIdentifier;
+    private Employee employee;
 
-	private Datestamp				fromDate;
-	private Datestamp				endDate;
+    private PayrollTaxIdentifier taxIdentifier;
 
-	private Entry					salary;
-	private Entry					withholding;
-	private Entry					paycheck;
+    private Datestamp fromDate;
 
-	public PayrollTransaction() {
-		super();
-	}
+    private Datestamp endDate;
 
-	/**
-	 * General use constructor.
-	 * 
-	 * @param employee
-	 *            the Employee you're paying.
-	 * @param identifier
-	 *            the PayrollTaxIdentifier relevent to this paycheck.
-	 */
-	public PayrollTransaction(Employee employee, PayrollTaxIdentifier identifier) {
-		super();
-		setEmployee(employee);
-		setTaxIdentifier(identifier);
-	}
+    private Entry salary;
 
-	/**
-	 * Artificial constructor for mockups and unit tests only. You <i>really</i>
-	 * want to make sure that the entries passed to this are sensible, otherwise
-	 * editing this Transaction will lead to all sorts of unwanted artifacts.
-	 * 
-	 * @param employee
-	 *            The Employee object for the person being paid
-	 * @param date
-	 *            The date the person was paid
-	 * @param entries
-	 *            an array of Entry objects. <b>Must be in order salary,
-	 *            withholding, paycheck</b>
-	 */
-	public PayrollTransaction(Employee employee, PayrollTaxIdentifier identifier, Datestamp date,
-		Datestamp fromDate, Datestamp endDate, Entry[] entries) {
-		/*
-		 * The super call runs addEntries() over the array; the setters below
-		 * set PayrollTransaction's fields.
-		 */
-		super("Paycheck to " + employee.getName(), date, entries);
-		setEmployee(employee);
-		setTaxIdentifier(identifier);
-		setDate(date);
+    private Entry withholding;
 
-		setFromDate(fromDate);
-		setEndDate(endDate);
+    private Entry paycheck;
 
-		setSalaryEntry(entries[0]);
-		setWithholdingEntry(entries[1]);
-		setPaycheckEntry(entries[2]);
-	}
+    public PayrollTransaction() {
+        super();
+    }
 
-	public String getClassString() {
-		return "Payroll";
-	}
+    /**
+     * General use constructor.
+     * 
+     * @param employee
+     *            the Employee you're paying.
+     * @param identifier
+     *            the PayrollTaxIdentifier relevent to this paycheck.
+     */
+    public PayrollTransaction(Employee employee, PayrollTaxIdentifier identifier) {
+        super();
+        setEmployee(employee);
+        setTaxIdentifier(identifier);
+    }
 
-	/**
-	 * @return the Employee who was (will be) paid
-	 */
-	public Employee getEmployee() {
-		return employee;
-	}
+    /**
+     * Artificial constructor for mockups and unit tests only. You <i>really</i>
+     * want to make sure that the entries passed to this are sensible,
+     * otherwise editing this Transaction will lead to all sorts of unwanted
+     * artifacts.
+     * 
+     * @param employee
+     *            The Employee object for the person being paid
+     * @param date
+     *            The date the person was paid
+     * @param entries
+     *            an array of Entry objects. <b>Must be in order salary,
+     *            withholding, paycheck</b>
+     */
+    public PayrollTransaction(Employee employee, PayrollTaxIdentifier identifier, Datestamp date,
+            Datestamp fromDate, Datestamp endDate, Entry[] entries) {
+        /*
+         * The super call runs addEntries() over the array; the setters below
+         * set PayrollTransaction's fields.
+         */
+        super("Paycheck to " + employee.getName(), date, entries);
+        setEmployee(employee);
+        setTaxIdentifier(identifier);
+        setDate(date);
 
-	/**
-	 * @param employee
-	 *            set the Employee who will receive this paycheck
-	 */
-	public void setEmployee(Employee employee) {
-		if (employee == null) {
-			throw new IllegalArgumentException("Can't set null as Employee");
-		}
-		this.employee = employee;
-		setDescription("Paycheck to " + employee.getName());
-	}
+        setFromDate(fromDate);
+        setEndDate(endDate);
 
-	/**
-	 * @return the PayrollTaxIdentifier that was used to determine the
-	 *         withholdings on this particular payroll. (ie, you can change the
-	 *         Employee's chosen TaxIdentifiers in the future, but once made and
-	 *         recorded, this Transaction will keep track of how it was set at
-	 *         the time.
-	 */
-	public PayrollTaxIdentifier getTaxIdentifier() {
-		return taxIdentifier;
-	}
+        setSalaryEntry(entries[0]);
+        setWithholdingEntry(entries[1]);
+        setPaycheckEntry(entries[2]);
+    }
 
-	/**
-	 * Set the PayrollTaxIdentifier used to determine the withholdings for this
-	 * paycheck.
-	 * 
-	 * @param identifier
-	 *            Can be null if the country specific implementation doesn't use
-	 *            a PayrollTaxIdentifier.
-	 */
-	public void setTaxIdentifier(PayrollTaxIdentifier identifier) {
-		this.taxIdentifier = identifier;
-	}
+    public String getClassString() {
+        return "Payroll";
+    }
 
-	public Datestamp getFromDate() {
-		return fromDate;
-	}
+    /**
+     * @return the Employee who was (will be) paid
+     */
+    public Employee getEmployee() {
+        return employee;
+    }
 
-	public void setFromDate(Datestamp fromDate) {
-		this.fromDate = fromDate;
-	}
+    /**
+     * @param employee
+     *            set the Employee who will receive this paycheck
+     */
+    public void setEmployee(Employee employee) {
+        if (employee == null) {
+            throw new IllegalArgumentException("Can't set null as Employee");
+        }
+        this.employee = employee;
+        setDescription("Paycheck to " + employee.getName());
+    }
 
-	public Datestamp getEndDate() {
-		return endDate;
-	}
+    /**
+     * @return the PayrollTaxIdentifier that was used to determine the
+     *         withholdings on this particular payroll. (ie, you can change
+     *         the Employee's chosen TaxIdentifiers in the future, but once
+     *         made and recorded, this Transaction will keep track of how it
+     *         was set at the time.
+     */
+    public PayrollTaxIdentifier getTaxIdentifier() {
+        return taxIdentifier;
+    }
 
-	/**
-	 * Set the end of the period this pay covers. Certainly, Transaction has a
-	 * Datestamp, but there are cases where you might reasonably have a paycheck
-	 * generated and paid out on a date that is after the end of a pay period.
-	 */
-	public void setEndDate(Datestamp endDate) {
-		this.endDate = endDate;
-	}
+    /**
+     * Set the PayrollTaxIdentifier used to determine the withholdings for
+     * this paycheck.
+     * 
+     * @param identifier
+     *            Can be null if the country specific implementation doesn't
+     *            use a PayrollTaxIdentifier.
+     */
+    public void setTaxIdentifier(PayrollTaxIdentifier identifier) {
+        this.taxIdentifier = identifier;
+    }
 
-	public Entry getPaycheckEntry() {
-		return paycheck;
-	}
+    public Datestamp getFromDate() {
+        return fromDate;
+    }
 
-	/**
-	 * Designate an Entry as representing the paycheck. This is just a
-	 * reference; you must still addEntry() when forming a Transaction.
-	 */
-	public void setPaycheckEntry(Entry paycheck) {
-		this.paycheck = paycheck;
-	}
+    public void setFromDate(Datestamp fromDate) {
+        this.fromDate = fromDate;
+    }
 
-	public Entry getSalaryEntry() {
-		return salary;
-	}
+    public Datestamp getEndDate() {
+        return endDate;
+    }
 
-	/**
-	 * Designate an Entry as representing the salary. This is just a reference;
-	 * you must still addEntry() when forming a Transaction.
-	 */
-	public void setSalaryEntry(Entry salary) {
-		this.salary = salary;
-	}
+    /**
+     * Set the end of the period this pay covers. Certainly, Transaction has a
+     * Datestamp, but there are cases where you might reasonably have a
+     * paycheck generated and paid out on a date that is after the end of a
+     * pay period.
+     */
+    public void setEndDate(Datestamp endDate) {
+        this.endDate = endDate;
+    }
 
-	public Entry getWithholdingEntry() {
-		return withholding;
-	}
+    public Entry getPaycheckEntry() {
+        return paycheck;
+    }
 
-	/**
-	 * Designate an Entry as representing the withholding. This is just a
-	 * reference; you must still addEntry() when forming a Transaction.
-	 */
-	public void setWithholdingEntry(Entry withholding) {
-		this.withholding = withholding;
-	}
+    /**
+     * Designate an Entry as representing the paycheck. This is just a
+     * reference; you must still addEntry() when forming a Transaction.
+     */
+    public void setPaycheckEntry(Entry paycheck) {
+        this.paycheck = paycheck;
+    }
+
+    public Entry getSalaryEntry() {
+        return salary;
+    }
+
+    /**
+     * Designate an Entry as representing the salary. This is just a
+     * reference; you must still addEntry() when forming a Transaction.
+     */
+    public void setSalaryEntry(Entry salary) {
+        this.salary = salary;
+    }
+
+    public Entry getWithholdingEntry() {
+        return withholding;
+    }
+
+    /**
+     * Designate an Entry as representing the withholding. This is just a
+     * reference; you must still addEntry() when forming a Transaction.
+     */
+    public void setWithholdingEntry(Entry withholding) {
+        this.withholding = withholding;
+    }
 }

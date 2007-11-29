@@ -15,156 +15,163 @@ import java.text.ParseException;
  * necessarily payable annually, only at the end).
  * <P>
  * Internal parameters use the traditional Time Value of Money terms: an
- * interest rate per period, a number of periods, and specification of how many
- * periods there are per year.
+ * interest rate per period, a number of periods, and specification of how
+ * many periods there are per year.
  * <P>
  * If you need something more exotic, subclass this.
  * 
  */
 public class Loan extends Item
 {
-	protected String	description		= null;
-	protected Datestamp	startDate		= null;
-	protected Datestamp	dueDate			= null;
-	protected String	interestRate	= null;
-	protected int		numPeriods		= 0;
-	protected int		periodsPerYear	= 0;
+    protected String description = null;
 
-	public Loan() {
-	}
+    protected Datestamp startDate = null;
 
-	public Loan(String description, Datestamp startDate, int periodsPerYear, int numPeriods) {
-		setDescription(description);
-		setStartDate(startDate);
-		setPeriodsPerYear(periodsPerYear);
-		setNumPeriods(numPeriods);
-		calculateDueDate();
-	}
+    protected Datestamp dueDate = null;
 
-	/*
-	 * Getters and Setters --------------------------------
-	 */
+    protected String interestRate = null;
 
-	public String getDescription() {
-		return description;
-	}
+    protected int numPeriods = 0;
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    protected int periodsPerYear = 0;
 
-	public Datestamp getStartDate() {
-		return startDate;
-	}
+    public Loan() {}
 
-	public void setStartDate(Datestamp date) {
-		this.startDate = date;
-	}
+    public Loan(String description, Datestamp startDate, int periodsPerYear, int numPeriods) {
+        setDescription(description);
+        setStartDate(startDate);
+        setPeriodsPerYear(periodsPerYear);
+        setNumPeriods(numPeriods);
+        calculateDueDate();
+    }
 
-	public Datestamp getDueDate() {
-		return dueDate;
-	}
+    /*
+     * Getters and Setters --------------------------------
+     */
 
-	/**
-	 * You can set the due date arbitrarily; calling this method will invalidate
-	 * FIXME
-	 * 
-	 * @param date
-	 */
-	public void setDueDate(Datestamp date) {
-		this.dueDate = date;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public int getPeriodsPerYear() {
-		return periodsPerYear;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setPeriodsPerYear(int periods) {
-		if (periods < 0) {
-			throw new IllegalArgumentException("The number of periods must be greater than zero");
-		}
-		if (periods > 365) {
-			throw new IllegalArgumentException("Interest compounds faster than daily? You're kidding, right?");
-		}
-		this.periodsPerYear = periods;
-	}
+    public Datestamp getStartDate() {
+        return startDate;
+    }
 
-	public void setNumPeriods(int periods) {
-		if (periods < 0) {
-			throw new IllegalArgumentException("The number of periods must be greater than zero");
-		}
-		numPeriods = periods;
-	}
+    public void setStartDate(Datestamp date) {
+        this.startDate = date;
+    }
 
-	public int getNumPeriods() {
-		return numPeriods;
-	}
+    public Datestamp getDueDate() {
+        return dueDate;
+    }
 
-	/*
-	 * A convenince to set the number of periods if the number of years is
-	 * known, which is actually the common use case. Assumptions: periodsPerYear
-	 * must already be set, and the total number of periods must fit into that
-	 * many years without remainder (ie, it will be calculated that way, so that
-	 * should be what you mean).
-	 */
-	public void setNumYears(int years) {
-		if (years < 0) {
-			throw new IllegalArgumentException("The number of years must be greater than zero");
-		}
-		if (periodsPerYear < 1) {
-			throw new IllegalStateException("The number of periods per year must already be set to use setNumYears()");
-		}
-		numPeriods = years * periodsPerYear;
-	}
+    /**
+     * You can set the due date arbitrarily; calling this method will
+     * invalidate FIXME
+     * 
+     * @param date
+     */
+    public void setDueDate(Datestamp date) {
+        this.dueDate = date;
+    }
 
-	public String getIntersestRate() {
-		return interestRate;
-	}
+    public int getPeriodsPerYear() {
+        return periodsPerYear;
+    }
 
-	/**
-	 * Set the interest rate for the loan. The rate is in per-period terms.
-	 * <P>
-	 * Once validated, will be stored in a decimal form String (ie 0.095 for
-	 * 9.5%).
-	 * 
-	 * @param rate
-	 *            a string, either in the form "0.055" or "5.5%"
-	 */
-	public void setInterestRate(String rate) {
-		// TODO validate
-		this.interestRate = rate;
-	}
+    public void setPeriodsPerYear(int periods) {
+        if (periods < 0) {
+            throw new IllegalArgumentException("The number of periods must be greater than zero");
+        }
+        if (periods > 365) {
+            throw new IllegalArgumentException(
+                    "Interest compounds faster than daily? You're kidding, right?");
+        }
+        this.periodsPerYear = periods;
+    }
 
-	/**
-	 * This is where the assumption that a month := year / 12 would creep in.
-	 * TODO probably needs leap year capability, etc... replace with Calendar
-	 * methods?
-	 */
-	protected void calculateDueDate() {
-		final long YEARMILLISECONDS = (1000l * 86400l * 365l);
+    public void setNumPeriods(int periods) {
+        if (periods < 0) {
+            throw new IllegalArgumentException("The number of periods must be greater than zero");
+        }
+        numPeriods = periods;
+    }
 
-		long startTimestamp = startDate.getInternalTimestamp();
+    public int getNumPeriods() {
+        return numPeriods;
+    }
 
-		if (numPeriods == 0) {
-			throw new IllegalStateException("Not much moint in trying to calculateDueDate() if numPeriods isn't set.");
-		}
-		if (periodsPerYear == 0) {
-			throw new IllegalStateException(
-					"Not much moint in trying to calculateDueDate() if the periodsPerYear isn't set.");
-		}
+    /*
+     * A convenince to set the number of periods if the number of years is
+     * known, which is actually the common use case. Assumptions:
+     * periodsPerYear must already be set, and the total number of periods
+     * must fit into that many years without remainder (ie, it will be
+     * calculated that way, so that should be what you mean).
+     */
+    public void setNumYears(int years) {
+        if (years < 0) {
+            throw new IllegalArgumentException("The number of years must be greater than zero");
+        }
+        if (periodsPerYear < 1) {
+            throw new IllegalStateException(
+                    "The number of periods per year must already be set to use setNumYears()");
+        }
+        numPeriods = years * periodsPerYear;
+    }
 
-		long dueTimestamp = startTimestamp + YEARMILLISECONDS / periodsPerYear * numPeriods;
+    public String getIntersestRate() {
+        return interestRate;
+    }
 
-		Datestamp due = new Datestamp();
-		try {
-			/*
-			 * Calling this will round it the nearest day. TODO It may well need
-			 * a round-up bias added.
-			 */
-			due.setDate(dueTimestamp);
-		} catch (ParseException pe) {
-			throw new IllegalStateException("ParseException hit when trying to calculate the Due Date");
-		}
-		dueDate = due;
-	}
+    /**
+     * Set the interest rate for the loan. The rate is in per-period terms.
+     * <P>
+     * Once validated, will be stored in a decimal form String (ie 0.095 for
+     * 9.5%).
+     * 
+     * @param rate
+     *            a string, either in the form "0.055" or "5.5%"
+     */
+    public void setInterestRate(String rate) {
+        // TODO validate
+        this.interestRate = rate;
+    }
+
+    /**
+     * This is where the assumption that a month := year / 12 would creep in.
+     * TODO probably needs leap year capability, etc... replace with Calendar
+     * methods?
+     */
+    protected void calculateDueDate() {
+        final long YEARMILLISECONDS = (1000l * 86400l * 365l);
+
+        long startTimestamp = startDate.getInternalTimestamp();
+
+        if (numPeriods == 0) {
+            throw new IllegalStateException(
+                    "Not much moint in trying to calculateDueDate() if numPeriods isn't set.");
+        }
+        if (periodsPerYear == 0) {
+            throw new IllegalStateException(
+                    "Not much moint in trying to calculateDueDate() if the periodsPerYear isn't set.");
+        }
+
+        long dueTimestamp = startTimestamp + YEARMILLISECONDS / periodsPerYear * numPeriods;
+
+        Datestamp due = new Datestamp();
+        try {
+            /*
+             * Calling this will round it the nearest day. TODO It may well
+             * need a round-up bias added.
+             */
+            due.setDate(dueTimestamp);
+        } catch (ParseException pe) {
+            throw new IllegalStateException("ParseException hit when trying to calculate the Due Date");
+        }
+        dueDate = due;
+    }
 }

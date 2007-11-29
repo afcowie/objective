@@ -25,51 +25,51 @@ import country.au.ui.AustralianPayrollEditorWindow;
 public class ObjectiveUserInterface extends UserInterface
 {
 
-	public ObjectiveUserInterface() {
-		super();
-	}
+    public ObjectiveUserInterface() {
+        super();
+    }
 
-	/**
-	 * Overrides (but calls)
-	 * {@link generic.ui.UserInterface#deregisterWindow(generic.ui.PrimaryWindow)}.
-	 * Removes w from the list of present windows if an Editor Window. The calls
-	 * super implementation.
-	 */
-	protected void deregisterWindow(PrimaryWindow w) {
-		super.deregisterWindow(w);
-	}
+    /**
+     * Overrides (but calls)
+     * {@link generic.ui.UserInterface#deregisterWindow(generic.ui.PrimaryWindow)}.
+     * Removes w from the list of present windows if an Editor Window. The
+     * calls super implementation.
+     */
+    protected void deregisterWindow(PrimaryWindow w) {
+        super.deregisterWindow(w);
+    }
 
-	/**
-	 * Launch a new window. The primary reason for this singleton class to exist
-	 * is to provide a central point which disparate event handlers can poke in
-	 * order to cause UI windows to be launched. This in inherited from (and
-	 * overrides) generic.ui.UserInterface to provide functionality specific to
-	 * ObjectiveAccounts.
-	 * 
-	 * @param id
-	 *            database id of the target object
-	 * @param target
-	 *            the object you are editing. This is NOT passed to launched
-	 *            editors, but is used to discriminate between
-	 *            PayrollTransaction, GenericTransaction, etc.
-	 */
-	protected EditorWindow launchEditor(long id, Object target) {
-		EditorWindow editor = null;
+    /**
+     * Launch a new window. The primary reason for this singleton class to
+     * exist is to provide a central point which disparate event handlers can
+     * poke in order to cause UI windows to be launched. This in inherited
+     * from (and overrides) generic.ui.UserInterface to provide functionality
+     * specific to ObjectiveAccounts.
+     * 
+     * @param id
+     *            database id of the target object
+     * @param target
+     *            the object you are editing. This is NOT passed to launched
+     *            editors, but is used to discriminate between
+     *            PayrollTransaction, GenericTransaction, etc.
+     */
+    protected EditorWindow launchEditor(long id, Object target) {
+        EditorWindow editor = null;
 
-		if (target instanceof Transaction) {
+        if (target instanceof Transaction) {
 
-			if (target instanceof PayrollTransaction) {
-				editor = new AustralianPayrollEditorWindow(id);
-			} else if (target instanceof ReimbursableExpensesTransaction) {
-				editor = new ReimbursableExpensesEditorWindow(id);
-			} else if (target instanceof GenericTransaction) {
-				editor = new GenericTransactionEditorWindow(id);
-			}
+            if (target instanceof PayrollTransaction) {
+                editor = new AustralianPayrollEditorWindow(id);
+            } else if (target instanceof ReimbursableExpensesTransaction) {
+                editor = new ReimbursableExpensesEditorWindow(id);
+            } else if (target instanceof GenericTransaction) {
+                editor = new GenericTransactionEditorWindow(id);
+            }
 
-		} else if (target instanceof Currency) {
-			throw new UnsupportedOperationException("This here just for kicks");
-		}
+        } else if (target instanceof Currency) {
+            throw new UnsupportedOperationException("This here just for kicks");
+        }
 
-		return editor;
-	}
+        return editor;
+    }
 }

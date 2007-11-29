@@ -30,99 +30,100 @@ import accounts.persistence.IdentifierAlreadyExistsException;
  */
 public class AddEntityCommand extends Command
 {
-	private transient Entity	entity	= null;
-	private transient Ledger	ledger	= null;
+    private transient Entity entity = null;
 
-	/**
-	 * ... Assumes that a ledger in the name of this Entity has not yet been
-	 * created.
-	 * 
-	 * @param entity
-	 */
-	public AddEntityCommand(Entity entity) {
-		this.entity = entity;
-		if (entity instanceof Client) {
-			this.ledger = new ClientLedger((Client) entity);
-		} else if (entity instanceof Supplier) {
-			this.ledger = new SupplierLedger((Supplier) entity);
-		} else {
-			throw new IllegalArgumentException("Huh? How come neither Client nor Supplier?");
-		}
-	}
+    private transient Ledger ledger = null;
 
-	/**
-	 * Creates the ItemsLedger appropriate to this Entity
-	 * 
-	 * @throws IdentifierAlreadyExistsException
-	 *             if the Entity you want to store is already present.
-	 */
-	protected void action(DataClient store) throws CommandNotReadyException {
-		if (ledger.getName() == null) {
-			throw new CommandNotReadyException("The Ledger (Client or Supplier) passed has a null name!");
-		}
+    /**
+     * ... Assumes that a ledger in the name of this Entity has not yet been
+     * created.
+     * 
+     * @param entity
+     */
+    public AddEntityCommand(Entity entity) {
+        this.entity = entity;
+        if (entity instanceof Client) {
+            this.ledger = new ClientLedger((Client) entity);
+        } else if (entity instanceof Supplier) {
+            this.ledger = new SupplierLedger((Supplier) entity);
+        } else {
+            throw new IllegalArgumentException("Huh? How come neither Client nor Supplier?");
+        }
+    }
 
-		/*
-		 * Use DataClient (db4o)'s capability to search by example to see if
-		 * there's already an Entity by this name.
-		 */
-		Entity prototype = new Entity();
-		prototype.setName(entity.getName());
+    /**
+     * Creates the ItemsLedger appropriate to this Entity
+     * 
+     * @throws IdentifierAlreadyExistsException
+     *             if the Entity you want to store is already present.
+     */
+    protected void action(DataClient store) throws CommandNotReadyException {
+        if (ledger.getName() == null) {
+            throw new CommandNotReadyException("The Ledger (Client or Supplier) passed has a null name!");
+        }
 
-		List found = store.queryByExample(prototype);
+        /*
+         * Use DataClient (db4o)'s capability to search by example to see if
+         * there's already an Entity by this name.
+         */
+        Entity prototype = new Entity();
+        prototype.setName(entity.getName());
 
-		if (found.size() > 0) {
-			throw new IdentifierAlreadyExistsException(entity.getName() + " already exists as an Entity");
-		}
+        List found = store.queryByExample(prototype);
 
-		/*
-		 * Ditto a {Client,Supplier}Ledger by this name
-		 */
+        if (found.size() > 0) {
+            throw new IdentifierAlreadyExistsException(entity.getName() + " already exists as an Entity");
+        }
 
-		Ledger protoLedger = new Ledger();
-		protoLedger.setName(entity.getName());
+        /*
+         * Ditto a {Client,Supplier}Ledger by this name
+         */
 
-		found = store.queryByExample(protoLedger);
+        Ledger protoLedger = new Ledger();
+        protoLedger.setName(entity.getName());
 
-		if (found.size() > 0) {
-			throw new IdentifierAlreadyExistsException("There is already an ItemsLedger with "
-				+ entity.getName() + " as its name");
-		}
+        found = store.queryByExample(protoLedger);
 
-		/*
-		 * Safety checks passed. Now fetch up the appropriate
-		 * Account{Receivable|Payable} Account.
-		 */
+        if (found.size() > 0) {
+            throw new IdentifierAlreadyExistsException("There is already an ItemsLedger with "
+                    + entity.getName() + " as its name");
+        }
 
-		if (entity instanceof Client) {
-			found = store.queryByExample(AccountsReceivable.class);
-		} else if (entity instanceof Supplier) {
-			found = store.queryByExample(AccountsPayable.class);
-		} else {
-			throw new DebugException(
-				"Huh? How did this AddEntityCommmand come to have neither Client nor Supplier as its candidate Entity?");
-		}
+        /*
+         * Safety checks passed. Now fetch up the appropriate
+         * Account{Receivable|Payable} Account.
+         */
 
-		if (found.size() > 1) {
-			throw new DebugException(
-				"As coded, we only allow for there being one Accounts{Receivable|Payable} account");
-		} else if (found.size() == 0) {
-			throw new IllegalStateException("Where is the Accounts{Receivable|Payable} account?");
-		}
+        if (entity instanceof Client) {
+            found = store.queryByExample(AccountsReceivable.class);
+        } else if (entity instanceof Supplier) {
+            found = store.queryByExample(AccountsPayable.class);
+        } else {
+            throw new DebugException(
+                    "Huh? How did this AddEntityCommmand come to have neither Client nor Supplier as its candidate Entity?");
+        }
 
-		Account trade = (Account) found.get(0);
-		trade.addLedger(ledger);
+        if (found.size() > 1) {
+            throw new DebugException(
+                    "As coded, we only allow for there being one Accounts{Receivable|Payable} account");
+        } else if (found.size() == 0) {
+            throw new IllegalStateException("Where is the Accounts{Receivable|Payable} account?");
+        }
 
-		// TODO automatically? Linking them in action()?
+        Account trade = (Account) found.get(0);
+        trade.addLedger(ledger);
 
-		store.save(entity);
-		store.save(trade);
-	}
+        // TODO automatically? Linking them in action()?
 
-	protected void reverse(DataClient store) throws CommandNotUndoableException {
-		throw new UnsupportedOperationException();
-	}
+        store.save(entity);
+        store.save(trade);
+    }
 
-	public String getClassString() {
-		return "Add Entity";
-	}
+    protected void reverse(DataClient store) throws CommandNotUndoableException {
+        throw new UnsupportedOperationException();
+    }
+
+    public String getClassString() {
+        return "Add Entity";
+    }
 }

@@ -14,21 +14,21 @@ package accounts.services;
 public class CommandNotReadyException extends Exception
 {
 
-	private static final long	serialVersionUID	= 1L;
+    private static final long serialVersionUID = 1L;
 
-	public CommandNotReadyException() {
-		super();
-	}
+    public CommandNotReadyException() {
+        super();
+    }
 
-	public CommandNotReadyException(String message) {
-		super(message);
-	}
+    public CommandNotReadyException(String message) {
+        super(message);
+    }
 
-	public CommandNotReadyException(Throwable throwable) {
-		super(throwable);
-	}
+    public CommandNotReadyException(Throwable throwable) {
+        super(throwable);
+    }
 
-	public CommandNotReadyException(String message, Throwable throwable) {
-		super(message, throwable);
-	}
+    public CommandNotReadyException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 }

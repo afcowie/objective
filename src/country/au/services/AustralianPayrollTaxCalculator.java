@@ -15,8 +15,8 @@ import accounts.services.PayrollTaxCalculator;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 
 /**
- * Calculate the "Pay As You Go" (PAYG) withholding to be deducted from a given
- * salary or due as a result of a given payment.
+ * Calculate the "Pay As You Go" (PAYG) withholding to be deducted from a
+ * given salary or due as a result of a given payment.
  * <p>
  * The ATO formulas are based on weekly payments; other periods have to be
  * normalized to per week.
@@ -25,153 +25,155 @@ import country.au.domain.AustralianPayrollTaxIdentifier;
  */
 public class AustralianPayrollTaxCalculator extends PayrollTaxCalculator
 {
-	double[][]	coefficients;
-	float		weeks;
+    double[][] coefficients;
 
-	/**
-	 * Sets 1 as a default number of weeks.
-	 * 
-	 * @param store
-	 *            the DataClient from which to fetch tax Identifiers and tax
-	 *            table data.
-	 * @param asAtDate
-	 *            allows the calculator to pick which set of tax table data is
-	 *            appropriate.
-	 * @throws IllegalStateException
-	 *             thorwn from the Finder if you've managed to ask for tax data
-	 *             that isn't there.
-	 */
-	public AustralianPayrollTaxCalculator(DataClient store, AustralianPayrollTaxIdentifier scale,
-		Datestamp asAtDate) throws NotFoundException {
+    float weeks;
 
-		super(asAtDate);
-		if (scale == null) {
-			throw new NotActivatedException();
-		}
+    /**
+     * Sets 1 as a default number of weeks.
+     * 
+     * @param store
+     *            the DataClient from which to fetch tax Identifiers and tax
+     *            table data.
+     * @param asAtDate
+     *            allows the calculator to pick which set of tax table data is
+     *            appropriate.
+     * @throws IllegalStateException
+     *             thorwn from the Finder if you've managed to ask for tax
+     *             data that isn't there.
+     */
+    public AustralianPayrollTaxCalculator(DataClient store, AustralianPayrollTaxIdentifier scale,
+            Datestamp asAtDate) throws NotFoundException {
 
-		AustralianPayrollTaxTableFinder finder = new AustralianPayrollTaxTableFinder(scale, asAtDate);
-		finder.query(store);
-		this.coefficients = finder.getCoefficients();
-		this.weeks = 1.0f;
-	}
+        super(asAtDate);
+        if (scale == null) {
+            throw new NotActivatedException();
+        }
 
-	/**
-	 * @return the number of weeks that are currently in use to make this
-	 *         calculation.
-	 */
-	public float getWeeks() {
-		return weeks;
-	}
+        AustralianPayrollTaxTableFinder finder = new AustralianPayrollTaxTableFinder(scale, asAtDate);
+        finder.query(store);
+        this.coefficients = finder.getCoefficients();
+        this.weeks = 1.0f;
+    }
 
-	/**
-	 * Set the number of weeks this pay encompasses. This is used to normalize
-	 * the salary or paycheck to the magnitude of single weeks, which is the
-	 * basis on which the ATO PAYG tables are defined.
-	 */
+    /**
+     * @return the number of weeks that are currently in use to make this
+     *         calculation.
+     */
+    public float getWeeks() {
+        return weeks;
+    }
 
-	public void setWeeks(float weeks) {
-		if (weeks <= 0.0) {
-			throw new IllegalArgumentException("The number of weeks must be positive and non-zero");
-		}
-		this.weeks = weeks;
-	}
+    /**
+     * Set the number of weeks this pay encompasses. This is used to normalize
+     * the salary or paycheck to the magnitude of single weeks, which is the
+     * basis on which the ATO PAYG tables are defined.
+     */
 
-	/**
-	 * Calculate the withholding due as a result of a given paycheck amount. A
-	 * common use case is that a given sum of money is paid/given/transfered to
-	 * an employee; the appropriate amount of PAYG needs to be calculated and,
-	 * added to the actual paycheck disbursed, equals the "salary" or wage that
-	 * that person received.
-	 * <p>
-	 * This uses calculateGivenSalary() which is where the logic from the ATO
-	 * tax tables is embedded.
-	 */
-	public void calculateGivenPayable() {
-		if (paycheck.isZero()) {
-			salary.setNumber(0);
-			withhold.setNumber(0);
-			return;
-		}
+    public void setWeeks(float weeks) {
+        if (weeks <= 0.0) {
+            throw new IllegalArgumentException("The number of weeks must be positive and non-zero");
+        }
+        this.weeks = weeks;
+    }
 
-		/*
-		 * Brute force: start with paycheck amount (taxes payable could be zero,
-		 * after all), then increment by $1 and recalculate. Limit: we will
-		 * assume taxes aren't going to be more than 90% of salary, so ... FIXME
-		 */
+    /**
+     * Calculate the withholding due as a result of a given paycheck amount. A
+     * common use case is that a given sum of money is paid/given/transfered
+     * to an employee; the appropriate amount of PAYG needs to be calculated
+     * and, added to the actual paycheck disbursed, equals the "salary" or
+     * wage that that person received.
+     * <p>
+     * This uses calculateGivenSalary() which is where the logic from the ATO
+     * tax tables is embedded.
+     */
+    public void calculateGivenPayable() {
+        if (paycheck.isZero()) {
+            salary.setNumber(0);
+            withhold.setNumber(0);
+            return;
+        }
 
-		Amount original = (Amount) paycheck.clone();
-		Amount candidate = (Amount) paycheck.clone();
-		Amount limit = new Amount(paycheck.getNumber() * 10);
+        /*
+         * Brute force: start with paycheck amount (taxes payable could be
+         * zero, after all), then increment by $1 and recalculate. Limit: we
+         * will assume taxes aren't going to be more than 90% of salary, so
+         * ... FIXME
+         */
 
-		for (; candidate.compareTo(limit) < 0; candidate.incrementBy(new Amount("1.00"))) {
-			salary.setValue(candidate);
-			calculateGivenSalary();
+        Amount original = (Amount) paycheck.clone();
+        Amount candidate = (Amount) paycheck.clone();
+        Amount limit = new Amount(paycheck.getNumber() * 10);
 
-			// System.out.println(candidate + " - " + withhold + " = " +
-			// paycheck);
-			if (salary.getNumber() - withhold.getNumber() >= original.getNumber()) {
-				return;
-			}
-			paycheck.setValue(original);
-		}
-		throw new IllegalStateException("Couldn't calculate withholding given paycheck amount");
-	}
+        for (; candidate.compareTo(limit) < 0; candidate.incrementBy(new Amount("1.00"))) {
+            salary.setValue(candidate);
+            calculateGivenSalary();
 
-	/**
-	 * Calcualte the PAYG withholding amount given the salary that is set. This
-	 * is of course the traditional use case.
-	 */
-	public void calculateGivenSalary() {
-		if ((salary == null) || (withhold == null) || (paycheck == null)) {
-			throw new IllegalStateException(
-				"To use a Calculator you need to have all the parameter values set with instantiated objects");
-		}
+            // System.out.println(candidate + " - " + withhold + " = " +
+            // paycheck);
+            if (salary.getNumber() - withhold.getNumber() >= original.getNumber()) {
+                return;
+            }
+            paycheck.setValue(original);
+        }
+        throw new IllegalStateException("Couldn't calculate withholding given paycheck amount");
+    }
 
-		double weekly = salary.getNumber() / 100 / weeks;
+    /**
+     * Calcualte the PAYG withholding amount given the salary that is set.
+     * This is of course the traditional use case.
+     */
+    public void calculateGivenSalary() {
+        if ((salary == null) || (withhold == null) || (paycheck == null)) {
+            throw new IllegalStateException(
+                    "To use a Calculator you need to have all the parameter values set with instantiated objects");
+        }
 
-		/*
-		 * The Australian PAYG formula is the linear equation y = ax - b, where
-		 * x is {weekly earnings~drop cents+0.99} and then rounding y to the
-		 * nearest whole dollar.
-		 */
+        double weekly = salary.getNumber() / 100 / weeks;
 
-		double nocents = Math.floor(weekly);
-		double x = nocents + 0.99;
+        /*
+         * The Australian PAYG formula is the linear equation y = ax - b,
+         * where x is {weekly earnings~drop cents+0.99} and then rounding y to
+         * the nearest whole dollar.
+         */
 
-		/*
-		 * Now fetch the appropriate coefficients
-		 */
-		double a = 0, b = 0;
+        double nocents = Math.floor(weekly);
+        double x = nocents + 0.99;
 
-		for (int i = 0; i < coefficients.length; i++) {
-			if (x > coefficients[i][0]) {
-				continue;
-			}
-			a = coefficients[i][1];
-			b = coefficients[i][2];
-			break;
-		}
+        /*
+         * Now fetch the appropriate coefficients
+         */
+        double a = 0, b = 0;
 
-		double y;
+        for (int i = 0; i < coefficients.length; i++) {
+            if (x > coefficients[i][0]) {
+                continue;
+            }
+            a = coefficients[i][1];
+            b = coefficients[i][2];
+            break;
+        }
 
-		y = a * x - b;
+        double y;
 
-		long rounded = Math.round(y);
+        y = a * x - b;
 
-		/*
-		 * And that ends the ATO tax algorithm. Now we have to de-normalize the
-		 * value scaling it up by the number of weeks, and passing that to be
-		 * the value of the withheld Amount. We again round the denormalized
-		 * value.
-		 */
+        long rounded = Math.round(y);
 
-		float denormalized = Math.round(rounded * weeks);
-		withhold.setValue(Float.toString(denormalized));
+        /*
+         * And that ends the ATO tax algorithm. Now we have to de-normalize
+         * the value scaling it up by the number of weeks, and passing that to
+         * be the value of the withheld Amount. We again round the
+         * denormalized value.
+         */
 
-		/*
-		 * And now reset the paycheck amount.
-		 */
-		paycheck.setValue(salary);
-		paycheck.decrementBy(withhold);
-	}
+        float denormalized = Math.round(rounded * weeks);
+        withhold.setValue(Float.toString(denormalized));
+
+        /*
+         * And now reset the paycheck amount.
+         */
+        paycheck.setValue(salary);
+        paycheck.decrementBy(withhold);
+    }
 }
