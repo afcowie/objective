@@ -25,9 +25,11 @@ import org.gnome.gtk.EventBox;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.ReliefStyle;
+import org.gnome.gtk.SelectionMode;
 import org.gnome.gtk.Statusbar;
 import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.TreePath;
+import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
 import org.gnome.gtk.Window;
@@ -94,11 +96,9 @@ public class AccountPicker extends HBox
 
         popup = new AccountPickerPopup("accountpicker", "share/AccountPickerPopup.glade");
 
-        wide.addListener(new ButtonListener() {
-            public void buttonEvent(ButtonEvent event) {
-                if (event.getType() == ButtonEvent.Type.CLICK) {
-                    popup.present();
-                }
+        wide.connect(new Button.CLICKED() {
+            public void onClicked(Button source) {
+                popup.present();
             }
         });
 
@@ -132,8 +132,6 @@ public class AccountPicker extends HBox
 
         private TreeView view;
 
-        TreeViewColumn account_ViewColumn;
-
         private SearchEntry search;
 
         private int visibleRows;
@@ -146,6 +144,9 @@ public class AccountPicker extends HBox
 
         AccountPickerPopup(String which, String filename) {
             super(which, filename);
+
+            TreeViewColumn vertical;
+            CellRendererText text;
 
             /*
              * Setup the underlying TreeModel. Each viewable column has three
@@ -182,54 +183,42 @@ public class AccountPicker extends HBox
             view = (TreeView) gladeParser.getWidget("possibles_treeview");
             view.setModel(sortedStore);
 
-            /*
-             * As is tradition by now, I observe that "this is the most god
-             * aweful API since EJB"
-             */
             // Account column
-            account_ViewColumn = new TreeViewColumn();
-            account_ViewColumn.setResizable(true);
-            account_ViewColumn.setReorderable(false);
+            vertical = view.appendColumn();
+            vertical.setResizable(true);
+            vertical.setReorderable(false);
 
-            CellRendererText account_CellRenderer = new CellRendererText();
-            account_ViewColumn.packStart(account_CellRenderer, true);
-            account_ViewColumn.addAttributeMapping(account_CellRenderer,
-                    CellRendererText.Attribute.MARKUP, accountDisplay_DataColumn);
+            text = new CellRendererText(vertical);
+            text.setMarkup(accountDisplay_DataColumn);
 
-            account_ViewColumn.setTitle("Account");
-            account_ViewColumn.setClickable(true);
-            account_ViewColumn.setSortColumn(accountTitle_DataColumn);
-
-            view.appendColumn(account_ViewColumn);
+            vertical.setTitle("Account");
+            vertical.setClickable(true);
+            vertical.setSortColumn(accountTitle_DataColumn);
+            vertical.clicked();
 
             // Ledger column
-            TreeViewColumn ledger_ViewColumn = new TreeViewColumn();
-            ledger_ViewColumn.setResizable(true);
-            ledger_ViewColumn.setReorderable(false);
+            vertical = view.appendColumn();
+            vertical.setResizable(true);
+            vertical.setReorderable(false);
 
-            CellRendererText ledger_CellRenderer = new CellRendererText();
-            ledger_ViewColumn.packStart(ledger_CellRenderer, true);
-            ledger_ViewColumn.addAttributeMapping(ledger_CellRenderer,
-                    CellRendererText.Attribute.MARKUP, ledgerDisplay_DataColumn);
+            text = new CellRendererText(vertical);
+            text.setMarkup(ledgerDisplay_DataColumn);
 
-            ledger_ViewColumn.setTitle("Ledger");
-            ledger_ViewColumn.setClickable(true);
-            ledger_ViewColumn.setSortColumn(ledgerName_DataColumn);
-
-            view.appendColumn(ledger_ViewColumn);
+            vertical.setTitle("Ledger");
+            vertical.setClickable(true);
+            vertical.setSortColumn(ledgerName_DataColumn);
 
             /*
              * overall properties
              */
-            view.setAlternateRowColor(false);
+            view.setRulesHint(false);
             view.setEnableSearch(false);
             view.setReorderable(false);
-            account_ViewColumn.click();
 
             TreeSelection selection = view.getSelection();
             selection.setMode(SelectionMode.SINGLE);
 
-            status = (StatusBar) gladeParser.getWidget("statusbar");
+            status = (Statusbar) gladeParser.getWidget("statusbar");
 
             /*
              * Populate
@@ -421,12 +410,10 @@ public class AccountPicker extends HBox
                 }
             });
 
-            view.addListener(new TreeViewListener() {
-                public void treeViewEvent(TreeViewEvent event) {
-                    if (event.getType() == TreeViewEvent.Type.ROW_ACTIVATED) {
-                        TreeIter pointer = event.getTreeIter();
-                        applySelection(pointer);
-                    }
+            view.connect(new TreeView.ROW_ACTIVATED() {
+                public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
+                    TreeIter pointer = source.getModel().getIter(path);
+                    applySelection(pointer);
                 }
             });
 
@@ -546,7 +533,7 @@ public class AccountPicker extends HBox
 
             int x = gdkWindow.getOrigin().getX();
             int y = gdkWindow.getOrigin().getY(); // +
-                                                    // gdkWindow.getHeight();
+            // gdkWindow.getHeight();
 
             window.move(x, y);
 
@@ -573,7 +560,7 @@ public class AccountPicker extends HBox
      */
     class SearchEntry extends Entry
     {
-        private EntryListener listener = null;
+        private Entry.CHANGED handler = null;
 
         SearchEntry() {
             super();
@@ -589,7 +576,7 @@ public class AccountPicker extends HBox
 
         /**
          * 
-         * @param listener
+         * @param handler
          *            the EntryListener (presumably listening for CHANGED
          *            events) that you will be toggled off when
          *            programatically setting the Entry is required.

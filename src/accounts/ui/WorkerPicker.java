@@ -123,9 +123,9 @@ public class WorkerPicker extends HBox
                     worker = getSelection();
 
                     if (worker == null) {
-                        entry.setTextColor(StateType.NORMAL, Color.RED);
+                        entry.modifyText(StateType.NORMAL, Color.RED);
                     } else {
-                        entry.setTextColor(StateType.NORMAL, Color.BLACK);
+                        entry.modifyText(StateType.NORMAL, Color.BLACK);
                     }
                 }
             }

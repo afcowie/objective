@@ -16,9 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.gnome.gdk.Color;
+import org.gnome.gdk.EventFocus;
+import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
+import org.gnome.gtk.StateType;
 import org.gnome.gtk.Widget;
 
 import accounts.domain.Amount;
@@ -83,7 +87,7 @@ public class ForeignAmountEntryBox extends HBox
         grayWidgets.add(x_Label);
 
         rate_Entry = new Entry();
-        rate_Entry.setWidth(8);
+        rate_Entry.setWidthChars(8);
         packStart(rate_Entry, true, true, 0);
         grayWidgets.add(rate_Entry);
 
@@ -143,53 +147,51 @@ public class ForeignAmountEntryBox extends HBox
             }
         });
 
-        rate_Entry.addListener(new EntryListener() {
-            public void entryEvent(EntryEvent event) {
-                if (event.getType() == EntryEvent.Type.CHANGED) {
-                    final String text = rate_Entry.getText();
-                    Debug.print("listeners", "rateEntry CHANGED " + text);
-                    if (!rate_Entry.hasFocus()) {
-                        return;
-                    }
-                    if (text.equals("")) {
-                        return;
-                    }
-
-                    try {
-                        foreignAmount.setRate(text);
-                        rate_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
-                    } catch (NumberFormatException nfe) {
-                        rate_Entry.setTextColor(StateType.NORMAL, Color.RED);
-                        return;
-                    }
-                    homeValue_AmountEntry.setAmount(foreignAmount);
-                    lastRates.put(foreign_CurrencySelector.getCurrency(), foreignAmount.getRate());
-
-                    if (changeListener != null) {
-                        changeListener.userChangedData();
-                    }
+        rate_Entry.connect(new Entry.CHANGED() {
+            public void onChanged(Editable source) {
+                final String text = rate_Entry.getText();
+                Debug.print("listeners", "rateEntry CHANGED " + text);
+                if (!rate_Entry.getHasFocus()) {
+                    return;
+                }
+                if (text.equals("")) {
+                    return;
                 }
 
-                if (event.getType() == EntryEvent.Type.ACTIVATE) {
-                    final String original = rate_Entry.getText();
-                    final String text = foreignAmount.getRate();
-                    rate_Entry.setText(text);
-                    rate_Entry.setPosition(original.length());
+                try {
+                    foreignAmount.setRate(text);
+                    rate_Entry.modifyText(StateType.NORMAL, Color.BLACK);
+                } catch (NumberFormatException nfe) {
+                    rate_Entry.modifyText(StateType.NORMAL, Color.RED);
+                    return;
+                }
+                homeValue_AmountEntry.setAmount(foreignAmount);
+                lastRates.put(foreign_CurrencySelector.getCurrency(), foreignAmount.getRate());
+
+                if (changeListener != null) {
+                    changeListener.userChangedData();
                 }
             }
+        });
+        
+        rate_Entry.connect(new Entry.ACTIVATE() {
+            public void onActivate(Entry source) {
+                final String original = rate_Entry.getText();
+                final String text = foreignAmount.getRate();
+                rate_Entry.setText(text);
+                rate_Entry.setPosition(original.length());
+            }           
         });
 
         /*
          * If focus leaves or user presses enter, then apply the formatting
          * inherent in ForeignAmount's rate String.
          */
-        rate_Entry.addListener(new FocusListener() {
-            public boolean focusEvent(FocusEvent event) {
-                if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
-                    rate_Entry.setText(foreignAmount.getRate());
-                    rate_Entry.selectRegion(0, 0);
-                    rate_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
-                }
+        rate_Entry.connect(new Widget.FOCUS_OUT_EVENT() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                rate_Entry.setText(foreignAmount.getRate());
+                rate_Entry.selectRegion(0, 0);
+                rate_Entry.modifyText(StateType.NORMAL, Color.BLACK);
                 return false;
             };
         });

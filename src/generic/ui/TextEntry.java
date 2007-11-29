@@ -40,7 +40,7 @@ public class TextEntry extends Entry
 
             public void entryEvent(EntryEvent event) {
                 if (event.getType() == EntryEvent.Type.CHANGED) {
-                    if (!self.hasFocus()) {
+                    if (!self.getHasFocus()) {
                         return;
                     }
 

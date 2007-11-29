@@ -60,7 +60,7 @@ public class DatePicker extends HBox
         date = (Datestamp) _lastSelectedDate.clone();
 
         entry = new Entry();
-        entry.setWidth(9);
+        entry.setWidthChars(9);
         entry.setText(date.toString());
 
         // _pick = new Button("Pick", false);
@@ -71,7 +71,7 @@ public class DatePicker extends HBox
 
         pick = new Button();
         Image icon = new Image(Stock.INDEX, IconSize.BUTTON);
-        Label label = new Label("Pick", false);
+        Label label = new Label("Pick");
         HBox box = new HBox(false, 1);
 
         box.packStart(icon, false, false, 0);

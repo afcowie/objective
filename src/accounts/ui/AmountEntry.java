@@ -60,7 +60,7 @@ public class AmountEntry extends HBox
         amount = new Amount(0);
 
         amount_Entry = new Entry();
-        amount_Entry.setWidth(10);
+        amount_Entry.setWidthChars(10);
         amount_Entry.setAlignment(1.0f);
 
         amount_Entry.addListener(new EntryListener() {
@@ -77,7 +77,7 @@ public class AmountEntry extends HBox
 
                     Debug.print("listeners", "in AmountEntry, Entry CHANGED, text: " + text);
 
-                    if (!amount_Entry.hasFocus()) {
+                    if (!amount_Entry.getHasFocus()) {
                         /*
                          * Then the change wasn't the result of a user action
                          * in this Widget, but rather as a result of some
@@ -104,13 +104,13 @@ public class AmountEntry extends HBox
 
                     try {
                         amount.setValue(text);
-                        amount_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
+                        amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
                     } catch (NumberFormatException nfe) {
                         /*
                          * if the user input is invalid, then ignore it. The
                          * Amount will stay as previously set.
                          */
-                        amount_Entry.setTextColor(StateType.NORMAL, Color.RED);
+                        amount_Entry.modifyText(StateType.NORMAL, Color.RED);
                         return;
                     }
 
@@ -146,7 +146,7 @@ public class AmountEntry extends HBox
                      * the selection.
                      */
                     amount_Entry.selectRegion(0, 0);
-                    amount_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
+                    amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
                 }
                 return false;
             };
@@ -211,7 +211,7 @@ public class AmountEntry extends HBox
         final String str = a.getValue();
         if (!amount_Entry.getText().equals(str)) {
             amount_Entry.setText(str);
-            amount_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
+            amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
         }
     }
 
@@ -228,7 +228,7 @@ public class AmountEntry extends HBox
 
         if (!amount_Entry.getText().equals(value)) {
             amount_Entry.setText(value);
-            amount_Entry.setTextColor(StateType.NORMAL, Color.BLACK);
+            amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
         }
     }
 
