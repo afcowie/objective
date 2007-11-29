@@ -341,7 +341,7 @@ public class AccountPicker extends HBox
 			search.addListener(new FocusListener() {
 				public boolean focusEvent(FocusEvent event) {
 					if (event.getType() == FocusEvent.Type.FOCUS_IN) {
-						search.setCursorPosition(search.getText().length());
+						search.setPosition(search.getText().length());
 					}
 					return false;
 				}
@@ -383,12 +383,12 @@ public class AccountPicker extends HBox
 						} else if (key == KeyValue.Left) {
 							search.grabFocus();
 							if (len > 0) {
-								search.setCursorPosition(len - 1);
+								search.setPosition(len - 1);
 							}
 							return true;
 						} else if (key == KeyValue.Right) {
 							search.grabFocus();
-							search.setCursorPosition(len);
+							search.setPosition(len);
 							return true;
 						} else if (regexAtoZ.matcher(str).matches()) {
 							search.grabFocus();
@@ -607,7 +607,7 @@ public class AccountPicker extends HBox
 		public void setText(String text) {
 			disableChangeListener();
 			super.setText(text);
-			super.setCursorPosition(text.length());
+			super.setPosition(text.length());
 			enableChangeListener();
 		}
 

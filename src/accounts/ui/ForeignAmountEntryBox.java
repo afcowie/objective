@@ -169,7 +169,7 @@ public class ForeignAmountEntryBox extends HBox
 					final String original = rate_Entry.getText();
 					final String text = foreignAmount.getRate();
 					rate_Entry.setText(text);
-					rate_Entry.setCursorPosition(original.length());
+					rate_Entry.setPosition(original.length());
 				}
 			}
 		});

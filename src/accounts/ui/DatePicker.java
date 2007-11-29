@@ -76,34 +76,21 @@ public class DatePicker extends HBox
 		packStart(entry, false, false, 0);
 		packStart(pick, false, false, 0);
 
-		pick.addListener(new ButtonListener() {
-			public void buttonEvent(ButtonEvent event) {
-				if (event.getType() == ButtonEvent.Type.CLICK) {
-					if (popup == null) {
-						popup = new DatePickerPopup("datepicker", "share/DatePickerPopup.glade");
-					}
-					popup.present();
-				}
+		pick.connect(new Button.CLICKED() {
+			public void onClicked(Button source) {
+			    if (popup == null) {
+				popup = new DatePickerPopup("datepicker", "share/DatePickerPopup.glade");
 			}
+			popup.present();			}
 		});
 
-		entry.addListener(new EntryListener() {
-			public void entryEvent(EntryEvent event) {
-				try {
-					date.setDate(entry.getText());
-				} catch (ParseException pe) {
-					return;
-				}
+		entry.connect(new Entry.ACTIVATE() {
+			public void onActivate(Entry source) {
+				entry.setText(date.toString());
+				entry.setPosition(9);
 
-				if (event.getType() == EntryEvent.Type.CHANGED) {
-					//
-				} else if (event.getType() == EntryEvent.Type.ACTIVATE) {
-					entry.setText(date.toString());
-					entry.setCursorPosition(9);
-
-					if (changeListener != null) {
-						changeListener.userChangedData();
-					}
+				if (changeListener != null) {
+					changeListener.userChangedData();
 				}
 			};
 		});
@@ -228,6 +215,6 @@ public class DatePicker extends HBox
 	public void setDate(Datestamp date) {
 		this.date = date;
 		entry.setText(date.toString());
-		entry.setCursorPosition(9);
+		entry.setPosition(9);
 	}
 }

@@ -127,7 +127,7 @@ public class AmountEntry extends HBox
 					 */
 					final String text = amount.getValue();
 					amount_Entry.setText(text);
-					amount_Entry.setCursorPosition(text.length());
+					amount_Entry.setPosition(text.length());
 				}
 			}
 		});
