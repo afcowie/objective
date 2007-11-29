@@ -6,11 +6,13 @@
  */
 package accounts.ui;
 
+import static org.freedesktop.bindings.Time.makeTime;
 import generic.ui.AbstractWindow;
 import generic.ui.ChangeListener;
 
 import java.text.ParseException;
 
+import org.freedesktop.bindings.Time;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.Calendar;
 import org.gnome.gtk.Entry;
@@ -112,11 +114,9 @@ public class DatePicker extends HBox
             super(which, filename);
 
             calendar = (Calendar) gladeParser.getWidget("calendar");
-            calendar.addListener(new CalendarListener() {
-                public void calendarEvent(CalendarEvent event) {
-                    if (event.getType() == CalendarEvent.Type.DAY_SELECTED_DOUBLE_CLICK) {
-                        applySelection();
-                    }
+            calendar.connect(new Calendar.DAY_SELECTED_DOUBLE_CLICK() {
+                public void onDaySelectedDoubleClick(Calendar source) {
+                    applySelection();
                 }
             });
 
@@ -142,9 +142,16 @@ public class DatePicker extends HBox
         }
 
         private void applySelection() {
-            java.util.Calendar cal = calendar.getDate();
+            final long seconds;
+            
             window.hide();
-            date.setDate(cal);
+            
+            seconds = makeTime(calendar.getDateYear(), calendar.getDateMonth(), calendar.getDateDay(), 0, 0, 0);
+            try {
+                date.setDate(seconds * 1000);
+            } catch (ParseException pe) {
+                return;
+            }
             entry.setText(date.toString());
 
             if (changeListener != null) {
