@@ -1,26 +1,35 @@
 /*
  * DatePicker.java
  * 
- * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005-2006 Operational Dynamics
+ * Copyright (c) 2005-2007 Operational Dynamics Consulting Pty Ltd
+ * 
+ * The code in this file, and the library it is a part of, are made available
+ * to you by the authors under the terms of the "GNU General Public Licence,
+ * version 2" See the LICENCE file for the terms governing usage and
+ * redistribution.
  */
 package accounts.ui;
 
 import static org.freedesktop.bindings.Time.makeTime;
-import generic.ui.AbstractWindow;
 import generic.ui.ChangeListener;
 
 import java.text.ParseException;
 
-import org.freedesktop.bindings.Time;
+import org.gnome.gdk.Event;
+import org.gnome.gdk.EventKey;
+import org.gnome.gdk.Keyval;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.Calendar;
+import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
+import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.Stock;
+import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
+import org.gnome.gtk.WindowPosition;
 
 import accounts.domain.Datestamp;
 
@@ -35,11 +44,11 @@ public class DatePicker extends HBox
 {
     private Datestamp date = null;
 
-    private static Datestamp _lastSelectedDate = null;
+    private static Datestamp lastSelectedDate = null;
 
     static {
-        _lastSelectedDate = new Datestamp();
-        _lastSelectedDate.setAsToday();
+        lastSelectedDate = new Datestamp();
+        lastSelectedDate.setAsToday();
     }
 
     private Entry entry = null;
@@ -57,17 +66,11 @@ public class DatePicker extends HBox
      */
     public DatePicker() {
         super(false, 3);
-        date = (Datestamp) _lastSelectedDate.clone();
+        date = (Datestamp) lastSelectedDate.clone();
 
         entry = new Entry();
         entry.setWidthChars(9);
         entry.setText(date.toString());
-
-        // _pick = new Button("Pick", false);
-        // _pick = new Button(new GtkStockItem("stock_calendar-view-month"));
-        // GtkStockItem stock = new GtkStockItem("stock_calendar-view-month");
-        // Image icon = new Image(stock, IconSize.BUTTON);
-        // _pick = new Button("stock_calendar-view-month");
 
         pick = new Button();
         Image icon = new Image(Stock.INDEX, IconSize.BUTTON);
@@ -84,9 +87,19 @@ public class DatePicker extends HBox
         pick.connect(new Button.CLICKED() {
             public void onClicked(Button source) {
                 if (popup == null) {
-                    popup = new DatePickerPopup("datepicker", "share/DatePickerPopup.glade");
+                    popup = new DatePickerPopup();
                 }
                 popup.present();
+            }
+        });
+
+        entry.connect(new Entry.CHANGED() {
+            public void onChanged(Editable source) {
+                try {
+                    date.setDate(entry.getText());
+                } catch (ParseException pe) {
+                    return;
+                }
             }
         });
 
@@ -103,34 +116,47 @@ public class DatePicker extends HBox
     }
 
     /**
-     * A Window (constructed from a glade file) containing the Calendar
-     * Widget, and listeners to catch appropriate keystrokes.
+     * A Window containing the Calendar Widget, and listeners to catch
+     * appropriate keystrokes.
      */
-    class DatePickerPopup extends AbstractWindow
+    class DatePickerPopup
     {
         private Calendar calendar = null;
 
-        private DatePickerPopup(String which, String filename) {
-            super(which, filename);
+        private Window window;
 
-            calendar = (Calendar) gladeParser.getWidget("calendar");
+        private DatePickerPopup() {
+            window = new Window();
+            window.setDecorated(false);
+
+            /*
+             * Not entirely necessary? Probably could use some better
+             * positioning, perhaps so the north west corner is at the middle
+             * of the Button or something. Center on mouse isn't bad, though.
+             */
+            window.setTransientFor((Window) entry.getToplevel());
+            window.setPosition(WindowPosition.MOUSE);
+
+            calendar = new Calendar();
+            window.add(calendar);
+
             calendar.connect(new Calendar.DAY_SELECTED_DOUBLE_CLICK() {
                 public void onDaySelectedDoubleClick(Calendar source) {
                     applySelection();
                 }
             });
 
-            window.addListener(new KeyListener() {
-                public boolean keyEvent(KeyEvent event) {
-                    int key = event.getKeyval();
-                    if (key == KeyValue.Escape) {
+            window.connect(new Widget.KEY_RELEASE_EVENT() {
+                public boolean onKeyReleaseEvent(Widget source, EventKey event) {
+                    Keyval key = event.getKeyval();
+                    if (key == Keyval.Escape) {
                         window.hide();
                         return true;
-                    } else if (key == KeyValue.Home || key == KeyValue.t) {
+                    } else if (key == Keyval.Home || key == Keyval.t) {
                         date.setAsToday();
                         present();
                         return true;
-                    } else if (key == KeyValue.Return) {
+                    } else if (key == Keyval.Return) {
                         applySelection();
                         return true;
                     } else {
@@ -139,14 +165,38 @@ public class DatePicker extends HBox
                     }
                 }
             });
+
+            window.connect(new Widget.HIDE_EVENT() {
+                /*
+                 * Raise the window that popped the picker.
+                 */
+                public void onHide(Widget source) {
+                    Window top = (Window) entry.getToplevel();
+                    top.present();
+                }
+            });
+
+            window.connect(new Window.DELETE_EVENT() {
+                /*
+                 * Only hide, don't destroy. More to the point, override the
+                 * default return of false.
+                 */
+                public boolean onDeleteEvent(Widget source, Event event) {
+                    window.hide();
+                    return true;
+                }
+            });
+
+            window.showAll();
         }
 
         private void applySelection() {
             final long seconds;
-            
+
             window.hide();
-            
-            seconds = makeTime(calendar.getDateYear(), calendar.getDateMonth(), calendar.getDateDay(), 0, 0, 0);
+
+            seconds = makeTime(calendar.getDateYear(), calendar.getDateMonth(), calendar.getDateDay(),
+                    0, 0, 0);
             try {
                 date.setDate(seconds * 1000);
             } catch (ParseException pe) {
@@ -159,16 +209,15 @@ public class DatePicker extends HBox
             }
         }
 
-        /*
-         * Overrides of inherited methods -----------------
-         */
-
-        public void present() {
+        private void present() {
+            /*
+             * TODO there a better way to do this?
+             */
             java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTime(date.getDate());
 
             int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
-            int month = cal.get(java.util.Calendar.MONTH);
+            int month = cal.get(java.util.Calendar.MONTH) + 1;
             int year = cal.get(java.util.Calendar.YEAR);
 
             /*
@@ -178,28 +227,7 @@ public class DatePicker extends HBox
             calendar.selectMonth(month, year);
             calendar.selectDay(day);
 
-            super.present();
-        }
-
-        /**
-         * Raise the window that popped the picker.
-         */
-        protected void hideHook() {
-            /*
-             * So annoying. You'd think you should be able to cast from Widget
-             * to Window here, but it blows ClassCastException.
-             */
-            Window top = (Window) entry.getToplevel();
-            top.present();
-        }
-
-        /**
-         * Only hide, don't destroy. More to the point, override the default
-         * return of false.
-         */
-        public boolean deleteHook() {
-            window.hide();
-            return true;
+            window.present();
         }
     }
 

@@ -7,14 +7,15 @@
 package generic.ui;
 
 import generic.client.Master;
-import generic.util.Debug;
 
 import java.io.FileNotFoundException;
 
+import org.gnome.gdk.Event;
 import org.gnome.glade.Glade;
 import org.gnome.glade.XML;
 import org.gnome.gtk.Box;
 import org.gnome.gtk.VBox;
+import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
 /**
@@ -51,7 +52,7 @@ public abstract class AbstractWindow
      * overrideable. Likewise, this field is protected so you can just
      * override it in a subclass if you need to.
      */
-    protected LifeCycleListener defaultListener;
+    protected Window.DELETE_EVENT defaultListener;
 
     /**
      * These are all protected, so as to be visible to subclasses so there's
@@ -108,23 +109,9 @@ public abstract class AbstractWindow
         /*
          * Setup standard listener to handle hide and delete events
          */
-        defaultListener = new LifeCycleListener() {
-            public void lifeCycleEvent(LifeCycleEvent event) {
-                Debug.print("listeners", me + " lifeCyleEvent " + event.getType().getName());
-                if (event.getType() == LifeCycleEvent.Type.HIDE) {
-                    /* (overridable) */
-                    hideHook();
-                }
-            }
-
-            public boolean lifeCycleQuery(LifeCycleEvent event) {
-                Debug.print("listeners", me + " lifeCyleQuery " + event.getType().getName());
-                if (event.getType() == LifeCycleEvent.Type.DELETE) {
-                    /* (overridable) */
-                    return deleteHook();
-                } else {
-                    return false;
-                }
+        defaultListener = new Window.DELETE_EVENT() {
+            public boolean onDeleteEvent(Widget source, Event event) {
+                return deleteHook();
             }
         };
     }
@@ -147,13 +134,12 @@ public abstract class AbstractWindow
         window = new Window();
         window.hide();
 
-        window.addListener(defaultListener);
+        window.connect(defaultListener);
 
         /*
          * Finally, create a new Box to hold things, in this case a VBox.
          */
         top = new VBox(false, 3);
-        top.setName("top");
         window.add(top);
     }
 
@@ -184,7 +170,7 @@ public abstract class AbstractWindow
          */
 
         try {
-            gladeParser = Glade.parse(gladeFilename, "FIXME"); // FIXME
+            gladeParser = Glade.parse(gladeFilename, whichElement); // FIXME
         } catch (FileNotFoundException e) {
             // If it can't find that glade file, we have an app
             // configuration problem or worse some UI bug, and need to abort.
@@ -201,7 +187,7 @@ public abstract class AbstractWindow
          */
 
         window.hide();
-        window.addListener(defaultListener);
+        window.connect(defaultListener);
 
         top = (Box) gladeParser.getWidget("top");
     }
@@ -224,15 +210,15 @@ public abstract class AbstractWindow
 
     /**
      * The default action to take on closing the window is to hide() <i>and</i>
-     * destroy() it. Override this if you want to do something different!
+     * dereference it. Override this if you want to do something different!
      * 
-     * @return the boolean value that you want the LifeCycleListener to
-     *         return, ie whether or not the event was handled (true) or
-     *         whether it should be further propagated back up to GTK.
+     * @return the boolean value that you want the DELETE_EVENT to return, ie
+     *         whether or not the event was handled (true) or whether it
+     *         should be further propagated back up to GTK.
      */
     protected boolean deleteHook() {
         window.hide();
-        window.destroy();
+        window = null;
         return false;
     }
 
