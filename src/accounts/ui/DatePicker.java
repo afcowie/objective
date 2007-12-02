@@ -149,6 +149,7 @@ public class DatePicker extends HBox
             window.connect(new Widget.KEY_RELEASE_EVENT() {
                 public boolean onKeyReleaseEvent(Widget source, EventKey event) {
                     Keyval key = event.getKeyval();
+
                     if (key == Keyval.Escape) {
                         window.hide();
                         return true;
@@ -166,9 +167,10 @@ public class DatePicker extends HBox
                 }
             });
 
-            window.connect(new Widget.HIDE_EVENT() {
+            window.connect(new Widget.HIDE() {
                 /*
-                 * Raise the window that popped the picker.
+                 * Raise the window that popped the picker. Given having added
+                 * transient, is this necessary?
                  */
                 public void onHide(Widget source) {
                     Window top = (Window) entry.getToplevel();

@@ -76,21 +76,17 @@ public abstract class EditorWindow extends PrimaryWindow
         buttonbox.setLayout(ButtonBoxStyle.END);
 
         cancel = new Button(Stock.CANCEL);
-        cancel.addListener(new ButtonListener() {
-            public void buttonEvent(ButtonEvent event) {
-                if (event.getType() == ButtonEvent.Type.CLICK) {
-                    cancel();
-                }
+        cancel.connect(new Button.CLICKED() {
+            public void onClicked(Button source) {
+                cancel();
             }
         });
         buttonbox.add(cancel);
 
         ok = new Button(Stock.OK);
-        ok.addListener(new ButtonListener() {
-            public void buttonEvent(ButtonEvent event) {
-                if (event.getType() == ButtonEvent.Type.CLICK) {
-                    ok();
-                }
+        ok.connect(new Button.CLICKED() {
+            public void onClicked(Button source) {
+                ok();
             }
         });
         buttonbox.add(ok);

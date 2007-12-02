@@ -19,7 +19,6 @@ import accounts.ui.DatePicker;
 
 public class DemoWindowWrapper
 {
-
     public static void main(String[] args) {
         final Window w;
         final DatePicker picker;
@@ -42,5 +41,4 @@ public class DemoWindowWrapper
 
         Gtk.main();
     }
-
 }
