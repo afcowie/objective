@@ -160,7 +160,7 @@ public class DomainObjectTest extends TestCase
 
 		final SubThing wanted = rock.getSubbie();
 
-		class FactoidSelector extends Selector
+		class FactoidSelector extends Selector<Factoid>
 		{
 			private SubThing	target;
 			private long		targetId;
@@ -186,7 +186,7 @@ public class DomainObjectTest extends TestCase
 		result = store.nativeQuery(new FactoidSelector(wanted));
 		assertEquals(1, result.size());
 
-		result = store.nativeQuery(new Selector() {
+		result = store.nativeQuery(new Selector<Factoid>() {
 			public boolean match(Factoid fact) {
 				if (fact.getSubbie().congruent(wanted)) {
 					return true;

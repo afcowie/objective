@@ -57,10 +57,9 @@ build/config: build/dirs .config
 	touch $@
 
 # [compose final classpath]
-#CLASSPATH=$(JAVAGNOME_JARS):$(DB4O_JARS)
 #JNI_PATH=/home/andrew/workspace/libgtk-java:/usr/lib
 #CLASSPATH=/home/andrew/workspace/libgtk-java/gtk2.6.jar:$(JAVAGNOME_JARS)
-CLASSPATH=$(JAVAGNOME_JARS)
+CLASSPATH=$(JAVAGNOME_JARS):$(DB4O_JARS)
 
 SOURCES_DIST=$(shell find src -name '*.java')
 SOURCES_LIBS=$(shell find lib -name '*.java')

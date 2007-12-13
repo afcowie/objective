@@ -65,7 +65,7 @@ public class UpdateTransactionCommand extends TransactionCommand
          * will actually still be in the Transaction, and some will have faded
          * into the sunset.
          */
-        List storedEntries = store.nativeQuery(new Selector(transaction) {
+        List storedEntries = store.nativeQuery(new Selector<Entry>(transaction) {
             public boolean match(Entry entry) {
                 Transaction parent = entry.getParentTransaction();
 

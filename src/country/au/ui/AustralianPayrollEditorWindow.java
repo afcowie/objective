@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.Label;
+import org.gnome.gtk.MessageType;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
@@ -142,14 +143,14 @@ public class AustralianPayrollEditorWindow extends EditorWindow
          */
 
         final Label employeeName_Label = new Label("Pay employee:");
-        employeeName_Label.setAlignment(1.0, 0.5);
+        employeeName_Label.setAlignment(1.0f, 0.5f);
         table.attach(employeeName_Label, LEFT);
 
         employee_WorkerPicker = new WorkerPicker(store, Employee.class);
         table.attach(employee_WorkerPicker, RIGHT);
 
         final Label payDate_Label = new Label("On date:");
-        payDate_Label.setAlignment(1.0, 0.5);
+        payDate_Label.setAlignment(1.0f, 0.5f);
         table.attach(payDate_Label, LEFT);
 
         payDate_Picker = new DatePicker();
@@ -160,7 +161,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
          */
 
         final Label payg_Label = new Label("PAYG withholding type:");
-        payg_Label.setAlignment(1.0, 0.5);
+        payg_Label.setAlignment(1.0f, 0.5f);
         table.attach(payg_Label, LEFT);
 
         // FIXME this will be buggy the moment there is more than one

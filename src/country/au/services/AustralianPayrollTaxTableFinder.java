@@ -75,7 +75,7 @@ public class AustralianPayrollTaxTableFinder extends Finder
          * possibility that an object from a different DataClient is being
          * used by using DomainObject.congruent()
          */
-        List l = store.nativeQuery(new Selector(scale) {
+        List l = store.nativeQuery(new Selector<AustralianPayrollTaxTable>(scale) {
             public boolean match(AustralianPayrollTaxTable table) {
                 if (table.getScale().congruent(target)) {
                     return true;

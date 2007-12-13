@@ -98,7 +98,7 @@ public class SpecificLedgerFinder extends Finder
             throw new IllegalStateException("You can't run this finder with title and name both blank");
         }
 
-        this.result = store.nativeQuery(new Selector() {
+        this.result = store.nativeQuery(new Selector<Ledger>() {
             private String title = new String(accountTitle);
 
             private String name = new String(ledgerName);

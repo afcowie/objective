@@ -25,7 +25,7 @@ import com.db4o.query.Predicate;
  * @author Andrew Cowie
  * @see generic.persistence.DataClient#nativeQuery(Selector)
  */
-public abstract class Selector extends Predicate
+public abstract class Selector<T> extends Predicate<T>
 {
     protected DomainObject target = null;
 
@@ -48,8 +48,4 @@ public abstract class Selector extends Predicate
     public Selector(DomainObject target) {
         this.target = target;
     }
-
-    /*
-     * boolean match(Type t);
-     */
 }
