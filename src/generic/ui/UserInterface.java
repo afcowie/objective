@@ -17,6 +17,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.gnome.gdk.Cursor;
+import org.gnome.gdk.CursorType;
 import org.gnome.gtk.Gtk;
 
 /**
@@ -213,10 +215,6 @@ public abstract class UserInterface
      *            true if the app is busy working away at something.
      */
     public void showAsWorking(boolean working) {
-        if (!Gtk.isGtkThread()) {
-            System.err.println("You must only call showAsWorking() from within the GTK main Thread");
-            return;
-        }
         Iterator wI = windows.iterator();
 
         while (wI.hasNext()) {
