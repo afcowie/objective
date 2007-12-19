@@ -7,9 +7,12 @@
 package accounts.ui;
 
 import org.gnome.gdk.Color;
+import org.gnome.gdk.EventFocus;
+import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.StateType;
+import org.gnome.gtk.Widget;
 
 import generic.ui.ChangeListener;
 import generic.util.Debug;
@@ -63,91 +66,91 @@ public class AmountEntry extends HBox
         amount_Entry.setWidthChars(10);
         amount_Entry.setAlignment(1.0f);
 
-        amount_Entry.addListener(new EntryListener() {
-            public void entryEvent(EntryEvent event) {
+        amount_Entry.connect(new Entry.CHANGED() {
+            public void onChanged(Editable source) {
                 /*
                  * "changed" signals will come in as a result of either user
                  * action or setText() on the Widget. In either case, after
                  * appropriate guards we parse the result by [trying to] set
                  * our Amount object.
                  */
-                if (event.getType() == EntryEvent.Type.CHANGED) {
 
-                    final String text = amount_Entry.getText();
+                final String text = amount_Entry.getText();
 
-                    Debug.print("listeners", "in AmountEntry, Entry CHANGED, text: " + text);
+                Debug.print("listeners", "in AmountEntry, Entry CHANGED, text: " + text);
 
-                    if (!amount_Entry.getHasFocus()) {
-                        /*
-                         * Then the change wasn't the result of a user action
-                         * in this Widget, but rather as a result of some
-                         * other logic element calling setText(). So, ignore
-                         * the event by returning immediately.
-                         */
-                        Debug.print("listeners", "in AmountEntry, Entry CHANGED, ignoring not focused");
-                        return;
-                    }
-                    if (text.equals("")) {
-                        /*
-                         * If we have an empty field, then don't do anything
-                         * to the Amount we represent (leaving it at whatever
-                         * was set). This also covers the case where changing
-                         * the value results in a CHANGED event where the text
-                         * is blank right before a CHANGED event where the
-                         * text is the new value.
-                         */
-                        Debug.print("listeners", "in AmountEntry, Entry CHANGED, ignoring blank");
-                        return;
-                    }
-
-                    Debug.print("listeners", "in AmountEntry, Entry CHANGED, parsing");
-
-                    try {
-                        amount.setValue(text);
-                        amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
-                    } catch (NumberFormatException nfe) {
-                        /*
-                         * if the user input is invalid, then ignore it. The
-                         * Amount will stay as previously set.
-                         */
-                        amount_Entry.modifyText(StateType.NORMAL, Color.RED);
-                        return;
-                    }
-
-                    if (changeListener != null) {
-                        Debug.print("listeners", "in AmountEntry, Entry CHANGED, firing ChangeListener");
-                        changeListener.userChangedData();
-                    }
+                if (!amount_Entry.getHasFocus()) {
+                    /*
+                     * Then the change wasn't the result of a user action in
+                     * this Widget, but rather as a result of some other logic
+                     * element calling setText(). So, ignore the event by
+                     * returning immediately.
+                     */
+                    Debug.print("listeners", "in AmountEntry, Entry CHANGED, ignoring not focused");
+                    return;
+                }
+                if (text.equals("")) {
+                    /*
+                     * If we have an empty field, then don't do anything to
+                     * the Amount we represent (leaving it at whatever was
+                     * set). This also covers the case where changing the
+                     * value results in a CHANGED event where the text is
+                     * blank right before a CHANGED event where the text is
+                     * the new value.
+                     */
+                    Debug.print("listeners", "in AmountEntry, Entry CHANGED, ignoring blank");
+                    return;
                 }
 
-                if (event.getType() == EntryEvent.Type.ACTIVATE) {
+                Debug.print("listeners", "in AmountEntry, Entry CHANGED, parsing");
+
+                try {
+                    amount.setValue(text);
+                    amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
+                } catch (NumberFormatException nfe) {
                     /*
-                     * Ensure the Entry shows the properly formatted Amount.
+                     * if the user input is invalid, then ignore it. The
+                     * Amount will stay as previously set.
                      */
-                    final String text = amount.getValue();
-                    amount_Entry.setText(text);
-                    amount_Entry.setPosition(text.length());
+                    amount_Entry.modifyText(StateType.NORMAL, Color.RED);
+                    return;
+                }
+
+                if (changeListener != null) {
+                    Debug.print("listeners", "in AmountEntry, Entry CHANGED, firing ChangeListener");
+                    changeListener.userChangedData();
                 }
             }
         });
 
-        amount_Entry.addListener(new FocusListener() {
-            public boolean focusEvent(FocusEvent event) {
-                if (event.getType() == FocusEvent.Type.FOCUS_OUT) {
-                    /*
-                     * Ensure the Entry shows the properly formatted Amount.
-                     */
-                    final String text = amount.getValue();
-                    amount_Entry.setText(text);
-                    /*
-                     * It looks really stupid if a subset (or even all) of the
-                     * characters are selected when focus leaves; it grays out
-                     * and there is no reason to keep the visual reminder of
-                     * the selection.
-                     */
-                    amount_Entry.selectRegion(0, 0);
-                    amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
-                }
+        amount_Entry.connect(new Entry.ACTIVATE() {
+            public void onActivate(Entry source) {
+                /*
+                 * Ensure the Entry shows the properly formatted Amount.
+                 */
+                final String text = amount.getValue();
+                amount_Entry.setText(text);
+                amount_Entry.setPosition(text.length());
+            }
+        });
+
+        
+        amount_Entry.connect(new Widget.FOCUS_OUT_EVENT() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                /*
+                 * Ensure the Entry shows the properly formatted Amount.
+                 */
+                final String text = amount.getValue();
+                amount_Entry.setText(text);
+                /*
+                 * It looks really stupid if a subset (or even all) of the
+                 * characters are selected when focus leaves; it grays out and
+                 * there is no reason to keep the visual reminder of the
+                 * selection.
+                 */
+                amount_Entry.selectRegion(0, 0);
+                amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
+
                 return false;
             };
         });
