@@ -18,6 +18,7 @@ import java.util.WeakHashMap;
 
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
+import org.gnome.gtk.ComboBox;
 import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
@@ -122,27 +123,25 @@ public class ForeignAmountEntryBox extends HBox
 
         });
 
-        foreign_CurrencySelector.addListener(new ComboBoxListener() {
-            public void comboBoxEvent(ComboBoxEvent event) {
-                if (event.getType() == ComboBoxEvent.Type.CHANGED) {
-                    Currency cur = foreign_CurrencySelector.getCurrency();
-                    foreignAmount.setCurrency(cur);
+        foreign_CurrencySelector.connect(new ComboBox.CHANGED() {
+            public void onChanged(ComboBox source) {
+                Currency cur = foreign_CurrencySelector.getCurrency();
+                foreignAmount.setCurrency(cur);
 
-                    String rate = (String) lastRates.get(cur);
-                    if (rate == null) {
-                        rate = "1.0";
-                    }
-                    Debug.print("listeners", "currencySelector CHANGED " + cur.getCode() + " @" + rate);
+                String rate = (String) lastRates.get(cur);
+                if (rate == null) {
+                    rate = "1.0";
+                }
+                Debug.print("listeners", "currencySelector CHANGED " + cur.getCode() + " @" + rate);
 
-                    foreignAmount.setRate(rate);
-                    rate_Entry.setText(foreignAmount.getRate());
-                    homeValue_AmountEntry.setAmount(foreignAmount);
+                foreignAmount.setRate(rate);
+                rate_Entry.setText(foreignAmount.getRate());
+                homeValue_AmountEntry.setAmount(foreignAmount);
 
-                    grayOut();
+                grayOut();
 
-                    if (changeListener != null) {
-                        changeListener.userChangedData();
-                    }
+                if (changeListener != null) {
+                    changeListener.userChangedData();
                 }
             }
         });
