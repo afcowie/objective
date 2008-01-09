@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -59,9 +58,9 @@ public final class DataServer
 
     private Class rootObjectType = null;
 
-    private static LinkedList poolAvailable;
+    private static LinkedList<DataClient> poolAvailable;
 
-    private static Set poolInUse;
+    private static Set<DataClient> poolInUse;
 
     /**
      * Configure the Db4o engine. Apparently this is once per VM, and on first
@@ -165,8 +164,8 @@ public final class DataServer
             throw new DebugException("Huh? openServer() failed to return an ObjectServer!");
         }
 
-        poolAvailable = new LinkedList();
-        poolInUse = Collections.synchronizedSet(new HashSet());
+        poolAvailable = new LinkedList<DataClient>();
+        poolInUse = Collections.synchronizedSet(new HashSet<DataClient>());
     }
 
     /**
@@ -200,7 +199,7 @@ public final class DataServer
         synchronized (poolInUse) {
             if (poolAvailable.size() > 0) {
                 Debug.print("pool", "Getting client from pool");
-                client = (DataClient) poolAvailable.removeLast();
+                client = poolAvailable.removeLast();
                 if (client.getUnderlyingContainer().isClosed()) {
                     throw new IllegalStateException("Client retrieved from pool is closed!");
                 }
@@ -255,12 +254,8 @@ public final class DataServer
             throw new DebugException("This client is closed, can't return it to connection pool!");
         }
 
-        Set dS = client.getDirtyObjects();
-        Iterator dI = dS.iterator();
-        while (dI.hasNext()) {
-            Object dirty = dI.next();
-            ext.deactivate(dirty, 5);
-            dI.remove();
+        for (Object d : client.getDirtyObjects()) {
+            ext.deactivate(d, 5);
         }
         client.clearCachedReferences();
 
@@ -280,27 +275,22 @@ public final class DataServer
      */
     void close() {
         synchronized (poolInUse) {
-            Iterator iter;
-
             if (poolInUse.size() > 0) {
                 Debug.print("pool", "WARNING: There are still released connections!");
             }
 
-            iter = poolInUse.iterator();
-            while (iter.hasNext()) {
-                DataClient client = (DataClient) iter.next();
+            for (DataClient client : poolInUse) {
                 client.rollback();
                 client.close();
-                iter.remove();
             }
+            poolInUse.clear();
 
-            iter = poolAvailable.iterator();
-            while (iter.hasNext()) {
-                DataClient client = (DataClient) iter.next();
+            for (DataClient client : poolAvailable) {
                 client.rollback();
                 client.close();
-                iter.remove();
             }
+            poolAvailable.clear();
+
         }
         objectServer.close();
 
