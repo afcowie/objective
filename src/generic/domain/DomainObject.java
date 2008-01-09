@@ -2,13 +2,11 @@
  * DomainObject.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006-2008 Operational Dynamics
  */
 package generic.domain;
 
 import generic.persistence.NotActivatedException;
-
-import com.db4o.ObjectContainer;
 
 /**
  * Superclass of any domain objects stored in our DataStore. This is not
@@ -19,17 +17,9 @@ import com.db4o.ObjectContainer;
  */
 public abstract class DomainObject
 {
+    // private static long count;
+
     private long databaseId;
-
-    public void objectOnActivate(ObjectContainer container) {
-        if (databaseId == 0) {
-            this.databaseId = container.ext().getID(this);
-        }
-    }
-
-    public void objectOnNew(ObjectContainer container) {
-        this.databaseId = container.ext().getID(this);
-    }
 
     public long getID() {
         if (databaseId == 0) {
@@ -77,5 +67,9 @@ public abstract class DomainObject
         buf.append(databaseId);
         buf.append(")");
         return buf.toString();
+    }
+
+    public void setID(long id) {
+        this.databaseId = id;
     }
 }

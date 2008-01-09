@@ -2,13 +2,14 @@
  * DataClient.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006-2008 Operational Dynamics
  * 
  * Code originally accounts.persistence.DataStore,
  * Copyright (c) 2005-2006 Operational Dynamics
  */
 package generic.persistence;
 
+import generic.domain.DomainObject;
 import generic.domain.Root;
 
 import java.util.Iterator;
@@ -19,7 +20,14 @@ import java.util.Set;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
+import com.db4o.events.Event4;
+import com.db4o.events.EventArgs;
+import com.db4o.events.EventListener4;
+import com.db4o.events.EventRegistry;
+import com.db4o.events.EventRegistryFactory;
+import com.db4o.events.ObjectEventArgs;
 import com.db4o.ext.ExtObjectContainer;
+import com.db4o.ext.ObjectInfo;
 
 /**
  * A connection to an accounting database. This wraps the mechanics of reading
@@ -45,15 +53,45 @@ public final class DataClient
 
     private transient Set dirty = null;
 
+    private transient EventListener4 listener = null;
+
     /**
      * Create a new DataClient instance around a {@link ObjectContainer}.
      */
-    DataClient(ObjectContainer container) throws IllegalStateException {
+    DataClient(final ObjectContainer container) throws IllegalStateException {
+        final EventRegistry registry;
+
         if (container == null) {
             throw new IllegalArgumentException(
                     "A bit hard to be instantiating a client with a null ObjectContainer");
         }
         this.container = container.ext();
+
+        this.listener = new EventListener4() {
+            public void onEvent(Event4 event, EventArgs args) {
+                final Object obj;
+                final DomainObject dom;
+                final ObjectInfo info;
+                final long id;
+
+                obj = ((ObjectEventArgs) args).object();
+
+                if (obj instanceof DomainObject) {
+                    dom = (DomainObject) obj;
+                    info = container.ext().getObjectInfo(obj);
+                    if (info != null) {
+                        id = info.getInternalID();
+                        dom.setID(id);
+                    }
+                }
+            }
+        };
+
+        registry = EventRegistryFactory.forObjectContainer(container);
+
+        registry.created().addListener(listener);
+        registry.activated().addListener(listener);
+
         dirty = new LinkedHashSet();
     }
 
@@ -179,7 +217,7 @@ public final class DataClient
      */
     public Root getRoot() {
         if (root == null) {
-            ObjectSet os = container.get(Root.class);
+            ObjectSet<Root> os = container.get(Root.class);
 
             if (os.size() > 1) {
                 throw new IllegalStateException(
@@ -187,7 +225,7 @@ public final class DataClient
             } else if (os.size() == 0) {
                 throw new NoSuchElementException("No Books object in this container!");
             } else {
-                this.root = (Root) os.next();
+                this.root = os.next();
             }
         }
         return root;
@@ -248,6 +286,7 @@ public final class DataClient
         Iterator iter = os.iterator();
         while (os.hasNext()) {
             Object obj = os.next();
+            container.activate(obj, 5);
 
             // if (obj instanceof Cascade) {
             // Cascade cascade = (Cascade) obj; ...
