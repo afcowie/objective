@@ -8,9 +8,11 @@ package accounts.ui;
 
 import generic.client.Master;
 import generic.ui.EditorWindow;
-import generic.ui.ModalDialog;
 import generic.util.Debug;
 import generic.util.DebugException;
+
+import org.gnome.gtk.Dialog;
+import org.gnome.gtk.ErrorMessageDialog;
 
 import accounts.domain.Transaction;
 import accounts.services.Command;
@@ -127,36 +129,29 @@ public abstract class TransactionEditorWindow extends EditorWindow
 
                     store.commit();
 
-                    CustomEvents.addEvent(new Runnable() {
-                        public void run() {
-                            Master.ui.showAsWorking(false);
-                            self.deleteHook();
-                        }
-                    });
+                    Master.ui.showAsWorking(false);
+                    self.deleteHook();
 
                 } catch (final CommandNotReadyException cnre) {
+                    final Dialog dialog;
+
                     Debug.print("events", "Command not ready: " + cnre.getMessage());
-                    CustomEvents.addEvent(new Runnable() {
-                        public void run() {
-                            Master.ui.showAsWorking(false);
+                    Master.ui.showAsWorking(false);
 
-                            ModalDialog dialog = new ModalDialog(
-                                    self.window,
-                                    "Command Not Ready!",
-                                    "<i>An exception was raised when trying to commit this accounting Transaction to the database. "
-                                            + "There's a chance this is harmless, ie, if you just try again, or perhaps cancel, reopen, and try again, then you'll succeed. "
-                                            + "More likely, the program has managed to get itself into an inconsistent state, probably due to a bug, and you'll need to restart to reset things. "
-                                            + "The specific message raised was:</i>\n"
-                                            + cnre.getMessage(), MessageType.ERROR);
-                            dialog.run();
+                    dialog = new ErrorMessageDialog(
+                            self.window,
+                            "Command Not Ready!",
+                            "<i>An exception was raised when trying to commit this accounting Transaction to the database. "
+                                    + "There's a chance this is harmless, ie, if you just try again, or perhaps cancel, reopen, and try again, then you'll succeed. "
+                                    + "More likely, the program has managed to get itself into an inconsistent state, probably due to a bug, and you'll need to restart to reset things. "
+                                    + "The specific message raised was:</i>\n" + cnre.getMessage());
+                    dialog.run();
 
-                            /*
-                             * Leave the Window open so user can fix, as
-                             * opposed to calling cancel()
-                             */
-                            window.present();
-                        }
-                    });
+                    /*
+                     * Leave the Window open so user can fix, as opposed to
+                     * calling cancel()
+                     */
+                    window.present();
                 }
             }
         }.start();
