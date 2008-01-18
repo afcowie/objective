@@ -15,21 +15,21 @@ import org.gnome.gtk.Gtk;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
-import accounts.ui.DatePicker;
+import accounts.ui.ForeignAmountEntryBox;
 
 public class DemoWindowWrapper
 {
     public static void main(String[] args) {
         final Window w;
-        final DatePicker picker;
+        final ForeignAmountEntryBox foreign;
 
         Gtk.init(args);
 
-        picker = new DatePicker();
+        foreign = new ForeignAmountEntryBox(null);
 
         w = new Window();
         w.setBorderWidth(15);
-        w.add(picker);
+        w.add(foreign);
 
         w.showAll();
         w.connect(new Window.DELETE_EVENT() {

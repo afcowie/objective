@@ -2,7 +2,7 @@
  * DemoWindowRunner.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005-2006 Operational Dynamics
+ * Copyright (c) 2005-2008 Operational Dynamics
  */
 package demo.ui;
 
@@ -22,6 +22,8 @@ public class DemoWindowRunner
 {
 
     public static void main(String[] args) {
+        final TransactionListViewHolder view;
+
         Debug.setProgname("windowrunner");
         Debug.register("main");
         Debug.register("debug"); // temporary debugs only!
@@ -55,7 +57,7 @@ public class DemoWindowRunner
         // AccountTypeSelectorDialog();
 
         Debug.print("main", "Initializing TransactionListViewHolder");
-        TransactionListViewHolder view = new TransactionListViewHolder();
+        view = new TransactionListViewHolder();
 
         // Debug.print("main", "Initializing SingleWidgetHolder");
         // SingleWidgetHolder swh = new SingleWidgetHolder();
