@@ -6,6 +6,9 @@
  */
 package accounts.ui;
 
+import static org.gnome.gtk.Alignment.LEFT;
+import static org.gnome.gtk.Alignment.RIGHT;
+import static org.gnome.gtk.Alignment.TOP;
 import generic.client.Master;
 import generic.persistence.DataClient;
 import generic.ui.Text;
@@ -23,9 +26,11 @@ import java.util.regex.Pattern;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnBoolean;
+import org.gnome.gtk.DataColumnLong;
 import org.gnome.gtk.DataColumnReference;
 import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.ListStore;
+import org.gnome.gtk.SelectionMode;
 import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.TreePath;
 import org.gnome.gtk.TreeRowReference;
@@ -64,44 +69,44 @@ public class TransactionListView extends TreeView implements UpdateListener
 {
     private transient Currency home = null;
 
-    private DataClient db;
+    private final DataClient db;
 
-    private DataColumnString typeMarkup_DataColumn;
+    private final DataColumnString typeMarkup_DataColumn;
 
-    private DataColumnString typeSort_DataColumn;
+    private final DataColumnString typeSort_DataColumn;
 
-    private DataColumnString dateText_DataColumn;
+    private final DataColumnString dateText_DataColumn;
 
-    private DataColumnLong dateSort_DataColumn;
+    private final DataColumnLong dateSort_DataColumn;
 
-    private DataColumnString descriptionAccountLedgerText_DataColumn;
+    private final DataColumnString descriptionAccountLedgerText_DataColumn;
 
-    private DataColumnString descriptionSort_DataColumn;
+    private final DataColumnString descriptionSort_DataColumn;
 
-    private DataColumnString debitAmountsText_DataColumn;
+    private final DataColumnString debitAmountsText_DataColumn;
 
-    private DataColumnLong debitAmountsSort_DataColumn;
+    private final DataColumnLong debitAmountsSort_DataColumn;
 
-    private DataColumnString creditAmountsText_DataColumn;
+    private final DataColumnString creditAmountsText_DataColumn;
 
-    private DataColumnLong creditAmountsSort_DataColumn;
+    private final DataColumnLong creditAmountsSort_DataColumn;
 
     /**
      * The Transaction object that this row represents. This must be set
      * before calling {@link #populate(TreeIter)}
      */
-    private DataColumnReference transactionObject_DataColumn;
+    private final DataColumnReference transactionObject_DataColumn;
 
     /**
      * Whether the row is to be rendered with bright colours. Set this as true
      * if the row is selected and you want it to show up in "reverse video",
      * otherwise use false for normal colouring.
      */
-    private DataColumnBoolean active_DataColumn;
+    private final DataColumnBoolean active_DataColumn;
 
-    private ListStore model;
+    private final ListStore model;
 
-    private TreeView view;
+    private final TreeView view;
 
     /**
      * Instantiate a new widget to view a list of Transactions.
@@ -112,11 +117,15 @@ public class TransactionListView extends TreeView implements UpdateListener
      * @param transactions
      *            the Transactions that you wish to display.
      */
-    public TransactionListView(DataClient db, List transactions) {
+    public TransactionListView(final DataClient db, final List transactions) {
         super();
+
+        TreeViewColumn vertical;
+        CellRendererText renderer;
+
         this.db = db;
 
-        Books root = (Books) db.getRoot();
+        final Books root = (Books) db.getRoot();
         home = root.getHomeCurrency();
 
         typeMarkup_DataColumn = new DataColumnString();
@@ -157,115 +166,93 @@ public class TransactionListView extends TreeView implements UpdateListener
         /*
          * Type
          */
-        TreeViewColumn type_ViewColumn = new TreeViewColumn();
-        type_ViewColumn.setResizable(false);
-        type_ViewColumn.setReorderable(false);
 
-        CellRendererText type_CellRenderer = new CellRendererText();
-        type_CellRenderer.setFloatProperty("yalign", 0.0f);
-        type_ViewColumn.packStart(type_CellRenderer, false);
-        type_ViewColumn.addAttributeMapping(type_CellRenderer, CellRendererText.Attribute.MARKUP,
-                typeMarkup_DataColumn);
+        vertical = view.appendColumn();
+        vertical.setResizable(false);
+        vertical.setReorderable(false);
 
-        type_ViewColumn.setTitle("Type");
-        type_ViewColumn.setClickable(true);
-        type_ViewColumn.setSortColumn(typeSort_DataColumn);
+        renderer = new CellRendererText(vertical);
+        renderer.setAlignment(LEFT, TOP);
+        renderer.setMarkup(typeMarkup_DataColumn);
 
-        view.appendColumn(type_ViewColumn);
+        vertical.setTitle("Type");
+        vertical.setClickable(true);
+        vertical.setSortColumn(typeSort_DataColumn);
 
         /*
          * Date
          */
-        TreeViewColumn date_ViewColumn = new TreeViewColumn();
-        date_ViewColumn.setResizable(false);
-        date_ViewColumn.setReorderable(false);
+        vertical = view.appendColumn();
+        vertical.setResizable(false);
+        vertical.setReorderable(false);
 
-        CellRendererText date_CellRenderer = new CellRendererText();
-        date_CellRenderer.setFloatProperty("yalign", 0.0f);
-        date_ViewColumn.packStart(date_CellRenderer, false);
-        date_ViewColumn.addAttributeMapping(date_CellRenderer, CellRendererText.Attribute.MARKUP,
-                dateText_DataColumn);
+        renderer = new CellRendererText(vertical);
+        renderer.setAlignment(LEFT, TOP);
+        renderer.setMarkup(dateText_DataColumn);
 
-        date_ViewColumn.setTitle("Date");
-        date_ViewColumn.setClickable(true);
-        date_ViewColumn.setSortColumn(dateSort_DataColumn);
-
-        view.appendColumn(date_ViewColumn);
+        vertical.setTitle("Date");
+        vertical.setClickable(true);
+        vertical.setSortColumn(dateSort_DataColumn);
+        vertical.clicked();
 
         /*
          * Description + Entries' parent Account » Ledger
          */
-        TreeViewColumn descEntryText_ViewColumn = new TreeViewColumn();
-        descEntryText_ViewColumn.setResizable(false);
-        descEntryText_ViewColumn.setReorderable(false);
-        descEntryText_ViewColumn.setExpand(true);
+        vertical = view.appendColumn();
+        vertical.setResizable(false);
+        vertical.setReorderable(false);
+        vertical.setExpand(true);
 
-        CellRendererText descEntryText_CellRenderer = new CellRendererText();
-        descEntryText_ViewColumn.packStart(descEntryText_CellRenderer, true);
-        descEntryText_ViewColumn.addAttributeMapping(descEntryText_CellRenderer,
-                CellRendererText.Attribute.MARKUP, descriptionAccountLedgerText_DataColumn);
+        renderer = new CellRendererText(vertical);
+        renderer.setMarkup(descriptionAccountLedgerText_DataColumn);
 
-        descEntryText_ViewColumn.setTitle("Description");
-        descEntryText_ViewColumn.setClickable(true);
-        descEntryText_ViewColumn.setSortColumn(descriptionSort_DataColumn);
+        vertical.setTitle("Description");
+        vertical.setClickable(true);
+        vertical.setSortColumn(descriptionSort_DataColumn);
 
         // TODO sort order AccountComparator, yo
 
-        view.appendColumn(descEntryText_ViewColumn);
-
         /*
          * Entries' Debit
          */
-        TreeViewColumn debitAmounts_ViewColumn = new TreeViewColumn();
-        debitAmounts_ViewColumn.setResizable(false);
-        debitAmounts_ViewColumn.setReorderable(false);
+        vertical = view.appendColumn();
+        vertical.setResizable(false);
+        vertical.setReorderable(false);
 
-        CellRendererText debitAmounts_CellRenderer = new CellRendererText();
-        debitAmounts_CellRenderer.setFloatProperty("xalign", 1.0f);
-        debitAmounts_ViewColumn.packStart(debitAmounts_CellRenderer, false);
-        debitAmounts_ViewColumn.addAttributeMapping(debitAmounts_CellRenderer,
-                CellRendererText.Attribute.MARKUP, debitAmountsText_DataColumn);
+        renderer = new CellRendererText(vertical);
+        renderer.setAlignment(RIGHT, TOP);
+        renderer.setMarkup(debitAmountsText_DataColumn);
 
-        debitAmounts_ViewColumn.setTitle("Debits       ");
-        debitAmounts_ViewColumn.setAlignment(1.0);
-        debitAmounts_ViewColumn.setClickable(true);
-        debitAmounts_ViewColumn.setSortColumn(debitAmountsSort_DataColumn);
-
-        view.appendColumn(debitAmounts_ViewColumn);
+        vertical.setTitle("Debits       ");
+        vertical.setAlignment(1.0f);
+        vertical.setClickable(true);
+        vertical.setSortColumn(debitAmountsSort_DataColumn);
 
         /*
-         * Entries' Debit
+         * Entries' Credit
          */
-        TreeViewColumn creditAmounts_ViewColumn = new TreeViewColumn();
-        creditAmounts_ViewColumn.setResizable(false);
-        creditAmounts_ViewColumn.setReorderable(false);
+        vertical = view.appendColumn();
+        vertical.setResizable(false);
+        vertical.setReorderable(false);
 
-        CellRendererText creditAmounts_CellRenderer = new CellRendererText();
-        creditAmounts_CellRenderer.setFloatProperty("xalign", 1.0f);
-        // creditAmounts_CellRenderer.setFloatProperty("justify", 1.0f);
-        creditAmounts_ViewColumn.packStart(creditAmounts_CellRenderer, false);
-        creditAmounts_ViewColumn.addAttributeMapping(creditAmounts_CellRenderer,
-                CellRendererText.Attribute.MARKUP, creditAmountsText_DataColumn);
+        renderer = new CellRendererText(vertical);
+        renderer.setAlignment(RIGHT, TOP);
+        renderer.setMarkup(creditAmountsText_DataColumn);
 
-        creditAmounts_ViewColumn.setTitle("Credits    ");
+        vertical.setTitle("Credits    ");
         // Label title = new Label("Credits <span font_desc='Mono'> </span>");
         // title.setUseMarkup(true);
         // creditAmounts_ViewColumn.setWidget(title);
 
-        creditAmounts_ViewColumn.setAlignment(1.0);
-        creditAmounts_ViewColumn.setClickable(true);
-        creditAmounts_ViewColumn.setSortColumn(creditAmountsSort_DataColumn);
-
-        view.appendColumn(creditAmounts_ViewColumn);
+        vertical.setAlignment(1.0f);
+        vertical.setClickable(true);
+        vertical.setSortColumn(creditAmountsSort_DataColumn);
 
         /*
          * overall properties
          */
         view.setRulesHint(true);
         view.setEnableSearch(false);
-        view.setReorderable(false);
-
-        date_ViewColumn.clicked();
 
         /*
          * repopulate [via showAsActive()] when a row is selected to cause
@@ -273,27 +260,25 @@ public class TransactionListView extends TreeView implements UpdateListener
          * selected row background colour.
          */
 
-        TreeSelection selection = view.getSelection();
+        final TreeSelection selection = view.getSelection();
         selection.setMode(SelectionMode.SINGLE);
-        selection.addListener(new TreeSelectionListener() {
-            public void selectionChangedEvent(TreeSelectionEvent event) {
-                TreeSelection selection = (TreeSelection) event.getSource();
-                TreePath[] paths = selection.getSelectedRows();
-                if (paths.length > 0) {
-                    showAsActive(paths[0]);
+        selection.connect(new TreeSelection.CHANGED() {
+            public void onChanged(TreeSelection source) {
+                final TreeIter row;
+
+                row = source.getSelected();
+                if (row != null) {
+                    showAsActive(row);
                 }
             }
         });
 
-        view.addListener(new TreeViewListener() {
-            public void treeViewEvent(TreeViewEvent event) {
-                Debug.print("listeners", "TreeViewEvent: " + event.getType().getName());
-                if (event.getType() == TreeViewEvent.Type.ROW_ACTIVATED) {
-                    TreeIter pointer = event.getTreeIter();
-                    Transaction t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);
+        view.connect(new TreeView.ROW_ACTIVATED() {
+            public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
+                final TreeIter pointer = model.getIter(path); // TODO CHECK
+                final Transaction t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);
 
-                    Master.ui.launchEditor(t);
-                }
+                Master.ui.launchEditor(t);
             }
         });
 
@@ -307,17 +292,12 @@ public class TransactionListView extends TreeView implements UpdateListener
          * And when the widget gets deleted, stop listening. This probably
          * needs further testing; does unrealize always get sent?
          */
-        this.addListener(new LifeCycleListener() {
-            public void lifeCycleEvent(LifeCycleEvent event) {
-                if (event.getType() == LifeCycleEvent.Type.UNREALIZE) {
-                    Master.ui.deregisterListener(me);
-                }
-            }
-
-            public boolean lifeCycleQuery(LifeCycleEvent event) {
-                return false;
-            }
-        });
+        // FIXME 4.0!
+        // this.connect(new Widget.UNREALIZE() {
+        // public void onUnrealize(Widget source) {
+        // Master.ui.deregisterListener(me);
+        // }
+        // });
     }
 
     private static final Pattern regexAmp = Pattern.compile("&");
@@ -334,10 +314,10 @@ public class TransactionListView extends TreeView implements UpdateListener
      * assortment of Transactions is being updated into an existing widget.
      */
     private void populate(List transactions) {
-        Iterator tI = transactions.iterator();
+        final Iterator tI = transactions.iterator();
         while (tI.hasNext()) {
-            Transaction t = (Transaction) tI.next();
-            TreeIter pointer = model.appendRow();
+            final Transaction t = (Transaction) tI.next();
+            final TreeIter pointer = model.appendRow();
 
             /*
              * Populate is geared to be re-used and extracts its Transaction
@@ -363,28 +343,30 @@ public class TransactionListView extends TreeView implements UpdateListener
 
     /**
      * Set a given row of the ListStore as as "active" (ie, selected) by
-     * repopulaing its DataColumns to have our _ACTIVE color values rather
-     * than _NORMAL ones. The row that was previously active is set back to
-     * "normal".
+     * repopulaing its DataColumns src/accounts/ui/TransactionListView.javato
+     * have our _ACTIVE color values rather than _NORMAL ones. The row that
+     * was previously active is set back to "normal".
      * 
      * @param path
      *            the TreePath (presumably extracted from a TreeSelection)
      *            that you want to indicate as active.
      */
-    private void showAsActive(TreePath path) {
-        TreeIter pointer = model.getIter(path);
+    private void showAsActive(TreeIter pointer) {
+        final TreePath current;
 
         model.setValue(pointer, active_DataColumn, true);
         populate(pointer);
 
+        current = model.getPath(pointer);
+
         if (previous != null) {
-            if (!(previous.getPath().equals(path))) {
+            if (!(previous.getPath().equals(current))) {
                 pointer = model.getIter(previous.getPath());
                 model.setValue(pointer, active_DataColumn, false);
                 populate(pointer);
             }
         }
-        previous = new TreeRowReference(model, path);
+        previous = new TreeRowReference(model, current);
     }
 
     /**
@@ -401,11 +383,16 @@ public class TransactionListView extends TreeView implements UpdateListener
      * Markup ones are where the pango mush goes (which is why we can't sort
      * on them - it'd sort by colour!)
      */
-    private void populate(TreeIter pointer) {
-        Transaction t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);
-        boolean active = model.getValue(pointer, active_DataColumn);
+    private void populate(final TreeIter pointer) {
+        final Transaction t;
+        final boolean active;
+        final StringBuffer creditVal;
+        final List amountBuffers, entryObjects;
 
-        StringBuffer type = new StringBuffer();
+        t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);
+        active = model.getValue(pointer, active_DataColumn);
+
+        final StringBuffer type = new StringBuffer();
 
         if (active) {
             type.append("<span color='" + LIGHTGRAY + "'>");
@@ -422,20 +409,20 @@ public class TransactionListView extends TreeView implements UpdateListener
                 + "</span>");
         model.setValue(pointer, dateSort_DataColumn, t.getDate().getInternalTimestamp());
 
-        StringBuffer titleName = new StringBuffer();
+        final StringBuffer titleName = new StringBuffer();
         final String OPEN = "<b>";
         final String CLOSE = "</b>";
         titleName.append(OPEN);
         titleName.append(t.getDescription());
         titleName.append(CLOSE);
 
-        StringBuffer debitVal = new StringBuffer();
+        final StringBuffer debitVal = new StringBuffer();
         debitVal.append(OPEN);
         debitVal.append(' ');
         debitVal.append(CLOSE);
         debitVal.append('\n');
 
-        StringBuffer creditVal = new StringBuffer(debitVal.toString());
+        creditVal = new StringBuffer(debitVal.toString());
 
         /* ... in this Transaction */
         long largestDebitNumber = 0;
@@ -443,23 +430,23 @@ public class TransactionListView extends TreeView implements UpdateListener
         int widestDebitWidth = 0;
         int widestCreditWidth = 0;
 
-        List amountBuffers = new ArrayList(3);
-        List entryObjects = new ArrayList(3);
+        amountBuffers = new ArrayList(3);
+        entryObjects = new ArrayList(3);
 
-        Set ordered = new TreeSet(new EntryComparator(t));
+        final Set ordered = new TreeSet(new EntryComparator(t));
         ordered.addAll(t.getEntries());
-        Iterator eI = ordered.iterator();
+        final Iterator eI = ordered.iterator();
         while (eI.hasNext()) {
-            Entry entry = (Entry) eI.next();
-            Ledger ledger = entry.getParentLedger();
-            Account account = ledger.getParentAccount();
+            final Entry entry = (Entry) eI.next();
+            final Ledger ledger = entry.getParentLedger();
+            final Account account = ledger.getParentAccount();
 
             titleName.append("\n");
 
             titleName.append("<span color='");
             titleName.append(account.getColor(active));
             titleName.append("'>");
-            Matcher ma = regexAmp.matcher(account.getTitle());
+            final Matcher ma = regexAmp.matcher(account.getTitle());
             titleName.append(ma.replaceAll("&amp;"));
             titleName.append("</span>");
             /*
@@ -476,11 +463,11 @@ public class TransactionListView extends TreeView implements UpdateListener
             titleName.append("<span color='");
             titleName.append(ledger.getColor(active));
             titleName.append("'>");
-            Matcher ml = regexAmp.matcher(ledger.getName());
+            final Matcher ml = regexAmp.matcher(ledger.getName());
             titleName.append(ml.replaceAll("&amp;"));
             titleName.append("</span>");
 
-            Amount a = entry.getAmount();
+            final Amount a = entry.getAmount();
             ForeignAmount fa;
             if (entry.getAmount() instanceof ForeignAmount) {
                 fa = (ForeignAmount) a;
@@ -490,7 +477,7 @@ public class TransactionListView extends TreeView implements UpdateListener
                 fa.setRate("1.0");
                 fa.setForeignValue(a);
             }
-            StringBuffer value = new StringBuffer();
+            final StringBuffer value = new StringBuffer();
 
             value.append(fa.getCurrency().getSymbol());
             value.append(fa.toString()); // has , separators
@@ -510,7 +497,7 @@ public class TransactionListView extends TreeView implements UpdateListener
              * We sort the entires by their face value; number from Amount
              * represents underlying home quantity.
              */
-            long num = Math.round(Double.parseDouble(fa.getForeignValue()) * 100);
+            final long num = Math.round(Double.parseDouble(fa.getForeignValue()) * 100);
             if (entry instanceof Debit) {
                 if (num > largestDebitNumber) {
                     largestDebitNumber = num;
@@ -536,11 +523,11 @@ public class TransactionListView extends TreeView implements UpdateListener
 
         final int num = entryObjects.size();
         for (int i = 0; i < num; i++) {
-            Entry entry = (Entry) entryObjects.get(i);
-            StringBuffer buf = (StringBuffer) amountBuffers.get(i);
+            final Entry entry = (Entry) entryObjects.get(i);
+            final StringBuffer buf = (StringBuffer) amountBuffers.get(i);
 
             if (entry instanceof Debit) {
-                int diff = widestDebitWidth - buf.length();
+                final int diff = widestDebitWidth - buf.length();
                 for (int j = 0; j < diff; j++) {
                     buf.insert(0, ' ');
                 }
@@ -549,7 +536,7 @@ public class TransactionListView extends TreeView implements UpdateListener
                 creditVal.append("\n");
 
             } else if (entry instanceof Credit) {
-                int diff = widestCreditWidth - buf.length();
+                final int diff = widestCreditWidth - buf.length();
                 for (int j = 0; j < diff; j++) {
                     buf.insert(0, ' ');
                 }
@@ -600,19 +587,24 @@ public class TransactionListView extends TreeView implements UpdateListener
     }
 
     public void redisplayObject(long id) {
-        Transaction t = (Transaction) db.fetchByID(id);
+        final Transaction t;
+        final TreeIter pointer;
+
+        t = (Transaction) db.fetchByID(id);
         db.reload(t);
 
-        TreeIter pointer = model.getFirstIter();
-        while (pointer != null) {
+        pointer = model.getIterFirst();
+        if (pointer == null) {
+            return;
+        }
+        do {
             if (model.getValue(pointer, transactionObject_DataColumn) == t) {
                 Debug.print("listeners", "redisplayObject(" + id + ") called; repopulating TreeIter "
                         + pointer);
                 populate(pointer);
                 return;
             }
-            pointer = pointer.getNextIter();
-        }
+        } while (pointer.iterNext());
 
         /*
          * Well, not here. No biggie, unless we start registering ID to Window

@@ -11,6 +11,7 @@ import generic.ui.Text;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.Requisition;
@@ -66,13 +67,11 @@ public class AccountLedgerDisplay extends HBox
         /*
          * 60 works out to be just enough room for "A… » C…".
          */
-        this.setMinimumSize(60, -1);
+        this.setSizeRequest(60, -1);
 
-        this.addListener(new ExposeListener() {
-            public boolean exposeEvent(ExposeEvent event) {
-                if (event.getType() == ExposeEvent.Type.EXPOSE) {
-                    resize();
-                }
+        this.connect(new Widget.EXPOSE_EVENT() {
+            public boolean onExposeEvent(Widget source, EventExpose event) {
+                resize();
                 return false;
             }
         });
@@ -107,7 +106,7 @@ public class AccountLedgerDisplay extends HBox
          */
         needed = (al > ll ? al : ll) * 2;
         width = needed;
-        label.setMarkup(toMarkup());
+        label.setLabel(toMarkup());
     }
 
     /**
@@ -159,11 +158,11 @@ public class AccountLedgerDisplay extends HBox
         }
 
         do {
-            label.setMarkup(toMarkup());
+            label.setLabel(toMarkup());
 
-            Requisition req = new Requisition(0, 0);
-            Widget.gtk_widget_size_request(label.getHandle(), req.getHandle());
+            Requisition req = label.getRequisition();
             labelRequestedPixels = req.getWidth();
+            labelRequestedPixels = 0;
 
             // Debug.print("debug", " --> requisited " + labelRequestedPixels
             // +

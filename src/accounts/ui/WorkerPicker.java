@@ -6,11 +6,15 @@
  */
 package accounts.ui;
 
+import static org.gnome.gdk.Color.BLACK;
+import static org.gnome.gdk.Color.RED;
+import static org.gnome.gtk.StateType.NORMAL;
 import generic.persistence.DataClient;
 
 import java.util.Iterator;
 import java.util.List;
 
+import org.gnome.gtk.ComboBox;
 import org.gnome.gtk.ComboBoxEntry;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnReference;
@@ -104,7 +108,7 @@ public class WorkerPicker extends HBox
          * column.
          */
 
-        worker_ComboBoxEntry = new ComboBoxEntry(listStore, 0);
+        worker_ComboBoxEntry = new ComboBoxEntry(listStore, nameDisplay_DataColumn);
 
         this.packStart(worker_ComboBoxEntry, false, false, 0);
 
@@ -115,18 +119,16 @@ public class WorkerPicker extends HBox
          */
         final Entry entry = (Entry) worker_ComboBoxEntry.getChild();
 
-        worker_ComboBoxEntry.addListener(new ComboBoxListener() {
-            public void comboBoxEvent(ComboBoxEvent event) {
-                if (event.getType() == ComboBoxEvent.Type.CHANGED) {
-                    worker_ComboBoxEntry.popup();
+        worker_ComboBoxEntry.connect(new ComboBox.CHANGED() {
+            public void onChanged(ComboBox source) {
+                worker_ComboBoxEntry.popup();
 
-                    worker = getSelection();
+                worker = getSelection();
 
-                    if (worker == null) {
-                        entry.modifyText(StateType.NORMAL, Color.RED);
-                    } else {
-                        entry.modifyText(StateType.NORMAL, Color.BLACK);
-                    }
+                if (worker == null) {
+                    entry.modifyText(NORMAL, RED);
+                } else {
+                    entry.modifyText(NORMAL, BLACK);
                 }
             }
         });
@@ -164,16 +166,17 @@ public class WorkerPicker extends HBox
      *             Workers represented by this widget as constrained.
      */
     public void setWorker(Worker worker) {
+        TreeIter pointer;
+
         this.worker = worker;
 
-        TreeIter pointer = listStore.getFirstIter();
-        while (pointer != null) {
+        pointer = listStore.getIterFirst();
+        do {
             if (listStore.getValue(pointer, workerObject_DataColumn) == worker) {
                 worker_ComboBoxEntry.setActiveIter(pointer);
                 return;
             }
-            pointer = pointer.getNextIter();
-        }
+        } while (pointer.iterNext());
 
         throw new IllegalArgumentException(
                 "How did you manage to ask to activate a Worker object that isn't in the set of Workers represented by this picker?");

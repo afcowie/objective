@@ -2,21 +2,22 @@
  * ReimbursableExpensesEditorWindow.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005-2006 Operational Dynamics
+ * Copyright (c) 2005-2007 Operational Dynamics
  */
 package accounts.ui;
 
 import generic.client.Master;
 import generic.ui.EditorWindow;
-import generic.ui.ModalDialog;
 import generic.util.Debug;
 
 import java.util.Iterator;
 import java.util.Set;
 
+import org.gnome.gtk.Dialog;
 import org.gnome.gtk.Entry;
-import org.gnome.gtk.MessageType;
+import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.Table;
+import org.gnome.gtk.WarningMessageDialog;
 
 import accounts.domain.Amount;
 import accounts.domain.Credit;
@@ -42,15 +43,15 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
      */
     protected Table table;
 
-    protected WorkerPicker person_WorkerPicker;
+    protected final WorkerPicker person_WorkerPicker;
 
-    protected DatePicker datePicker;
+    protected final DatePicker datePicker;
 
-    protected AccountPicker accountPicker;
+    protected final AccountPicker accountPicker;
 
-    protected Entry descriptionEntry;
+    protected final Entry descriptionEntry;
 
-    protected ForeignAmountEntryBox amountEntryBox;
+    protected final ForeignAmountEntryBox amountEntryBox;
 
     private ReimbursableExpensesTransaction existing = null;
 
@@ -119,29 +120,31 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
         final Worker person = person_WorkerPicker.getWorker();
 
         if (person == null) {
-            ModalDialog dialog = new ModalDialog(window, "Select someone!",
-                    "You need to select the person you're trying to pay first.", MessageType.WARNING);
+            Dialog dialog;
+            dialog = new WarningMessageDialog(window, "Select someone!",
+                    "You need to select the person you're trying to pay first.");
             dialog.run();
             person_WorkerPicker.grabFocus();
             return;
         }
 
         if (descriptionEntry.getText().equals("")) {
-            ModalDialog dialog = new ModalDialog(
+            Dialog dialog;
+
+            dialog = new WarningMessageDialog(
                     window,
                     "Enter a description!",
                     "It's really a good idea for each Transaction to have an appropriate description."
                             + " Try to be a bit more specific than '<i>Expenses reimbursable to Joe Smith</i>' as that won't facilitate identifying this Transaction in future searches and reports."
-                            + " Perhaps '<i>Taxi from CDG to Paris Hotel</i>' instead.",
-                    MessageType.WARNING);
+                            + " Perhaps '<i>Taxi from CDG to Paris Hotel</i>' instead.");
             dialog.run();
             descriptionEntry.grabFocus();
             return;
         }
 
         if (accountPicker.getAccount() == null) {
-            ModalDialog dialog = new ModalDialog(window, "Select an Account!",
-                    "You need to select the account to which these expenses apply.", MessageType.WARNING);
+            Dialog dialog = new WarningMessageDialog(window, "Select an Account!",
+                    "You need to select the account to which these expenses apply.");
             dialog.run();
             accountPicker.grabFocus();
             return;
@@ -207,28 +210,18 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
                     store.commit();
 
-                    CustomEvents.addEvent(new Runnable() {
-                        public void run() {
-                            Master.ui.showAsWorking(false);
-                            self.deleteHook();
-                        }
-                    });
-
                 } catch (final CommandNotReadyException cnre) {
                     Debug.print("events", "Command not ready: " + cnre.getMessage());
-                    CustomEvents.addEvent(new Runnable() {
-                        public void run() {
-                            ModalDialog dialog = new ModalDialog(window, "Command Not Ready!",
-                                    cnre.getMessage(), MessageType.ERROR);
-                            dialog.run();
 
-                            /*
-                             * Leave the Window open so user can fix, as
-                             * opposed to calling cancel()
-                             */
-                            window.present();
-                        }
-                    });
+                    Dialog dialog = new ErrorMessageDialog(window, "Command Not Ready!",
+                            cnre.getMessage());
+                    dialog.run();
+
+                    /*
+                     * Leave the Window open so user can fix, as opposed to
+                     * calling cancel()
+                     */
+                    window.present();
                 }
 
             }
