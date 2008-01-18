@@ -134,7 +134,6 @@ public class AmountEntry extends HBox
             }
         });
 
-        
         amount_Entry.connect(new Widget.FOCUS_OUT_EVENT() {
             public boolean onFocusOutEvent(Widget source, EventFocus event) {
                 /*

@@ -172,14 +172,14 @@ public class ForeignAmountEntryBox extends HBox
                 }
             }
         });
-        
+
         rate_Entry.connect(new Entry.ACTIVATE() {
             public void onActivate(Entry source) {
                 final String original = rate_Entry.getText();
                 final String text = foreignAmount.getRate();
                 rate_Entry.setText(text);
                 rate_Entry.setPosition(original.length());
-            }           
+            }
         });
 
         /*

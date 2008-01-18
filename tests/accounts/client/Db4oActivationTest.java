@@ -29,172 +29,175 @@ import accounts.services.InitBooksCommand;
 import accounts.services.PostTransactionCommand;
 
 /**
- * A large (ie long duration and much computational effort) unit test to verify
- * that deep activation is working. More or less follows the path taken by `make
- * setup dump`. Should any activation problems be discovered, figure a way to
- * make this unit test show them.
+ * A large (ie long duration and much computational effort) unit test to
+ * verify that deep activation is working. More or less follows the path taken
+ * by `make setup dump`. Should any activation problems be discovered, figure
+ * a way to make this unit test show them.
  * <p>
  * Also note that can be used as a stand alone test, ie`java -classpath
- * /usr/share/junit/lib/junit.jar:tmp/classes accounts.client.Db4oActivationTest
- * [num]`
+ * /usr/share/junit/lib/junit.jar:tmp/classes
+ * accounts.client.Db4oActivationTest [num]`
  * 
  * @author Andrew Cowie
  */
 public class Db4oActivationTest extends BlankDatafileTestCase
 {
-	static {
-		DATAFILE = "tmp/unittests/Db4oActivationTest.yap";
-	}
+    static {
+        DATAFILE = "tmp/unittests/Db4oActivationTest.yap";
+    }
 
-	private static final int	DEFAULT			= 20;
-	/**
-	 * Controls the number of accounts created and the number of transactions
-	 * pumped into them. Up this, considerably - to at least 100 - if you're
-	 * using this unit test for tuning. Higher it is, lower fraction of time is
-	 * spent in database open and what not.
-	 */
-	private static int			NUM_ACCOUNTS	= DEFAULT;
+    private static final int DEFAULT = 20;
 
-	private static final String	DATESTRING		= "15 Jul 04";
+    /**
+     * Controls the number of accounts created and the number of transactions
+     * pumped into them. Up this, considerably - to at least 100 - if you're
+     * using this unit test for tuning. Higher it is, lower fraction of time
+     * is spent in database open and what not.
+     */
+    private static int NUM_ACCOUNTS = DEFAULT;
 
-	final public void testSetupDeepGraph() {
-		// Debug.init("all");
-		// Debug.register("main");
-		// Debug.register("command");
-		// Debug.register("memory");
-		// Debug.setProgname("activation");
+    private static final String DATESTRING = "15 Jul 04";
 
-		try {
-			Currency home = new Currency("CUR", "Some Currency", "#");
-			InitBooksCommand ibc = new InitBooksCommand(home);
-			ibc.execute(rw);
-			rw.commit();
+    final public void testSetupDeepGraph() {
+        // Debug.init("all");
+        // Debug.register("main");
+        // Debug.register("command");
+        // Debug.register("memory");
+        // Debug.setProgname("activation");
 
-			CashAccount[] as = new CashAccount[NUM_ACCOUNTS];
+        try {
+            Currency home = new Currency("CUR", "Some Currency", "#");
+            InitBooksCommand ibc = new InitBooksCommand(home);
+            ibc.execute(rw);
+            rw.commit();
 
-			for (int i = 0; i < NUM_ACCOUNTS; i++) {
-				as[i] = new CashAccount("N:" + i, "L:" + i);
-				AddAccountCommand aac = new AddAccountCommand(as[i]);
-				aac.execute(rw);
-				rw.commit();
-			}
+            CashAccount[] as = new CashAccount[NUM_ACCOUNTS];
 
-			for (int i = 0; i < NUM_ACCOUNTS; i++) {
-				Ledger ll = as[i].getLedger();
-				Ledger lr = as[NUM_ACCOUNTS - i - 1].getLedger();
+            for (int i = 0; i < NUM_ACCOUNTS; i++) {
+                as[i] = new CashAccount("N:" + i, "L:" + i);
+                AddAccountCommand aac = new AddAccountCommand(as[i]);
+                aac.execute(rw);
+                rw.commit();
+            }
 
-				Entry left = new Debit(new Amount("1.00"), ll);
-				Entry right = new Credit(new Amount("1.00"), lr);
+            for (int i = 0; i < NUM_ACCOUNTS; i++) {
+                Ledger ll = as[i].getLedger();
+                Ledger lr = as[NUM_ACCOUNTS - i - 1].getLedger();
 
-				Transaction gt = new GenericTransaction("T:" + i, new Datestamp(DATESTRING), new Entry[] {
-					left,
-					right
-				});
+                Entry left = new Debit(new Amount("1.00"), ll);
+                Entry right = new Credit(new Amount("1.00"), lr);
 
-				PostTransactionCommand ptc = new PostTransactionCommand(gt);
-				ptc.execute(rw);
-				rw.commit();
-			}
+                Transaction gt = new GenericTransaction("T:" + i, new Datestamp(DATESTRING),
+                        new Entry[] {
+                                left, right
+                        });
 
-		} catch (CommandNotReadyException cnre) {
-			cnre.printStackTrace();
-			fail("Threw Exception");
-		}
-	}
+                PostTransactionCommand ptc = new PostTransactionCommand(gt);
+                ptc.execute(rw);
+                rw.commit();
+            }
 
-	/*
-	 * close, open
-	 */
+        } catch (CommandNotReadyException cnre) {
+            cnre.printStackTrace();
+            fail("Threw Exception");
+        }
+    }
 
-	final public void testActivation() {
-		Amount totalDebits = new Amount("0.00");
-		Amount totalCredits = new Amount("0.00");
+    /*
+     * close, open
+     */
 
-		Books root = (Books) rw.getRoot();
+    final public void testActivation() {
+        Amount totalDebits = new Amount("0.00");
+        Amount totalCredits = new Amount("0.00");
 
-		Set aS = root.getAccountsSet();
-		Iterator aI = aS.iterator();
-		while (aI.hasNext()) {
-			Account a = (Account) aI.next();
+        Books root = (Books) rw.getRoot();
 
-			Set lS = a.getLedgers();
-			Iterator lI = lS.iterator();
-			while (lI.hasNext()) {
-				Ledger l = (Ledger) lI.next();
+        Set aS = root.getAccountsSet();
+        Iterator aI = aS.iterator();
+        while (aI.hasNext()) {
+            Account a = (Account) aI.next();
 
-				Set eS = l.getEntries();
-				Iterator eI = eS.iterator();
-				while (eI.hasNext()) {
-					Entry e = (Entry) eI.next();
+            Set lS = a.getLedgers();
+            Iterator lI = lS.iterator();
+            while (lI.hasNext()) {
+                Ledger l = (Ledger) lI.next();
 
-					Amount amt = e.getAmount();
+                Set eS = l.getEntries();
+                Iterator eI = eS.iterator();
+                while (eI.hasNext()) {
+                    Entry e = (Entry) eI.next();
 
-					if (amt == null) {
-						fail("Null Amount retreived. Activation failure?");
-					}
+                    Amount amt = e.getAmount();
 
-					assertNotNull("parentTranasction.description is null", e.getParentTransaction().getDescription());
+                    if (amt == null) {
+                        fail("Null Amount retreived. Activation failure?");
+                    }
 
-					assertEquals(DATESTRING, e.getDate().toString());
+                    assertNotNull("parentTranasction.description is null", e.getParentTransaction()
+                            .getDescription());
 
-					if (e instanceof Debit) {
-						totalDebits.incrementBy(e.getAmount());
-					} else if (e instanceof Credit) {
-						totalCredits.incrementBy(e.getAmount());
-					} else {
-						fail("Retrieved an Entry neither Credit nor Debit");
-					}
-				}
-			}
-		}
+                    assertEquals(DATESTRING, e.getDate().toString());
 
-		assertEquals(Integer.toString(NUM_ACCOUNTS) + ".00", totalDebits.getValue());
-		assertEquals(Integer.toString(NUM_ACCOUNTS) + ".00", totalCredits.getValue());
+                    if (e instanceof Debit) {
+                        totalDebits.incrementBy(e.getAmount());
+                    } else if (e instanceof Credit) {
+                        totalCredits.incrementBy(e.getAmount());
+                    } else {
+                        fail("Retrieved an Entry neither Credit nor Debit");
+                    }
+                }
+            }
+        }
 
-		last = true;
-	}
+        assertEquals(Integer.toString(NUM_ACCOUNTS) + ".00", totalDebits.getValue());
+        assertEquals(Integer.toString(NUM_ACCOUNTS) + ".00", totalCredits.getValue());
 
-	public static void main(String[] args) {
-		if (args.length == 1) {
-			int tries;
-			try {
-				tries = Integer.parseInt(args[0]);
+        last = true;
+    }
 
-				if (tries < 1) {
-					throw new NumberFormatException();
-				}
-				if (tries > 1000) {
-					throw new NumberFormatException("More than 1000 internal iterations is probably a bad idea.");
-				}
+    public static void main(String[] args) {
+        if (args.length == 1) {
+            int tries;
+            try {
+                tries = Integer.parseInt(args[0]);
 
-				NUM_ACCOUNTS = tries;
-			} catch (NumberFormatException nfe) {
-				System.err.println(nfe.getMessage());
-				usage();
-				System.exit(1);
-			}
-		} else if (args.length > 1) {
-			usage();
-			System.exit(1);
-		}
-		// otherwise, leave default alone.
-		TestRunner.run(Db4oActivationTest.class);
-	}
+                if (tries < 1) {
+                    throw new NumberFormatException();
+                }
+                if (tries > 1000) {
+                    throw new NumberFormatException(
+                            "More than 1000 internal iterations is probably a bad idea.");
+                }
 
-	public static void usage() {
-		final String[] msg = {
-			"ERROR.",
-			"Usage: java " + Db4oActivationTest.class.getClass() + " [size]",
-			"",
-			"The single optional argument must be a positive number which will determine",
-			"the number of accounts, transactions and other internal iterations.",
-			"Make it large (100-200) if doing tuning in order to average out startup costs.",
-			"",
-			"The current default is " + DEFAULT + ".",
+                NUM_ACCOUNTS = tries;
+            } catch (NumberFormatException nfe) {
+                System.err.println(nfe.getMessage());
+                usage();
+                System.exit(1);
+            }
+        } else if (args.length > 1) {
+            usage();
+            System.exit(1);
+        }
+        // otherwise, leave default alone.
+        TestRunner.run(Db4oActivationTest.class);
+    }
 
-		};
-		for (int i = 0; i < msg.length; i++) {
-			System.err.println(msg[i]);
-		}
-	}
+    public static void usage() {
+        final String[] msg = {
+                "ERROR.",
+                "Usage: java " + Db4oActivationTest.class.getClass() + " [size]",
+                "",
+                "The single optional argument must be a positive number which will determine",
+                "the number of accounts, transactions and other internal iterations.",
+                "Make it large (100-200) if doing tuning in order to average out startup costs.",
+                "",
+                "The current default is " + DEFAULT + ".",
+
+        };
+        for (int i = 0; i < msg.length; i++) {
+            System.err.println(msg[i]);
+        }
+    }
 }

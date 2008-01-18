@@ -21,54 +21,54 @@ import demo.client.DemoBooksSetup;
 public class DemoWindowRunner
 {
 
-	public static void main(String[] args) {
-		Debug.setProgname("windowrunner");
-		Debug.register("main");
-		Debug.register("debug"); // temporary debugs only!
-		Debug.register("command");
-		Debug.register("events");
-		Debug.register("listeners");
-		Debug.register("threads");
-		Debug.register("memory");
+    public static void main(String[] args) {
+        Debug.setProgname("windowrunner");
+        Debug.register("main");
+        Debug.register("debug"); // temporary debugs only!
+        Debug.register("command");
+        Debug.register("events");
+        Debug.register("listeners");
+        Debug.register("threads");
+        Debug.register("memory");
 
-		args = Debug.init(args);
-		Debug.print("main", "Starting DemoWindowRunner");
+        args = Debug.init(args);
+        Debug.print("main", "Starting DemoWindowRunner");
 
-		Debug.print("main", "Loading demo books");
+        Debug.print("main", "Loading demo books");
 
-		try {
-			Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE, Books.class);
-		} catch (FileNotFoundException fnfe) {
-			System.err.println("You need to run DemoBooksSetup to create the demo dataset.");
-			System.exit(1);
-		} catch (IllegalStateException ise) {
-			System.err.println("The database is locked by another program (doh)");
-			System.exit(2);
-		}
-		Debug.print("main", "Initializing Gtk");
-		Gtk.init(args);
+        try {
+            Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE, Books.class);
+        } catch (FileNotFoundException fnfe) {
+            System.err.println("You need to run DemoBooksSetup to create the demo dataset.");
+            System.exit(1);
+        } catch (IllegalStateException ise) {
+            System.err.println("The database is locked by another program (doh)");
+            System.exit(2);
+        }
+        Debug.print("main", "Initializing Gtk");
+        Gtk.init(args);
 
-		Master.ui = new ObjectiveUserInterface();
+        Master.ui = new ObjectiveUserInterface();
 
-		// Debug.print("main", "initializing AccountTypeSelectorDialog");
-		// AccountTypeSelectorDialog selector = new
-		// AccountTypeSelectorDialog();
+        // Debug.print("main", "initializing AccountTypeSelectorDialog");
+        // AccountTypeSelectorDialog selector = new
+        // AccountTypeSelectorDialog();
 
-		Debug.print("main", "Initializing TransactionListViewHolder");
-		TransactionListViewHolder view = new TransactionListViewHolder();
+        Debug.print("main", "Initializing TransactionListViewHolder");
+        TransactionListViewHolder view = new TransactionListViewHolder();
 
-		// Debug.print("main", "Initializing SingleWidgetHolder");
-		// SingleWidgetHolder swh = new SingleWidgetHolder();
+        // Debug.print("main", "Initializing SingleWidgetHolder");
+        // SingleWidgetHolder swh = new SingleWidgetHolder();
 
-		// Debug.print("main", "Initializing AustralianPayrollEditorWindow");
-		// AustralianPayrollEditorWindow payroll = new
-		// AustralianPayrollEditorWindow();
-		// payroll.present();
+        // Debug.print("main", "Initializing AustralianPayrollEditorWindow");
+        // AustralianPayrollEditorWindow payroll = new
+        // AustralianPayrollEditorWindow();
+        // payroll.present();
 
-		Debug.print("main", "Starting Gtk main loop");
-		Gtk.main();
-		Debug.print("main", "Returned from Gtk main loop");
-		Engine.shutdown();
-		Debug.print("main", "Engine shutdown.");
-	}
+        Debug.print("main", "Starting Gtk main loop");
+        Gtk.main();
+        Debug.print("main", "Returned from Gtk main loop");
+        Engine.shutdown();
+        Debug.print("main", "Engine shutdown.");
+    }
 }

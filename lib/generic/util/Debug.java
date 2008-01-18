@@ -12,14 +12,15 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * Debug control (as used by the xseq program). Debugging output is synchronous
- * on purpose. It is frighteningly difficult to debug mutlithreaded
- * applications, and even tougher to diagnose problems in antonomous event
- * driven GUI programs. The price paid, however, is that actually writing the
- * output will block the program, and worse, if the output is going to a
- * terminal which is slow to scroll (ie gnome-terminal), then having excessive
- * logging (ie that which results in deubg statements being printed from any
- * tight loop) will destructively slow your program down.
+ * Debug control (as used by the xseq program). Debugging output is
+ * synchronous on purpose. It is frighteningly difficult to debug
+ * mutlithreaded applications, and even tougher to diagnose problems in
+ * antonomous event driven GUI programs. The price paid, however, is that
+ * actually writing the output will block the program, and worse, if the
+ * output is going to a terminal which is slow to scroll (ie gnome-terminal),
+ * then having excessive logging (ie that which results in deubg statements
+ * being printed from any tight loop) will destructively slow your program
+ * down.
  * 
  * <P>
  * So having gone on about the downside, here's the upside. You can activate
@@ -27,218 +28,224 @@ import java.util.TreeSet;
  * different tags ("groups") by which your logging can be selected.
  * 
  * <P>
- * You must initialize the debugging subsystem by calling Debug.init() early on
- * in your program. Then, for any group name you wish to have entries under, you
- * must Debug.register() which does some internal parsing. Debug.setProgname()
- * is a good idea.
+ * You must initialize the debugging subsystem by calling Debug.init() early
+ * on in your program. Then, for any group name you wish to have entries
+ * under, you must Debug.register() which does some internal parsing.
+ * Debug.setProgname() is a good idea.
  * 
  * @author Andrew Cowie
  */
 public class Debug
 {
-	private static final String	DEBUG_SWITCH		= "--debug=";
+    private static final String DEBUG_SWITCH = "--debug=";
 
-	private static TreeSet		activeGroups		= null;
-	private static TreeMap		groupText			= null;
-	private static TreeMap		groupSpaces			= null;
-	private static String		progname			= "<progname not set>";
+    private static TreeSet activeGroups = null;
 
-	/**
-	 * The max width of the debug group output to screen. Groups names which are
-	 * shorter will be blank padded so that the actual debug output is column
-	 * aligned.
-	 */
-	public static final int		MAX_GROUP_LENGTH	= 10;
-	private static boolean		debugOn				= false;
-	private static boolean		allActive			= false;
+    private static TreeMap groupText = null;
 
-	static {
-		activeGroups = new TreeSet();
-		groupText = new TreeMap();
-		groupSpaces = new TreeMap();
+    private static TreeMap groupSpaces = null;
 
-		String env = System.getProperty("debug");
+    private static String progname = "<progname not set>";
 
-		init(env);
-	}
+    /**
+     * The max width of the debug group output to screen. Groups names which
+     * are shorter will be blank padded so that the actual debug output is
+     * column aligned.
+     */
+    public static final int MAX_GROUP_LENGTH = 10;
 
-	/**
-	 * Parse the command line for a debug argument and initialize Debug
-	 * subsystem if found. This calls {@link #init(String)} to actually parse
-	 * the value of the debug argument if one is found on the command line.
-	 * 
-	 * <P>
-	 * Obviously there is a little duplication here, because without a doubt the
-	 * calling program is going to have to parse the args, but that's life.
-	 * 
-	 * @param args
-	 *            The command line args [ie from main()]
-	 * @return A new String[] containing the command line without the debug arg
-	 *         that was parsed by this method.
-	 */
-	public static String[] init(String[] args) {
-		ArrayList newargs = new ArrayList(args.length);
+    private static boolean debugOn = false;
 
-		for (int i = 0; i < args.length; i++) {
+    private static boolean allActive = false;
 
-			if (args[i].startsWith(DEBUG_SWITCH)) {
-				Debug.init(args[i].substring(DEBUG_SWITCH.length()));
-			} else {
-				newargs.add(args[i]);
-			}
-		}
+    static {
+        activeGroups = new TreeSet();
+        groupText = new TreeMap();
+        groupSpaces = new TreeMap();
 
-		return (String[]) newargs.toArray(new String[0]);
-	}
+        String env = System.getProperty("debug");
 
-	/**
-	 * Complete the initialization of the Debug system by parsing a string
-	 * containing a list of the which groups of debug outout you want displayed.
-	 * 
-	 * <P>
-	 * Comming up with a widely applicable way of initializing the debug system
-	 * has proved tricky.
-	 * 
-	 * <P>
-	 * This method is called from the static initializer of the Debug class
-	 * [which picks up java property "debug" (which you can specify with a
-	 * -Ddebug= option to a Java VM)]. It is also called by the other
-	 * {@link Debug#init(String[])} constructor if you choose to use that to
-	 * process the command line arguments. You can also call it explicitly on
-	 * your own.
-	 * 
-	 * @param groups
-	 *            A comma separated list of debug groups you wish active, or
-	 *            "all" to activate all debug groups.
-	 */
-	public static void init(String groups) {
-		if (groups == null) {
-			return;
-		}
+        init(env);
+    }
 
-		debugOn = true;
+    /**
+     * Parse the command line for a debug argument and initialize Debug
+     * subsystem if found. This calls {@link #init(String)} to actually parse
+     * the value of the debug argument if one is found on the command line.
+     * 
+     * <P>
+     * Obviously there is a little duplication here, because without a doubt
+     * the calling program is going to have to parse the args, but that's
+     * life.
+     * 
+     * @param args
+     *            The command line args [ie from main()]
+     * @return A new String[] containing the command line without the debug
+     *         arg that was parsed by this method.
+     */
+    public static String[] init(String[] args) {
+        ArrayList newargs = new ArrayList(args.length);
 
-		int index = 0;
-		ArrayList items = new ArrayList();
+        for (int i = 0; i < args.length; i++) {
 
-		while (index < groups.length()) {
-			String chunk;
-			int comma;
+            if (args[i].startsWith(DEBUG_SWITCH)) {
+                Debug.init(args[i].substring(DEBUG_SWITCH.length()));
+            } else {
+                newargs.add(args[i]);
+            }
+        }
 
-			if ((comma = groups.indexOf(",", index)) != -1) {
-				chunk = groups.substring(index, comma);
-				index = comma + 1;
-			} else {
-				chunk = groups.substring(index);
-				index = groups.length();
-			}
-			items.add(chunk);
-		}
+        return (String[]) newargs.toArray(new String[0]);
+    }
 
-		Iterator iter = items.iterator();
-		while (iter.hasNext()) {
-			String item = (String) iter.next();
+    /**
+     * Complete the initialization of the Debug system by parsing a string
+     * containing a list of the which groups of debug outout you want
+     * displayed.
+     * 
+     * <P>
+     * Comming up with a widely applicable way of initializing the debug
+     * system has proved tricky.
+     * 
+     * <P>
+     * This method is called from the static initializer of the Debug class
+     * [which picks up java property "debug" (which you can specify with a
+     * -Ddebug= option to a Java VM)]. It is also called by the other
+     * {@link Debug#init(String[])} constructor if you choose to use that to
+     * process the command line arguments. You can also call it explicitly on
+     * your own.
+     * 
+     * @param groups
+     *            A comma separated list of debug groups you wish active, or
+     *            "all" to activate all debug groups.
+     */
+    public static void init(String groups) {
+        if (groups == null) {
+            return;
+        }
 
-			if (item.equals("all")) {
-				allActive = true;
-				return;
-			} else {
-				activeGroups.add(item);
-			}
-		}
+        debugOn = true;
 
-	}
+        int index = 0;
+        ArrayList items = new ArrayList();
 
-	/**
-	 * Activate debugging on a given group. This is only for inline dubugging
-	 * when coding.
-	 * 
-	 * @param group
-	 *            the debug group to be activated
-	 */
-	public static void activate(String group) {
-		debugOn = true;
-		activeGroups.add(group);
-	}
+        while (index < groups.length()) {
+            String chunk;
+            int comma;
 
-	/**
-	 * Print a debug message to console.
-	 * 
-	 * @param group
-	 *            A string specifying the group this message belongs to. Make
-	 *            sure you {@link #register(String)} the group first. Don't
-	 *            forget that if you want to see the message you must either
-	 *            have activated the group at run time with a command line
-	 *            argument like {@link #init(String) --debug=main,listeners} or
-	 *            turned the group on programmatically with
-	 *            {@link #activate(String)}!
-	 * @param msg
-	 *            The message to be output
-	 */
-	public static void print(String group, String msg) {
-		if (debugOn == true) {
-			if (allActive == true || activeGroups.contains(group)) {
-				// if it's not actually registered, then there will be
-				// no formatting information for it.
-				if (groupText.get(group) == null) {
-					System.out.println(progname
-						+ ": PROGRAMMER ERROR: Debug.print was called with unregistered group \""
-						+ group + "\", message \"" + msg + "\"");
-				} else {
-					System.out.println(progname + ": [" + groupText.get(group) + "] "
-						+ groupSpaces.get(group) + msg);
-				}
-			}
-		}
-	}
+            if ((comma = groups.indexOf(",", index)) != -1) {
+                chunk = groups.substring(index, comma);
+                index = comma + 1;
+            } else {
+                chunk = groups.substring(index);
+                index = groups.length();
+            }
+            items.add(chunk);
+        }
 
-	/**
-	 * Tell the Debug subsystem that you want to use a given referent. This call
-	 * is here largely so that the label can be preprocessed and formatted so
-	 * that debug output has a fixed prefix length.
-	 * 
-	 * @param group
-	 *            the name of the group of debug messages to be activated
-	 */
-	public static void register(String group) {
-		int len = MAX_GROUP_LENGTH - group.length();
-		String truncatedGroupName = group.substring(0, (MAX_GROUP_LENGTH > group.length()
-			? group.length()
-			: MAX_GROUP_LENGTH));
+        Iterator iter = items.iterator();
+        while (iter.hasNext()) {
+            String item = (String) iter.next();
 
-		StringBuffer buf = new StringBuffer("");
-		for (int i = 0; i < len; i++) {
-			buf.append(" ");
-		}
+            if (item.equals("all")) {
+                allActive = true;
+                return;
+            } else {
+                activeGroups.add(item);
+            }
+        }
 
-		groupText.put(group, truncatedGroupName);
-		groupSpaces.put(group, buf.toString());
-	}
+    }
 
-	/**
-	 * Set the program name. This will be used as a prefix to the text of every
-	 * printed debug message.
-	 */
-	public static void setProgname(String progname) {
-		Debug.progname = progname;
-	}
+    /**
+     * Activate debugging on a given group. This is only for inline dubugging
+     * when coding.
+     * 
+     * @param group
+     *            the debug group to be activated
+     */
+    public static void activate(String group) {
+        debugOn = true;
+        activeGroups.add(group);
+    }
 
-	// new Thread() {
-	// public void run() {
-	// while (true) {
-	// Runtime r = Runtime.getRuntime();
-	//
-	// long total = r.totalMemory();
-	// long free = r.freeMemory();
-	//
-	// Debug.print("memory", Text.padComma(total) + " alloc, "
-	// + Text.padComma(total - free) + " used.");
-	//
-	// try {
-	// Thread.sleep(2000);
-	// } catch (InterruptedException ie) {
-	// }
-	// }
-	// }
-	// }.start();
+    /**
+     * Print a debug message to console.
+     * 
+     * @param group
+     *            A string specifying the group this message belongs to. Make
+     *            sure you {@link #register(String)} the group first. Don't
+     *            forget that if you want to see the message you must either
+     *            have activated the group at run time with a command line
+     *            argument like {@link #init(String) --debug=main,listeners}
+     *            or turned the group on programmatically with
+     *            {@link #activate(String)}!
+     * @param msg
+     *            The message to be output
+     */
+    public static void print(String group, String msg) {
+        if (debugOn == true) {
+            if (allActive == true || activeGroups.contains(group)) {
+                // if it's not actually registered, then there will be
+                // no formatting information for it.
+                if (groupText.get(group) == null) {
+                    System.out.println(progname
+                            + ": PROGRAMMER ERROR: Debug.print was called with unregistered group \""
+                            + group + "\", message \"" + msg + "\"");
+                } else {
+                    System.out.println(progname + ": [" + groupText.get(group) + "] "
+                            + groupSpaces.get(group) + msg);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tell the Debug subsystem that you want to use a given referent. This
+     * call is here largely so that the label can be preprocessed and
+     * formatted so that debug output has a fixed prefix length.
+     * 
+     * @param group
+     *            the name of the group of debug messages to be activated
+     */
+    public static void register(String group) {
+        int len = MAX_GROUP_LENGTH - group.length();
+        String truncatedGroupName = group.substring(0,
+                (MAX_GROUP_LENGTH > group.length() ? group.length() : MAX_GROUP_LENGTH));
+
+        StringBuffer buf = new StringBuffer("");
+        for (int i = 0; i < len; i++) {
+            buf.append(" ");
+        }
+
+        groupText.put(group, truncatedGroupName);
+        groupSpaces.put(group, buf.toString());
+    }
+
+    /**
+     * Set the program name. This will be used as a prefix to the text of
+     * every printed debug message.
+     */
+    public static void setProgname(String progname) {
+        Debug.progname = progname;
+    }
+
+    // new Thread() {
+    // public void run() {
+    // while (true) {
+    // Runtime r = Runtime.getRuntime();
+    //
+    // long total = r.totalMemory();
+    // long free = r.freeMemory();
+    //
+    // Debug.print("memory", Text.padComma(total) + " alloc, "
+    // + Text.padComma(total - free) + " used.");
+    //
+    // try {
+    // Thread.sleep(2000);
+    // } catch (InterruptedException ie) {
+    // }
+    // }
+    // }
+    // }.start();
 }

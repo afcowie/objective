@@ -24,43 +24,43 @@ import demo.client.DemoBooksSetup;
  */
 public class DemoOutputDump
 {
-	public static void main(String[] args) {
-		TextOutput outputter = null;
+    public static void main(String[] args) {
+        TextOutput outputter = null;
 
-		try {
-			Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE, Books.class);
-		} catch (FileNotFoundException fnfe) {
-			System.err.println("\nDemo database not found! Did you run DemoBooksSetup?\n");
-			System.exit(1);
-		}
+        try {
+            Engine.openDatafile(DemoBooksSetup.DEMO_DATABASE, Books.class);
+        } catch (FileNotFoundException fnfe) {
+            System.err.println("\nDemo database not found! Did you run DemoBooksSetup?\n");
+            System.exit(1);
+        }
 
-		DataClient ro = Engine.primaryClient();
-		try {
-			Books root = (Books) ro.getRoot();
+        DataClient ro = Engine.primaryClient();
+        try {
+            Books root = (Books) ro.getRoot();
 
-			System.out.println();
+            System.out.println();
 
-			/*
-			 * First output all the Accounts
-			 */
+            /*
+             * First output all the Accounts
+             */
 
-			outputter = new AccountTextOutput(ro);
-			outputter.toOutput(System.out);
+            outputter = new AccountTextOutput(ro);
+            outputter.toOutput(System.out);
 
-			/*
-			 * And now output all the Transactions
-			 */
-			System.out.println();
+            /*
+             * And now output all the Transactions
+             */
+            System.out.println();
 
-			outputter = new TransactionTextOutput(ro);
-			outputter.toOutput(System.out);
+            outputter = new TransactionTextOutput(ro);
+            outputter.toOutput(System.out);
 
-			System.out.flush();
+            System.out.flush();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		Engine.shutdown();
-	}
+        Engine.shutdown();
+    }
 }

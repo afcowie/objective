@@ -13,76 +13,76 @@ import accounts.persistence.BlankDatafileTestCase;
 
 public class BasicFinderTest extends BlankDatafileTestCase
 {
-	static {
-		DATAFILE = "tmp/unittests/BasicFinderTest.yap";
-	}
+    static {
+        DATAFILE = "tmp/unittests/BasicFinderTest.yap";
+    }
 
-	public final void testSpecificLedgerFinderFullyQualified() throws CommandNotReadyException {
-		Command cmd;
-		/*
-		 * Setup an account
-		 */
-		Currency cur = new Currency("BLN", "Blue Nationals", ":-)");
-		cmd = new InitBooksCommand(cur);
-		cmd.execute(rw);
+    public final void testSpecificLedgerFinderFullyQualified() throws CommandNotReadyException {
+        Command cmd;
+        /*
+         * Setup an account
+         */
+        Currency cur = new Currency("BLN", "Blue Nationals", ":-)");
+        cmd = new InitBooksCommand(cur);
+        cmd.execute(rw);
 
-		Account a = new SalesTaxPayableAccount("GST");
-		cmd = new AddAccountCommand(a);
-		cmd.execute(rw);
+        Account a = new SalesTaxPayableAccount("GST");
+        cmd = new AddAccountCommand(a);
+        cmd.execute(rw);
 
-		rw.commit();
+        rw.commit();
 
-		/*
-		 * Now find it!
-		 */
+        /*
+         * Now find it!
+         */
 
-		SpecificLedgerFinder f = new SpecificLedgerFinder();
-		f.setAccountTitle("GST");
-		f.setLedgerName("Paid");
+        SpecificLedgerFinder f = new SpecificLedgerFinder();
+        f.setAccountTitle("GST");
+        f.setLedgerName("Paid");
 
-		try {
-			f.query(rw);
-			f.getLedger();
-		} catch (NotFoundException nfe) {
-			fail(nfe.getMessage());
-		}
-	}
+        try {
+            f.query(rw);
+            f.getLedger();
+        } catch (NotFoundException nfe) {
+            fail(nfe.getMessage());
+        }
+    }
 
-	public final void testSpecificLedgerFinderNullArguments() throws CommandNotReadyException {
-		SpecificLedgerFinder f = new SpecificLedgerFinder();
-		f.setAccountTitle("GST");
-		f.setLedgerName("");
+    public final void testSpecificLedgerFinderNullArguments() throws CommandNotReadyException {
+        SpecificLedgerFinder f = new SpecificLedgerFinder();
+        f.setAccountTitle("GST");
+        f.setLedgerName("");
 
-		try {
-			f.query(rw);
-			f.getLedger();
-			fail("Two ledgers should have been returned (assuming that's what SalesTaxPayableAccount still does) so this should have thrown UnsupportedOperationException");
-		} catch (NotFoundException nfe) {
-			fail(nfe.getMessage());
-		} catch (UnsupportedOperationException uoe) {
-			// good
-		}
+        try {
+            f.query(rw);
+            f.getLedger();
+            fail("Two ledgers should have been returned (assuming that's what SalesTaxPayableAccount still does) so this should have thrown UnsupportedOperationException");
+        } catch (NotFoundException nfe) {
+            fail(nfe.getMessage());
+        } catch (UnsupportedOperationException uoe) {
+            // good
+        }
 
-		f.setLedgerName("Pa");
-		try {
-			f.query(rw);
-			f.getLedger();
-		} catch (NotFoundException nfe) {
-			fail(nfe.getMessage());
-		} catch (UnsupportedOperationException uoe) {
-			fail("Shouldn't have thrown UnsupportedOperationException with enough information to qualify it to GST|Paid");
-		}
+        f.setLedgerName("Pa");
+        try {
+            f.query(rw);
+            f.getLedger();
+        } catch (NotFoundException nfe) {
+            fail(nfe.getMessage());
+        } catch (UnsupportedOperationException uoe) {
+            fail("Shouldn't have thrown UnsupportedOperationException with enough information to qualify it to GST|Paid");
+        }
 
-		f.setAccountTitle("");
-		f.setLedgerName("Coll");
+        f.setAccountTitle("");
+        f.setLedgerName("Coll");
 
-		try {
-			f.query(rw);
-			f.getLedger();
-		} catch (NotFoundException nfe) {
-			fail(nfe.getMessage());
-		}
+        try {
+            f.query(rw);
+            f.getLedger();
+        } catch (NotFoundException nfe) {
+            fail(nfe.getMessage());
+        }
 
-		last = true;
-	}
+        last = true;
+    }
 }

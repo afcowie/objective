@@ -27,18 +27,19 @@ public class CalendarToDatestampTest extends TestCase
         final Calendar calendar;
         final Datestamp date;
         final long seconds;
-        
+
         Gtk.init(null);
         calendar = new Calendar();
-        
+
         calendar.selectMonth(12, 2007);
         calendar.selectDay(25);
-        
-        seconds = makeTime(calendar.getDateYear(), calendar.getDateMonth(), calendar.getDateDay(), 0, 0, 0);
-        
+
+        seconds = makeTime(calendar.getDateYear(), calendar.getDateMonth(), calendar.getDateDay(), 0, 0,
+                0);
+
         date = new Datestamp();
         date.setDate(seconds * 1000);
-        
+
         assertEquals("25 Dec 07", date.toString());
     }
 }

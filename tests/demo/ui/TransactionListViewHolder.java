@@ -18,27 +18,27 @@ import accounts.ui.TransactionListView;
 
 public class TransactionListViewHolder extends PrimaryWindow
 {
-	public TransactionListViewHolder() {
-		super();
-		super.setTitle("Example display of TransactionListView widget");
+    public TransactionListViewHolder() {
+        super();
+        super.setTitle("Example display of TransactionListView widget");
 
-		DataClient ro = Engine.primaryClient();
+        DataClient ro = Engine.primaryClient();
 
-		List rL = ro.queryByExample(Transaction.class);
+        List rL = ro.queryByExample(Transaction.class);
 
-		TransactionListView view = new TransactionListView(ro, rL);
+        TransactionListView view = new TransactionListView(ro, rL);
 
-		top.add(view);
+        top.add(view);
 
-		super.present();
-	}
+        super.present();
+    }
 
-	public boolean deleteHook() {
-		// hide & destroy
-		super.deleteHook();
-		// quit
-		System.out.println("Notice: deleteHook() overriden to call Master.shutdown()");
-		Master.shutdown();
-		return false;
-	}
+    public boolean deleteHook() {
+        // hide & destroy
+        super.deleteHook();
+        // quit
+        System.out.println("Notice: deleteHook() overriden to call Master.shutdown()");
+        Master.shutdown();
+        return false;
+    }
 }

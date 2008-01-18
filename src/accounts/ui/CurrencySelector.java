@@ -109,7 +109,7 @@ public class CurrencySelector extends ComboBox
             throw new IllegalArgumentException(
                     "How did you manage to ask to activate a Currency object that isn't in the system?");
         }
-        
+
         do {
             if (listStore.getValue(pointer, currencyObject_DataColumn) == cur) {
                 this.setActiveIter(pointer);

@@ -27,8 +27,8 @@ import accounts.domain.Books;
  *   ...
  * </code>
  * 
- * Then reference <code>rw</code> in your unit tests as an already opened read
- * write DataClient.
+ * Then reference <code>rw</code> in your unit tests as an already opened
+ * read write DataClient.
  * <p>
  * You must set <code>last</code> to true in the your last text fixture so
  * that {@link #tearDown()} knows to call {@link Engine#shutdown()}.
@@ -37,64 +37,66 @@ import accounts.domain.Books;
  */
 public class BlankDatafileTestCase extends TestCase
 {
-	protected static String	DATAFILE	= null;
+    protected static String DATAFILE = null;
 
-	private static Class	initialized	= null;
-	protected DataClient	rw			= null;
-	protected boolean		last;
+    private static Class initialized = null;
 
-	public void setUp() {
-		if (initialized != this.getClass()) {
-			if (DATAFILE == null) {
-				throw new Error(
-					"You must define DATAFILE in a static {...} block in a BlankDatafileTestCase sublcass");
-			}
-			/*
-			 * In case it got missed:
-			 */
-			try {
-				Engine.shutdown();
-				System.err.println("\nlast was not set to true in " + initialized.getName()
-					+ " and so Engine was still running.\n");
-			} catch (IllegalStateException e) {
-				// good
-			}
+    protected DataClient rw = null;
 
-			/*
-			 * And open a new database:
-			 */
-			new File(DATAFILE).delete();
-			Engine.newDatafile(DATAFILE, Books.class);
+    protected boolean last;
 
-			initialized = this.getClass();
-			last = false;
-		}
+    public void setUp() {
+        if (initialized != this.getClass()) {
+            if (DATAFILE == null) {
+                throw new Error(
+                        "You must define DATAFILE in a static {...} block in a BlankDatafileTestCase sublcass");
+            }
+            /*
+             * In case it got missed:
+             */
+            try {
+                Engine.shutdown();
+                System.err.println("\nlast was not set to true in " + initialized.getName()
+                        + " and so Engine was still running.\n");
+            } catch (IllegalStateException e) {
+                // good
+            }
 
-		try {
-			rw = Engine.gainClient();
-		} catch (IllegalStateException ise) {
-			throw new IllegalStateException(
-				"You forgot to move the `last = true` setting to the final test fixture in "
-					+ this.getClass().getName());
-		}
-	}
+            /*
+             * And open a new database:
+             */
+            new File(DATAFILE).delete();
+            Engine.newDatafile(DATAFILE, Books.class);
 
-	public void tearDown() {
-		Engine.releaseClient(rw);
+            initialized = this.getClass();
+            last = false;
+        }
 
-		/*
-		 * Since db4o is multithreaded, give, it a chance to catch up. This
-		 * shouldn't ever be an issue but unit tests are pretty fast and CPU
-		 * intensive, so deliberately take a brief pause.
-		 */
-		try {
-			Thread.sleep(20);
-		} catch (InterruptedException e) {
-			// ignore
-		}
+        try {
+            rw = Engine.gainClient();
+        } catch (IllegalStateException ise) {
+            throw new IllegalStateException(
+                    "You forgot to move the `last = true` setting to the final test fixture in "
+                            + this.getClass().getName());
+        }
+    }
 
-		if (last) {
-			Engine.shutdown();
-		}
-	}
+    public void tearDown() {
+        Engine.releaseClient(rw);
+
+        /*
+         * Since db4o is multithreaded, give, it a chance to catch up. This
+         * shouldn't ever be an issue but unit tests are pretty fast and CPU
+         * intensive, so deliberately take a brief pause.
+         */
+        try {
+            Thread.sleep(20);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+
+        if (last) {
+            Engine.shutdown();
+        }
+    }
 }

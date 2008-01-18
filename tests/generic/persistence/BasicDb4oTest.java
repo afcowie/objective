@@ -22,58 +22,59 @@ import junit.framework.TestCase;
  */
 public class BasicDb4oTest extends TestCase
 {
-	private static String	TMPDBFILE	= "tmp/unittests/BasicDb4oTest.yap";
-	File					_target		= null;
+    private static String TMPDBFILE = "tmp/unittests/BasicDb4oTest.yap";
 
-	public final void testDatabaseCreation() {
-		_target = new File(TMPDBFILE);
-		if (_target.exists()) {
-			_target.delete();
-		}
-		Configuration config = Db4o.configure();
-		config.messageLevel(0);
+    File _target = null;
 
-		ObjectContainer container = Db4o.openFile(TMPDBFILE);
+    public final void testDatabaseCreation() {
+        _target = new File(TMPDBFILE);
+        if (_target.exists()) {
+            _target.delete();
+        }
+        Configuration config = Db4o.configure();
+        config.messageLevel(0);
 
-		for (int i = 0; i < 10; i++) {
-			container.set(new DummyInts(i));
-		}
-		container.close();
+        ObjectContainer container = Db4o.openFile(TMPDBFILE);
 
-		File probe = new File(TMPDBFILE);
-		assertTrue(probe.exists());
+        for (int i = 0; i < 10; i++) {
+            container.set(new DummyInts(i));
+        }
+        container.close();
 
-		assertTrue(container.ext().isClosed());
-	}
+        File probe = new File(TMPDBFILE);
+        assertTrue(probe.exists());
 
-	public final void testFetchObject() {
-		ObjectContainer container = Db4o.openFile(TMPDBFILE);
-		assertFalse(container.ext().isClosed());
+        assertTrue(container.ext().isClosed());
+    }
 
-		ObjectSet result = container.get(new DummyInts(7));
-		assertNotNull(result);
-		assertEquals(1, result.size());
+    public final void testFetchObject() {
+        ObjectContainer container = Db4o.openFile(TMPDBFILE);
+        assertFalse(container.ext().isClosed());
 
-		DummyInts seven = (DummyInts) result.next();
-		assertEquals("7", seven.toString());
+        ObjectSet result = container.get(new DummyInts(7));
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-		container.close();
-	}
+        DummyInts seven = (DummyInts) result.next();
+        assertEquals("7", seven.toString());
 
-	public final void testFetchAllObjects() {
-		ObjectContainer container = Db4o.openFile(TMPDBFILE);
+        container.close();
+    }
 
-		ObjectSet result = container.get(null);
+    public final void testFetchAllObjects() {
+        ObjectContainer container = Db4o.openFile(TMPDBFILE);
 
-		int i = 0;
-		while (result.hasNext()) {
-			DummyInts obj = (DummyInts) result.next();
-			assertNotNull(obj);
-			i++;
-			// System.out.println(obj.toString());
-		}
-		assertEquals(10, i);
+        ObjectSet result = container.get(null);
 
-		container.close();
-	}
+        int i = 0;
+        while (result.hasNext()) {
+            DummyInts obj = (DummyInts) result.next();
+            assertNotNull(obj);
+            i++;
+            // System.out.println(obj.toString());
+        }
+        assertEquals(10, i);
+
+        container.close();
+    }
 }

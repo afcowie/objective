@@ -13,21 +13,21 @@ package generic.persistence;
  */
 public class DummyInts
 {
-	int	num;
+    int num;
 
-	public DummyInts(int i) {
-		this.num = i;
-	}
+    public DummyInts(int i) {
+        this.num = i;
+    }
 
-	public int getNum() {
-		return num;
-	}
+    public int getNum() {
+        return num;
+    }
 
-	public void setNum(int num) {
-		this.num = num;
-	}
+    public void setNum(int num) {
+        this.num = num;
+    }
 
-	public String toString() {
-		return Integer.toString(num);
-	}
+    public String toString() {
+        return Integer.toString(num);
+    }
 }

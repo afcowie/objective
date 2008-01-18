@@ -39,46 +39,46 @@ import country.au.services.AustralianPayrollTaxTest;
  */
 public class UnitTests
 {
-	public static void main(String[] args) {
-		VerboseTestRunner.run(suite());
-	}
+    public static void main(String[] args) {
+        VerboseTestRunner.run(suite());
+    }
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("All Unit Tests for ObjectiveAccounts");
+    public static Test suite() {
+        TestSuite suite = new TestSuite("All Unit Tests for ObjectiveAccounts");
 
-		// persistence
-		suite.addTestSuite(BasicDb4oTest.class);
-		suite.addTestSuite(RollbackDb4oTest.class);
-		suite.addTestSuite(EngineTest.class);
-		suite.addTestSuite(ExposeDb4oInterfaceTest.class);
+        // persistence
+        suite.addTestSuite(BasicDb4oTest.class);
+        suite.addTestSuite(RollbackDb4oTest.class);
+        suite.addTestSuite(EngineTest.class);
+        suite.addTestSuite(ExposeDb4oInterfaceTest.class);
 
-		// domain
-		suite.addTestSuite(DomainObjectTest.class);
-		suite.addTestSuite(BasicAccountTest.class);
-		suite.addTestSuite(BasicLedgerTest.class);
-		suite.addTestSuite(BasicTransactionTest.class);
-		suite.addTestSuite(GenericTransactionTest.class);
-		suite.addTestSuite(DatestampTest.class);
-		suite.addTestSuite(BasicLoanTest.class);
-		suite.addTestSuite(ForeignCurrencyTest.class);
-		suite.addTestSuite(IdentifierTest.class);
+        // domain
+        suite.addTestSuite(DomainObjectTest.class);
+        suite.addTestSuite(BasicAccountTest.class);
+        suite.addTestSuite(BasicLedgerTest.class);
+        suite.addTestSuite(BasicTransactionTest.class);
+        suite.addTestSuite(GenericTransactionTest.class);
+        suite.addTestSuite(DatestampTest.class);
+        suite.addTestSuite(BasicLoanTest.class);
+        suite.addTestSuite(ForeignCurrencyTest.class);
+        suite.addTestSuite(IdentifierTest.class);
 
-		// services
-		suite.addTestSuite(BasicCommandTest.class);
-		suite.addTestSuite(BooksSetByCommandsTest.class);
-		suite.addTestSuite(TransactionCommandsTest.class);
-		suite.addTestSuite(ComparatorsDetailedTest.class);
-		suite.addTestSuite(ComparatorsInTreeSetTest.class);
-		suite.addTestSuite(BasicFinderTest.class);
-		suite.addTestSuite(EntityCommandTest.class);
-		suite.addTestSuite(IdentifierCommandsTest.class);
-		suite.addTestSuite(RangeCalculatorTest.class);
-		suite.addTestSuite(AustralianPayrollTaxTest.class);
-		suite.addTestSuite(WorkerCommandsTest.class);
+        // services
+        suite.addTestSuite(BasicCommandTest.class);
+        suite.addTestSuite(BooksSetByCommandsTest.class);
+        suite.addTestSuite(TransactionCommandsTest.class);
+        suite.addTestSuite(ComparatorsDetailedTest.class);
+        suite.addTestSuite(ComparatorsInTreeSetTest.class);
+        suite.addTestSuite(BasicFinderTest.class);
+        suite.addTestSuite(EntityCommandTest.class);
+        suite.addTestSuite(IdentifierCommandsTest.class);
+        suite.addTestSuite(RangeCalculatorTest.class);
+        suite.addTestSuite(AustralianPayrollTaxTest.class);
+        suite.addTestSuite(WorkerCommandsTest.class);
 
-		// client
-		suite.addTestSuite(Db4oActivationTest.class);
+        // client
+        suite.addTestSuite(Db4oActivationTest.class);
 
-		return suite;
-	}
+        return suite;
+    }
 }

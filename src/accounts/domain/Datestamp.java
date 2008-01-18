@@ -179,7 +179,7 @@ public class Datestamp implements Comparable, Leaf
                 cal.setTime(new Date());
             } else {
                 cal.setTime(new Date(timestamp)); // use this Datestamp's
-                                                    // year
+                // year
             }
 
             String assumedYear = Integer.toString(cal.get(java.util.Calendar.YEAR));

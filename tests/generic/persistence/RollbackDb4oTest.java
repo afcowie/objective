@@ -6,7 +6,6 @@
  */
 package generic.persistence;
 
-
 import java.io.File;
 
 import com.db4o.Db4o;
@@ -23,83 +22,84 @@ import junit.framework.TestCase;
  */
 public class RollbackDb4oTest extends TestCase
 {
-	private static String	TMPDBFILE	= "tmp/unittests/RollbackDb4oTest.yap";
-	File					_target		= null;
+    private static String TMPDBFILE = "tmp/unittests/RollbackDb4oTest.yap";
 
-	/*
-	 * ripped from BasicDb4oTest
-	 */
-	public final void testDatabaseCreation() {
-		_target = new File(TMPDBFILE);
-		if (_target.exists()) {
-			_target.delete();
-		}
-		Configuration config = Db4o.configure();
-		config.messageLevel(0);
+    File _target = null;
 
-		ObjectContainer container = Db4o.openFile(TMPDBFILE);
+    /*
+     * ripped from BasicDb4oTest
+     */
+    public final void testDatabaseCreation() {
+        _target = new File(TMPDBFILE);
+        if (_target.exists()) {
+            _target.delete();
+        }
+        Configuration config = Db4o.configure();
+        config.messageLevel(0);
 
-		for (int i = 0; i < 10; i++) {
-			container.set(new DummyInts(i));
-		}
-		container.close();
+        ObjectContainer container = Db4o.openFile(TMPDBFILE);
 
-		File probe = new File(TMPDBFILE);
-		assertTrue(probe.exists());
-	}
+        for (int i = 0; i < 10; i++) {
+            container.set(new DummyInts(i));
+        }
+        container.close();
 
-	public final void testDeactivateReactivate() {
-		ObjectContainer container = Db4o.openFile(TMPDBFILE);
-		assertFalse(container.ext().isClosed());
+        File probe = new File(TMPDBFILE);
+        assertTrue(probe.exists());
+    }
 
-		ObjectSet result = container.get(new DummyInts(7));
-		assertNotNull(result);
-		assertEquals(1, result.size());
+    public final void testDeactivateReactivate() {
+        ObjectContainer container = Db4o.openFile(TMPDBFILE);
+        assertFalse(container.ext().isClosed());
 
-		DummyInts seven = (DummyInts) result.next();
-		assertEquals("7", seven.toString());
+        ObjectSet result = container.get(new DummyInts(7));
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-		synchronized (seven) {
-			container.deactivate(seven, 2);
-			assertEquals("0", seven.toString());
+        DummyInts seven = (DummyInts) result.next();
+        assertEquals("7", seven.toString());
 
-			container.activate(seven, 2);
-			assertEquals("7", seven.toString());
-		}
-		assertEquals("7", seven.toString());
-		container.close();
-	}
+        synchronized (seven) {
+            container.deactivate(seven, 2);
+            assertEquals("0", seven.toString());
 
-	public final void testRollback() {
-		ObjectContainer container = Db4o.openFile(TMPDBFILE);
-		assertFalse(container.ext().isClosed());
+            container.activate(seven, 2);
+            assertEquals("7", seven.toString());
+        }
+        assertEquals("7", seven.toString());
+        container.close();
+    }
 
-		ObjectSet result = container.get(new DummyInts(7));
-		assertNotNull(result);
-		assertEquals(1, result.size());
+    public final void testRollback() {
+        ObjectContainer container = Db4o.openFile(TMPDBFILE);
+        assertFalse(container.ext().isClosed());
 
-		DummyInts seven = (DummyInts) result.next();
-		assertEquals("7", seven.toString());
+        ObjectSet result = container.get(new DummyInts(7));
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-		seven.setNum(8);
-		assertEquals("8", seven.toString());
+        DummyInts seven = (DummyInts) result.next();
+        assertEquals("7", seven.toString());
 
-		container.set(seven);
-		assertEquals("8", seven.toString());
+        seven.setNum(8);
+        assertEquals("8", seven.toString());
 
-		synchronized (seven) {
-			container.rollback();
-			assertEquals("8", seven.toString());
+        container.set(seven);
+        assertEquals("8", seven.toString());
 
-			container.deactivate(seven, 2);
-			assertEquals("0", seven.toString());
+        synchronized (seven) {
+            container.rollback();
+            assertEquals("8", seven.toString());
 
-			container.activate(seven, 2);
-			assertEquals("7", seven.toString());
-		}
-		assertEquals("7", seven.toString());
-		container.close();
-	}
+            container.deactivate(seven, 2);
+            assertEquals("0", seven.toString());
+
+            container.activate(seven, 2);
+            assertEquals("7", seven.toString());
+        }
+        assertEquals("7", seven.toString());
+        container.close();
+    }
 
 }
 
