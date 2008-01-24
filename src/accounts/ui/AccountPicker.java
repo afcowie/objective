@@ -9,7 +9,6 @@ package accounts.ui;
 import static org.gnome.gtk.Alignment.CENTER;
 import static org.gnome.gtk.Alignment.LEFT;
 import generic.persistence.DataClient;
-import generic.ui.AbstractWindow;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -29,7 +28,9 @@ import org.gnome.gtk.Entry;
 import org.gnome.gtk.EventBox;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.ListStore;
+import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ReliefStyle;
+import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.SelectionMode;
 import org.gnome.gtk.Statusbar;
 import org.gnome.gtk.TreeIter;
@@ -39,6 +40,7 @@ import org.gnome.gtk.TreePath;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
+import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
@@ -102,7 +104,7 @@ public class AccountPicker extends HBox
         backing = new EventBox();
         backing.add(wide);
 
-        popup = new AccountPickerPopup("accountpicker", "share/AccountPickerPopup.glade");
+        popup = new AccountPickerPopup();
 
         wide.connect(new Button.CLICKED() {
             public void onClicked(Button source) {
@@ -114,11 +116,14 @@ public class AccountPicker extends HBox
     }
 
     /**
-     * A Window (constructed from a glade file) containing the list of
-     * Accounts and an Entry box, and listeners to catch appropriate
-     * keystrokes. This is an inner class of AccountPicker.
+     * A Window containing the list of Accounts and an Entry box, and
+     * listeners to catch appropriate keystrokes. This is an inner class of
+     * AccountPicker.
      */
-    class AccountPickerPopup extends AbstractWindow
+    /*
+     * It's a bit of a monster, this class.
+     */
+    class AccountPickerPopup
     {
         private ListStore listStore;
 
@@ -139,18 +144,26 @@ public class AccountPicker extends HBox
 
         private DataColumnReference ledgerObject_DataColumn;
 
-        private TreeView view;
+        private final Window window;
 
-        private Entry search;
+        private final VBox top;
+
+        private final ScrolledWindow scroll;
+
+        private final TreeView view;
+
+        private final Entry search;
 
         private int visibleRows;
 
         private int totalRows;
 
-        private Statusbar status;
+        private final Statusbar status;
 
-        AccountPickerPopup(String which, String filename) {
-            super(which, filename);
+        AccountPickerPopup() {
+            super();
+
+            window = new Window();
 
             TreeViewColumn vertical;
             CellRendererText text;
@@ -185,11 +198,10 @@ public class AccountPicker extends HBox
 
             filteredStore = new TreeModelFilter(listStore, null);
 
-            // sortedStore = new TreeModelSort(filteredStore);
+            // FIXME sortedStore = new TreeModelSort(filteredStore);
             sortedStore = filteredStore;
 
-            view = (TreeView) gladeParser.getWidget("possibles_treeview");
-            view.setModel(sortedStore);
+            view = new TreeView(sortedStore);
 
             // Account column
             vertical = view.appendColumn();
@@ -225,8 +237,6 @@ public class AccountPicker extends HBox
 
             TreeSelection selection = view.getSelection();
             selection.setMode(SelectionMode.SINGLE);
-
-            status = (Statusbar) gladeParser.getWidget("statusbar");
 
             /*
              * Populate
@@ -269,18 +279,39 @@ public class AccountPicker extends HBox
             /*
              * Setup the search / filter mechanism.
              */
-            search = (Entry) gladeParser.getWidget("search_entry");
+
+            search = new Entry();
 
             /*
-             * this is here as needs _search to be initialized, otherwise GTK
-             * makes a mess
+             * And, for visual effect, a statusbar showing what completions
+             * are available.
              */
 
-            filteredStore.connect(new TreeModel.ROW_CHANGED() {
-                public void onRowChanged(TreeModel source, TreePath path, TreeIter row) {
-                    System.out.println("onRowChanged() hit");
-                }
-            });
+            status = new Statusbar();
+
+            /*
+             * With the main Widgets constructed, pack the elements together
+             * to form the popup window.
+             */
+
+            top = new VBox(false, 0);
+
+            top.packStart(search);
+
+            view.setSizeRequest(-1, 210);
+            scroll = new ScrolledWindow();
+            scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
+            scroll.add(view);
+            top.packStart(scroll);
+
+            top.packEnd(status);
+
+            window.add(top);
+            window.setDecorated(false);
+
+            /*
+             * Signal handlers and Callbacks
+             */
 
             filteredStore.setVisibleCallback(new TreeModelFilter.VISIBLE() {
                 private Pattern regex = null;
@@ -543,10 +574,10 @@ public class AccountPicker extends HBox
             y = gdkWindow.getOriginY(); // +
             // REMOVE gdkWindow.getHeight();
 
-            window.showAll();
             window.move(x, y);
 
-            super.present();
+            window.showAll();
+            window.present();
 
             selected = view.getSelection().getSelected();
             if (selected != null) {
