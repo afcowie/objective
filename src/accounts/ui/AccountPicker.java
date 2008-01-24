@@ -2,24 +2,29 @@
  * AccountPicker.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005-2006 Operational Dynamics
+ * Copyright (c) 2005-2008 Operational Dynamics
  */
 package accounts.ui;
 
+import static org.gnome.gtk.Alignment.CENTER;
+import static org.gnome.gtk.Alignment.LEFT;
 import generic.persistence.DataClient;
 import generic.ui.AbstractWindow;
-import generic.util.Debug;
 
 import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.gnome.gdk.EventFocus;
+import org.gnome.gdk.EventKey;
+import org.gnome.gdk.Keyval;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnReference;
 import org.gnome.gtk.DataColumnString;
+import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.EventBox;
 import org.gnome.gtk.HBox;
@@ -28,10 +33,13 @@ import org.gnome.gtk.ReliefStyle;
 import org.gnome.gtk.SelectionMode;
 import org.gnome.gtk.Statusbar;
 import org.gnome.gtk.TreeIter;
+import org.gnome.gtk.TreeModel;
+import org.gnome.gtk.TreeModelFilter;
 import org.gnome.gtk.TreePath;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
+import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
 import accounts.domain.Account;
@@ -80,7 +88,7 @@ public class AccountPicker extends HBox
         db = store;
 
         display = new AccountLedgerDisplay();
-        display.setMinimumSize(240, -1);
+        display.setSizeRequest(240, -1);
 
         /*
          * This box is a spacer so that the EventBox is as wide as the widget
@@ -116,7 +124,8 @@ public class AccountPicker extends HBox
 
         private TreeModelFilter filteredStore;
 
-        private TreeModelSort sortedStore;
+        // private TreeModelSort sortedStore;
+        private TreeModel sortedStore;
 
         private DataColumnString accountDisplay_DataColumn;
 
@@ -132,15 +141,13 @@ public class AccountPicker extends HBox
 
         private TreeView view;
 
-        private SearchEntry search;
+        private Entry search;
 
         private int visibleRows;
 
         private int totalRows;
 
         private Statusbar status;
-
-        private int lastID = 0;
 
         AccountPickerPopup(String which, String filename) {
             super(which, filename);
@@ -176,9 +183,10 @@ public class AccountPicker extends HBox
 
             listStore = new ListStore(accountsPicker_DataColumnsArray);
 
-            filteredStore = new TreeModelFilter(listStore);
+            filteredStore = new TreeModelFilter(listStore, null);
 
-            sortedStore = new TreeModelSort(filteredStore);
+            // sortedStore = new TreeModelSort(filteredStore);
+            sortedStore = filteredStore;
 
             view = (TreeView) gladeParser.getWidget("possibles_treeview");
             view.setModel(sortedStore);
@@ -193,7 +201,7 @@ public class AccountPicker extends HBox
 
             vertical.setTitle("Account");
             vertical.setClickable(true);
-            vertical.setSortColumn(accountTitle_DataColumn);
+            // FIXME vertical.setSortColumn(accountTitle_DataColumn);
             vertical.clicked();
 
             // Ledger column
@@ -206,7 +214,7 @@ public class AccountPicker extends HBox
 
             vertical.setTitle("Ledger");
             vertical.setClickable(true);
-            vertical.setSortColumn(ledgerName_DataColumn);
+            // FIXME vertical.setSortColumn(ledgerName_DataColumn);
 
             /*
              * overall properties
@@ -224,18 +232,18 @@ public class AccountPicker extends HBox
              * Populate
              */
             Books root = (Books) db.getRoot();
-            Set accounts = root.getAccountsSet();
-            Iterator acctIter = accounts.iterator();
+            Set<Account> accounts = root.getAccountsSet();
+            Iterator<Account> acctIter = accounts.iterator();
 
             final Pattern regexAmp = Pattern.compile("&");
             while (acctIter.hasNext()) {
-                Account acct = (Account) acctIter.next();
-                Set ledgers = acct.getLedgers();
-                Iterator ledgersIter = ledgers.iterator();
+                Account acct = acctIter.next();
+                Set<Ledger> ledgers = acct.getLedgers();
+                Iterator<Ledger> ledgersIter = ledgers.iterator();
                 while (ledgersIter.hasNext()) {
                     TreeIter pointer = listStore.appendRow();
 
-                    Ledger ledger = (Ledger) ledgersIter.next();
+                    Ledger ledger = ledgersIter.next();
 
                     /*
                      * Eek! Deeply burried presentation code. Alas. Well, it's
@@ -261,20 +269,25 @@ public class AccountPicker extends HBox
             /*
              * Setup the search / filter mechanism.
              */
-            Entry e = (Entry) gladeParser.getWidget("search_entry");
-            search = new SearchEntry(e);
+            search = (Entry) gladeParser.getWidget("search_entry");
 
             /*
              * this is here as needs _search to be initialized, otherwise GTK
              * makes a mess
              */
 
-            filteredStore.setVisibleMethod(new TreeModelFilterVisibleMethod() {
+            filteredStore.connect(new TreeModel.ROW_CHANGED() {
+                public void onRowChanged(TreeModel source, TreePath path, TreeIter row) {
+                    System.out.println("onRowChanged() hit");
+                }
+            });
+
+            filteredStore.setVisibleCallback(new TreeModelFilter.VISIBLE() {
                 private Pattern regex = null;
 
                 private String cached = "bleep";
 
-                public boolean filter(TreeModel model, TreeIter pointer) {
+                public boolean onVisible(TreeModelFilter source, TreeModel model, TreeIter pointer) {
                     String q = search.getText();
 
                     /*
@@ -309,16 +322,15 @@ public class AccountPicker extends HBox
             /*
              * and now we can add the mechanism to refilter on keystrokes.
              */
-            search.setChangeListener(new EntryListener() {
-                public void entryEvent(EntryEvent event) {
-                    Debug.print("listeners", "AccountPickerPopup search entryEvent "
-                            + event.getType().getName());
-                    if (event.getType() == EntryEvent.Type.CHANGED) {
-                        refilter();
-                    }
-                    if (event.getType() == EntryEvent.Type.ACTIVATE) {
-                        view.grabFocus();
-                    }
+            search.connect(new Entry.CHANGED() {
+                public void onChanged(Editable source) {
+                    refilter();
+                }
+            });
+
+            search.connect(new Entry.ACTIVATE() {
+                public void onActivate(Entry source) {
+                    view.grabFocus();
                 }
             });
 
@@ -326,10 +338,12 @@ public class AccountPicker extends HBox
              * If in the entry and you press down, jump straight to the rows
              * (skipping the headers).
              */
-            search.addListener(new KeyListener() {
-                public boolean keyEvent(KeyEvent event) {
-                    int key = event.getKeyval();
-                    if ((key == KeyValue.Down) || (key == KeyValue.Up)) {
+            search.connect(new Widget.KEY_PRESS_EVENT() {
+                public boolean onKeyPressEvent(Widget source, EventKey event) {
+                    final Keyval key;
+
+                    key = event.getKeyval();
+                    if ((key == Keyval.Down) || (key == Keyval.Up)) {
                         view.grabFocus();
                         return true;
                     } else {
@@ -343,19 +357,16 @@ public class AccountPicker extends HBox
              * deselect all the text in the process - otherwise you get an
              * overwrite)
              */
-            search.addListener(new FocusListener() {
-                public boolean focusEvent(FocusEvent event) {
-                    if (event.getType() == FocusEvent.Type.FOCUS_IN) {
-                        search.setPosition(search.getText().length());
-                    }
+            search.connect(new Widget.FOCUS_IN_EVENT() {
+                public boolean onFocusInEvent(Widget source, EventFocus event) {
+                    search.setPosition(search.getText().length());
                     return false;
                 }
             });
 
-            window.addListener(new KeyListener() {
-                public boolean keyEvent(KeyEvent event) {
-                    int key = event.getKeyval();
-                    if (key == KeyValue.Escape) {
+            window.connect(new Widget.KEY_PRESS_EVENT() {
+                public boolean onKeyPressEvent(Widget source, EventKey event) {
+                    if (event.getKeyval() == Keyval.Escape) {
                         if (selectedAccount == null) {
                             clearEntry();
                         }
@@ -369,44 +380,42 @@ public class AccountPicker extends HBox
             });
 
             final Pattern regexAtoZ = Pattern.compile("[a-z]");
-            view.addListener(new KeyListener() {
-                public boolean keyEvent(KeyEvent event) {
-                    if (event.getType() == KeyEvent.Type.KEY_PRESSED) {
-                        int key = event.getKeyval();
-                        String str = event.getString();
+            view.connect(new Widget.KEY_PRESS_EVENT() {
+                public boolean onKeyPressEvent(Widget source, EventKey event) {
+                    final Keyval key;
 
-                        String orig = search.getText();
-                        int len = orig.length();
+                    key = event.getKeyval();
 
-                        if (key == KeyValue.BackSpace) {
-                            search.grabFocus();
-                            if (len > 0) {
-                                search.setText(orig.substring(0, len - 1));
-                                refilter();
-                            }
-                            return true;
-                        } else if (key == KeyValue.Left) {
-                            search.grabFocus();
-                            if (len > 0) {
-                                search.setPosition(len - 1);
-                            }
-                            return true;
-                        } else if (key == KeyValue.Right) {
-                            search.grabFocus();
-                            search.setPosition(len);
-                            return true;
-                        } else if (regexAtoZ.matcher(str).matches()) {
-                            search.grabFocus();
-                            search.setText(search.getText() + str);
+                    String str = "" + key.toUnicode();
+
+                    String orig = search.getText();
+                    int len = orig.length();
+
+                    if (key == Keyval.BackSpace) {
+                        search.grabFocus();
+                        if (len > 0) {
+                            search.setText(orig.substring(0, len - 1));
                             refilter();
-                            return true;
-                        } else {
-                            return false;
                         }
+                        return true;
+                    } else if (key == Keyval.Left) {
+                        search.grabFocus();
+                        if (len > 0) {
+                            search.setPosition(len - 1);
+                        }
+                        return true;
+                    } else if (key == Keyval.Right) {
+                        search.grabFocus();
+                        search.setPosition(len);
+                        return true;
+                    } else if (regexAtoZ.matcher(str).matches()) {
+                        search.grabFocus();
+                        search.setText(search.getText() + str);
+                        refilter();
+                        return true;
                     } else {
                         return false;
                     }
-
                 }
             });
 
@@ -416,7 +425,6 @@ public class AccountPicker extends HBox
                     applySelection(pointer);
                 }
             });
-
         }
 
         /**
@@ -437,26 +445,21 @@ public class AccountPicker extends HBox
             TreeIter pointer;
             totalRows = 0;
 
-            pointer = listStore.getFirstIter();
-            while (pointer != null) {
+            pointer = listStore.getIterFirst();
+            do {
                 totalRows++;
-                pointer = pointer.getNextIter();
-            }
+            } while (pointer.iterNext());
 
             filteredStore.refilter();
 
             visibleRows = 0;
-            pointer = filteredStore.getFirstIter();
-            while (pointer != null) {
-                visibleRows++;
-                pointer = pointer.getNextIter();
-            }
 
-            if (lastID != 0) {
-                status.pop(lastID);
-            }
-            lastID = status.getContextID("" + visibleRows);
-            status.push(lastID, visibleRows + "/" + totalRows + " visible");
+            pointer = filteredStore.getIterFirst();
+            do {
+                visibleRows++;
+            } while (pointer.iterNext());
+
+            status.setMessage(visibleRows + "/" + totalRows + " visible");
         }
 
         /**
@@ -497,17 +500,17 @@ public class AccountPicker extends HBox
          * Account) in the TreeView
          */
         private void setSelection(Ledger ledger) {
-            TreeIter pointer = sortedStore.getFirstIter();
-            while (pointer != null) {
+            TreeIter pointer;
+
+            pointer = sortedStore.getIterFirst();
+            do {
                 Ledger l = (Ledger) sortedStore.getValue(pointer, ledgerObject_DataColumn);
 
                 if (ledger == l) {
-                    view.getSelection().select(pointer);
+                    view.getSelection().selectRow(pointer);
                     return;
                 }
-
-                pointer = pointer.getNextIter();
-            }
+            } while (pointer.iterNext());
         }
 
         private void clearEntry() {
@@ -521,7 +524,7 @@ public class AccountPicker extends HBox
         }
 
         private void clearSearch() {
-            search.clearText();
+            search.setText("");
         }
 
         /*
@@ -529,91 +532,30 @@ public class AccountPicker extends HBox
          */
 
         public void present() {
-            org.gnome.gdk.Window gdkWindow = backing.getWindow();
+            org.gnome.gdk.Window gdkWindow;
+            int x, y;
+            TreeIter selected;
+            TreePath path;
 
-            int x = gdkWindow.getOrigin().getX();
-            int y = gdkWindow.getOrigin().getY(); // +
-            // gdkWindow.getHeight();
+            gdkWindow = backing.getWindow();
 
+            x = gdkWindow.getOriginX();
+            y = gdkWindow.getOriginY(); // +
+            // REMOVE gdkWindow.getHeight();
+
+            window.showAll();
             window.move(x, y);
 
             super.present();
 
-            TreePath[] selected = view.getSelection().getSelectedRows();
-            if (selected.length == 1) {
-                view.scrollToCell(selected[0], account_ViewColumn, 0.5, 0.0);
+            selected = view.getSelection().getSelected();
+            if (selected != null) {
+                path = filteredStore.getPath(selected);
+                view.scrollToCell(path, null, CENTER, LEFT);
             }
 
             search.grabFocus();
             refilter();
-        }
-
-    }
-
-    /**
-     * An override of {@link Entry} which has a single {@link EntryListener}
-     * which is removed before programatic changes to the Entry widget.
-     */
-    /*
-     * FUTURE: We can probably replace this with a normal Entry that only
-     * takes action if it has focus.
-     */
-    class SearchEntry extends Entry
-    {
-        private Entry.CHANGED handler = null;
-
-        SearchEntry() {
-            super();
-        }
-
-        /**
-         * Create a new SearchEntry from an existing Entry Widget (presumably
-         * retrieved from glade).
-         */
-        SearchEntry(Entry existingWidget) {
-            super(existingWidget.getHandle());
-        }
-
-        /**
-         * 
-         * @param handler
-         *            the EntryListener (presumably listening for CHANGED
-         *            events) that you will be toggled off when
-         *            programatically setting the Entry is required.
-         */
-        void setChangeListener(EntryListener listener) {
-            if (listener == null) {
-                throw new IllegalArgumentException();
-            }
-            this.listener = listener;
-            enableChangeListener();
-        }
-
-        void disableChangeListener() {
-            if (listener == null) {
-                return;
-            }
-            super.removeListener(listener);
-        }
-
-        void enableChangeListener() {
-            if (listener == null) {
-                return;
-            }
-            super.addListener(listener);
-        }
-
-        void clearText() {
-            disableChangeListener();
-            super.setText("");
-            enableChangeListener();
-        }
-
-        public void setText(String text) {
-            disableChangeListener();
-            super.setText(text);
-            super.setPosition(text.length());
-            enableChangeListener();
         }
 
     }
