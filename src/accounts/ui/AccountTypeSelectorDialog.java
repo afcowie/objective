@@ -2,16 +2,16 @@
  * AccountTypeSelectorDialog.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005 Operational Dynamics
+ * Copyright (c) 2005,2008 Operational Dynamics
  */
 package accounts.ui;
+
+import generic.ui.AbstractWindow;
+import generic.util.Debug;
 
 import org.gnome.gtk.Button;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.RadioButton;
-
-import generic.ui.AbstractWindow;
-import generic.util.Debug;
 
 import accounts.domain.Account;
 import accounts.domain.AssetAccount;
@@ -48,22 +48,18 @@ class AccountTypeSelectorDialog extends AbstractWindow
         // _assetsVBox.add()
 
         Button ok = (Button) gladeParser.getWidget("ok_button");
-        ok.addListener(new ButtonListener() {
-            public void buttonEvent(ButtonEvent event) {
-                if (event.getType() == ButtonEvent.Type.CLICK) {
-                    Debug.print("listeners", "Ok Button click");
-                    deleteHook();
-                }
+        ok.connect(new Button.CLICKED() {
+            public void onClicked(Button source) {
+                Debug.print("listeners", "Ok Button click");
+                deleteHook();
             }
         });
 
         Button cancel = (Button) gladeParser.getWidget("cancel_button");
-        cancel.addListener(new ButtonListener() {
-            public void buttonEvent(ButtonEvent event) {
-                if (event.getType() == ButtonEvent.Type.CLICK) {
-                    Debug.print("listeners", "Cancel Button click");
-                    deleteHook();
-                }
+        cancel.connect(new Button.CLICKED() {
+            public void onClicked(Button source) {
+                Debug.print("listeners", "Cancel Button click");
+                deleteHook();
             }
         });
 
@@ -93,7 +89,8 @@ class AccountTypeSelectorDialog extends AbstractWindow
         }
         if (activate != null) {
             RadioButton rb = (RadioButton) gladeParser.getWidget(activate);
-            rb.clicked();
+            // rb.clicked();
+            rb.activate();
         }
     }
 
@@ -102,13 +99,4 @@ class AccountTypeSelectorDialog extends AbstractWindow
         Gtk.mainQuit();
         return false;
     }
-}
-
-class AccountTypeListener implements ButtonListener
-{
-
-    public void buttonEvent(ButtonEvent event) {
-        event.notify();
-    }
-
 }

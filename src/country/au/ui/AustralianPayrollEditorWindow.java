@@ -2,23 +2,25 @@
  * AustralianPayrollEditorWindow.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006,2008 Operational Dynamics
  */
 package country.au.ui;
 
 import generic.ui.Align;
 import generic.ui.ChangeListener;
 import generic.ui.EditorWindow;
-import generic.ui.ModalDialog;
 import generic.ui.TwoColumnTable;
 import generic.util.Debug;
 
 import java.util.List;
 
+import org.gnome.gtk.ComboBox;
+import org.gnome.gtk.Dialog;
+import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.Label;
-import org.gnome.gtk.MessageType;
 import org.gnome.gtk.VBox;
+import org.gnome.gtk.WarningMessageDialog;
 import org.gnome.gtk.Widget;
 
 import accounts.domain.Amount;
@@ -240,58 +242,55 @@ public class AustralianPayrollEditorWindow extends EditorWindow
          * up so that the appropriate calculator is instantiated.
          */
 
-        payg_IdentifierSelector.addListener(new ComboBoxListener() {
-            public void comboBoxEvent(ComboBoxEvent event) {
-                if (event.getType() == ComboBoxEvent.Type.CHANGED) {
-                    AustralianPayrollTaxIdentifier payg = (AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection();
-                    Datestamp date = payPeriod_RangePicker.getStartDate();
-                    try {
-                        calc = new AustralianPayrollTaxCalculator(store, payg, date);
-                        calc.setWeeks(payPeriod_RangePicker.getRangeCalculator().calculateWeeks());
+        payg_IdentifierSelector.connect(new ComboBox.CHANGED() {
+            public void onChanged(ComboBox source) {
+                AustralianPayrollTaxIdentifier payg = (AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection();
+                Datestamp date = payPeriod_RangePicker.getStartDate();
+                try {
+                    calc = new AustralianPayrollTaxCalculator(store, payg, date);
+                    calc.setWeeks(payPeriod_RangePicker.getRangeCalculator().calculateWeeks());
 
-                        // make sure new calc has the appropriate references
-                        calc.setSalary(salary);
-                        calc.setWithhold(withholding);
-                        calc.setPaycheck(paycheck);
+                    // make sure new calc has the appropriate references
+                    calc.setSalary(salary);
+                    calc.setWithhold(withholding);
+                    calc.setPaycheck(paycheck);
 
-                        /*
-                         * Now recalculate given the existing values...
-                         */
+                    /*
+                     * Now recalculate given the existing values...
+                     */
 
-                        if (last == null) {
-                            return;
-                        } else if (last == salary_AmountEntry) {
-                            Debug.print("listeners", "Recalculating given salary");
+                    if (last == null) {
+                        return;
+                    } else if (last == salary_AmountEntry) {
+                        Debug.print("listeners", "Recalculating given salary");
 
-                            calc.calculateGivenSalary();
+                        calc.calculateGivenSalary();
 
-                            withholding = calc.getWithhold();
-                            withholding_AmountDisplay.setAmount(withholding);
-                            paycheck = calc.getPaycheck();
-                            paycheck_AmountEntry.setAmount(paycheck);
+                        withholding = calc.getWithhold();
+                        withholding_AmountDisplay.setAmount(withholding);
+                        paycheck = calc.getPaycheck();
+                        paycheck_AmountEntry.setAmount(paycheck);
 
-                        } else if (last == paycheck_AmountEntry) {
-                            Debug.print("listeners", "Recalculating given paycheck");
+                    } else if (last == paycheck_AmountEntry) {
+                        Debug.print("listeners", "Recalculating given paycheck");
 
-                            calc.calculateGivenPayable();
+                        calc.calculateGivenPayable();
 
-                            salary = calc.getSalary();
-                            salary_AmountEntry.setAmount(salary);
-                            withholding = calc.getWithhold();
-                            withholding_AmountDisplay.setAmount(withholding);
-                        }
-                    } catch (NotFoundException nfe) {
-                        ModalDialog dialog = new ModalDialog(
-                                window,
-                                "Not found",
-                                "Can't find tax data for identifier <b>"
-                                        + payg
-                                        + "</b> effective <b>"
-                                        + calc.getAsAtDate()
-                                        + "</b>. That's probably a bug (tax tables tend to be all or nothing) but please try another one.",
-                                MessageType.ERROR);
-                        dialog.run();
+                        salary = calc.getSalary();
+                        salary_AmountEntry.setAmount(salary);
+                        withholding = calc.getWithhold();
+                        withholding_AmountDisplay.setAmount(withholding);
                     }
+                } catch (NotFoundException nfe) {
+                    Dialog dialog = new ErrorMessageDialog(
+                            window,
+                            "Not found",
+                            "Can't find tax data for identifier <b>"
+                                    + payg
+                                    + "</b> effective <b>"
+                                    + calc.getAsAtDate()
+                                    + "</b>. That's probably a bug (tax tables tend to be all or nothing) but please try another one.");
+                    dialog.run();
                 }
             }
         });
@@ -451,16 +450,15 @@ public class AustralianPayrollEditorWindow extends EditorWindow
          */
 
         if (employee == null) {
-            ModalDialog dialog = new ModalDialog(window, "Select an employee!",
-                    "You need to select the person you're trying to pay first.", MessageType.WARNING);
+            Dialog dialog = new WarningMessageDialog(window, "Select an employee!",
+                    "You need to select the person you're trying to pay first.");
             dialog.run();
             return;
         }
 
         if (salary.getNumber() == 0) {
-            ModalDialog dialog = new ModalDialog(window, "Enter some numbers!",
-                    "Not much point in trying to commit a paycheck for 0.00, is there?",
-                    MessageType.WARNING);
+            Dialog dialog = new WarningMessageDialog(window, "Enter some numbers!",
+                    "Not much point in trying to commit a paycheck for 0.00, is there?");
             dialog.run();
             /*
              * No need to throw CommandNotReadyException; while the state of
@@ -542,8 +540,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
             Debug.print("events", "Can't find Ledger " + nfe.getMessage());
         } catch (CommandNotReadyException cnre) {
             Debug.print("events", "Command not ready: " + cnre.getMessage());
-            ModalDialog dialog = new ModalDialog(window, "Command Not Ready!", cnre.getMessage(),
-                    MessageType.ERROR);
+            Dialog dialog = new ErrorMessageDialog(window, "Command Not Ready!", cnre.getMessage());
             dialog.run();
 
             /*
