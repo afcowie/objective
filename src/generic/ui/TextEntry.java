@@ -6,6 +6,7 @@
  */
 package generic.ui;
 
+import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 
 /**
@@ -24,8 +25,6 @@ public class TextEntry extends Entry
 {
     private ChangeListener changeListener = null;
 
-    private Entry self = null;
-
     /**
      * Create a new widget, hooking up listener to fire
      * {@link ChangeListener#userChangedData()} when the contents of the
@@ -34,22 +33,17 @@ public class TextEntry extends Entry
      */
     public TextEntry() {
         super();
-        self = this;
 
-        addListener(new EntryListener() {
+        connect(new Entry.CHANGED() {
+            public void onChanged(Editable source) {
+                if (!((Entry) source).getHasFocus()) {
+                    return;
+                }
 
-            public void entryEvent(EntryEvent event) {
-                if (event.getType() == EntryEvent.Type.CHANGED) {
-                    if (!self.getHasFocus()) {
-                        return;
-                    }
-
-                    if (changeListener != null) {
-                        changeListener.userChangedData();
-                    }
+                if (changeListener != null) {
+                    changeListener.userChangedData();
                 }
             }
-
         });
     }
 

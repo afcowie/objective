@@ -375,6 +375,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
             sideLabel = new Label("");
             sideLabel.setAlignment(1.0f, 0.5f);
+            sideLabel.setUseMarkup(true);
             columnSizeGroup.addWidget(sideLabel);
 
             /*
