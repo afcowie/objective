@@ -36,6 +36,7 @@ import org.gnome.gtk.Statusbar;
 import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.TreeModel;
 import org.gnome.gtk.TreeModelFilter;
+import org.gnome.gtk.TreeModelSort;
 import org.gnome.gtk.TreePath;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
@@ -129,8 +130,7 @@ public class AccountPicker extends HBox
 
         private TreeModelFilter filteredStore;
 
-        // private TreeModelSort sortedStore;
-        private TreeModel sortedStore;
+        private TreeModelSort sortedStore;
 
         private DataColumnString accountDisplay_DataColumn;
 
@@ -198,8 +198,7 @@ public class AccountPicker extends HBox
 
             filteredStore = new TreeModelFilter(listStore, null);
 
-            // FIXME sortedStore = new TreeModelSort(filteredStore);
-            sortedStore = filteredStore;
+            sortedStore = new TreeModelSort(filteredStore);
 
             view = new TreeView(sortedStore);
 
@@ -213,7 +212,7 @@ public class AccountPicker extends HBox
 
             vertical.setTitle("Account");
             vertical.setClickable(true);
-            // FIXME vertical.setSortColumn(accountTitle_DataColumn);
+            vertical.setSortColumn(accountTitle_DataColumn);
             vertical.clicked();
 
             // Ledger column
@@ -226,7 +225,7 @@ public class AccountPicker extends HBox
 
             vertical.setTitle("Ledger");
             vertical.setClickable(true);
-            // FIXME vertical.setSortColumn(ledgerName_DataColumn);
+            vertical.setSortColumn(ledgerName_DataColumn);
 
             /*
              * overall properties
@@ -581,7 +580,7 @@ public class AccountPicker extends HBox
 
             selected = view.getSelection().getSelected();
             if (selected != null) {
-                path = filteredStore.getPath(selected);
+                path = sortedStore.getPath(selected);
                 view.scrollToCell(path, null, CENTER, LEFT);
             }
 
