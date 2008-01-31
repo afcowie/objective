@@ -8,22 +8,22 @@ package accounts.ui;
 
 import generic.ui.Align;
 import generic.ui.ChangeListener;
-import generic.ui.ModalDialog;
 import generic.ui.TextEntry;
 import generic.ui.TwoColumnTable;
 
 import java.util.Iterator;
 
 import org.gnome.gtk.Button;
+import org.gnome.gtk.Dialog;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
-import org.gnome.gtk.MessageType;
 import org.gnome.gtk.ReliefStyle;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.VBox;
+import org.gnome.gtk.WarningMessageDialog;
 import org.gnome.gtk.Widget;
 
 import accounts.domain.Amount;
@@ -127,7 +127,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
         {
             Label tL = new Label("<big><b>Generic Transaction</b></big>");
             tL.setUseMarkup(true);
-            tL.setAlignment(0.0, 0.5);
+            tL.setAlignment(0.0f, 0.5f);
             top.packStart(tL, false, false, 3);
         }
         {
@@ -243,12 +243,10 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
             tailings = new HBox(false, 3);
 
             addButton = new Button(Stock.ADD);
-            addButton.addListener(new ButtonListener() {
-                public void buttonEvent(ButtonEvent event) {
-                    if (event.getType() == ButtonEvent.Type.CLICK) {
-                        addRow(new Debit(new Amount("0"), null));
-                        eB.showAll();
-                    }
+            addButton.connect(new Button.CLICKED() {
+                public void onClicked(Button source) {
+                    addRow(new Debit(new Amount("0"), null));
+                    eB.showAll();
                 }
             });
             addRemoveSizeGroup.addWidget(addButton);
@@ -376,7 +374,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
             amountSizeGroup.addWidget(amountEntry);
 
             sideLabel = new Label("");
-            sideLabel.setAlignment(1.0, 0.5);
+            sideLabel.setAlignment(1.0f, 0.5f);
             columnSizeGroup.addWidget(sideLabel);
 
             /*
@@ -396,53 +394,48 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
             flipFlop();
 
-            flopButton.addListener(new ButtonListener() {
-                public void buttonEvent(ButtonEvent event) {
-                    if (event.getType() == ButtonEvent.Type.CLICK) {
-
-                        if (state instanceof Debit) {
-                            debitPos.removeEntry(state);
-                        } else if (state instanceof Credit) {
-                            creditPos.removeEntry(state);
-                        }
-
-                        if (state == original) {
-                            state = alternate;
-                            state.setAmount(original.getAmount());
-                        } else {
-                            state = original;
-                            state.setAmount(alternate.getAmount());
-                        }
-
-                        flipFlop();
-
-                        if (state instanceof Debit) {
-                            debitPos.addEntry(state);
-                        } else if (state instanceof Credit) {
-                            creditPos.addEntry(state);
-                        }
-
-                        debitBalance.setAmount(debitPos.getBalance());
-                        creditBalance.setAmount(creditPos.getBalance());
+            flopButton.connect(new Button.CLICKED() {
+                public void onClicked(Button source) {
+                    if (state instanceof Debit) {
+                        debitPos.removeEntry(state);
+                    } else if (state instanceof Credit) {
+                        creditPos.removeEntry(state);
                     }
+
+                    if (state == original) {
+                        state = alternate;
+                        state.setAmount(original.getAmount());
+                    } else {
+                        state = original;
+                        state.setAmount(alternate.getAmount());
+                    }
+
+                    flipFlop();
+
+                    if (state instanceof Debit) {
+                        debitPos.addEntry(state);
+                    } else if (state instanceof Credit) {
+                        creditPos.addEntry(state);
+                    }
+
+                    debitBalance.setAmount(debitPos.getBalance());
+                    creditBalance.setAmount(creditPos.getBalance());
                 }
             });
 
             deleteButton = new Button(Stock.DELETE);
-            deleteButton.addListener(new ButtonListener() {
-                public void buttonEvent(ButtonEvent event) {
-                    if (event.getType() == ButtonEvent.Type.CLICK) {
-                        eB.remove(box);
+            deleteButton.connect(new Button.CLICKED() {
+                public void onClicked(Button source) {
+                    eB.remove(box);
 
-                        if (state instanceof Debit) {
-                            debitPos.removeEntry(state);
-                        } else if (state instanceof Credit) {
-                            creditPos.removeEntry(state);
-                        }
-
-                        debitBalance.setAmount(debitPos.getBalance());
-                        creditBalance.setAmount(creditPos.getBalance());
+                    if (state instanceof Debit) {
+                        debitPos.removeEntry(state);
+                    } else if (state instanceof Credit) {
+                        creditPos.removeEntry(state);
                     }
+
+                    debitBalance.setAmount(debitPos.getBalance());
+                    creditBalance.setAmount(creditPos.getBalance());
                 }
             });
 
@@ -452,11 +445,11 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
         private void flipFlop() {
             if (state instanceof Debit) {
-                sideLabel.setMarkup("<span color='" + Debit.COLOR_NORMAL + "'>Debit</span>");
+                sideLabel.setLabel("<span color='" + Debit.COLOR_NORMAL + "'>Debit</span>");
                 flopTable.remove(sideLabel);
                 flopTable.attach(sideLabel, 0, 1, 0, 1);
             } else if (state instanceof Credit) {
-                sideLabel.setMarkup("<span color='" + Credit.COLOR_NORMAL + "'>Credit</span>");
+                sideLabel.setLabel("<span color='" + Credit.COLOR_NORMAL + "'>Credit</span>");
                 flopTable.remove(sideLabel);
                 flopTable.attach(sideLabel, 1, 2, 0, 1);
             } else {
@@ -494,12 +487,11 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
                 Entry e = row.getEntry();
 
                 if (e.getAmount().getNumber() == 0) {
-                    ModalDialog dialog = new ModalDialog(
+                    Dialog dialog = new WarningMessageDialog(
                             window,
                             "Amount blank",
                             "It doesn't make much sense for there to be an Entry in a Transaction with a 0.00 Amount. "
-                                    + "Either set the Entry to the appropriate value, or remove the Entry.",
-                            MessageType.WARNING);
+                                    + "Either set the Entry to the appropriate value, or remove the Entry.");
                     dialog.run();
                     t.getEntries().clear();
                     row.amountEntry.grabFocus();
@@ -507,11 +499,8 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
                 }
 
                 if (e.getParentLedger() == null) {
-                    ModalDialog dialog = new ModalDialog(
-                            window,
-                            "Account not set",
-                            "You need to pick the Account and Ledger to which each Entry in the Transaction belongs.",
-                            MessageType.WARNING);
+                    Dialog dialog = new WarningMessageDialog(window, "Account not set",
+                            "You need to pick the Account and Ledger to which each Entry in the Transaction belongs.");
                     dialog.run();
                     t.getEntries().clear();
                     row.accountPicker.grabFocus();
@@ -523,12 +512,11 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
         }
 
         if (t.getEntries().size() == 0) {
-            ModalDialog dialog = new ModalDialog(
+            Dialog dialog = new WarningMessageDialog(
                     window,
                     "No Entries!",
                     "The whole point of a GenericTransaction is to let you enter Debits and Credits manually. "
-                            + "You must have at least two, and the net Debit and net Credit balance must be equal.",
-                    MessageType.WARNING);
+                            + "You must have at least two, and the net Debit and net Credit balance must be equal.");
             dialog.run();
             addButton.grabFocus();
             return;
@@ -542,12 +530,11 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
          */
 
         if (!t.isBalanced()) {
-            ModalDialog dialog = new ModalDialog(window, "Transaction not balanced!",
+            Dialog dialog = new WarningMessageDialog(window, "Transaction not balanced!",
                     "Any accounting Transaction must have have an equal Debit and Credit value. "
                             + "You must either change the Amounts you've entered, "
                             + "change a Debit to a Credit (or vice versa), "
-                            + "or add another Entry to bring the Transaction into balance.",
-                    MessageType.WARNING);
+                            + "or add another Entry to bring the Transaction into balance.");
             dialog.run();
             /*
              * re-clear the Entries set.

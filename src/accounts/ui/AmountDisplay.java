@@ -44,10 +44,8 @@ public class AmountDisplay extends HBox
         /*
          * Numbers on screen aren't much use if you can't copy them!
          */
-        // FIXME needs libgtk-java 2.8.5
-        // amount_Label.setCanFocus(false);
         amount_Label.setSelectable(true);
-        amount_Label.setBooleanProperty("can-focus", false);
+        amount_Label.setCanFocus(false);
 
         /*
          * The following [2 in setPadding() and 5 in packStart()] pads the
@@ -69,6 +67,6 @@ public class AmountDisplay extends HBox
             throw new IllegalArgumentException();
         }
         this.amount = a;
-        amount_Label.setText(amount.getValue());
+        amount_Label.setLabel(amount.getValue());
     }
 }

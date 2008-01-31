@@ -86,10 +86,10 @@ public class IdentifierSelector extends ComboBox
          */
         this.setModel(listStore);
 
-        CellRendererText name_CellRenderer = new CellRendererText();
-        this.packStart(name_CellRenderer, true);
-        this.addAttributeMapping(name_CellRenderer, CellRendererText.Attribute.TEXT,
-                nameDisplay_DataColumn);
+        CellRendererText renderer;
+
+        renderer = new CellRendererText(this);
+        renderer.setText(nameDisplay_DataColumn);
     }
 
     /**
@@ -119,19 +119,25 @@ public class IdentifierSelector extends ComboBox
      *             represents
      */
     public void setIdentifier(Identifier identifier) {
+        final TreeIter pointer;
+
         if (identifier == null) {
             return;
         }
-        TreeIter pointer = listStore.getFirstIter();
 
-        while (pointer != null) {
+        pointer = listStore.getIterFirst();
+        if (pointer == null) {
+            return;
+        }
+
+        do {
             if (listStore.getValue(pointer, identifierObject_DataColumn) == identifier) {
                 this.setActiveIter(pointer);
                 this.activate();
                 return;
             }
-            pointer = pointer.getNextIter();
-        }
+        } while (pointer.iterNext());
+
         throw new IllegalArgumentException(
                 "How did you manage to ask to activate a Identifier object that isn't in the IdentifierGroup represented by this picker?");
     }
