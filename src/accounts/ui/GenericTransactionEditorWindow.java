@@ -192,11 +192,11 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
             Label blankL = new Label("");
 
-            accountSizeGroup.addWidget(aL);
-            amountSizeGroup.addWidget(faL);
-            flopSizeGroup.addWidget(flopTable);
+            accountSizeGroup.add(aL);
+            amountSizeGroup.add(faL);
+            flopSizeGroup.add(flopTable);
 
-            addRemoveSizeGroup.addWidget(blankL);
+            addRemoveSizeGroup.add(blankL);
             headings.packStart(aL, true, true, 0);
             headings.packStart(faL, false, false, 0);
             headings.packStart(flopTable, false, false, 0);
@@ -249,15 +249,15 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
                     eB.showAll();
                 }
             });
-            addRemoveSizeGroup.addWidget(addButton);
+            addRemoveSizeGroup.add(addButton);
             tailings.packEnd(addButton, false, false, 0);
 
             debitBalance.setAmount(debitPos.getBalance());
             creditBalance.setAmount(creditPos.getBalance());
             tailings.packEnd(creditBalance, false, false, 0);
             tailings.packEnd(debitBalance, false, false, 0);
-            columnSizeGroup.addWidget(debitBalance);
-            columnSizeGroup.addWidget(creditBalance);
+            columnSizeGroup.add(debitBalance);
+            columnSizeGroup.add(creditBalance);
 
             eB.packEnd(tailings, true, false, 0);
         }
@@ -344,7 +344,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
                 // ignore
             }
             packStart(accountPicker, true, true, 0);
-            accountSizeGroup.addWidget(accountPicker);
+            accountSizeGroup.add(accountPicker);
 
             amountEntry = new ForeignAmountEntryBox(store);
             amountEntry.addListener(new ChangeListener() {
@@ -371,12 +371,12 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
                 amountEntry.setForeignAmount(fa);
             }
             box.packStart(amountEntry, false, false, 0);
-            amountSizeGroup.addWidget(amountEntry);
+            amountSizeGroup.add(amountEntry);
 
             sideLabel = new Label("");
             sideLabel.setAlignment(1.0f, 0.5f);
             sideLabel.setUseMarkup(true);
-            columnSizeGroup.addWidget(sideLabel);
+            columnSizeGroup.add(sideLabel);
 
             /*
              * Just put the sideLabel anywhere; it'll be moved by the forced
@@ -391,7 +391,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
             flopButton.add(flopTable);
 
             box.packStart(flopButton, false, false, 3);
-            flopSizeGroup.addWidget(flopButton);
+            flopSizeGroup.add(flopButton);
 
             flipFlop();
 
@@ -441,7 +441,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
             });
 
             box.packEnd(deleteButton, false, false, 0);
-            addRemoveSizeGroup.addWidget(deleteButton);
+            addRemoveSizeGroup.add(deleteButton);
         }
 
         private void flipFlop() {

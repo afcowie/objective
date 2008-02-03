@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.gnome.gdk.Event;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
@@ -455,6 +456,16 @@ public class AccountPicker extends HBox
                     applySelection(pointer);
                 }
             });
+
+            window.connect(new Window.DELETE_EVENT() {
+                public boolean onDeleteEvent(Widget source, Event event) {
+                    window.hide();
+                    clearSearch();
+                    Window parentTop = (Window) wide.getToplevel();
+                    parentTop.present();
+                    return true;
+                }
+            });
         }
 
         /**
@@ -490,32 +501,6 @@ public class AccountPicker extends HBox
             } while (pointer.iterNext());
 
             status.setMessage(visibleRows + "/" + totalRows + " visible");
-        }
-
-        /**
-         * When this thing closes the default handler will call deleteHook
-         * which will hide and do other things. That's all fine. But we want
-         * to raise the parent as well.
-         */
-        protected void hideHook() {
-            Window parentTop = (Window) wide.getToplevel();
-            parentTop.present();
-        }
-
-        /**
-         * Override default deleteHook (which destroys; we only want to hide).
-         * We will clear the Entry text. We don't even have to check
-         * _ignoreChangeEvents because this is only called if the user Alt-F4s
-         * the popup or something like that.
-         * 
-         * @return override the default return of false - we return true
-         *         because we've handled it, and *don't* want the delete to
-         *         turn into a destroy.
-         */
-        protected boolean deleteHook() {
-            window.hide();
-            clearSearch();
-            return true;
         }
 
         private void applySelection(TreeIter pointer) {
@@ -561,7 +546,7 @@ public class AccountPicker extends HBox
          * Overrides of inherited methods -----------------
          */
 
-        public void present() {
+        void present() {
             org.gnome.gdk.Window gdkWindow;
             int x, y;
             TreeIter selected;
@@ -587,7 +572,6 @@ public class AccountPicker extends HBox
             search.grabFocus();
             refilter();
         }
-
     }
 
     /*

@@ -11,6 +11,7 @@ package generic.ui;
 
 import org.gnome.gtk.ButtonsType;
 import org.gnome.gtk.MessageDialog;
+import org.gnome.gtk.MessageType;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WindowPosition;
 
@@ -69,8 +70,7 @@ public class ModalDialog
             buttons = ButtonsType.CLOSE;
         }
 
-        dialog = new MessageDialog(parentWindow, DialogFlags.DESTROY_WITH_PARENT, type, buttons,
-                message, false);
+        dialog = new MessageDialog(parentWindow, true, type, buttons, message);
         dialog.hide();
         /*
          * According to the documentation, setting secondary markup takes care
@@ -78,7 +78,7 @@ public class ModalDialog
          * message wasn't set with Pango true. We'll stick with that so that
          * we get GTK default theming and what not.
          */
-        dialog.setSecondaryMarkup(subtext);
+        dialog.setSecondaryText(subtext, true);
         dialog.setPosition(WindowPosition.CENTER);
     }
 

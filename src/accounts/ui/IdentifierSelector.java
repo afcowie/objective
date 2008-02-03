@@ -2,7 +2,7 @@
  * IdentifierSelector.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006,2008 Operational Dynamics
  */
 package accounts.ui;
 
@@ -46,7 +46,7 @@ public class IdentifierSelector extends ComboBox
      *            you got it from, presumably.
      */
     public IdentifierSelector(IdentifierGroup group) {
-        super((ListStore) null);
+        super();
 
         /*
          * We go to the considerable effort of having a TreeModel here so that
@@ -133,7 +133,6 @@ public class IdentifierSelector extends ComboBox
         do {
             if (listStore.getValue(pointer, identifierObject_DataColumn) == identifier) {
                 this.setActiveIter(pointer);
-                this.activate();
                 return;
             }
         } while (pointer.iterNext());

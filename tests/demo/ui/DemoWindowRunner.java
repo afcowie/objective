@@ -59,9 +59,6 @@ public class DemoWindowRunner
         Debug.print("main", "Initializing TransactionListViewHolder");
         view = new TransactionListViewHolder();
 
-        // Debug.print("main", "Initializing SingleWidgetHolder");
-        // SingleWidgetHolder swh = new SingleWidgetHolder();
-
         // Debug.print("main", "Initializing AustralianPayrollEditorWindow");
         // AustralianPayrollEditorWindow payroll = new
         // AustralianPayrollEditorWindow();

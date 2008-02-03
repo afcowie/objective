@@ -62,7 +62,7 @@ public class Books extends Root
      * (TODO which may move) are provided to pull accounts from those
      * individual subclasses.
      */
-    protected Set accounts = null;
+    protected Set<Account> accounts = null;
 
     protected Set workers = null;
 
@@ -84,11 +84,11 @@ public class Books extends Root
     /**
      * @return Returns the entire Accounts Set.
      */
-    public Set getAccountsSet() {
+    public Set<Account> getAccountsSet() {
         return accounts;
     }
 
-    public void setAccountsSet(Set accounts) {
+    public void setAccountsSet(Set<Account> accounts) {
         if (accounts == null) {
             throw new IllegalArgumentException(
                     "Can't make a null Set the accounts held by this Books object!");

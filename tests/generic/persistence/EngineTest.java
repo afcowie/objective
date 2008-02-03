@@ -62,7 +62,7 @@ public class EngineTest extends TestCase
      * Directly evaluate DataServer's connection pool mechanism
      */
     public final void testConnectionPool() throws FileNotFoundException {
-        DataServer server = server = new DataServer(TESTFILE, null);
+        DataServer server = new DataServer(TESTFILE, null);
         assertNotNull(server);
 
         DataClient c1 = server.gainClient();

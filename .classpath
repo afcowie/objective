@@ -4,7 +4,8 @@
 	<classpathentry kind="src" path="lib"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/java-gnome"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3.8.1"/>
+	<classpathentry kind="lib" path="lib/db4o-7.0.22.8811-java5.jar" sourcepath="/home/andrew/src/open/db4o-7.0.22.8811/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/java-gnome"/>
 	<classpathentry kind="output" path="tmp/classes"/>
 </classpath>
