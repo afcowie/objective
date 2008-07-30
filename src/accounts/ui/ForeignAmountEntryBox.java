@@ -2,7 +2,7 @@
  * ForeignAmountEntryBox.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005-2006 Operational Dynamics
+ * Copyright (c) 2005-2006,2008 Operational Dynamics
  */
 package accounts.ui;
 
@@ -123,7 +123,7 @@ public class ForeignAmountEntryBox extends HBox
 
         });
 
-        foreign_CurrencySelector.connect(new ComboBox.CHANGED() {
+        foreign_CurrencySelector.connect(new ComboBox.Changed() {
             public void onChanged(ComboBox source) {
                 Currency cur = foreign_CurrencySelector.getCurrency();
                 foreignAmount.setCurrency(cur);
@@ -146,7 +146,7 @@ public class ForeignAmountEntryBox extends HBox
             }
         });
 
-        rate_Entry.connect(new Entry.CHANGED() {
+        rate_Entry.connect(new Entry.Changed() {
             public void onChanged(Editable source) {
                 final String text = rate_Entry.getText();
                 Debug.print("listeners", "rateEntry CHANGED " + text);
@@ -173,7 +173,7 @@ public class ForeignAmountEntryBox extends HBox
             }
         });
 
-        rate_Entry.connect(new Entry.ACTIVATE() {
+        rate_Entry.connect(new Entry.Activate() {
             public void onActivate(Entry source) {
                 final String original = rate_Entry.getText();
                 final String text = foreignAmount.getRate();
@@ -186,7 +186,7 @@ public class ForeignAmountEntryBox extends HBox
          * If focus leaves or user presses enter, then apply the formatting
          * inherent in ForeignAmount's rate String.
          */
-        rate_Entry.connect(new Widget.FOCUS_OUT_EVENT() {
+        rate_Entry.connect(new Widget.FocusOutEvent() {
             public boolean onFocusOutEvent(Widget source, EventFocus event) {
                 rate_Entry.setText(foreignAmount.getRate());
                 rate_Entry.selectRegion(0, 0);

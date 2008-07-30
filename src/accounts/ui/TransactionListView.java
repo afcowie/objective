@@ -2,7 +2,7 @@
  * TransactionListView.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006,2008 Operational Dynamics
  */
 package accounts.ui;
 
@@ -262,7 +262,7 @@ public class TransactionListView extends TreeView implements UpdateListener
 
         final TreeSelection selection = view.getSelection();
         selection.setMode(SelectionMode.SINGLE);
-        selection.connect(new TreeSelection.CHANGED() {
+        selection.connect(new TreeSelection.Changed() {
             public void onChanged(TreeSelection source) {
                 final TreeIter row;
 
@@ -273,7 +273,7 @@ public class TransactionListView extends TreeView implements UpdateListener
             }
         });
 
-        view.connect(new TreeView.ROW_ACTIVATED() {
+        view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
                 final TreeIter pointer = model.getIter(path); // TODO CHECK
                 final Transaction t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);

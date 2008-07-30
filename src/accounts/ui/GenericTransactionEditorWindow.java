@@ -2,7 +2,7 @@
  * GenericTransactionEditorWindow.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006,2008 Operational Dynamics
  */
 package accounts.ui;
 
@@ -243,7 +243,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
             tailings = new HBox(false, 3);
 
             addButton = new Button(Stock.ADD);
-            addButton.connect(new Button.CLICKED() {
+            addButton.connect(new Button.Clicked() {
                 public void onClicked(Button source) {
                     addRow(new Debit(new Amount("0"), null));
                     eB.showAll();
@@ -395,7 +395,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
             flipFlop();
 
-            flopButton.connect(new Button.CLICKED() {
+            flopButton.connect(new Button.Clicked() {
                 public void onClicked(Button source) {
                     if (state instanceof Debit) {
                         debitPos.removeEntry(state);
@@ -425,7 +425,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
             });
 
             deleteButton = new Button(Stock.DELETE);
-            deleteButton.connect(new Button.CLICKED() {
+            deleteButton.connect(new Button.Clicked() {
                 public void onClicked(Button source) {
                     eB.remove(box);
 

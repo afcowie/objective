@@ -242,7 +242,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
          * up so that the appropriate calculator is instantiated.
          */
 
-        payg_IdentifierSelector.connect(new ComboBox.CHANGED() {
+        payg_IdentifierSelector.connect(new ComboBox.Changed() {
             public void onChanged(ComboBox source) {
                 AustralianPayrollTaxIdentifier payg = (AustralianPayrollTaxIdentifier) payg_IdentifierSelector.getSelection();
                 Datestamp date = payPeriod_RangePicker.getStartDate();

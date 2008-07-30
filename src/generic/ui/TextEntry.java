@@ -2,7 +2,7 @@
  * TextEntry.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006,2008 Operational Dynamics
  */
 package generic.ui;
 
@@ -34,7 +34,7 @@ public class TextEntry extends Entry
     public TextEntry() {
         super();
 
-        connect(new Entry.CHANGED() {
+        connect(new Entry.Changed() {
             public void onChanged(Editable source) {
                 if (!((Entry) source).getHasFocus()) {
                     return;

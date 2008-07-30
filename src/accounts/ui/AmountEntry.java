@@ -2,9 +2,12 @@
  * AmountEntry.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006,2008 Operational Dynamics
  */
 package accounts.ui;
+
+import generic.ui.ChangeListener;
+import generic.util.Debug;
 
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
@@ -13,9 +16,6 @@ import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.StateType;
 import org.gnome.gtk.Widget;
-
-import generic.ui.ChangeListener;
-import generic.util.Debug;
 
 import accounts.domain.Amount;
 
@@ -66,7 +66,7 @@ public class AmountEntry extends HBox
         amount_Entry.setWidthChars(10);
         amount_Entry.setAlignment(1.0f);
 
-        amount_Entry.connect(new Entry.CHANGED() {
+        amount_Entry.connect(new Entry.Changed() {
             public void onChanged(Editable source) {
                 /*
                  * "changed" signals will come in as a result of either user
@@ -123,7 +123,7 @@ public class AmountEntry extends HBox
             }
         });
 
-        amount_Entry.connect(new Entry.ACTIVATE() {
+        amount_Entry.connect(new Entry.Activate() {
             public void onActivate(Entry source) {
                 /*
                  * Ensure the Entry shows the properly formatted Amount.
@@ -134,7 +134,7 @@ public class AmountEntry extends HBox
             }
         });
 
-        amount_Entry.connect(new Widget.FOCUS_OUT_EVENT() {
+        amount_Entry.connect(new Widget.FocusOutEvent() {
             public boolean onFocusOutEvent(Widget source, EventFocus event) {
                 /*
                  * Ensure the Entry shows the properly formatted Amount.

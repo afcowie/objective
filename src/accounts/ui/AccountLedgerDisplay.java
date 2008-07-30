@@ -2,7 +2,7 @@
  * AccountLedgerDisplay.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006,2008 Operational Dynamics
  */
 package accounts.ui;
 
@@ -69,7 +69,7 @@ public class AccountLedgerDisplay extends HBox
          */
         this.setSizeRequest(60, -1);
 
-        this.connect(new Widget.EXPOSE_EVENT() {
+        this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
                 resize();
                 return false;
@@ -232,5 +232,4 @@ public class AccountLedgerDisplay extends HBox
 
         return buf.toString();
     }
-
 }

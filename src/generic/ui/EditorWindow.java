@@ -2,19 +2,19 @@
  * EditorWindow.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005-2006 Operational Dynamics
+ * Copyright (c) 2005-2006,2008 Operational Dynamics
  */
 package generic.ui;
+
+import generic.persistence.DataClient;
+import generic.persistence.Engine;
+import generic.util.Debug;
 
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonBoxStyle;
 import org.gnome.gtk.HButtonBox;
 import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.Stock;
-
-import generic.persistence.DataClient;
-import generic.persistence.Engine;
-import generic.util.Debug;
 
 /**
  * A great number of UI windows follow the pattern of being either editors or
@@ -76,7 +76,7 @@ public abstract class EditorWindow extends PrimaryWindow
         buttonbox.setLayout(ButtonBoxStyle.END);
 
         cancel = new Button(Stock.CANCEL);
-        cancel.connect(new Button.CLICKED() {
+        cancel.connect(new Button.Clicked() {
             public void onClicked(Button source) {
                 cancel();
             }
@@ -84,7 +84,7 @@ public abstract class EditorWindow extends PrimaryWindow
         buttonbox.add(cancel);
 
         ok = new Button(Stock.OK);
-        ok.connect(new Button.CLICKED() {
+        ok.connect(new Button.Clicked() {
             public void onClicked(Button source) {
                 ok();
             }

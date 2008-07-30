@@ -2,7 +2,7 @@
  * AbstractWindow.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2005-2006 Operational Dynamics
+ * Copyright (c) 2005-2006,2008 Operational Dynamics
  */
 package generic.ui;
 
@@ -52,7 +52,7 @@ public abstract class AbstractWindow
      * overrideable. Likewise, this field is protected so you can just
      * override it in a subclass if you need to.
      */
-    protected Window.DELETE_EVENT defaultListener;
+    protected Window.DeleteEvent defaultListener;
 
     /**
      * These are all protected, so as to be visible to subclasses so there's
@@ -109,7 +109,7 @@ public abstract class AbstractWindow
         /*
          * Setup standard listener to handle hide and delete events
          */
-        defaultListener = new Window.DELETE_EVENT() {
+        defaultListener = new Window.DeleteEvent() {
             public boolean onDeleteEvent(Widget source, Event event) {
                 return deleteHook();
             }

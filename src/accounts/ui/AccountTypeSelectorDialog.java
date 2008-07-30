@@ -48,7 +48,7 @@ class AccountTypeSelectorDialog extends AbstractWindow
         // _assetsVBox.add()
 
         Button ok = (Button) gladeParser.getWidget("ok_button");
-        ok.connect(new Button.CLICKED() {
+        ok.connect(new Button.Clicked() {
             public void onClicked(Button source) {
                 Debug.print("listeners", "Ok Button click");
                 deleteHook();
@@ -56,7 +56,7 @@ class AccountTypeSelectorDialog extends AbstractWindow
         });
 
         Button cancel = (Button) gladeParser.getWidget("cancel_button");
-        cancel.connect(new Button.CLICKED() {
+        cancel.connect(new Button.Clicked() {
             public void onClicked(Button source) {
                 Debug.print("listeners", "Cancel Button click");
                 deleteHook();

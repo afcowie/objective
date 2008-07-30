@@ -6,8 +6,6 @@
  */
 package accounts.ui;
 
-import static org.gnome.gtk.Alignment.CENTER;
-import static org.gnome.gtk.Alignment.LEFT;
 import generic.persistence.DataClient;
 
 import java.util.Iterator;
@@ -49,6 +47,9 @@ import org.gnome.gtk.Window;
 import accounts.domain.Account;
 import accounts.domain.Books;
 import accounts.domain.Ledger;
+
+import static org.gnome.gtk.Alignment.CENTER;
+import static org.gnome.gtk.Alignment.LEFT;
 
 /**
  * A widget to select an Account / Ledger combination. AccountPicker presents
@@ -108,7 +109,7 @@ public class AccountPicker extends HBox
 
         popup = new AccountPickerPopup();
 
-        wide.connect(new Button.CLICKED() {
+        wide.connect(new Button.Clicked() {
             public void onClicked(Button source) {
                 popup.present();
             }
@@ -313,7 +314,7 @@ public class AccountPicker extends HBox
              * Signal handlers and Callbacks
              */
 
-            filteredStore.setVisibleCallback(new TreeModelFilter.VISIBLE() {
+            filteredStore.setVisibleCallback(new TreeModelFilter.Visible() {
                 private Pattern regex = null;
 
                 private String cached = "bleep";
@@ -353,13 +354,13 @@ public class AccountPicker extends HBox
             /*
              * and now we can add the mechanism to refilter on keystrokes.
              */
-            search.connect(new Entry.CHANGED() {
+            search.connect(new Editable.Changed() {
                 public void onChanged(Editable source) {
                     refilter();
                 }
             });
 
-            search.connect(new Entry.ACTIVATE() {
+            search.connect(new Entry.Activate() {
                 public void onActivate(Entry source) {
                     view.grabFocus();
                 }
@@ -369,7 +370,7 @@ public class AccountPicker extends HBox
              * If in the entry and you press down, jump straight to the rows
              * (skipping the headers).
              */
-            search.connect(new Widget.KEY_PRESS_EVENT() {
+            search.connect(new Widget.KeyPressEvent() {
                 public boolean onKeyPressEvent(Widget source, EventKey event) {
                     final Keyval key;
 
@@ -388,14 +389,14 @@ public class AccountPicker extends HBox
              * deselect all the text in the process - otherwise you get an
              * overwrite)
              */
-            search.connect(new Widget.FOCUS_IN_EVENT() {
+            search.connect(new Widget.FocusInEvent() {
                 public boolean onFocusInEvent(Widget source, EventFocus event) {
                     search.setPosition(search.getText().length());
                     return false;
                 }
             });
 
-            window.connect(new Widget.KEY_PRESS_EVENT() {
+            window.connect(new Widget.KeyPressEvent() {
                 public boolean onKeyPressEvent(Widget source, EventKey event) {
                     if (event.getKeyval() == Keyval.Escape) {
                         if (selectedAccount == null) {
@@ -411,7 +412,7 @@ public class AccountPicker extends HBox
             });
 
             final Pattern regexAtoZ = Pattern.compile("[a-z]");
-            view.connect(new Widget.KEY_PRESS_EVENT() {
+            view.connect(new Widget.KeyPressEvent() {
                 public boolean onKeyPressEvent(Widget source, EventKey event) {
                     final Keyval key;
 
@@ -450,14 +451,14 @@ public class AccountPicker extends HBox
                 }
             });
 
-            view.connect(new TreeView.ROW_ACTIVATED() {
+            view.connect(new TreeView.RowActivated() {
                 public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
                     TreeIter pointer = source.getModel().getIter(path);
                     applySelection(pointer);
                 }
             });
 
-            window.connect(new Window.DELETE_EVENT() {
+            window.connect(new Window.DeleteEvent() {
                 public boolean onDeleteEvent(Widget source, Event event) {
                     window.hide();
                     clearSearch();

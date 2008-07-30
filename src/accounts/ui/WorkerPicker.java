@@ -2,13 +2,10 @@
  * WorkerPicker.java
  * 
  * See LICENCE file for usage and redistribution terms
- * Copyright (c) 2006 Operational Dynamics
+ * Copyright (c) 2006,2008 Operational Dynamics
  */
 package accounts.ui;
 
-import static org.gnome.gdk.Color.BLACK;
-import static org.gnome.gdk.Color.RED;
-import static org.gnome.gtk.StateType.NORMAL;
 import generic.persistence.DataClient;
 
 import java.util.Iterator;
@@ -26,6 +23,10 @@ import org.gnome.gtk.TreeIter;
 
 import accounts.domain.Employee;
 import accounts.domain.Worker;
+
+import static org.gnome.gdk.Color.BLACK;
+import static org.gnome.gdk.Color.RED;
+import static org.gnome.gtk.StateType.NORMAL;
 
 /**
  * A picker allowing you to choose from a list of Workers. This delegates to
@@ -119,7 +120,7 @@ public class WorkerPicker extends HBox
          */
         final Entry entry = (Entry) worker_ComboBoxEntry.getChild();
 
-        worker_ComboBoxEntry.connect(new ComboBox.CHANGED() {
+        worker_ComboBoxEntry.connect(new ComboBox.Changed() {
             public void onChanged(ComboBox source) {
                 worker_ComboBoxEntry.popup();
 

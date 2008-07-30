@@ -1,7 +1,7 @@
 /*
  * DatePicker.java
  * 
- * Copyright (c) 2005-2007 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2005-2008 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the library it is a part of, are made available
  * to you by the authors under the terms of the "GNU General Public Licence,
@@ -10,7 +10,6 @@
  */
 package accounts.ui;
 
-import static org.freedesktop.bindings.Time.makeTime;
 import generic.ui.ChangeListener;
 
 import java.text.ParseException;
@@ -32,6 +31,8 @@ import org.gnome.gtk.Window;
 import org.gnome.gtk.WindowPosition;
 
 import accounts.domain.Datestamp;
+
+import static org.freedesktop.bindings.Time.makeTime;
 
 /**
  * A date picker widget, customized for use within the ObjectiveAccounts
@@ -84,7 +85,7 @@ public class DatePicker extends HBox
         packStart(entry, false, false, 0);
         packStart(pick, false, false, 0);
 
-        pick.connect(new Button.CLICKED() {
+        pick.connect(new Button.Clicked() {
             public void onClicked(Button source) {
                 if (popup == null) {
                     popup = new DatePickerPopup();
@@ -93,7 +94,7 @@ public class DatePicker extends HBox
             }
         });
 
-        entry.connect(new Entry.CHANGED() {
+        entry.connect(new Editable.Changed() {
             public void onChanged(Editable source) {
                 try {
                     date.setDate(entry.getText());
@@ -103,7 +104,7 @@ public class DatePicker extends HBox
             }
         });
 
-        entry.connect(new Entry.ACTIVATE() {
+        entry.connect(new Entry.Activate() {
             public void onActivate(Entry source) {
                 entry.setText(date.toString());
                 entry.setPosition(9);
@@ -140,20 +141,20 @@ public class DatePicker extends HBox
             calendar = new Calendar();
             window.add(calendar);
 
-            calendar.connect(new Calendar.DAY_SELECTED_DOUBLE_CLICK() {
+            calendar.connect(new Calendar.DaySelectedDoubleClick() {
                 public void onDaySelectedDoubleClick(Calendar source) {
                     applySelection();
                 }
             });
 
-            window.connect(new Widget.KEY_RELEASE_EVENT() {
+            window.connect(new Widget.KeyReleaseEvent() {
                 public boolean onKeyReleaseEvent(Widget source, EventKey event) {
                     Keyval key = event.getKeyval();
 
                     if (key == Keyval.Escape) {
                         window.hide();
                         return true;
-                    } else if (key == Keyval.Home || key == Keyval.t) {
+                    } else if ((key == Keyval.Home) || (key == Keyval.t)) {
                         date.setAsToday();
                         present();
                         return true;
@@ -167,7 +168,7 @@ public class DatePicker extends HBox
                 }
             });
 
-            window.connect(new Widget.HIDE() {
+            window.connect(new Widget.Hide() {
                 /*
                  * Raise the window that popped the picker. Given having added
                  * transient, is this necessary?
@@ -178,7 +179,7 @@ public class DatePicker extends HBox
                 }
             });
 
-            window.connect(new Window.DELETE_EVENT() {
+            window.connect(new Window.DeleteEvent() {
                 /*
                  * Only hide, don't destroy. More to the point, override the
                  * default return of false.
