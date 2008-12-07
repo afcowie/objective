@@ -6,9 +6,6 @@
  */
 package accounts.ui;
 
-import static org.gnome.gtk.Alignment.LEFT;
-import static org.gnome.gtk.Alignment.RIGHT;
-import static org.gnome.gtk.Alignment.TOP;
 import generic.client.Master;
 import generic.persistence.DataClient;
 import generic.ui.Text;
@@ -49,6 +46,10 @@ import accounts.domain.ForeignAmount;
 import accounts.domain.Ledger;
 import accounts.domain.Transaction;
 import accounts.services.EntryComparator;
+
+import static org.gnome.gtk.Alignment.LEFT;
+import static org.gnome.gtk.Alignment.RIGHT;
+import static org.gnome.gtk.Alignment.TOP;
 
 /**
  * Summarize a List of {@link accounts.domain.Transaction}s in
@@ -193,7 +194,7 @@ public class TransactionListView extends TreeView implements UpdateListener
         vertical.setTitle("Date");
         vertical.setClickable(true);
         vertical.setSortColumn(dateSort_DataColumn);
-        vertical.clicked();
+        vertical.emitClicked();
 
         /*
          * Description + Entries' parent Account » Ledger

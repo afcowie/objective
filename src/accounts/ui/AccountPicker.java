@@ -215,7 +215,7 @@ public class AccountPicker extends HBox
             vertical.setTitle("Account");
             vertical.setClickable(true);
             vertical.setSortColumn(accountTitle_DataColumn);
-            vertical.clicked();
+            vertical.emitClicked();
 
             // Ledger column
             vertical = view.appendColumn();
