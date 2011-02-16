@@ -69,7 +69,8 @@ public class IdentifierSelector extends ComboBox
         identifierObject_DataColumn = new DataColumnReference();
 
         DataColumn[] currencySelector_DataColumnArray = {
-                nameDisplay_DataColumn, identifierObject_DataColumn
+            nameDisplay_DataColumn,
+            identifierObject_DataColumn
         };
 
         listStore = new ListStore(currencySelector_DataColumnArray);

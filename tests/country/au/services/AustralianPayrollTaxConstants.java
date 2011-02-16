@@ -28,8 +28,8 @@ import country.au.domain.AustralianPayrollTaxIdentifier;
  * A utility class to load the constants on AustralianPayrollTaxIdentifier.
  * It's for unit tests and demo setup only - the one place you should NOT use
  * this from is the actual application.
- * <code>new AustralianPayrollTaxConstants(db).loadIdentifiers();</code>
- * ought to be sufficient.
+ * <code>new AustralianPayrollTaxConstants(db).loadIdentifiers();</code> ought
+ * to be sufficient.
  * 
  * @author Andrew Cowie
  */

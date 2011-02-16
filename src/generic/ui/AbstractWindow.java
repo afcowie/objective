@@ -221,8 +221,9 @@ public abstract class AbstractWindow
     }
 
     /**
-     * The default action to take on closing the window is to hide() <i>and</i>
-     * dereference it. Override this if you want to do something different!
+     * The default action to take on closing the window is to hide()
+     * <i>and</i> dereference it. Override this if you want to do something
+     * different!
      * 
      * @return the boolean value that you want the DELETE_EVENT to return, ie
      *         whether or not the event was handled (true) or whether it

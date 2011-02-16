@@ -69,8 +69,9 @@ public class Amount implements Comparable, Leaf
      * 
      * @param value
      *            strictly, syntax is as per
-     *            {@link BigDecimal#BigDecimal(java.lang.String) BigDecimal(String)},
-     *            but practically, "0.00" works, and is what is expected.
+     *            {@link BigDecimal#BigDecimal(java.lang.String)
+     *            BigDecimal(String)}, but practically, "0.00" works, and is
+     *            what is expected.
      * @throws NumberFormatException
      */
     public Amount(String value) {

@@ -155,18 +155,18 @@ public class TransactionListView extends TreeView implements UpdateListener
         active_DataColumn = new DataColumnBoolean();
 
         model = new ListStore(new DataColumn[] {
-                typeMarkup_DataColumn,
-                typeSort_DataColumn,
-                dateText_DataColumn,
-                dateSort_DataColumn,
-                descriptionAccountLedgerText_DataColumn,
-                descriptionSort_DataColumn,
-                debitAmountsText_DataColumn,
-                debitAmountsSort_DataColumn,
-                creditAmountsText_DataColumn,
-                creditAmountsSort_DataColumn,
-                transactionObject_DataColumn,
-                active_DataColumn
+            typeMarkup_DataColumn,
+            typeSort_DataColumn,
+            dateText_DataColumn,
+            dateSort_DataColumn,
+            descriptionAccountLedgerText_DataColumn,
+            descriptionSort_DataColumn,
+            debitAmountsText_DataColumn,
+            debitAmountsSort_DataColumn,
+            creditAmountsText_DataColumn,
+            creditAmountsSort_DataColumn,
+            transactionObject_DataColumn,
+            active_DataColumn
         });
 
         populate(transactions);

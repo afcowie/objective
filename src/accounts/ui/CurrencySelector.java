@@ -65,7 +65,8 @@ public class CurrencySelector extends ComboBox
         currencyObject_DataColumn = new DataColumnReference();
 
         DataColumn[] currencySelector_DataColumnArray = {
-                codeDisplay_DataColumn, currencyObject_DataColumn
+            codeDisplay_DataColumn,
+            currencyObject_DataColumn
         };
 
         listStore = new ListStore(currencySelector_DataColumnArray);

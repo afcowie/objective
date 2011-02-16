@@ -31,8 +31,8 @@ import org.gnome.gtk.WindowPosition;
 /**
  * A simple wrapper, as the {@link org.gnu.gtk.MessageDialog} class (which is
  * supposedly a convenience) is a pain to use. Also, historically,
- * {@link org.gnu.gtk.MessageDialog#setSecondaryText(String) setSecondaryText()}
- * was not available.
+ * {@link org.gnu.gtk.MessageDialog#setSecondaryText(String)
+ * setSecondaryText()} was not available.
  * <p>
  * Instantiate the dialog then call {@link #run()} to show &amp; block, or
  * {@link #present()} just to show it. It will center on the screen.
@@ -71,8 +71,8 @@ public class ModalDialog
      *            MessageType.{{@link MessageType#ERROR ERROR},
      *            {@link MessageType#WARNING WARNING},
      *            {@link MessageType#INFO INFO}, and
-     *            {@link MessageType#QUESTION QUESTION}}. We don't do
-     *            anything special with QUESTION for the time being.
+     *            {@link MessageType#QUESTION QUESTION} . We don't do anything
+     *            special with QUESTION for the time being.
      */
     public ModalDialog(Window parentWindow, String message, String subtext, MessageType type) {
         ButtonsType buttons;

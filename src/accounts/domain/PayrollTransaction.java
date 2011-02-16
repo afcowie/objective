@@ -58,10 +58,10 @@ public class PayrollTransaction extends Transaction
     }
 
     /**
-     * Artificial constructor for mockups and unit tests only. You <i>really</i>
-     * want to make sure that the entries passed to this are sensible,
-     * otherwise editing this Transaction will lead to all sorts of unwanted
-     * artifacts.
+     * Artificial constructor for mockups and unit tests only. You
+     * <i>really</i> want to make sure that the entries passed to this are
+     * sensible, otherwise editing this Transaction will lead to all sorts of
+     * unwanted artifacts.
      * 
      * @param employee
      *            The Employee object for the person being paid

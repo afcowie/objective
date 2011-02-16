@@ -57,7 +57,9 @@ public class TransactionCommandsTest extends BlankDatafileTestCase
         Debit expense = new Debit(new Amount("1000.00"), null);
 
         Entry[] entries = new Entry[] {
-                price, gst, expense
+            price,
+            gst,
+            expense
         };
 
         Datestamp d = new Datestamp();

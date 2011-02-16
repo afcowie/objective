@@ -236,8 +236,8 @@ public class Datestamp implements Comparable, Leaf
      * Get the internal timestamp which backs this Datestamp object. Exposed
      * only so things like sorting can be done more effectively.
      * 
-     * @return a long value. Note that this class only works to day precision -
-     *         hours and seconds are (supposed to be) zero.
+     * @return a long value. Note that this class only works to day precision
+     *         - hours and seconds are (supposed to be) zero.
      */
     public long getInternalTimestamp() {
         if (timestamp == 0) {

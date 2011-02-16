@@ -39,8 +39,8 @@ import accounts.domain.Books;
  *   ...
  * </code>
  * 
- * Then reference <code>rw</code> in your unit tests as an already opened
- * read write DataClient.
+ * Then reference <code>rw</code> in your unit tests as an already opened read
+ * write DataClient.
  * <p>
  * You must set <code>last</code> to true in the your last text fixture so
  * that {@link #tearDown()} knows to call {@link Engine#shutdown()}.

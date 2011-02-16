@@ -40,7 +40,8 @@ public class ProfessionalRevenueAccount extends RevenueAccount
     public ProfessionalRevenueAccount(String accountTitle, String feeName) {
         super(accountTitle);
         Ledger[] ledgers = {
-                new CreditPositiveLedger(feeName), new CreditPositiveLedger("Expense Reimbursement")
+            new CreditPositiveLedger(feeName),
+            new CreditPositiveLedger("Expense Reimbursement")
         };
         for (int i = 0; i < ledgers.length; i++) {
             addLedger(ledgers[i]);

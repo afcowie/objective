@@ -100,61 +100,61 @@ public class DemoBooksSetup
              */
 
             Account[] realAccounts = {
-                    new CashAccount("Petty Cash", "Manly Office"),
-                    new BankAccount("ANZ", "Current Account"),
-                    new BankAccount("Citibank", "Chequing Account"),
-                    new AccountsReceivable("Trade Debtors"),
-                    new DepreciatingAssetAccount("Computer Equipment"),
-                    new DepreciatingAssetAccount("Office Equipment"),
-                    new DepreciatingAssetAccount("Furniture"),
+                new CashAccount("Petty Cash", "Manly Office"),
+                new BankAccount("ANZ", "Current Account"),
+                new BankAccount("Citibank", "Chequing Account"),
+                new AccountsReceivable("Trade Debtors"),
+                new DepreciatingAssetAccount("Computer Equipment"),
+                new DepreciatingAssetAccount("Office Equipment"),
+                new DepreciatingAssetAccount("Furniture"),
 
-                    new AccountsPayable("Trade Creditors"),
-                    new SalesTaxPayableAccount("GST"),
-                    new PayrollTaxPayableAccount("PAYG Withholding"),
-                    new ReimbursableExpensesPayableAccount("Expenses Payable"),
-                    new LoanPayableAccount("Shareholders' Loans", new LoanLedger[] {
-                        new LoanLedger("Andrew Cowie"),
-                    }),
+                new AccountsPayable("Trade Creditors"),
+                new SalesTaxPayableAccount("GST"),
+                new PayrollTaxPayableAccount("PAYG Withholding"),
+                new ReimbursableExpensesPayableAccount("Expenses Payable"),
+                new LoanPayableAccount("Shareholders' Loans", new LoanLedger[] {
+                    new LoanLedger("Andrew Cowie"),
+                }),
 
-                    new OwnersEquityAccount("Owner's Equity", "Andrew Cowie"),
+                new OwnersEquityAccount("Owner's Equity", "Andrew Cowie"),
 
-                    new ProfessionalRevenueAccount("Strategic Planning and Board Governance",
-                            "Consulting Fees"),
-                    new ProfessionalRevenueAccount("Leadership & Teamwork", "Consulting Fees"),
-                    new ProfessionalRevenueAccount("Procedures", "Consulting Fees"),
-                    new ProfessionalRevenueAccount("Systems Performance", "Consulting Fees"),
-                    new ProfessionalRevenueAccount("Conference Speaking and Tutorials", "Speaking Fees"),
-                    new ProfessionalRevenueAccount("Publications", "Writing Fees"),
-                    new ProfessionalRevenueAccount("Internet Services", "Service Fees"),
+                new ProfessionalRevenueAccount("Strategic Planning and Board Governance",
+                        "Consulting Fees"),
+                new ProfessionalRevenueAccount("Leadership & Teamwork", "Consulting Fees"),
+                new ProfessionalRevenueAccount("Procedures", "Consulting Fees"),
+                new ProfessionalRevenueAccount("Systems Performance", "Consulting Fees"),
+                new ProfessionalRevenueAccount("Conference Speaking and Tutorials", "Speaking Fees"),
+                new ProfessionalRevenueAccount("Publications", "Writing Fees"),
+                new ProfessionalRevenueAccount("Internet Services", "Service Fees"),
 
-                    new GenericExpenseAccount("General and Administrative Expenses", new Ledger[] {
-                            new DebitPositiveLedger("Accounting Fees"),
-                            new DebitPositiveLedger("Legal Fees"),
-                            new DebitPositiveLedger("Government Fees")
-                    }),
-                    new GenericExpenseAccount("Telecommunications Expenses", new Ledger[] {
-                            new DebitPositiveLedger("Phone Lines, Office"),
-                            new DebitPositiveLedger("Phone Lines, International"),
-                            new DebitPositiveLedger("Phone Cards, Australia"),
-                            new DebitPositiveLedger("Phone Cards, International")
-                    }),
-                    new GenericExpenseAccount("Travel Expenses", new Ledger[] {
-                            new DebitPositiveLedger("Tickets, Air"),
-                            new DebitPositiveLedger("Tickets, Rail"),
-                            new DebitPositiveLedger("Ground Transfer"),
-                            new DebitPositiveLedger("Accommodation"),
-                            new DebitPositiveLedger("Meals"),
-                    }),
-                    new GenericExpenseAccount("Meals and Entertainment Expenses", new Ledger[] {
-                            new DebitPositiveLedger("Staff Meetings"),
-                            new DebitPositiveLedger("Client Meetings"),
-                    }),
-                    new GenericExpenseAccount("Employment Expenses", new Ledger[] {
-                            new DebitPositiveLedger("Staff Ammenities"),
-                            new DebitPositiveLedger("Salaries and Benefits"),
-                            new DebitPositiveLedger("Recruiting Costs"),
-                            new DebitPositiveLedger("Employee Medical Insurance"),
-                    }),
+                new GenericExpenseAccount("General and Administrative Expenses", new Ledger[] {
+                    new DebitPositiveLedger("Accounting Fees"),
+                    new DebitPositiveLedger("Legal Fees"),
+                    new DebitPositiveLedger("Government Fees")
+                }),
+                new GenericExpenseAccount("Telecommunications Expenses", new Ledger[] {
+                    new DebitPositiveLedger("Phone Lines, Office"),
+                    new DebitPositiveLedger("Phone Lines, International"),
+                    new DebitPositiveLedger("Phone Cards, Australia"),
+                    new DebitPositiveLedger("Phone Cards, International")
+                }),
+                new GenericExpenseAccount("Travel Expenses", new Ledger[] {
+                    new DebitPositiveLedger("Tickets, Air"),
+                    new DebitPositiveLedger("Tickets, Rail"),
+                    new DebitPositiveLedger("Ground Transfer"),
+                    new DebitPositiveLedger("Accommodation"),
+                    new DebitPositiveLedger("Meals"),
+                }),
+                new GenericExpenseAccount("Meals and Entertainment Expenses", new Ledger[] {
+                    new DebitPositiveLedger("Staff Meetings"),
+                    new DebitPositiveLedger("Client Meetings"),
+                }),
+                new GenericExpenseAccount("Employment Expenses", new Ledger[] {
+                    new DebitPositiveLedger("Staff Ammenities"),
+                    new DebitPositiveLedger("Salaries and Benefits"),
+                    new DebitPositiveLedger("Recruiting Costs"),
+                    new DebitPositiveLedger("Employee Medical Insurance"),
+                }),
             };
 
             Debug.print("main", "Create a whole ton of accounts");
@@ -170,8 +170,8 @@ public class DemoBooksSetup
              * Add any other accouts being used for testing purposes
              */
             Account[] testAccounts = {
-                    new CashAccount("Petty Cash", "Toronto Office"),
-                    new CashAccount("Petty Cash", "London Office"),
+                new CashAccount("Petty Cash", "Toronto Office"),
+                new CashAccount("Petty Cash", "London Office"),
             };
 
             for (int i = 0; i < testAccounts.length; i++) {
@@ -190,13 +190,13 @@ public class DemoBooksSetup
             Debug.print("main", "Set up some currencies");
 
             Currency[] currencies = {
-                    new Currency("CAD", "Canadian Dollar", "$"),
-                    new Currency("USD", "United States Dollar", "$"),
-                    new Currency("GBP", "British Pound", "\u00A3"),
-                    new Currency("CHF", "Swiss Franc", "SFr"),
-                    new Currency("EUR", "Eurpoean Union Euro", "\u20AC"),
-                    new Currency("SGD", "Singaporean Dollar", "S$"),
-                    new Currency("INR", "Indian Rupee", "Rs")
+                new Currency("CAD", "Canadian Dollar", "$"),
+                new Currency("USD", "United States Dollar", "$"),
+                new Currency("GBP", "British Pound", "\u00A3"),
+                new Currency("CHF", "Swiss Franc", "SFr"),
+                new Currency("EUR", "Eurpoean Union Euro", "\u20AC"),
+                new Currency("SGD", "Singaporean Dollar", "S$"),
+                new Currency("INR", "Indian Rupee", "Rs")
             };
 
             for (int i = 0; i < currencies.length; i++) {
@@ -215,7 +215,8 @@ public class DemoBooksSetup
             Debug.print("main", "Add a few Clients and Suppliers");
 
             Entity[] entities = {
-                    new Client("ACME, Inc"), new Supplier("Katoomba Telecom"),
+                new Client("ACME, Inc"),
+                new Supplier("Katoomba Telecom"),
             };
 
             for (int i = 0; i < entities.length; i++) {
@@ -232,7 +233,8 @@ public class DemoBooksSetup
             Debug.print("main", "Add some Employees");
 
             Employee[] staff = {
-                    new Employee("Andrew Cowie"), new Employee("Katrina Ross"),
+                new Employee("Andrew Cowie"),
+                new Employee("Katrina Ross"),
             };
 
             for (int i = 0; i < staff.length; i++) {

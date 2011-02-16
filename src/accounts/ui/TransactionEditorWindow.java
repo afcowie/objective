@@ -65,8 +65,8 @@ public abstract class TransactionEditorWindow extends EditorWindow
     private TransactionEditorWindow self;
 
     /**
-     * Set <code>self</code> and, for a non-zero id, fetch the object and
-     * set <code>editing</code> to true.
+     * Set <code>self</code> and, for a non-zero id, fetch the object and set
+     * <code>editing</code> to true.
      */
     private void setup(long id) {
         self = this;

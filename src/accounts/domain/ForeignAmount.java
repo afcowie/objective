@@ -106,8 +106,8 @@ public class ForeignAmount extends Amount
      * @param a
      *            a regular Amount whose literal numerical value you want to
      *            copy and use as the foreign value of this ForeignAmount.
-     *            Note this is <b>not</b> setting a 1:1 exchange rate; this
-     *            is just copying whatever value happens to be in the Amount
+     *            Note this is <b>not</b> setting a 1:1 exchange rate; this is
+     *            just copying whatever value happens to be in the Amount
      *            object passed in. Of course, if you pass in a ForeignAmount,
      *            then it's actual internal number value (which is denominated
      *            in home currency) will be used so you will set this

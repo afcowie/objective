@@ -45,9 +45,9 @@ public class Transaction extends DomainObject implements Normal
     protected String description = null;
 
     /**
-     * A reference connected with the transaction. This is <b>not</b> a
-     * unique id or primary key, but rather some optional meta data
-     * originating from the external source document.
+     * A reference connected with the transaction. This is <b>not</b> a unique
+     * id or primary key, but rather some optional meta data originating from
+     * the external source document.
      */
     protected String reference = null;
 

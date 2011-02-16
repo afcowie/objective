@@ -53,8 +53,8 @@ public abstract class Selector<T> extends Predicate<T>
      * 
      * @param target
      *            a DomainObject which will be set to protected field
-     *            <code>target</code> which you can then use as an argument
-     *            in a <code>match()</code> method when making a call to
+     *            <code>target</code> which you can then use as an argument in
+     *            a <code>match()</code> method when making a call to
      *            {@link DomainObject#congruent(Object) congruent()}.
      */
     public Selector(DomainObject target) {

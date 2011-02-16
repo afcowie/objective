@@ -200,12 +200,12 @@ public class AccountPicker extends HBox
             ledgerObject_DataColumn = new DataColumnReference();
 
             DataColumn[] accountsPicker_DataColumnsArray = new DataColumn[] {
-                    accountDisplay_DataColumn,
-                    accountTitle_DataColumn,
-                    accountObject_DataColumn,
-                    ledgerDisplay_DataColumn,
-                    ledgerName_DataColumn,
-                    ledgerObject_DataColumn
+                accountDisplay_DataColumn,
+                accountTitle_DataColumn,
+                accountObject_DataColumn,
+                ledgerDisplay_DataColumn,
+                ledgerName_DataColumn,
+                ledgerObject_DataColumn
             };
 
             listStore = new ListStore(accountsPicker_DataColumnsArray);

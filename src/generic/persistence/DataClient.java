@@ -182,9 +182,9 @@ public final class DataClient
     }
 
     /**
-     * Wraps
-     * {@link ObjectContainer#set(java.lang.Object) ObjectContainer.set()}. I
-     * prefer Hibernate's term for this, so "save" it is.
+     * Wraps {@link ObjectContainer#set(java.lang.Object)
+     * ObjectContainer.set()}. I prefer Hibernate's term for this, so "save"
+     * it is.
      */
     public void save(Object obj) {
         if (readOnly) {

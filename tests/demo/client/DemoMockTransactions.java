@@ -214,64 +214,64 @@ public class DemoMockTransactions
             Debug.print("main", "Store various transactions");
 
             Transaction[] initialization = {
-                    new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 02"),
-                            new Entry[] {
-                                    new Credit(new Amount("1.00"), ownersEquity),
-                                    new Debit(new Amount("1.00"), pettyCash),
-                            }),
-                    // FIXME change to some kind of Loan Transaction?
-                    new GenericTransaction("Loan from owner", new Datestamp("21 Dec 02"), new Entry[] {
-                            new Debit(new Amount("52700.00"), bankAccount),
-                            new Credit(new Amount("52700.00"), shareholdersLoan),
-                    }),
-                    new GenericTransaction("Chair for office", new Datestamp("6 Jan 04"), new Entry[] {
-                            new Debit(new Amount("659.10"), furniture),
-                            new Debit(new Amount("65.90"), gstPaid),
-                            new Credit(new Amount("725.00"), bankAccount),
-                    }),
-                    // FIXME change Transaction type?
-                    new GenericTransaction("Procedures implementation ACME, Inc", new Datestamp(
-                            "29 Aug 04"), new Entry[] {
+                new GenericTransaction("Initial capitalization", new Datestamp("19 Dec 02"),
+                        new Entry[] {
+                            new Credit(new Amount("1.00"), ownersEquity),
+                            new Debit(new Amount("1.00"), pettyCash),
+                        }),
+                // FIXME change to some kind of Loan Transaction?
+                new GenericTransaction("Loan from owner", new Datestamp("21 Dec 02"), new Entry[] {
+                    new Debit(new Amount("52700.00"), bankAccount),
+                    new Credit(new Amount("52700.00"), shareholdersLoan),
+                }),
+                new GenericTransaction("Chair for office", new Datestamp("6 Jan 04"), new Entry[] {
+                    new Debit(new Amount("659.10"), furniture),
+                    new Debit(new Amount("65.90"), gstPaid),
+                    new Credit(new Amount("725.00"), bankAccount),
+                }),
+                // FIXME change Transaction type?
+                new GenericTransaction("Procedures implementation ACME, Inc",
+                        new Datestamp("29 Aug 04"), new Entry[] {
                             new Debit(new Amount("21500.00"), bankAccount),
                             new Credit(new Amount("19545.45"), consultingRevenue),
                             new Credit(new Amount("1954.55"), gstCollected),
-                    }),
-                    new ReimbursableExpensesTransaction(andrew, "Dinner during WSIS", new Datestamp(
-                            "11 Dec 03"), new Entry[] {
-                            new Debit(new ForeignAmount("67.00", chf, "1.0657"), travelMeals),
-                            new Credit(new Amount("71.40"), andrew.getExpensesPayable()),
-                    }),
-                    new ReimbursableExpensesTransaction(andrew, "Dorcheseter Hotel London",
-                            new Datestamp("14 Sep 04"), new Entry[] {
-                                    new Debit(new ForeignAmount("242.16", gbp, "2.5606"), hotels),
-                                    new Credit(new Amount("620.07"), andrew.getExpensesPayable()),
-                            }),
-                    new ReimbursableExpensesTransaction(andrew, "Taxi from CDG to Paris", new Datestamp(
-                            "27 Mar 05"), new Entry[] {
-                            new Credit(new Amount("16.77"), andrew.getExpensesPayable()),
-                            new Debit(new ForeignAmount("9.99", eur, "1.67819"), groundTransport),
-                    }),
-                    new ReimbursableExpensesTransaction(katrina, "Coffee at Bacino", new Datestamp(
-                            "4 May 06"), new Entry[] {
-                            new Credit(new Amount("11.50"), katrina.getExpensesPayable()),
-                            new Debit(new Amount("10.45"), staffMeetings),
-                            new Debit(new Amount("1.05"), gstPaid),
-                    }),
-                    // FIXME change to Supplier/Bill Transaction when A/P
-                    // system in
-                    // place
-                    new GenericTransaction("March phone bill", new Datestamp("15 Apr 06"), new Entry[] {
-                            new Debit(new ForeignAmount("55.65", usd, "1.37193"), internationalPhone),
-                            new Credit(new Amount("76.35"), bankAccount),
-                    }),
-                    new PayrollTransaction(andrew,
-                            AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING,
-                            new Datestamp("13 Dec 05"), new Datestamp("1 Jul 05"), new Datestamp(
-                                    "31 Dec 05"), new Entry[] {
-                                    new Debit(new Amount("6550.00"), salaryExpense),
-                                    new Credit(new Amount("550.00"), paygCollected),
-                                    new Credit(new Amount("6000.00"), bankAccount)
-                            }),
+                        }),
+                new ReimbursableExpensesTransaction(andrew, "Dinner during WSIS", new Datestamp(
+                        "11 Dec 03"), new Entry[] {
+                    new Debit(new ForeignAmount("67.00", chf, "1.0657"), travelMeals),
+                    new Credit(new Amount("71.40"), andrew.getExpensesPayable()),
+                }),
+                new ReimbursableExpensesTransaction(andrew, "Dorcheseter Hotel London", new Datestamp(
+                        "14 Sep 04"), new Entry[] {
+                    new Debit(new ForeignAmount("242.16", gbp, "2.5606"), hotels),
+                    new Credit(new Amount("620.07"), andrew.getExpensesPayable()),
+                }),
+                new ReimbursableExpensesTransaction(andrew, "Taxi from CDG to Paris", new Datestamp(
+                        "27 Mar 05"), new Entry[] {
+                    new Credit(new Amount("16.77"), andrew.getExpensesPayable()),
+                    new Debit(new ForeignAmount("9.99", eur, "1.67819"), groundTransport),
+                }),
+                new ReimbursableExpensesTransaction(katrina, "Coffee at Bacino", new Datestamp(
+                        "4 May 06"), new Entry[] {
+                    new Credit(new Amount("11.50"), katrina.getExpensesPayable()),
+                    new Debit(new Amount("10.45"), staffMeetings),
+                    new Debit(new Amount("1.05"), gstPaid),
+                }),
+                // FIXME change to Supplier/Bill Transaction when A/P
+                // system in
+                // place
+                new GenericTransaction("March phone bill", new Datestamp("15 Apr 06"), new Entry[] {
+                    new Debit(new ForeignAmount("55.65", usd, "1.37193"), internationalPhone),
+                    new Credit(new Amount("76.35"), bankAccount),
+                }),
+                new PayrollTransaction(andrew,
+                        AustralianPayrollTaxIdentifier.TAXFREE_THRESHOLD_WITH_LEAVE_LOADING,
+                        new Datestamp("13 Dec 05"), new Datestamp("1 Jul 05"),
+                        new Datestamp("31 Dec 05"), new Entry[] {
+                            new Debit(new Amount("6550.00"), salaryExpense),
+                            new Credit(new Amount("550.00"), paygCollected),
+                            new Credit(new Amount("6000.00"), bankAccount)
+                        }),
 
             };
 

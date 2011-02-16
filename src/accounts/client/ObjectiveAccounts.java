@@ -32,22 +32,22 @@ public class ObjectiveAccounts
     /**
      * A String constant expressing the current version of the overall
      * released codebase. Used by equivalence (the top level
-     * <code>./configure</code> program) to find out the version to use in
-     * the names of release and snapshot tarballs. Small helper programs
-     * making use of this class do not need to override this constant.
+     * <code>./configure</code> program) to find out the version to use in the
+     * names of release and snapshot tarballs. Small helper programs making
+     * use of this class do not need to override this constant.
      */
     public static final String VERSION = "0.1.17";
 
     /**
      * The copyright statement for this code and a pointer to the top level
      * <code>LICENCE</code> file. Iterate over this array and print with
-     * newlines or {@link org.gnu.gtk.Label}s if you will, but this is here
-     * to embed it in distributed bytecode.
+     * newlines or {@link org.gnu.gtk.Label}s if you will, but this is here to
+     * embed it in distributed bytecode.
      */
     public static final String[] COPYRIGHT = new String[] {
-            "Copyright © 2005-2011 Operational Dynamics Consulting, Pty Ltd and Others.",
-            "The LICENCE file included with these sources lists the terms under which",
-            "you may use and redistribute this code.",
+        "Copyright © 2005-2011 Operational Dynamics Consulting, Pty Ltd and Others.",
+        "The LICENCE file included with these sources lists the terms under which",
+        "you may use and redistribute this code.",
     };
 
     /**

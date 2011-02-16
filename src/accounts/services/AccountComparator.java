@@ -64,32 +64,32 @@ public class AccountComparator implements Comparator
 
     static {
         final Class[] ordering = {
-                Account.class,
-                DebitPositiveAccount.class,
-                CreditPositiveAccount.class,
+            Account.class,
+            DebitPositiveAccount.class,
+            CreditPositiveAccount.class,
 
-                AssetAccount.class,
-                BankAccount.class,
-                CashAccount.class,
-                AccountsReceivable.class,
-                DepreciatingAssetAccount.class,
+            AssetAccount.class,
+            BankAccount.class,
+            CashAccount.class,
+            AccountsReceivable.class,
+            DepreciatingAssetAccount.class,
 
-                LiabilityAccount.class,
-                AccountsPayable.class,
-                SalesTaxPayableAccount.class,
-                PayrollTaxPayableAccount.class,
-                ReimbursableExpensesPayableAccount.class,
-                LoanPayableAccount.class,
+            LiabilityAccount.class,
+            AccountsPayable.class,
+            SalesTaxPayableAccount.class,
+            PayrollTaxPayableAccount.class,
+            ReimbursableExpensesPayableAccount.class,
+            LoanPayableAccount.class,
 
-                EquityAccount.class,
-                OwnersEquityAccount.class,
+            EquityAccount.class,
+            OwnersEquityAccount.class,
 
-                RevenueAccount.class,
-                ProfessionalRevenueAccount.class,
-                CurrencyGainLossAccount.class,
+            RevenueAccount.class,
+            ProfessionalRevenueAccount.class,
+            CurrencyGainLossAccount.class,
 
-                ExpenseAccount.class,
-                GenericExpenseAccount.class,
+            ExpenseAccount.class,
+            GenericExpenseAccount.class,
         };
 
         lookupTable = new TreeMap();

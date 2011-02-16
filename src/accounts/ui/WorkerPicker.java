@@ -90,7 +90,8 @@ public class WorkerPicker extends HBox
         workerObject_DataColumn = new DataColumnReference();
 
         DataColumn[] workerPicker_DataColumnArray = {
-                nameDisplay_DataColumn, workerObject_DataColumn
+            nameDisplay_DataColumn,
+            workerObject_DataColumn
         };
 
         listStore = new ListStore(workerPicker_DataColumnArray);

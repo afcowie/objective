@@ -101,7 +101,8 @@ public class Db4oActivationTest extends BlankDatafileTestCase
 
                 Transaction gt = new GenericTransaction("T:" + i, new Datestamp(DATESTRING),
                         new Entry[] {
-                                left, right
+                            left,
+                            right
                         });
 
                 PostTransactionCommand ptc = new PostTransactionCommand(gt);
@@ -198,14 +199,14 @@ public class Db4oActivationTest extends BlankDatafileTestCase
 
     public static void usage() {
         final String[] msg = {
-                "ERROR.",
-                "Usage: java " + Db4oActivationTest.class.getClass() + " [size]",
-                "",
-                "The single optional argument must be a positive number which will determine",
-                "the number of accounts, transactions and other internal iterations.",
-                "Make it large (100-200) if doing tuning in order to average out startup costs.",
-                "",
-                "The current default is " + DEFAULT + ".",
+            "ERROR.",
+            "Usage: java " + Db4oActivationTest.class.getClass() + " [size]",
+            "",
+            "The single optional argument must be a positive number which will determine",
+            "the number of accounts, transactions and other internal iterations.",
+            "Make it large (100-200) if doing tuning in order to average out startup costs.",
+            "",
+            "The current default is " + DEFAULT + ".",
 
         };
         for (int i = 0; i < msg.length; i++) {

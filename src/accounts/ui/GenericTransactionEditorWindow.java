@@ -471,8 +471,8 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
         }
 
         /**
-         * Get the Entry object for this row. You <b>must</b> call this to
-         * get the result of converting the Entry from Debit to Credit or vise
+         * Get the Entry object for this row. You <b>must</b> call this to get
+         * the result of converting the Entry from Debit to Credit or vise
          * versa if its direction has been flopped.
          * 
          * @return the (possibly new) Entry.

@@ -82,8 +82,8 @@ public class AustralianPayrollTaxTable implements Cascade
     }
 
     /**
-     * Each line of the table is a max salary (<=) and then the coefficients
-     * a and b to be used at or below that point. The last entry should have
+     * Each line of the table is a max salary (<=) and then the coefficients a
+     * and b to be used at or below that point. The last entry should have
      * ceiling set to Double.MAX_VALUE as all potential salaries will be below
      * it.
      */
@@ -102,7 +102,9 @@ public class AustralianPayrollTaxTable implements Cascade
             }
         }
         data[i] = new double[] {
-                ceiling, a, b
+            ceiling,
+            a,
+            b
         };
         i++;
     }

@@ -73,9 +73,9 @@ public class GenericTransactionTest extends TestCase
          * existing set
          */
         t.setEntries(new Entry[] {
-                new Debit(new Amount("10.00"), null),
-                new Credit(new Amount("4.25"), null),
-                new Credit(new Amount("5.75"), null),
+            new Debit(new Amount("10.00"), null),
+            new Credit(new Amount("4.25"), null),
+            new Credit(new Amount("5.75"), null),
         });
         assertTrue("Should still be a balanced transaction", t.isBalanced());
         Set e = t.getEntries();

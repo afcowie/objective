@@ -38,8 +38,8 @@ import org.gnome.gtk.Gtk;
  * application with a GTK based graphical user interface should extend this
  * class and implement approrpriate methods to allow windows to be launched
  * and clearn shutdowns to occur. Then, when bringing up your application,
- * assign an instance of this subclass to
- * {@link generic.client.Master#ui Master.ui}
+ * assign an instance of this subclass to {@link generic.client.Master#ui
+ * Master.ui}
  * 
  * @see generic.client.Master
  * @author Andrew Cowie
@@ -215,7 +215,8 @@ public abstract class UserInterface
      * Show the application as being in a busy state. Call this with
      * <code>true</code> when before you fire off a worker thread from an OK
      * button and then call it <code>false</code> when you are done. <i>This
-     * is GTK code so make sure you call it from within the main thread only.</i>
+     * is GTK code so make sure you call it from within the main thread
+     * only.</i>
      * <p>
      * Showing as working:
      * <ul>

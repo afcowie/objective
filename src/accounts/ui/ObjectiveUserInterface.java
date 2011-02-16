@@ -43,8 +43,8 @@ public class ObjectiveUserInterface extends UserInterface
 
     /**
      * Overrides (but calls)
-     * {@link generic.ui.UserInterface#deregisterWindow(generic.ui.PrimaryWindow)}.
-     * Removes w from the list of present windows if an Editor Window. The
+     * {@link generic.ui.UserInterface#deregisterWindow(generic.ui.PrimaryWindow)}
+     * . Removes w from the list of present windows if an Editor Window. The
      * calls super implementation.
      */
     protected void deregisterWindow(PrimaryWindow w) {

@@ -84,7 +84,8 @@ public class ComparatorsInTreeSetTest extends BlankDatafileTestCase
             }
 
             Account[] primes = {
-                    new BankAccount("Barkleys", "Main"), new OwnersEquityAccount("GST", "Paid"),
+                new BankAccount("Barkleys", "Main"),
+                new OwnersEquityAccount("GST", "Paid"),
             };
 
             for (int i = 0; i < primes.length; i++) {
@@ -108,7 +109,9 @@ public class ComparatorsInTreeSetTest extends BlankDatafileTestCase
 
                 Transaction gt = new GenericTransaction("T:" + i, new Datestamp(DATESTRING),
                         new Entry[] {
-                                leftone, lefttwo, right
+                            leftone,
+                            lefttwo,
+                            right
                         });
 
                 PostTransactionCommand ptc = new PostTransactionCommand(gt);
