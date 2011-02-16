@@ -44,7 +44,7 @@ endif
 	exit 1
 
 # Variables we expect to be set in .config are:
-#	JAVAGNOME_JARS
+#	GNOME_JARS
 #	JUNIT_JARS
 #	JNI_PATH
 #	JAVAC[_CMD]	[expected to be 9 chars wide]
@@ -53,13 +53,13 @@ endif
 # [This is just a quick sanity check]
 build/config: build/dirs .config
 	@echo "CHECK     build system configuration"
-	( if [ ! "$(JAVAGNOME_JARS)" ] ; then echo "Sanity check failed. Run ./configure" ; exit 1 ; fi )
+	( if [ ! "$(GNOME_JARS)" ] ; then echo "Sanity check failed. Run ./configure" ; exit 1 ; fi )
 	touch $@
 
 # [compose final classpath]
-#CLASSPATH=/home/andrew/workspace/libgtk-java/gtk2.6.jar:$(JAVAGNOME_JARS)
-CLASSPATH=$(JAVAGNOME_JARS):$(DB4O_JARS)
-JNI_PATH=$(JAVAGNOME_LIBS)
+#CLASSPATH=/home/andrew/workspace/libgtk-java/gtk2.6.jar:$(GNOME_JARS)
+CLASSPATH=$(GNOME_JARS):$(DB4O_JARS)
+JNI_PATH=$(GNOME_LIBS)
 
 SOURCES_DIST=$(shell find src -name '*.java')
 SOURCES_LIBS=$(shell find lib -name '*.java')
@@ -175,9 +175,9 @@ objective: build/native-libs build/native-dist
 	@echo "$(GCJ_LINK_CMD) $@"
 	$(GCJ) \
 		-Wl,-rpath=$(GCJ_LIB_PATH) \
-		-Wl,-rpath=$(JAVAGNOME_LIB_PATH) \
+		-Wl,-rpath=$(GNOME_LIB_PATH) \
 		-L$(GCJ_LIB_PATH) \
-		-L$(JAVAGNOME_LIB_PATH) \
+		-L$(GNOME_LIB_PATH) \
 		-lgtkjava-2.6 -lgladejava-2.10 \
 		-classpath $(CLASSPATH):lib:src \
 		-fjni -O \
@@ -228,7 +228,7 @@ build/javadoc: build/classes-dist build/dirs-javadoc \
 	@echo "JAVADOC   lib/generic src/*"
 	$(JAVADOC) \
 		-d doc/api \
-		-classpath tmp/classes:$(JAVAGNOME_JARS) \
+		-classpath tmp/classes:$(GNOME_JARS) \
 		-public \
 		-nodeprecated \
 		-source 1.4 \
@@ -266,7 +266,6 @@ test: build/unittests
 build/unittests: build/classes-tests
 	@echo "$(JAVA_CMD) UnitTests"
 	$(JAVA) \
-		-Djava.library.path=$(JNI_PATH) \
 		-classpath $(CLASSPATH):$(JUNIT_JARS):tmp/classes \
 		generic.junit.VerboseTestRunner UnitTests
 

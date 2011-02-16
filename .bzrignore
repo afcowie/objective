@@ -1,3 +1,4 @@
 tmp
 .config
 lib/db4o*.jar
+ext
