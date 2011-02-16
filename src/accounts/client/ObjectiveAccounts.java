@@ -45,7 +45,7 @@ public class ObjectiveAccounts
      * to embed it in distributed bytecode.
      */
     public static final String[] COPYRIGHT = new String[] {
-            "Copyright © 2005-2006 Operational Dynamics Consulting Pty Ltd, and others.",
+            "Copyright © 2005-2011 Operational Dynamics Consulting, Pty Ltd and Others.",
             "The LICENCE file included with these sources lists the terms under which",
             "you may use and redistribute this code.",
     };
