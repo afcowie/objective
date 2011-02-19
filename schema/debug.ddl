@@ -4,7 +4,14 @@ CREATE VIEW list_accounts AS
 SELECT
 	a.name,
 	l.name,
-	b.amount,
+	CASE
+	WHEN b.amount = 0 THEN
+		'0.00'
+	WHEN b.amount % 10 = 0 THEN
+		CAST (b.amount / 100.0 AS TEXT) || '0'
+	ELSE
+		CAST (b.amount / 100.0 AS TEXT)
+	END,
 	d.code
 FROM
 	accounts a, ledgers l, balances b, directions d
@@ -23,7 +30,15 @@ SELECT
 	t.description,
 	a.name,
 	l.name,
-	e.amount, 
+	CASE
+	WHEN e.amount = 0 THEN
+		'0.00'
+	WHEN e.amount % 10 = 0 THEN
+		CAST (e.amount / 100.0 AS TEXT) || '0'
+	ELSE
+		CAST (e.amount / 100.0 AS TEXT)
+	END,
+	e.currency,
 	d.code
 FROM
 	transactions t, entries e, ledgers l, accounts a, directions d
