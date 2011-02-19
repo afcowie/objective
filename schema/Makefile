@@ -9,9 +9,11 @@ clean:
 
 load: accounts.db
 accounts.db: create.ddl mock.ddl debug.ddl
-	sqlite3 accounts.db < create.ddl
-	sqlite3 accounts.db < mock.ddl
-	sqlite3 accounts.db < debug.ddl
+	rm -f accounts.db.tmp
+	sqlite3 -bail accounts.db.tmp < create.ddl
+	sqlite3 -bail accounts.db.tmp < mock.ddl
+	sqlite3 -bail accounts.db.tmp < debug.ddl
+	mv accounts.db.tmp accounts.db
 
 run: accounts.db
 	sqlite3 accounts.db

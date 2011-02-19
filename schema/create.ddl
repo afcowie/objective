@@ -1,5 +1,7 @@
 PRAGMA foreign_keys = ON;
 
+BEGIN;
+
 CREATE TABLE currencies
 (
 	code TEXT PRIMARY KEY,
@@ -61,7 +63,8 @@ CREATE TABLE entries
 	transaction_id INTEGER REFERENCES transactions,
 	ledger_id INTEGER REFERENCES ledgers,
 	amount INTEGER,
-	currencies TEXT REFERENCES currencies,
+	currency TEXT REFERENCES currencies,
+	rate REAL,
 	direction INTEGER REFERENCES directions
 );
 
@@ -80,3 +83,5 @@ WHERE
 GROUP BY
 	l.ledger_id;
 
+END;
+-- vim: filetype=text
