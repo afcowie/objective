@@ -11,7 +11,7 @@ SELECT
 		CAST (b.amount / 100.0 AS TEXT) || '0'
 	ELSE
 		CAST (b.amount / 100.0 AS TEXT)
-	END,
+	END AS amount,
 	d.code
 FROM
 	accounts a, ledgers l, balances b, directions d
@@ -26,10 +26,10 @@ GROUP BY
 
 CREATE VIEW list_transactions AS
 SELECT
-	date(t.datestamp, 'unixepoch'),
+	date(t.datestamp, 'unixepoch') AS datestamp,
 	t.description,
-	a.name,
-	l.name,
+	a.name AS account,
+	l.name AS ledger,
 	CASE
 	WHEN e.amount = 0 THEN
 		'0.00'
@@ -37,9 +37,9 @@ SELECT
 		CAST (e.amount / 100.0 AS TEXT) || '0'
 	ELSE
 		CAST (e.amount / 100.0 AS TEXT)
-	END,
+	END AS amount,
 	e.currency,
-	d.code
+	d.code AS type
 FROM
 	transactions t, entries e, ledgers l, accounts a, directions d
 WHERE
@@ -52,3 +52,4 @@ GROUP BY
 ORDER BY
 	t.datestamp;
 
+-- vim: filetype=text

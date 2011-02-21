@@ -52,6 +52,7 @@ CREATE TABLE ledgers
 CREATE TABLE transactions
 (
 	transaction_id INTEGER PRIMARY KEY,
+	type_id INTEGER REFERENCES types,
 	datestamp INTEGER,
 	description TEXT,
 	reference TEXT
