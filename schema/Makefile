@@ -12,8 +12,7 @@ accounts.db: create.ddl mock.ddl debug.ddl
 	rm -f accounts.db.tmp
 	sqlite3 -bail accounts.db.tmp < create.ddl
 	sqlite3 -bail accounts.db.tmp < mock.ddl
-	sqlite3 -bail accounts.db.tmp < debug.ddl
 	mv accounts.db.tmp accounts.db
 
 run: accounts.db
-	sqlite3 accounts.db
+	sqlite3 -init debug.ddl -interactive accounts.db

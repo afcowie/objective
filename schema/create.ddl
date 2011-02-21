@@ -46,6 +46,7 @@ CREATE TABLE ledgers
 	ledger_id INTEGER PRIMARY KEY,
 	account_id INTEGER REFERENCES accounts,
 	name TEXT,
+	currency TEXT REFERENCES currencies,
 	direction INTEGER REFERENCES directions
 );
 
@@ -65,7 +66,7 @@ CREATE TABLE entries
 	ledger_id INTEGER REFERENCES ledgers,
 	amount INTEGER,
 	currency TEXT REFERENCES currencies,
-	rate REAL,
+	value INTEGER,
 	direction INTEGER REFERENCES directions
 );
 
@@ -74,7 +75,8 @@ CREATE TABLE entries
 CREATE VIEW balances AS
 SELECT
 	l.ledger_id,
-	sum(e.amount * e.direction) * l.direction AS amount
+	sum(e.amount * e.direction) * l.direction AS amount,
+	sum(e.value * e.direction) * l.direction AS value
 FROM
 	entries e, accounts a, ledgers l, directions d
 WHERE
