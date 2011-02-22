@@ -75,14 +75,12 @@ CREATE TABLE entries
 CREATE VIEW balances AS
 SELECT
 	l.ledger_id,
-	sum(e.amount * e.direction) * l.direction AS amount,
+	sum((e.currency NOTNULL) * e.amount * e.direction) * l.direction AS amount,
 	sum(e.value * e.direction) * l.direction AS value
 FROM
-	entries e, accounts a, ledgers l, directions d
+	entries e, ledgers l
 WHERE
-	e.ledger_id = l.ledger_id AND
-	l.account_id = a.account_id AND
-	l.direction = d.direction
+	e.ledger_id = l.ledger_id
 GROUP BY
 	l.ledger_id;
 

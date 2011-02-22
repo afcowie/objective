@@ -7,8 +7,8 @@ BEGIN;
 CREATE TEMPORARY VIEW list_accounts AS
 SELECT
 	pad(a.name, 37),
-	money(sum(b.value), 'AUD', a.direction, 1) AS debit,
-	money(sum(b.value), 'AUD', a.direction, -1) AS credit
+	money(sum(b.value), NULL, a.direction, 1) AS debit,
+	money(sum(b.value), NULL, a.direction, -1) AS credit
 FROM
 	accounts a, ledgers l, balances b
 WHERE
@@ -21,13 +21,26 @@ GROUP BY
 
 CREATE TEMPORARY VIEW list_ledgers AS
 SELECT
-	pad(a.name, 18),
-	pad(l.name, 18),
-	money(b.value, 'AUD', l.direction, 1) AS debit,
-	money(b.value, 'AUD', l.direction, -1) AS credit
+	pad(a.name || ' » ' || l.name, 37),
+	money(b.value, NULL, l.direction, 1) AS debit,
+	money(b.value, NULL, l.direction, -1) AS credit
 FROM
-	accounts a, ledgers l, balances b, directions d
+	accounts a, ledgers l, balances b
 WHERE
+	l.account_id = a.account_id AND
+	l.ledger_id = b.ledger_id
+GROUP BY
+	l.ledger_id;
+
+CREATE TEMPORARY VIEW list_amounts AS
+SELECT
+	pad(a.name || ' » ' || l.name, 37),
+	money(b.amount, l.currency, l.direction, 1) AS debit,
+	money(b.amount, l.currency, l.direction, -1) AS credit
+FROM
+	accounts a, ledgers l, balances b
+WHERE
+	l.currency NOTNULL AND
 	l.account_id = a.account_id AND
 	l.ledger_id = b.ledger_id
 GROUP BY
@@ -36,16 +49,34 @@ GROUP BY
 
 --
 
+
+CREATE TEMPORARY VIEW debug_entries AS
+SELECT
+	entry_id,
+	transaction_id,
+	ledger_id,
+	CASE
+	WHEN currency NOTNULL
+	THEN
+		amount
+	ELSE
+		value
+	END AS amount,
+	currency,
+	direction
+FROM
+	entries;
+
+
 CREATE TEMPORARY VIEW list_transactions AS
 SELECT
 	date(t.datestamp, 'unixepoch') AS datestamp,
-	pad(t.description, 12) AS description,
-	pad(a.name, 12) AS account,
-	pad(l.name, 12) AS ledger,
+	pad(t.description, 13) AS description,
+	pad(substr(a.name, 0, 12) || ' » ' || l.name, 25) AS "account,ledger",
 	money(e.amount, e.currency, e.direction, 1) AS debit,
 	money(e.amount, e.currency, e.direction, -1) AS credit
 FROM
-	transactions t, entries e, ledgers l, accounts a, directions d
+	transactions t, debug_entries e, ledgers l, accounts a, directions d
 WHERE
 	e.ledger_id = l.ledger_id AND
 	l.account_id = a.account_id AND
