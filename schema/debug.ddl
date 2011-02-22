@@ -6,33 +6,30 @@ BEGIN;
 
 CREATE TEMPORARY VIEW list_accounts AS
 SELECT
-	pad(a.name, 15),
-	pad(l.name, 15),
-	money(b.value, 'AUD', d.direction, 1) AS debit,
-	money(b.value, 'AUD', d.direction, -1) AS credit
+	pad(a.name, 37),
+	money(sum(b.value), 'AUD', a.direction, 1) AS debit,
+	money(sum(b.value), 'AUD', a.direction, -1) AS credit
 FROM
-	accounts a, ledgers l, balances b, directions d
+	accounts a, ledgers l, balances b
 WHERE
 	l.account_id = a.account_id AND
-	l.ledger_id = b.ledger_id AND
-	l.direction = d.direction
+	l.ledger_id = b.ledger_id
 GROUP BY
-	l.ledger_id;
+	a.account_id;
 
 --
 
 CREATE TEMPORARY VIEW list_ledgers AS
 SELECT
-	pad(a.name, 15),
-	pad(l.name, 15),
-	money(b.value, l.currency, d.direction, 1) AS debit,
-	money(b.value, l.currency, d.direction, -1) AS credit
+	pad(a.name, 18),
+	pad(l.name, 18),
+	money(b.value, 'AUD', l.direction, 1) AS debit,
+	money(b.value, 'AUD', l.direction, -1) AS credit
 FROM
 	accounts a, ledgers l, balances b, directions d
 WHERE
 	l.account_id = a.account_id AND
-	l.ledger_id = b.ledger_id AND
-	l.direction = d.direction
+	l.ledger_id = b.ledger_id
 GROUP BY
 	l.ledger_id;
 
