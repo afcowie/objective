@@ -16,11 +16,11 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 import junit.framework.TestCase;
 
-public class ForeignCurrencyTest extends TestCase
+public class ValidateForeignCurrency extends TestCase
 {
     public final void testCurrencyConstuctor() {
         Currency c = new Currency("CAD", "Canadian Dollar", "$");
@@ -33,12 +33,12 @@ public class ForeignCurrencyTest extends TestCase
 
     public final void testCurrencyCodeFormat() {
         try {
-            Currency c = new Currency("Cad", "Canadian Dollar", "$");
+            new Currency("Cad", "Canadian Dollar", "$");
             fail("Didn't throw IllegalArgumentExpception when a incorrectly formatted cuurency was used");
         } catch (IllegalArgumentException iae) {
         }
         try {
-            Currency c = new Currency("cad", "Canadian Dollar", "$");
+            new Currency("cad", "Canadian Dollar", "$");
             fail("Didn't throw IllegalArgumentExpception when a incorrectly formatted cuurency was used");
         } catch (IllegalArgumentException iae) {
         }
@@ -55,33 +55,39 @@ public class ForeignCurrencyTest extends TestCase
 
     public final void testRateFormat() {
         final int expected = 5;
-        if (ForeignAmount.RATE_DECIMAL_PLACES != expected) {
-            fail("No big deal, but you'll need to adjust this test case as it's rather carefully set up to test for "
-                    + expected + " decimal places.");
-        }
+        final Currency usd;
+        final ForeignAmount fa1, fa2, fa5, fa6a, fa6b;
 
-        Currency usd = new Currency("USD", "United States Dollar", "$");
-        ForeignAmount fa1 = new ForeignAmount("10.00", usd, "1.3");
+        assertEquals("No big deal, but you'll need to adjust this test case as it's"
+                + " rather carefully set up to test for " + expected + " decimal places.", expected,
+                ForeignAmount.RATE_DECIMAL_PLACES);
+
+        usd = new Currency("USD", "United States Dollar", "$");
+        fa1 = new ForeignAmount("10.00", usd, "1.3");
 
         assertEquals("1.30000", fa1.getRate());
 
-        ForeignAmount fa2 = new ForeignAmount("10.00", usd, "1.35");
+        fa2 = new ForeignAmount("10.00", usd, "1.35");
         assertEquals("1.35000", fa2.getRate());
 
-        ForeignAmount fa5 = new ForeignAmount("10.00", usd, "1.35761");
+        fa5 = new ForeignAmount("10.00", usd, "1.35761");
 
         assertEquals("1.35761", fa5.getRate());
 
-        ForeignAmount fa6a = new ForeignAmount("10.00", usd, "1.357611");
+        fa6a = new ForeignAmount("10.00", usd, "1.357611");
         assertEquals("1.35761", fa6a.getRate());
 
-        ForeignAmount fa6b = new ForeignAmount("10.00", usd, "1.357617");
+        fa6b = new ForeignAmount("10.00", usd, "1.357617");
         assertEquals("1.35762", fa6b.getRate());
     }
 
     public final void testForeignAmountCommaPadding() {
-        Currency usd = new Currency("USD", "United States Dollar", "$");
-        ForeignAmount fa = new ForeignAmount("10000.00", usd, "1.35761");
+        final Currency usd;
+        final ForeignAmount fa;
+        final Amount a;
+
+        usd = new Currency("USD", "United States Dollar", "$");
+        fa = new ForeignAmount("10000.00", usd, "1.35761");
 
         assertEquals("10000.00", fa.getForeignValue());
         assertEquals("13576.10", fa.getValue());
@@ -94,13 +100,16 @@ public class ForeignCurrencyTest extends TestCase
          * quickly construct a new Amount.with that value
          */
 
-        Amount a = new Amount(fa.getValue());
+        a = new Amount(fa.getValue());
         assertEquals("13,576.10", a.toString());
     }
 
     public final void testChangeRate() {
-        Currency gbp = new Currency("GBP", "British Pound", "?");
-        ForeignAmount fa = new ForeignAmount("10000.00", gbp, "2.5143666");
+        final Currency gbp;
+        final ForeignAmount fa;
+
+        gbp = new Currency("GBP", "British Pound", "?");
+        fa = new ForeignAmount("10000.00", gbp, "2.5143666");
 
         assertEquals("10000.00", fa.getForeignValue());
         assertEquals("Didn't round properly", "25143.67", fa.getValue());
@@ -113,8 +122,11 @@ public class ForeignCurrencyTest extends TestCase
     }
 
     public final void testChangeFaceValue() {
-        Currency sgd = new Currency("SGD", "Singaporean Dollar", "$");
-        ForeignAmount fa = new ForeignAmount("10000.00", sgd, "1.13571");
+        final Currency sgd;
+        final ForeignAmount fa;
+
+        sgd = new Currency("SGD", "Singaporean Dollar", "$");
+        fa = new ForeignAmount("10000.00", sgd, "1.13571");
 
         assertEquals("10000.00", fa.getForeignValue());
         assertEquals("11357.10", fa.getValue());
@@ -126,8 +138,11 @@ public class ForeignCurrencyTest extends TestCase
     }
 
     public final void testChangeHomeValue() {
-        Currency eur = new Currency("EUR", "European Euro", "?");
-        ForeignAmount fa = new ForeignAmount("100.00", eur, "1.500");
+        final Currency eur;
+        final ForeignAmount fa;
+
+        eur = new Currency("EUR", "European Euro", "?");
+        fa = new ForeignAmount("100.00", eur, "1.500");
 
         assertEquals("100.00", fa.getForeignValue());
         assertEquals("150.00", fa.getValue());
@@ -150,12 +165,15 @@ public class ForeignCurrencyTest extends TestCase
     }
 
     public final void testClone() {
-        Currency eur = new Currency("EUR", "European Euro", "?");
-        Currency gbp = new Currency("GBP", "British Pound", "?");
+        final Currency eur, gbp;
+        final ForeignAmount fa1, fa2, fa3;
+        final Amount a4;
+        eur = new Currency("EUR", "European Euro", "?");
+        gbp = new Currency("GBP", "British Pound", "?");
 
-        ForeignAmount fa1 = new ForeignAmount("100.00", eur, "1.500");
+        fa1 = new ForeignAmount("100.00", eur, "1.500");
 
-        ForeignAmount fa2 = (ForeignAmount) fa1.clone();
+        fa2 = (ForeignAmount) fa1.clone();
 
         assertEquals("100.00", fa2.getForeignValue());
         assertEquals(eur, fa2.getCurrency());
@@ -178,23 +196,27 @@ public class ForeignCurrencyTest extends TestCase
          * For now, it means that toString will always give the face value,
          * regardless of Amount or ForeignAmount, in face currency terms.
          */
-        ForeignAmount fa3 = (ForeignAmount) fa2.clone();
+        fa3 = (ForeignAmount) fa2.clone();
         assertEquals("100.00", fa3.toString());
 
         /*
          * If this fails, it menas the behaviour has changed and the fully
          * qualified subclass's toString() isn't prevailing
          */
-        Amount a4 = (Amount) ((Amount) fa2).clone();
+        a4 = (Amount) ((Amount) fa2).clone();
         assertNotSame("150.00", a4.toString());
         assertEquals("100.00", a4.toString());
     }
 
     public final void testAvoidDivideByZero() {
-        Currency eur = new Currency("EUR", "European Euro", "\u20AC");
-        ForeignAmount fa = new ForeignAmount("0.00", eur, "1.500");
+        final Currency eur;
+        final ForeignAmount fa;
+        ForeignAmount c;
 
-        ForeignAmount c = null;
+        eur = new Currency("EUR", "European Euro", "\u20AC");
+        fa = new ForeignAmount("0.00", eur, "1.500");
+
+        c = null;
         try {
             c = (ForeignAmount) fa.clone();
         } catch (ArithmeticException ae) {
@@ -205,17 +227,21 @@ public class ForeignCurrencyTest extends TestCase
     }
 
     public final void testSetValueAmount() {
-        Currency gbp = new Currency("GBP", "British Pound", "\u00A3");
-        Currency eur = new Currency("EUR", "European Euro", "\u20AC");
+        final Currency eur, gbp;
+        final ForeignAmount fa, other;
+        final Amount dummy;
 
-        ForeignAmount fa = new ForeignAmount("1.00", gbp, "2.450");
+        gbp = new Currency("GBP", "British Pound", "\u00A3");
+        eur = new Currency("EUR", "European Euro", "\u20AC");
 
-        Amount dummy = new Amount("5.00");
+        fa = new ForeignAmount("1.00", gbp, "2.450");
+
+        dummy = new Amount("5.00");
         fa.setForeignValue(dummy);
 
         assertEquals("5.00", fa.getForeignValue());
 
-        ForeignAmount other = new ForeignAmount("-10.00", eur, "1.50");
+        other = new ForeignAmount("-10.00", eur, "1.50");
         fa.setForeignValue(other);
 
         assertEquals("-36.75", fa.getValue());

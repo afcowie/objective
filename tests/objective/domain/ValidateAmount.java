@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 /**
  * Unit test Amount class.
  * 
- * @see accounts.domain.ForeignCurrencyTest
+ * @see objective.domain.ValidateForeignCurrency
  * @author Andrew Cowie
  */
 public class ValidateAmount extends TestCase

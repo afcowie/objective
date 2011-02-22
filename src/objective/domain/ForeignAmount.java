@@ -16,9 +16,10 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 import java.math.BigDecimal;
+
 
 /**
  * An amount of money in a foreign currency. ForeignAmount encapsulates the
@@ -37,6 +38,10 @@ public class ForeignAmount extends Amount
 
     private Currency currency;
 
+    private ForeignAmount() {
+        super(0);
+    }
+
     /**
      * The number of cents representing the foreign value we were given.
      */
@@ -48,10 +53,6 @@ public class ForeignAmount extends Amount
      */
     private String rate;
 
-    public ForeignAmount() {
-        super();
-    }
-
     /**
      * @param faceValue
      *            The amount denominated in the foreign (origin) currency
@@ -62,6 +63,7 @@ public class ForeignAmount extends Amount
      *            currency.
      */
     public ForeignAmount(String faceValue, Currency cur, String rate) {
+        super(0);
         this.setForeignValue(faceValue);
         this.setCurrency(cur);
         this.setRate(rate);
@@ -229,7 +231,9 @@ public class ForeignAmount extends Amount
     }
 
     public Object clone() {
-        ForeignAmount obj = new ForeignAmount();
+        final ForeignAmount obj;
+
+        obj = new ForeignAmount();
         // Copy the long
         obj.foreignNumber = this.foreignNumber;
         // Copy the reference
