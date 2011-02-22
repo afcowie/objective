@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 import java.math.BigDecimal;
 
@@ -28,13 +28,15 @@ import junit.framework.TestCase;
  * @see accounts.domain.ForeignCurrencyTest
  * @author Andrew Cowie
  */
-public class AmountTest extends TestCase
+public class ValidateAmount extends TestCase
 {
     public final void testDefaultConstructor() {
-        Amount a = new Amount();
+        final Amount a, b;
+
+        a = new Amount(0);
         assertEquals("0.00", a.getValue());
 
-        Amount b = new Amount("");
+        b = new Amount("");
         assertEquals("0.00", b.getValue());
     }
 
@@ -249,10 +251,12 @@ public class AmountTest extends TestCase
      * underlying long directly.
      */
     public final void testNumberMethods() {
-        Amount a = new Amount(0);
+        final Amount a, b;
+
+        a = new Amount(0);
         assertTrue(a.isZero());
 
-        Amount b = new Amount();
+        b = new Amount(0);
         b.setNumber(15634);
         assertEquals("156.34", b.getValue());
 

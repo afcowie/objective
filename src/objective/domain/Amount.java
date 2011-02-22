@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 import generic.domain.Leaf;
 
@@ -27,14 +27,17 @@ import java.math.BigDecimal;
  * amounts (at least, as recorded in accounting) are always to this exact
  * precision. All values are represented publicly as Strings in the form
  * "0.00", that is as numbers with two and only decimal places (ie, money).
- * <P>
+ * 
+ * <p>
  * Note that amounts are scalar - that is, being debit and credit is carried
  * as an aspects of entries in transactions/ledgers.
- * <P>
+ * 
+ * <p>
  * We use BigDecimal to do calculations which involve multiplication or
  * division, since it is needed to avoid rounding problems with floating
  * point. However, except in rare cases, we can shield most of that ugliness.
- * <P>
+ * 
+ * <p>
  * Internally, we store a long, which is the amount * 100. This was inspired
  * by {@link BigDecimal#valueOf(long, int)}- and we use that factory for
  * conversions to take advantage of its efficiency.
@@ -42,26 +45,13 @@ import java.math.BigDecimal;
  * @author Andrew Cowie
  * 
  */
-public class Amount implements Comparable, Leaf
+public class Amount implements Comparable<Amount>, Leaf
 {
-    /*
-     * Instance variables ---------------------------------
-     */
+
     /**
      * This is the value * 100. Or, if you prefer, the number of cents :)
      */
     private long number = 0;
-
-    /*
-     * Constructors ---------------------------------------
-     */
-
-    /**
-     * [Only for creating search prototypes]
-     */
-    public Amount() {
-    //
-    }
 
     /**
      * A new number. If you feed this constructor an empty string you'll get
@@ -97,10 +87,6 @@ public class Amount implements Comparable, Leaf
     public Amount(long cents) {
         this.number = cents;
     }
-
-    /*
-     * Getters and Setters --------------------------------
-     */
 
     /**
      * @param value
@@ -188,7 +174,6 @@ public class Amount implements Comparable, Leaf
             buf.insert(len - 2, '.');
         }
         return buf.toString();
-
     }
 
     /**
@@ -252,7 +237,7 @@ public class Amount implements Comparable, Leaf
     }
 
     /*
-     * Basic operations, use BigDecimal where necessary ---
+     * Basic operations, use BigDecimal where necessary.
      */
 
     /**
@@ -273,14 +258,11 @@ public class Amount implements Comparable, Leaf
      * +1 if this object is greater, and 0 if the object has the same internal
      * value. [This method implements Comparable interface]
      */
-    public int compareTo(Object x) {
+    public int compareTo(Amount x) {
         if (x == null) {
             throw new NullPointerException("Can't compareTo() against null");
         }
-        if (!(x instanceof Amount)) {
-            throw new IllegalArgumentException("Object passed to compareTo() is not an Amount");
-        }
-        Amount a = (Amount) x;
+        Amount a = x;
         if (this.number > a.number) {
             return 1;
         } else if (this.number < a.number) {
@@ -295,9 +277,7 @@ public class Amount implements Comparable, Leaf
      * course)
      */
     public Object clone() {
-        Amount obj = new Amount();
-        obj.number = this.number;
-        return obj;
+        return new Amount(this.number);
     }
 
     /**
