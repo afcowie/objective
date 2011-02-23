@@ -1,5 +1,5 @@
 PRAGMA foreign_keys = ON;
-.load ./amount.so
+.load ../tmp/native/amount.so
 
 BEGIN;
 
