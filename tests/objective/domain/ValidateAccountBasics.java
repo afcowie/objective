@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 import junit.framework.TestCase;
 
@@ -25,56 +25,52 @@ import junit.framework.TestCase;
  * 
  * @author Andrew Cowie
  */
-public class BasicAccountTest extends TestCase
+public class ValidateAccountBasics extends TestCase
 {
     public final void testIsDebitPositive() {
-        Account acct = new Account();
-        try {
-            assertFalse(acct.isDebitPositive());
-            fail("Should have thrown UnsupportedOperationException");
-        } catch (UnsupportedOperationException uoe) {
-        }
+        final Account a;
 
-        try {
-            assertFalse(acct.isCreditPositive());
-            fail("Should have thrown UnsupportedOperationException");
-        } catch (UnsupportedOperationException uoe) {
-        }
-
-        Account drPosAcct = new DebitPositiveAccount();
-        assertTrue(drPosAcct.isDebitPositive());
-        assertFalse(drPosAcct.isCreditPositive());
+        a = new BankAccount(0);
+        assertTrue(a.isDebitPositive());
+        assertFalse(a.isCreditPositive());
 
     }
 
     public final void testIsCreditPositive() {
-        Account crPosAcct = new CreditPositiveAccount();
-        assertTrue(crPosAcct.isCreditPositive());
-        assertFalse(crPosAcct.isDebitPositive());
+        final Account a;
+
+        a = new ProfessionalRevenueAccount(0);
+        assertTrue(a.isCreditPositive());
+        assertFalse(a.isDebitPositive());
     }
 
     public final void testSetTitle() {
-        Account acct = new Account();
+        final Account a;
+
+        a = new BankAccount(0);
 
         String TITLE = "Currency Gain/Loss";
-        acct.setTitle(TITLE);
-        assertEquals(TITLE, acct.getTitle());
+        a.setTitle(TITLE);
+        assertEquals(TITLE, a.getTitle());
     }
 
     public final void testCodeValidation() {
-        Account acct = new Account();
+        final Account a;
+
+        a = new BankAccount(0);
+
         try {
-            acct.setCode("4-9999");
+            a.setCode("4-9999");
         } catch (IllegalArgumentException iae) {
             fail("It threw an IllegalArgumentException. It shouldn't have!");
         }
-        assertEquals("4-9999", acct.getCode());
+        assertEquals("4-9999", a.getCode());
 
         /*
          * right length, but missing '-'
          */
         try {
-            acct.setCode("499999");
+            a.setCode("499999");
             fail("It should have thrown a IllegalArgumentException.");
         } catch (IllegalArgumentException iae) {
             //
@@ -86,7 +82,7 @@ public class BasicAccountTest extends TestCase
             /*
              * wrong length, but '-' in right place.
              */
-            acct.setCode("4-999");
+            a.setCode("4-999");
             fail("It should have thrown a IllegalArgumentException.");
         } catch (IllegalArgumentException iae) {
             //
@@ -95,6 +91,4 @@ public class BasicAccountTest extends TestCase
         }
 
     }
-
-    // public final void
 }

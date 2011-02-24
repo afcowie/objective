@@ -16,7 +16,11 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
+
+import accounts.domain.DebitPositiveLedger;
+import accounts.domain.Entry;
+import accounts.domain.SingleLedger;
 
 /**
  * A bank account. This is more complicated than a simple cash account because
@@ -38,8 +42,8 @@ public class BankAccount extends AssetAccount implements SingleLedger
     /**
      * [For creating search prototypes]
      */
-    public BankAccount() {
-        super();
+    public BankAccount(long rowid) {
+        super(rowid);
     }
 
     /**
@@ -53,8 +57,6 @@ public class BankAccount extends AssetAccount implements SingleLedger
     public BankAccount(String institution, String name) {
         super();
         this.setTitle(institution);
-        // this.institution = institution;
-        // this.name = name;
 
         ledger = new DebitPositiveLedger();
         ledger.setName(name);

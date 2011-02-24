@@ -16,19 +16,15 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * An asset account.
  */
-public class AssetAccount extends DebitPositiveAccount
+public abstract class AssetAccount extends DebitPositiveAccount
 {
-    public AssetAccount() {
-        super();
-    }
-
-    public AssetAccount(String title) {
-        super(title);
+    public AssetAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {
