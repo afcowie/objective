@@ -16,22 +16,22 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * An account which is Debit Positive.
  * 
  * @author Andrew Cowie
  */
-public class DebitPositiveAccount extends Account
+public abstract class DebitPositiveAccount extends Account
 {
     /*
      * Would have been abstract, except that having it concrete allows for
      * testing and searching with null prototypes.
      */
 
-    public DebitPositiveAccount() {
-        super();
+    public DebitPositiveAccount(long rowid) {
+        super(rowid);
     }
 
     public DebitPositiveAccount(String title) {

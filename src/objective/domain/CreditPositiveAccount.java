@@ -16,39 +16,29 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
- * A revenue account specific to professional services such as consulting. It
- * has two built in Ledgers: one for fee revenue, and one representing
- * received expense reimbursement payments.
+ * An account which is credit positive, ie a liability, equity or revenue
+ * account.
  * 
  * @author Andrew Cowie
  */
-public class ProfessionalRevenueAccount extends RevenueAccount
+public abstract class CreditPositiveAccount extends Account
 {
-    public ProfessionalRevenueAccount() {
-        super();
+    public CreditPositiveAccount(long rowid) {
+        super(rowid);
     }
 
-    /**
-     * @param accountTitle
-     *            Account's title, perhaps "Performance Coaching"
-     * @param feeName
-     *            Ledger name, typically "Consulting Fees"
-     */
-    public ProfessionalRevenueAccount(String accountTitle, String feeName) {
-        super(accountTitle);
-        Ledger[] ledgers = {
-            new CreditPositiveLedger(feeName),
-            new CreditPositiveLedger("Expense Reimbursement")
-        };
-        for (int i = 0; i < ledgers.length; i++) {
-            addLedger(ledgers[i]);
-        }
+    public boolean isDebitPositive() {
+        return false;
+    }
+
+    public boolean isCreditPositive() {
+        return true;
     }
 
     public String getClassString() {
-        return "Professional Services Revenue";
+        return "Credit Positive Account";
     }
 }

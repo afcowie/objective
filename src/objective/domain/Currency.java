@@ -43,10 +43,6 @@ public class Currency
 
     private String symbol;
 
-    public Currency() {
-    // for searching
-    }
-
     /**
      * 
      * @param code

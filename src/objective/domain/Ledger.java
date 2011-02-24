@@ -16,26 +16,27 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
-import generic.domain.DomainObject;
-import generic.domain.Normal;
 import generic.util.DebugException;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import accounts.domain.Credit;
+import accounts.domain.CreditPositiveLedger;
+import accounts.domain.Debit;
+import accounts.domain.DebitPositiveLedger;
+import accounts.domain.Entry;
+
 /**
  * Base class for the ledgers within actual accounts.
  * 
  * @author Andrew Cowie
  */
-public class Ledger extends DomainObject implements Normal
+public class Ledger
 {
-    /*
-     * Instance variables ---------------------------------
-     */
     private String name = null;
 
     private Set entries = null;
@@ -47,20 +48,12 @@ public class Ledger extends DomainObject implements Normal
      */
     protected transient Amount balance = null;
 
-    /*
-     * Constructors ---------------------------------------
-     */
-
     public Ledger() {
     /*
      * The default empty constructor provides a null prototype, useful for
      * searching. Otherwise, you use one of the subclasses.
      */
     }
-
-    /*
-     * Utility methods ------------------------------------
-     */
 
     /**
      * Add an Entry to this Ledger.
@@ -183,10 +176,6 @@ public class Ledger extends DomainObject implements Normal
                 "You're working with a raw Ledger object which is neither Debit nor Credit Postitive, so we can't subtract an Entry from it.");
     }
 
-    /*
-     * Getters and Setters --------------------------------
-     */
-
     /**
      * The ledger's current balance. Will calculate this if not yet available.
      * The whole idea is NOT to calculate this until we actually need it, ie,
@@ -254,10 +243,6 @@ public class Ledger extends DomainObject implements Normal
     public void setParentAccount(Account parent) {
         this.parentAccount = parent;
     }
-
-    /*
-     * Output ---------------------------------------------
-     */
 
     public String getClassString() {
         return "Ledger";

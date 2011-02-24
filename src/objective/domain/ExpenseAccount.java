@@ -16,26 +16,18 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
-public class GenericExpenseAccount extends ExpenseAccount
+/**
+ * An expense account.
+ */
+public abstract class ExpenseAccount extends DebitPositiveAccount
 {
-    public GenericExpenseAccount() {
-        super();
-    }
-
-    public GenericExpenseAccount(String title) {
-        super(title);
-    }
-
-    public GenericExpenseAccount(String title, Ledger[] ledgers) {
-        super(title);
-        for (int i = 0; i < ledgers.length; i++) {
-            addLedger(ledgers[i]);
-        }
+    public ExpenseAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {
-        return "Generic Expense";
+        return "Expense";
     }
 }

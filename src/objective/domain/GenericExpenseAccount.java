@@ -16,38 +16,15 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
-/**
- * An account which is credit positive, ie a liability, equity or revenue
- * account.
- * 
- * @author Andrew Cowie
- */
-public class CreditPositiveAccount extends Account
+public class GenericExpenseAccount extends ExpenseAccount
 {
-    /*
-     * Would have been abstract, except that having it concrete allows for
-     * testing and searching with null prototypes.
-     */
-
-    public CreditPositiveAccount() {
-        super();
-    }
-
-    public CreditPositiveAccount(String title) {
-        super(title);
-    }
-
-    public boolean isDebitPositive() {
-        return false;
-    }
-
-    public boolean isCreditPositive() {
-        return true;
+    public GenericExpenseAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {
-        return "Credit Positive Account";
+        return "Generic Expense";
     }
 }

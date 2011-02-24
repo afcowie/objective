@@ -16,13 +16,17 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
-
-import generic.domain.Normal;
+package objective.domain;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import objective.persistence.DomainObject;
+import accounts.domain.Credit;
+import accounts.domain.CreditPositiveLedger;
+import accounts.domain.Debit;
+import accounts.domain.DebitPositiveLedger;
 
 /**
  * Fundamental grouping. An Account consists of metadata for organizing, and
@@ -30,7 +34,7 @@ import java.util.Set;
  * 
  * @author Andrew Cowie
  */
-public class Account implements Normal
+public abstract class Account extends DomainObject
 {
     /*
      * Instance variables ---------------------------------
@@ -46,22 +50,8 @@ public class Account implements Normal
      */
     private transient Amount balance = null;
 
-    /*
-     * Constructors ---------------------------------------
-     */
-
-    /**
-     * [For creating search prototypes]
-     */
-    public Account() {
-    //
-    }
-
-    /**
-     * [For creating search prototypes]
-     */
-    public Account(String title) {
-        setTitle(title);
+    protected Account(long rowid) {
+        super(rowid);
     }
 
     /*
