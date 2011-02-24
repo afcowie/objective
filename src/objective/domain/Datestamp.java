@@ -16,9 +16,8 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
-import generic.domain.Leaf;
 import generic.persistence.NotActivatedException;
 import generic.util.DebugException;
 
@@ -35,7 +34,7 @@ import java.util.TimeZone;
  * 
  * @author Andrew Cowie
  */
-public class Datestamp implements Comparable, Leaf
+public class Datestamp implements Comparable<Datestamp>
 {
     /**
      * We use -1 for uninitialized, to guard against lacking activation, and
@@ -43,9 +42,6 @@ public class Datestamp implements Comparable, Leaf
      */
     private static final long UNSET = -1;
 
-    /*
-     * Instance variables ---------------------------------
-     */
     private long timestamp = UNSET;
 
     /**
@@ -97,7 +93,7 @@ public class Datestamp implements Comparable, Leaf
      */
     public boolean isSet() {
         if (timestamp == 0) {
-            throw new NotActivatedException();
+            throw new IllegalStateException();
         }
         return (!(timestamp == UNSET));
     }
@@ -106,9 +102,6 @@ public class Datestamp implements Comparable, Leaf
      * Outputs Datestamp in dd MMM yy (%e %b %y) form.
      */
     public String toString() {
-        if (timestamp == 0) {
-            return "NOTACTIVE";
-        }
         if (timestamp == UNSET) {
             return "  UNSET  ";
         }
@@ -254,17 +247,14 @@ public class Datestamp implements Comparable, Leaf
      *         x, -1 if this Datestmap is less than (older) than x, and 0 if
      *         they are the same.
      */
-    public int compareTo(Object x) {
+    public int compareTo(Datestamp x) {
         if (x == null) {
             throw new NullPointerException("Can't compareTo() against null");
-        }
-        if (!(x instanceof Datestamp)) {
-            throw new IllegalArgumentException("Can only compare Datestamp objects");
         }
         if (timestamp == 0) {
             throw new NotActivatedException();
         }
-        Datestamp d = (Datestamp) x;
+        Datestamp d = x;
 
         if (this.timestamp > d.timestamp) {
             return 1;

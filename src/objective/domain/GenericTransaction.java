@@ -16,13 +16,16 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
+
+import accounts.domain.Entry;
 
 /**
  * A generic transaction in the "general ledger" as traditional accounting
  * systems would call it. Simply consists of a balanced set of Entries, and
  * does not link to any special user interface.
- * <P>
+ * 
+ * <p>
  * This would have been called GeneralLedgerTransaction but ther was potential
  * for naming confustion as we have modelled the actual ledger(s) in any given
  * account with the Ledger class. This is most assuredly an accounting
@@ -35,14 +38,14 @@ public class GenericTransaction extends Transaction
     /**
      * Default constructor, for searching.
      */
-    public GenericTransaction() {
-        super();
+    public GenericTransaction(long rowid) {
+        super(rowid);
     }
 
     /**
      * Somewhat artificial constructor useful for mockups and unit tests
      */
-    public GenericTransaction(String description, Datestamp date, Entry[] entries) {
+    GenericTransaction(String description, Datestamp date, Entry[] entries) {
         super(description, date, entries);
     }
 

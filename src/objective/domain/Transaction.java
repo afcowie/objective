@@ -16,14 +16,16 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
-
-import generic.domain.DomainObject;
-import generic.domain.Normal;
+package objective.domain;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import objective.persistence.DomainObject;
+import accounts.domain.Credit;
+import accounts.domain.Debit;
+import accounts.domain.Entry;
 
 /**
  * Base class of the Transaction hierarchy. Transactions are operations which
@@ -37,11 +39,8 @@ import java.util.Set;
  * 
  * @author Andrew Cowie
  */
-public class Transaction extends DomainObject implements Normal
+public abstract class Transaction extends DomainObject
 {
-    /*
-     * Instance variables ---------------------------------
-     */
     protected String description = null;
 
     /**
@@ -55,15 +54,8 @@ public class Transaction extends DomainObject implements Normal
 
     protected Set entries = null;
 
-    /*
-     * Constructors ---------------------------------------
-     */
-
-    public Transaction() {
-    /*
-     * Default constructor to permit generic top level searches. We don't
-     * instantiate the Set here, though - save that for addding an entry.
-     */
+    protected Transaction(long rowid) {
+        super(rowid);
     }
 
     /**

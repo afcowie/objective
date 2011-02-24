@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,9 +24,8 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-public class DatestampTest extends TestCase
+public class ValidateDatestamp extends TestCase
 {
-
     public final void testValidDatestampStringInput() {
         Datestamp stamp = new Datestamp();
 
@@ -76,6 +75,7 @@ public class DatestampTest extends TestCase
 
     public final void testInvalidDatestampStringInput() {
         Datestamp stamp;
+
         stamp = new Datestamp();
         try {
             stamp.setDate("15 Janvier 2005");
@@ -99,24 +99,19 @@ public class DatestampTest extends TestCase
     }
 
     public final void testCompareTo() {
-        Datestamp andrew, katrina;
-        andrew = new Datestamp("28 Dec 73");
-        katrina = new Datestamp("18 Mar 74");
+        final Datestamp one, two;
 
-        assertTrue(andrew.compareTo(katrina) == -1);
-        assertTrue(katrina.compareTo(andrew) == 1);
-        assertTrue(andrew.compareTo(andrew) == 0);
+        one = new Datestamp("28 Dec 73");
+        two = new Datestamp("18 Mar 74");
 
-        try {
-            Object o = new Object();
-            andrew.compareTo(o);
-            fail("Should have bombed on a not-Datestamp");
-        } catch (IllegalArgumentException iae) {
-        }
+        assertTrue(one.compareTo(two) == -1);
+        assertTrue(two.compareTo(one) == 1);
+        assertTrue(one.compareTo(one) == 0);
     }
 
     public final void testUnbiasedByTimezones() {
-        Datestamp one;
+        final Datestamp one;
+
         one = new Datestamp("1 Jul 05");
 
         long internal = one.getInternalTimestamp();
