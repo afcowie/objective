@@ -47,8 +47,16 @@ public class Datestamp implements Comparable<Datestamp>
     /**
      * Construct a new Datestamp. Leaves it "unset"
      */
-    public Datestamp() {
-    // only for creating search prototypes
+    public Datestamp() {}
+
+    /**
+     * Store a given unix timestamp directly.
+     */
+    public Datestamp(long timestamp) {
+        if (timestamp < -1) {
+            throw new IllegalArgumentException();
+        }
+        this.timestamp = timestamp;
     }
 
     /**
@@ -80,7 +88,7 @@ public class Datestamp implements Comparable<Datestamp>
      */
     public void setAsToday() {
         try {
-            setDate(System.currentTimeMillis());
+            setDate(System.currentTimeMillis() / 1000);
         } catch (ParseException pe) {
             throw new DebugException(
                     "ParseException thrown when using setDate on System.currentTimeMillis()!");
@@ -106,7 +114,7 @@ public class Datestamp implements Comparable<Datestamp>
             return "  UNSET  ";
         }
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy");
-        return sdf.format(new Date(timestamp));
+        return sdf.format(new Date(timestamp * 1000));
     }
 
     /**
@@ -122,7 +130,7 @@ public class Datestamp implements Comparable<Datestamp>
         /*
          * TODO validate that the cal object is in fact date aligned.
          */
-        this.timestamp = cal.getTimeInMillis();
+        this.timestamp = cal.getTimeInMillis() / 1000;
     }
 
     /**
@@ -183,7 +191,8 @@ public class Datestamp implements Comparable<Datestamp>
             if (timestamp == UNSET) {
                 cal.setTime(new Date());
             } else {
-                cal.setTime(new Date(timestamp)); // use this Datestamp's
+                cal.setTime(new Date(timestamp * 1000)); // use this
+                // Datestamp's
                 // year
             }
 
@@ -212,7 +221,7 @@ public class Datestamp implements Comparable<Datestamp>
             // rethrow, having avoided fallback ladder.
             throw new ParseException(iae.getMessage(), 0);
         }
-        this.timestamp = d.getTime();
+        this.timestamp = d.getTime() / 1000;
     }
 
     /**

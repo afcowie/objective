@@ -89,6 +89,5 @@ public class ValidateAccountBasics extends TestCase
         } catch (Exception e) {
             fail("It threw something, but not what was expected: " + e);
         }
-
     }
 }
