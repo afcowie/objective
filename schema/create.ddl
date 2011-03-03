@@ -21,7 +21,7 @@ CREATE TABLE accounts
 (
 	account_id INTEGER PRIMARY KEY,
 	type_id INTEGER REFERENCES types,
-	name TEXT,
+	title TEXT,
 	direction INTEGER REFRENCES directions
 );
 
