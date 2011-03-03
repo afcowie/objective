@@ -40,8 +40,8 @@ INSERT INTO ledgers VALUES (8, 6, 'Meals', NULL, 1);
 INSERT INTO accounts VALUES (7, 7, 'Communications Expenses', 1);
 INSERT INTO ledgers VALUES (10, 7, 'Telephone', NULL, 1);
 
-INSERT INTO accounts VALUES (8, 6, 'Adjustments', -1);
-INSERT INTO ledgers VALUES (12, 8, 'Currency Gain/Loss', NULL, -1);
+INSERT INTO accounts VALUES (8, 7, 'Fees', 1);
+INSERT INTO ledgers VALUES (12, 8, 'Foreign Exchange', NULL, 1);
 
 
 --
@@ -55,8 +55,7 @@ INSERT INTO entries VALUES (NULL, 1, 4, 2250000, 'USD', 3381750, -1);
 
 INSERT INTO transactions VALUES (2, 10, 1098170000, 'Payment', '1033');
 INSERT INTO entries VALUES (NULL, 2, 1, 3573000, 'AUD', 3573000, 1);
-INSERT INTO entries VALUES (NULL, 2, 2, 2250000, 'USD', 3573000, -1);
-INSERT INTO entries VALUES (NULL, 2, 2, 0, 'USD', 191250, 1);
+INSERT INTO entries VALUES (NULL, 2, 2, 2250000, 'USD', 3381750, -1);
 INSERT INTO entries VALUES (NULL, 2, 4, 191250, 'AUD', 191250, -1);
 
 
