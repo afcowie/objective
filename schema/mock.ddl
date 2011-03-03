@@ -12,6 +12,10 @@ INSERT INTO types VALUES (8, 'objective.domain.GenericTransaction');
 INSERT INTO types VALUES (9, 'objective.domain.InvoiceTransaction');
 INSERT INTO types VALUES (10, 'objective.domain.PaymentTransaction');
 
+--
+-- Mock Accounts
+--
+
 INSERT INTO accounts VALUES (1, 1, 'ANZ', 1);
 INSERT INTO ledgers VALUES (1, 1, 'Current Account', 'AUD', 1);
 
@@ -36,30 +40,33 @@ INSERT INTO ledgers VALUES (8, 6, 'Meals', NULL, 1);
 INSERT INTO accounts VALUES (7, 7, 'Communications Expenses', 1);
 INSERT INTO ledgers VALUES (10, 7, 'Telephone', NULL, 1);
 
+INSERT INTO accounts VALUES (8, 6, 'Adjustments', -1);
+INSERT INTO ledgers VALUES (12, 8, 'Currency Gain/Loss', NULL, -1);
+
+
+--
+-- Mock Transactions
 --
 
 INSERT INTO transactions VALUES (1, 9, 1062164087, 'Automation', '1033');
 INSERT INTO entries VALUES (NULL, 1, 2, 2250000, 'USD', 3381750, 1);
-INSERT INTO entries VALUES (NULL, 1, 4, 0, NULL, 3381750, -1);
+INSERT INTO entries VALUES (NULL, 1, 4, 2250000, 'USD', 3381750, -1);
 
---
 
 INSERT INTO transactions VALUES (2, 10, 1098170000, 'Payment', '1033');
 INSERT INTO entries VALUES (NULL, 2, 1, 3573000, 'AUD', 3573000, 1);
 INSERT INTO entries VALUES (NULL, 2, 2, 2250000, 'USD', 3573000, -1);
-INSERT INTO entries VALUES (NULL, 2, 2, 0, NULL, 191250, 1);
-INSERT INTO entries VALUES (NULL, 2, 4, 0, NULL, 191250, -1);
+INSERT INTO entries VALUES (NULL, 2, 2, 0, 'USD', 191250, 1);
+INSERT INTO entries VALUES (NULL, 2, 4, 191250, 'AUD', 191250, -1);
 
---
 
 INSERT INTO transactions VALUES (3, 8, 1101040600, 'Phone Card', NULL);
-INSERT INTO entries VALUES (NULL, 3, 11, 4000, 'CAD', 4267, -1);
-INSERT INTO entries VALUES (NULL, 3, 10, 0, NULL, 4267, 1);
+INSERT INTO entries VALUES (NULL, 3, 10, 4000, 'CAD', 4267, 1);
+INSERT INTO entries VALUES (NULL, 3, 11, 4267, 'AUD', 4267, -1);
 
---
 
 INSERT INTO transactions VALUES (4, 8, 1063102035, 'Flight to SFO', NULL);
-INSERT INTO entries VALUES (NULL, 4, 7, 0, NULL, 329999, 1);
+INSERT INTO entries VALUES (NULL, 4, 7, 329999, 'AUD', 329999, 1);
 INSERT INTO entries VALUES (NULL, 4, 1, 329999, 'AUD', 329999, -1);
 
 COMMIT;

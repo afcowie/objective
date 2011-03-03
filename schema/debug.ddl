@@ -52,27 +52,7 @@ GROUP BY
 
 --
 
-
-CREATE TEMPORARY VIEW debug_entries AS
-SELECT
-	entry_id,
-	transaction_id,
-	ledger_id,
-	CASE
-	WHEN currency NOTNULL
-	THEN
-		amount
-	ELSE
-		value
-	END AS amount,
-	currency,
-	direction
-FROM
-	entries;
-
-
-
-CREATE TEMPORARY VIEW list_transactions AS
+CREATE TEMPORARY VIEW list_transactions_amounts AS
 SELECT
 	date(t.datestamp, 'unixepoch') AS datestamp,
 	pad(t.description, 13) AS description,
@@ -80,7 +60,7 @@ SELECT
 	money(e.amount, e.currency, e.direction, 1) AS debit,
 	money(e.amount, e.currency, e.direction, -1) AS credit
 FROM
-	transactions t, debug_entries e, ledgers l, accounts a, directions d
+	transactions t, entries e, ledgers l, accounts a, directions d
 WHERE
 	e.ledger_id = l.ledger_id AND
 	l.account_id = a.account_id AND
@@ -91,5 +71,34 @@ GROUP BY
 ORDER BY
 	t.datestamp;
 
+
+CREATE TEMPORARY VIEW list_transactions_values AS
+SELECT
+	date(t.datestamp, 'unixepoch') AS datestamp,
+	pad(t.description, 13) AS description,
+	pad(substr(a.title, 0, 12) || ' » ' || l.name, 25) AS "account,ledger",
+	money(e.value, NULL, e.direction, 1) AS debit,
+	money(e.value, NULL, e.direction, -1) AS credit
+FROM
+	transactions t, entries e, ledgers l, accounts a, directions d
+WHERE
+	e.ledger_id = l.ledger_id AND
+	l.account_id = a.account_id AND
+	e.transaction_id = t.transaction_id AND
+	e.direction = d.direction
+GROUP BY
+	t.transaction_id, e.entry_id
+ORDER BY
+	t.datestamp;
+
+
+
 COMMIT;
+
+SELECT 'Amounts:';
+SELECT * FROM list_transactions_amounts;
+
+SELECT 'Values:';
+SELECT * FROM list_transactions_values;
+
 -- vim: filetype=text
