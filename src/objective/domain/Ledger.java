@@ -18,185 +18,23 @@
  */
 package objective.domain;
 
-import generic.util.DebugException;
-
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import accounts.domain.Credit;
-import accounts.domain.CreditPositiveLedger;
-import accounts.domain.Debit;
-import accounts.domain.DebitPositiveLedger;
-import accounts.domain.Entry;
+import objective.persistence.DomainObject;
 
 /**
  * Base class for the ledgers within actual accounts.
  * 
  * @author Andrew Cowie
  */
-public class Ledger
+public abstract class Ledger extends DomainObject
 {
-    private String name = null;
+    private String name;
 
-    private Set entries = null;
+    private Account parentAccount;
 
-    private Account parentAccount = null;
+    private Currency currency;
 
-    /*
-     * Cached values --------------------------------------
-     */
-    protected transient Amount balance = null;
-
-    public Ledger() {
-    /*
-     * The default empty constructor provides a null prototype, useful for
-     * searching. Otherwise, you use one of the subclasses.
-     */
-    }
-
-    /**
-     * Add an Entry to this Ledger.
-     * 
-     * @throws NullPointerException
-     *             if you try to add a null Entry
-     * @throws IllegalArgumentException
-     *             if you try to add an Entry which is neither Debit nor
-     *             Credit (both are concrete subclasses of Entry).
-     */
-    public void addEntry(Entry entry) {
-        /*
-         * validation
-         */
-        if (entry == null) {
-            throw new IllegalArgumentException("Attempted to add a null Entry!");
-        }
-
-        if (!((entry instanceof Debit) || (entry instanceof Credit))) {
-            throw new DebugException("attempted to add an Entry which is neither Debit nor Credit!");
-        }
-        /*
-         * setup
-         */
-        if (entries == null) {
-            this.entries = new LinkedHashSet();
-        }
-        if (balance == null) {
-            calculateBalance();
-        }
-        /*
-         * add
-         */
-        entries.add(entry);
-        addToBalance(entry);
-    }
-
-    /**
-     * Tell the ledger than an Entry has changed. Somewhat artificial; all
-     * this does is zero out the cached balance value forcing it to be
-     * recalculated next time is is requested.
-     */
-    public void updateEntry(Entry one) {
-        /*
-         * TODO How can we possibly figure out what the old value of the Entry
-         * was? If we could, it would surely be better to subtract that and
-         * then add the current value, rather than forcing a full
-         * recalculation.
-         */
-        balance = null;
-    }
-
-    /**
-     * Remove an Entry from this ledger, adjusting the balance accordingly. We
-     * don't set the Entry's parentLedger to null; that's the business of
-     * whoever is removing this Entry; it'll either be deleted or reused
-     * immediately so no need to mess with it in that way.
-     */
-    public void removeEntry(Entry entry) {
-        if (entry == null) {
-            throw new IllegalArgumentException("Can't remove a null Entry!");
-        }
-        if ((entries == null) || (!(entries.contains(entry)))) {
-            throw new IllegalStateException("You've asked to remove an Entry that isn't in this Ledger");
-        }
-        if (balance == null) {
-            calculateBalance();
-        }
-        entries.remove(entry);
-        subtractFromBalance(entry);
-    }
-
-    /**
-     * Read the list of entries and sum them to arrive at this account's
-     * current balance. Used to set an initial value for a Ledger's balance if
-     * not currently set.
-     */
-    public void calculateBalance() {
-        if (balance == null) {
-            balance = new Amount("0");
-        } else {
-            balance.setValue("0");
-        }
-
-        if (entries == null) {
-            return;
-        }
-
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            Entry entry = (Entry) iter.next();
-            addToBalance(entry);
-        }
-    }
-
-    /**
-     * Add and Entry's Amount to the Ledger's balance.
-     * 
-     * @param entry
-     *            The Entry whose amount we will add to the Ledger's balance.
-     *            It will be tested for Debit/Credit-ness and added
-     *            accordingly.
-     */
-    protected void addToBalance(Entry entry) {
-        throw new UnsupportedOperationException(
-                "You're working with a raw Ledger object which is neither Debit nor Credit Postitive, so we can't add Entries to it.");
-
-    }
-
-    /**
-     * Subtract an Entry's Amount from the Ledger's balance.
-     * 
-     * @param entry
-     *            The Entry whose amount we will subtract from the Ledger's
-     *            balance. It will be tested for Debit/Credit-ness and added
-     *            accordingly.
-     */
-    protected void subtractFromBalance(Entry entry) {
-        throw new UnsupportedOperationException(
-                "You're working with a raw Ledger object which is neither Debit nor Credit Postitive, so we can't subtract an Entry from it.");
-    }
-
-    /**
-     * The ledger's current balance. Will calculate this if not yet available.
-     * The whole idea is NOT to calculate this until we actually need it, ie,
-     * certainly not on object instantiation.
-     */
-    public Amount getBalance() {
-        if (balance == null) {
-            calculateBalance();
-        }
-
-        return balance;
-    }
-
-    /**
-     * Get the Set of Entry objects in this Ledger.
-     * 
-     * @return null if not yet established (and does NOT instantiate a blank
-     *         one - important for persistence).
-     */
-    public Set getEntries() {
-        return entries;
+    protected Ledger(long rowid) {
+        super(rowid);
     }
 
     /**
@@ -249,7 +87,7 @@ public class Ledger
     }
 
     public String toString() {
-        return getClassString() + ": " + name + " [" + entries.size() + "]";
+        return getClassString() + ": " + name + " (" + getID() + ")";
     }
 
     /**
@@ -272,5 +110,18 @@ public class Ledger
         } else {
             return "";
         }
+    }
+
+    /**
+     * The currency this Ledger is denominated in <i>if it is a cash
+     * account</i>. <code>null</code> is the usual case for "accounting value"
+     * Ledgers.
+     */
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public Currency getCurrency() {
+        return currency;
     }
 }

@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * An accountign ledger which is credit positive, ie the accumulated
@@ -27,38 +27,13 @@ package accounts.domain;
  */
 public class CreditPositiveLedger extends Ledger
 {
-    public CreditPositiveLedger() {
-        super();
+    public CreditPositiveLedger(long rowid) {
+        super(rowid);
     }
 
     public CreditPositiveLedger(String name) {
-        super();
+        super(0);
         super.setName(name);
-    }
-
-    /*
-     * Overrides Ledger's addToBalance(). balance from Ledger.
-     */
-    protected void addToBalance(Entry entry) {
-        if (entry == null) {
-            throw new IllegalArgumentException("Can't add null Entry to a Ledger");
-        }
-        if (entry instanceof Credit) {
-            balance.incrementBy(entry.getAmount());
-        } else {
-            balance.decrementBy(entry.getAmount());
-        }
-    }
-
-    protected void subtractFromBalance(Entry entry) {
-        if (entry == null) {
-            throw new IllegalArgumentException("Can't subtract null Entry from a Ledger");
-        }
-        if (entry instanceof Credit) {
-            balance.decrementBy(entry.getAmount());
-        } else {
-            balance.incrementBy(entry.getAmount());
-        }
     }
 
     public String getClassString() {
