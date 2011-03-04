@@ -18,14 +18,7 @@
  */
 package objective.domain;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import objective.persistence.DomainObject;
-import accounts.domain.Credit;
-import accounts.domain.Debit;
-import accounts.domain.Entry;
 
 /**
  * Base class of the Transaction hierarchy. Transactions are operations which
@@ -52,126 +45,34 @@ public abstract class Transaction extends DomainObject
 
     protected Datestamp date = null;
 
-    protected Set entries = null;
-
     protected Transaction(long rowid) {
         super(rowid);
-    }
-
-    /**
-     * Create a new transaction prototype, setting the description field and
-     * providing an initial set of entries. This contstructor is largely
-     * intended for test cases and mockups.
-     * 
-     * @param description
-     * @param date
-     *            the Datestamp to assign to the Entries of this Transaction.
-     * @param entries
-     *            an array of Entry objects
-     */
-    public Transaction(String description, Datestamp date, Entry[] entries) {
-        setDescription(description);
-        setDate(date);
-        setEntries(entries);
-    }
-
-    /**
-     * Add an Entry to this Transaction.
-     * 
-     * <P>
-     * Note that this updates (sets) the date of the specified Entry to the
-     * date of this Transaction if that date has already been set. As you
-     * would expect, it also sets the parentTransaction field of the specified
-     * Entry.
-     * 
-     * @param entry
-     *            the Entry to add.
-     * @return true if the internal Entry Set was indeed modified (along the
-     *         lines of {@link java.util.Set#add})
-     */
-    public boolean addEntry(Entry entry) {
-        if (entry == null) {
-            throw new NullPointerException("attempted to add a null entry!");
-        }
-        if (entries == null) {
-            entries = new LinkedHashSet();
-        }
-        entry.setParentTransaction(this);
-        if (date != null) {
-            entry.setDate(date);
-        }
-        return entries.add(entry);
-    }
-
-    /**
-     * Remove an Entry from this Transaction's entries set. <b>Does not null
-     * the Entry's members such as parentTransaction and does not have any
-     * affect on the Entry's parentLedger. That's what
-     * UpdateTransactionCommand it for.</b>
-     * 
-     * @throws IllegalStateException
-     *             if you try to remove an Entry that isn't in this
-     *             Transaction.
-     */
-    public void removeEntry(Entry entry) {
-        if (entry == null) {
-            throw new IllegalArgumentException("Can't remove a null Entry!");
-        }
-        if (!(entries.contains(entry))) {
-            throw new IllegalStateException(
-                    "You've asked to remove an Entry that isn't in this Transaction");
-        }
-        entries.remove(entry);
     }
 
     /**
      * Perform checks on the Transaction object to make sure it is balanced
      * Debits == Credits.
      */
-    public boolean isBalanced() {
+    public boolean isBalanced(Entry[] entries) {
+        long total;
+
         if (entries == null) {
             return true;
         }
 
-        Amount total = new Amount("0");
-        Iterator iter = entries.iterator();
+        total = 0;
 
-        while (iter.hasNext()) {
-            Entry entry = (Entry) iter.next();
-
+        for (Entry entry : entries) {
             if (entry instanceof Debit) {
-                total.incrementBy(entry.getAmount());
+                total += entry.getAmount();
             } else if (entry instanceof Credit) {
-                total.decrementBy(entry.getAmount());
+                total -= entry.getAmount();
             } else {
-                throw new IllegalStateException(
-                        "How did you get an Entry that's neither Debit nor Credit?");
+                throw new AssertionError();
             }
         }
 
-        return total.isZero();
-    }
-
-    /*
-     * Getters and Setters --------------------------------
-     */
-
-    public Set getEntries() {
-        return entries;
-    }
-
-    /**
-     * Replace the internal list of entries, iterating over the supplied array
-     * and calling addEntry() one by one.
-     * 
-     * @param entries
-     *            an array of Entry objects to add to this Transaction.
-     */
-    public void setEntries(Entry[] entries) {
-        this.entries = null;
-        for (int i = 0; i < entries.length; i++) {
-            addEntry(entries[i]);
-        }
+        return (total == 0);
     }
 
     /**
@@ -221,42 +122,23 @@ public abstract class Transaction extends DomainObject
     /**
      * Get the date of this transaction
      */
-
     public Datestamp getDate() {
         return date;
     }
 
     /**
      * Set the date of the transaction.
-     * 
-     * <P>
-     * Works through all the entries to update their dates as well. (note that
-     * {@link Transaction#addEntry(Entry)} does the same update, assuming the
-     * date of the transaction is already available).
      */
-
     public void setDate(Datestamp date) {
         this.date = date;
-        if (entries == null) {
-            return;
-        }
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            Entry entry = (Entry) iter.next();
-            entry.setDate(date);
-        }
     }
-
-    /*
-     * Output ---------------------------------------------
-     */
 
     public String getClassString() {
         return "Transaction";
     }
 
     public String toString() {
-        return getClassString() + ": " + date + " " + description + " (" + reference + ") ["
-                + entries.size() + "]";
+        return getClassString() + ": " + date + " " + description
+                + (reference != null ? " [" + reference + "]" : "");
     }
 }
