@@ -27,10 +27,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.freedesktop.bindings.Time;
+
 /**
- * The date of a transaction. An object is used both to wrap representation,
- * and to allow changing in Transaction to not have to map through Account to
- * adjust indivitial stamps in Entries.
+ * The date of a transaction.
  * 
  * @author Andrew Cowie
  */
@@ -113,8 +113,8 @@ public class Datestamp implements Comparable<Datestamp>
         if (timestamp == UNSET) {
             return "  UNSET  ";
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy");
-        return sdf.format(new Date(timestamp * 1000));
+
+        return Time.formatTime("%e %b %y", timestamp);
     }
 
     /**
