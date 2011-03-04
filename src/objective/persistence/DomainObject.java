@@ -16,27 +16,23 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package generic.domain;
-
-import generic.persistence.NotActivatedException;
+package objective.persistence;
 
 /**
- * Superclass of any domain objects stored in our DataStore. This is not
- * necessary - but if you want to do equals() over the wire, then the objects
- * you're comparing had better ulimately extend this class.
+ * Superclass of any domain objects stored in our database. While not strictly
+ * necessary this binds an Object to a row in the database by ROWID.
  * 
  * @author Andrew Cowie
  */
 public abstract class DomainObject
 {
-    // private static long count;
-
     private long databaseId;
 
+    protected DomainObject(long rowid) {
+        this.databaseId = rowid;
+    }
+
     public long getID() {
-        if (databaseId == 0) {
-            throw new NotActivatedException();
-        }
         return databaseId;
     }
 
@@ -71,7 +67,7 @@ public abstract class DomainObject
     }
 
     /**
-     * Return a String with the databaseId (if set) or "new".
+     * Return a String with the databaseId.
      */
     public String toString() {
         StringBuffer buf = new StringBuffer();
