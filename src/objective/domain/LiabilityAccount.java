@@ -1,7 +1,7 @@
 /*
  * ObjectiveAccounts, accounting for small professional services firms.
  *
- * Copyright © 2006-2011 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2005-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,25 +16,20 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
- * Expenses payable to employees and subcontractors.
+ * A liability acount.
  * 
  * @author Andrew Cowie
  */
-public class ReimbursableExpensesPayableAccount extends LiabilityAccount
+public abstract class LiabilityAccount extends CreditPositiveAccount
 {
-
-    public ReimbursableExpensesPayableAccount() {
-        super();
-    }
-
-    public ReimbursableExpensesPayableAccount(String title) {
-        super(title);
+    public LiabilityAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {
-        return "Reimbursable Expenses Payable";
+        return "Liability";
     }
 }

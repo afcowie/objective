@@ -34,10 +34,6 @@ public abstract class DebitPositiveAccount extends Account
         super(rowid);
     }
 
-    public DebitPositiveAccount(String title) {
-        super(title);
-    }
-
     public boolean isDebitPositive() {
         return true;
     }

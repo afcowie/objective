@@ -16,41 +16,22 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
+
 
 /**
- * Trade Debetors. Holds a ledger per business Entity which owes us money.
- * Such debts presumably arise out of revenue generating transactions.
+ * Expenses payable to employees and subcontractors.
  * 
  * @author Andrew Cowie
- * @see accounts.domain.ItemsLedger
- * @see accounts.domain.AccountsPayable
  */
-public class AccountsReceivable extends AssetAccount
+public class ReimbursableExpensesPayableAccount extends LiabilityAccount
 {
-    public AccountsReceivable() {
-        super();
-    }
 
-    /**
-     * 
-     * @param title
-     *            a title for the Accounts Receivable account. Australians
-     *            probably prefer "Trade Debtors"
-     */
-    public AccountsReceivable(String title) {
-        super(title);
-    }
-
-    public void addLedger(Ledger ledger) {
-        if (!(ledger instanceof ClientLedger)) {
-            throw new IllegalArgumentException(
-                    "Ledgers added to AccountsReceivable accounts need to be ItemLedgers");
-        }
-        super.addLedger(ledger);
+    public ReimbursableExpensesPayableAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {
-        return "Accounts Receivable";
+        return "Reimbursable Expenses Payable";
     }
 }

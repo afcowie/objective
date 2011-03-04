@@ -1,7 +1,7 @@
 /*
  * ObjectiveAccounts, accounting for small professional services firms.
  *
- * Copyright © 2005-2011 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2006-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,24 +16,22 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
+
 
 /**
- * A liability acount.
+ * Trade Debetors. Holds a ledger per business Entity which owes us money.
+ * Such debts presumably arise out of revenue generating transactions.
  * 
  * @author Andrew Cowie
  */
-public class LiabilityAccount extends CreditPositiveAccount
+public class AccountsReceivableAccount extends AssetAccount
 {
-    public LiabilityAccount() {
-        super();
-    }
-
-    public LiabilityAccount(String title) {
-        super(title);
+    public AccountsReceivableAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {
-        return "Liability";
+        return "Accounts Receivable";
     }
 }

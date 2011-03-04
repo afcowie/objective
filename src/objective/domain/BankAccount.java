@@ -18,8 +18,6 @@
  */
 package objective.domain;
 
-import accounts.domain.DebitPositiveLedger;
-import accounts.domain.Entry;
 import accounts.domain.SingleLedger;
 
 /**
