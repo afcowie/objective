@@ -20,7 +20,6 @@ package objective.domain;
 
 import java.math.BigDecimal;
 
-
 /**
  * An amount of money in a foreign currency. ForeignAmount encapsulates the
  * notions of face value (the amount as demoninated in the foreign currency's
@@ -38,6 +37,9 @@ public class ForeignAmount extends Amount
 
     private Currency currency;
 
+    /**
+     * @deprecated
+     */
     private ForeignAmount() {
         super(0);
     }
@@ -61,12 +63,22 @@ public class ForeignAmount extends Amount
      * @param rate
      *            The exchange rate between the foreign currency and the home
      *            currency.
+     * @deprecated
      */
     public ForeignAmount(String faceValue, Currency cur, String rate) {
         super(0);
         this.setForeignValue(faceValue);
         this.setCurrency(cur);
         this.setRate(rate);
+    }
+
+    /**
+     * @deprecated
+     */
+    public ForeignAmount(long amount, Currency currency, long value) {
+        super(value);
+        this.foreignNumber = amount;
+        this.currency = currency;
     }
 
     /**
@@ -80,6 +92,10 @@ public class ForeignAmount extends Amount
      */
     public String getForeignValue() {
         return numberToString(foreignNumber);
+    }
+
+    public long getAmount() {
+        return foreignNumber;
     }
 
     /**

@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * A credit positive ledger entry.
@@ -29,11 +29,8 @@ public class Credit extends Entry
 
     public static final String COLOR_ACTIVE = "#a0ff97";
 
-    public Credit() {
-        super();
-        /*
-         * an actual null Entry...
-         */
+    public Credit(long rowid) {
+        super(rowid);
     }
 
     public Credit(Amount value, Ledger parent) {

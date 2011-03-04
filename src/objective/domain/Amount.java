@@ -156,7 +156,7 @@ public class Amount implements Comparable<Amount>, Leaf
      * Convert from our internal long representation to a string with two and
      * only two decimal places.
      */
-    protected String numberToString(long num) {
+    public static String numberToString(long num) {
         if (num == 0) {
             return "0.00";
         }

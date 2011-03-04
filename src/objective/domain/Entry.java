@@ -16,39 +16,34 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
-import generic.domain.DomainObject;
-import generic.domain.Normal;
-import generic.util.DebugException;
+import objective.persistence.DomainObject;
 
 /**
  * An entry in an account. These are formed in balanced (total Debits = total
  * Credits) transactions. Entries form a bridge between Transactions and
  * Accounts.
- * <P>
- * Note that an Entry's datestamp is shared with a transaction, so adding an
- * entry to a transaction will cause it to adopt that Transaction's Datestamp
- * object if one is set.
  * 
  * @author Andrew Cowie
  */
-public class Entry extends DomainObject implements Normal
+public class Entry extends DomainObject
 {
-    /*
-     * Instance variables ---------------------------------
-     */
     /**
-     * The date of the Entry. This should be set by (or, at least, will
-     * certainly be replaced by) the Transaction to which it belongs on commit
-     * via a PostTransactionCommand.
+     * If this is a real Entry, this is the face value amount in whatever
+     * currency.
      */
-    private Datestamp date = null;
+    private long amount;
 
     /**
-     * The value of the Entry
+     * If this is a real entry, then what currency is it denominated in?
      */
-    private Amount amount = null;
+    private Currency currency;
+
+    /**
+     * The value of this Entry, in home currency terms.
+     */
+    private long value;
 
     /**
      * The ledger to which this entry [will be] added.
@@ -60,57 +55,42 @@ public class Entry extends DomainObject implements Normal
      */
     private Transaction parentTransaction = null;
 
-    public Entry() {
-    /*
-     * default for searches...
-     */
-    }
-
-    /**
-     * Construct an Entry specifiying the amount and the Ledger to which it
-     * will be applied. Note that the Ledger will not have it's addEntry()
-     * method called until a PostTransactionCommand is executed for a
-     * transaction holding this Entry object.
-     * 
-     * @param value
-     *            The Amount (be it Debit or Credit) of this Entry.
-     * @param ledger
-     *            The Ledger (which, in turn is of an Account) to which this
-     *            Entry [will be] assinged.
-     */
-    public Entry(Amount value, Ledger ledger) {
-        this.amount = value;
-        this.parentLedger = ledger;
-    }
-
-    /*
-     * Getters and Setters --------------------------------
-     */
-
-    /**
-     * Get the date of the entry (transaction).
-     */
-    public Datestamp getDate() {
-        return date;
-    }
-
-    /**
-     * Set the datestamp of the entry (transaction).
-     */
-    public void setDate(Datestamp date) {
-        this.date = date;
-
+    public Entry(long rowid) {
+        super(rowid);
     }
 
     /**
      * Get the amount (value) this entry describes.
      */
-    public Amount getAmount() {
+    public long getAmount() {
         return amount;
     }
 
-    public void setAmount(Amount value) {
-        this.amount = value;
+    public void setAmount(long amount) {
+        this.amount = amount;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    /**
+     * Get the underlying value of this Entry. This will be valid regardless
+     * of whether or not this is a "real" Entry representing money.
+     */
+    public long getValue() {
+        return value;
+    }
+
+    /**
+     * Set the underlying value of this Entry. This is in home currency terms.
+     */
+    public void setValue(long value) {
+        this.value = value;
     }
 
     public Ledger getParentLedger() {
@@ -126,21 +106,35 @@ public class Entry extends DomainObject implements Normal
     }
 
     public void setParentTransaction(Transaction parent) {
-        parentTransaction = parent;
+        this.parentTransaction = parent;
     }
-
-    /*
-     * Output ---------------------------------------------
-     */
 
     /**
      * Prints the value of this entry, with an indication of whether it is a
      * Debit or Credit value.
      */
     public String toString() {
-        // TODO Are Entries only in native currency?
-        StringBuffer buf = new StringBuffer();
-        buf.append(amount.getValue());
+        StringBuffer buf;
+        String str, code;
+
+        buf = new StringBuffer();
+
+        if (currency == null) {
+            str = Amount.numberToString(amount);
+            buf.append(str);
+
+            buf.append(' ');
+            buf.append("   ");
+        } else {
+            str = Amount.numberToString(value);
+            buf.append(str);
+
+            buf.append(' ');
+
+            code = currency.getCode();
+            buf.append(code);
+        }
+
         buf.append(' ');
 
         if (this instanceof Debit) {
@@ -148,7 +142,7 @@ public class Entry extends DomainObject implements Normal
         } else if (this instanceof Credit) {
             buf.append("CR");
         } else {
-            throw new DebugException("huh?");
+            throw new IllegalStateException();
         }
         buf.append(' ');
         buf.append(super.toString());

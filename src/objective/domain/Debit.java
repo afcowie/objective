@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * A debit positive entry in a ledger.
@@ -29,14 +29,7 @@ public class Debit extends Entry
 
     public static final String COLOR_ACTIVE = "#32fdff";
 
-    public Debit() {
-        super();
-        /*
-         * an actual null Entry...
-         */
-    }
-
-    public Debit(Amount value, Ledger parent) {
-        super(value, parent);
+    public Debit(long rowid) {
+        super(rowid);
     }
 }
