@@ -16,10 +16,10 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.services;
+package objective.services;
 
 /**
- * A finder's query ran but did not result in any matches.
+ * A query ran but did not result in any matches.
  * 
  * @author Andrew Cowie
  */
