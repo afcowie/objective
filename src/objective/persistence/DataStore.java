@@ -201,7 +201,7 @@ public class DataStore
     private void loadLedgers() {
         final Statement stmt;
         long ledgerId, accountId, direction;
-        String type, name, code;
+        String name, code;
         Account parent;
         Currency currency;
         Ledger ledger;
@@ -260,6 +260,48 @@ public class DataStore
         }
 
         return result;
+    }
+
+    /**
+     * Change the title (and what else?) of an Account.
+     */
+    /*
+     * TODO
+     */
+    public void updateAccount(Account account) {
+        final Statement stmt;
+        final long accountId;
+        final String title;
+
+        stmt = db.prepare("UPDATE accounts SET title = ? WHERE account_id = ?");
+
+        title = account.getTitle();
+        stmt.bindText(1, title);
+
+        accountId = account.getID();
+        stmt.bindInteger(2, accountId);
+
+        stmt.step();
+        stmt.finish();
+    }
+
+    /**
+     * Delete the given Account. All referring Ledgers must have been deleted!
+     */
+    /*
+     * TODO
+     */
+    public void deleteAccount(Account account) {
+        final Statement stmt;
+        final long accountId;
+
+        stmt = db.prepare("DELETE FROM accounts WHERE account_id = ?");
+
+        accountId = account.getID();
+        stmt.bindInteger(1, accountId);
+
+        stmt.step();
+        stmt.finish();
     }
 
     /**
@@ -613,6 +655,25 @@ public class DataStore
 
         transactionId = t.getID();
         stmt.bindInteger(4, transactionId);
+
+        stmt.step();
+        stmt.finish();
+    }
+
+    /**
+     * Delete a Transaction from the database. You need to have deleted the
+     * Entries of this Transaction first!
+     * 
+     * @param transaction
+     */
+    public void deleteTransaction(Transaction transaction) {
+        final Statement stmt;
+        final long transactionId;
+
+        stmt = db.prepare("DELETE FROM transactions WHERE transaction_id = ?");
+
+        transactionId = transaction.getID();
+        stmt.bindInteger(1, transactionId);
 
         stmt.step();
         stmt.finish();
