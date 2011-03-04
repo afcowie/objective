@@ -16,41 +16,34 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package demo.ui;
+package objective.ui;
 
-import generic.client.Master;
-import generic.persistence.DataClient;
-import generic.persistence.Engine;
-import generic.ui.PrimaryWindow;
+import org.gnome.gdk.Event;
+import org.gnome.gtk.Gtk;
+import org.gnome.gtk.Widget;
+import org.gnome.gtk.Window;
 
-import java.util.List;
-
-import accounts.domain.Transaction;
 import accounts.ui.TransactionListView;
 
-public class TransactionListViewHolder extends PrimaryWindow
+class TransactionListViewHolder extends Window
 {
-    public TransactionListViewHolder() {
+    private final Window window;
+
+    private TransactionListView view;
+
+    TransactionListViewHolder() {
         super();
-        super.setTitle("Example display of TransactionListView widget");
+        window = this;
 
-        DataClient ro = Engine.primaryClient();
+        view = new TransactionListView();
 
-        List rL = ro.queryByExample(Transaction.class);
+        window.add(view);
 
-        TransactionListView view = new TransactionListView(ro, rL);
-
-        top.add(view);
-
-        super.present();
-    }
-
-    public boolean deleteHook() {
-        // hide & destroy
-        super.deleteHook();
-        // quit
-        System.out.println("Notice: deleteHook() overriden to call Master.shutdown()");
-        Master.shutdown();
-        return false;
+        window.connect(new Window.DeleteEvent() {
+            public boolean onDeleteEvent(Widget source, Event event) {
+                Gtk.mainQuit();
+                return false;
+            }
+        });
     }
 }
