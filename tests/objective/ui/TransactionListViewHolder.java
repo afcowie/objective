@@ -18,12 +18,13 @@
  */
 package objective.ui;
 
+import objective.domain.Transaction;
+import objective.persistence.DataStore;
+
 import org.gnome.gdk.Event;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
-
-import accounts.ui.TransactionListView;
 
 class TransactionListViewHolder extends Window
 {
@@ -31,13 +32,17 @@ class TransactionListViewHolder extends Window
 
     private TransactionListView view;
 
-    TransactionListViewHolder() {
+    TransactionListViewHolder(DataStore data) {
         super();
+        Transaction[] transactions;
+
         window = this;
 
-        view = new TransactionListView();
+        transactions = data.listTransactions();
 
+        view = new TransactionListView(data, transactions);
         window.add(view);
+        window.showAll();
 
         window.connect(new Window.DeleteEvent() {
             public boolean onDeleteEvent(Widget source, Event event) {

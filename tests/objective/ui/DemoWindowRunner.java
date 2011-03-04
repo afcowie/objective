@@ -34,7 +34,7 @@ public class DemoWindowRunner
             Gtk.init(args);
 
             data = new DataStore("schema/accounts.db");
-            window = new TransactionListViewHolder();
+            window = new TransactionListViewHolder(data);
             window.present();
 
             Gtk.main();

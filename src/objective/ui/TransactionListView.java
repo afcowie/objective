@@ -16,13 +16,10 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.ui;
+package objective.ui;
 
 import generic.client.Master;
-import generic.persistence.DataClient;
 import generic.ui.Text;
-import generic.ui.UpdateListener;
-import generic.util.Debug;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +28,17 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import objective.domain.Account;
+import objective.domain.Amount;
+import objective.domain.Credit;
+import objective.domain.Currency;
+import objective.domain.Debit;
+import objective.domain.Entry;
+import objective.domain.Ledger;
+import objective.domain.Transaction;
+import objective.persistence.DataStore;
+import objective.services.TransactionOperations;
 
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
@@ -47,30 +55,21 @@ import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
 
-import accounts.domain.Account;
-import accounts.domain.Amount;
-import accounts.domain.Books;
-import accounts.domain.Credit;
-import accounts.domain.Currency;
-import accounts.domain.Debit;
-import accounts.domain.Entry;
-import accounts.domain.ForeignAmount;
-import accounts.domain.Ledger;
-import accounts.domain.Transaction;
 import accounts.services.EntryComparator;
+import accounts.ui.TransactionEditorWindow;
 
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.RIGHT;
 import static org.gnome.gtk.Alignment.TOP;
 
 /**
- * Summarize a List of {@link accounts.domain.Transaction}s in
- * {@link org.gnu.gtk.TreeView ListView} form. For each one, display its tye,
- * date, description and then for each {@link accounts.domain.Entry} within,
- * display the {@link accounts.domain.Account} and
- * {@link accounts.domain.Ledger} to which the Entry belongs and the
- * {@link accounts.domain.ForeignAmount [Foreign]}{@link Amount} of each one,
- * presenting it in foreign currency terms.
+ * Summarize a List of {@link objective.domain.Transaction}s in
+ * {@link org.gnome.gtk.TreeView TreeView} form. For each one, display its
+ * tye, date, description and then for each {@link objective.domain.Entry}
+ * within, display the {@link objective.domain.Account} and
+ * {@link objective.domain.Ledger} to which the Entry belongs and the amount
+ * of each one, presenting it in foreign currency terms.
+ * 
  * <p>
  * Selecting and activating a row will cause the UI to launch an
  * {@linkplain TransactionEditorWindow editor window} suitable to modify the
@@ -78,11 +77,11 @@ import static org.gnome.gtk.Alignment.TOP;
  * 
  * @author Andrew Cowie
  */
-public class TransactionListView extends TreeView implements UpdateListener
+public class TransactionListView extends TreeView
 {
     private transient Currency home = null;
 
-    private final DataClient db;
+    private final DataStore data;
 
     private final DataColumnString typeMarkup_DataColumn;
 
@@ -108,7 +107,7 @@ public class TransactionListView extends TreeView implements UpdateListener
      * The Transaction object that this row represents. This must be set
      * before calling {@link #populate(TreeIter)}
      */
-    private final DataColumnReference transactionObject_DataColumn;
+    private final DataColumnReference<Transaction> transactionObject_DataColumn;
 
     /**
      * Whether the row is to be rendered with bright colours. Set this as true
@@ -130,16 +129,15 @@ public class TransactionListView extends TreeView implements UpdateListener
      * @param transactions
      *            the Transactions that you wish to display.
      */
-    public TransactionListView(final DataClient db, final List transactions) {
+    public TransactionListView(final DataStore data, final Transaction[] transactions) {
         super();
 
         TreeViewColumn vertical;
         CellRendererText renderer;
 
-        this.db = db;
+        this.data = data;
 
-        final Books root = (Books) db.getRoot();
-        home = root.getHomeCurrency();
+        home = null; // FIXME
 
         typeMarkup_DataColumn = new DataColumnString();
         typeSort_DataColumn = new DataColumnString();
@@ -151,7 +149,7 @@ public class TransactionListView extends TreeView implements UpdateListener
         debitAmountsSort_DataColumn = new DataColumnLong();
         creditAmountsText_DataColumn = new DataColumnString();
         creditAmountsSort_DataColumn = new DataColumnLong();
-        transactionObject_DataColumn = new DataColumnReference();
+        transactionObject_DataColumn = new DataColumnReference<Transaction>();
         active_DataColumn = new DataColumnBoolean();
 
         model = new ListStore(new DataColumn[] {
@@ -289,28 +287,11 @@ public class TransactionListView extends TreeView implements UpdateListener
         view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
                 final TreeIter pointer = model.getIter(path); // TODO CHECK
-                final Transaction t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);
+                final Transaction t = model.getValue(pointer, transactionObject_DataColumn);
 
                 Master.ui.launchEditor(t);
             }
         });
-
-        /*
-         * Listen for updates to the DomainObjects we represent:
-         */
-        final TransactionListView me = this;
-        Master.ui.registerListener(me);
-
-        /*
-         * And when the widget gets deleted, stop listening. This probably
-         * needs further testing; does unrealize always get sent?
-         */
-        // FIXME 4.0!
-        // this.connect(new Widget.UNREALIZE() {
-        // public void onUnrealize(Widget source) {
-        // Master.ui.deregisterListener(me);
-        // }
-        // });
     }
 
     private static final Pattern regexAmp = Pattern.compile("&");
@@ -326,10 +307,8 @@ public class TransactionListView extends TreeView implements UpdateListener
      * widget. This is called by both the constructor and when a new
      * assortment of Transactions is being updated into an existing widget.
      */
-    private void populate(List transactions) {
-        final Iterator tI = transactions.iterator();
-        while (tI.hasNext()) {
-            final Transaction t = (Transaction) tI.next();
+    private void populate(Transaction[] transactions) {
+        for (Transaction t : transactions) {
             final TreeIter pointer = model.appendRow();
 
             /*
@@ -400,9 +379,10 @@ public class TransactionListView extends TreeView implements UpdateListener
         final Transaction t;
         final boolean active;
         final StringBuffer creditVal;
-        final List amountBuffers, entryObjects;
+        final List<StringBuilder> amountBuffers;
+        final List<Entry> entryObjects;
 
-        t = (Transaction) model.getValue(pointer, transactionObject_DataColumn);
+        t = model.getValue(pointer, transactionObject_DataColumn);
         active = model.getValue(pointer, active_DataColumn);
 
         final StringBuffer type = new StringBuffer();
@@ -435,7 +415,7 @@ public class TransactionListView extends TreeView implements UpdateListener
         debitVal.append(CLOSE);
         debitVal.append('\n');
 
-        creditVal = new StringBuffer(debitVal.toString());
+        creditVal = new StringBuffer(debitVal);
 
         /* ... in this Transaction */
         long largestDebitNumber = 0;
@@ -443,11 +423,21 @@ public class TransactionListView extends TreeView implements UpdateListener
         int widestDebitWidth = 0;
         int widestCreditWidth = 0;
 
-        amountBuffers = new ArrayList(3);
-        entryObjects = new ArrayList(3);
+        amountBuffers = new ArrayList<StringBuilder>(3);
+        entryObjects = new ArrayList<Entry>(3);
 
-        final Set ordered = new TreeSet(new EntryComparator(t));
-        ordered.addAll(t.getEntries());
+        final Set<Entry> ordered = new TreeSet<Entry>(new EntryComparator(t));
+
+        TransactionOperations transactions;
+        Entry[] entries;
+
+        transactions = new TransactionOperations(data);
+        entries = transactions.findEntries(t);
+
+        for (Entry e : entries) {
+            ordered.add(e);
+        }
+
         final Iterator eI = ordered.iterator();
         while (eI.hasNext()) {
             final Entry entry = (Entry) eI.next();
@@ -480,50 +470,43 @@ public class TransactionListView extends TreeView implements UpdateListener
             titleName.append(ml.replaceAll("&amp;"));
             titleName.append("</span>");
 
-            final Amount a = entry.getAmount();
-            ForeignAmount fa;
-            if (entry.getAmount() instanceof ForeignAmount) {
-                fa = (ForeignAmount) a;
-            } else {
-                fa = new ForeignAmount();
-                fa.setCurrency(home);
-                fa.setRate("1.0");
-                fa.setForeignValue(a);
-            }
-            final StringBuffer value = new StringBuffer();
+            long amount = entry.getAmount();
+            Currency cur = entry.getCurrency();
+            long value = entry.getValue();
 
-            value.append(fa.getCurrency().getSymbol());
-            value.append(fa.toString()); // has , separators
-            value.append(' ');
+            final StringBuilder buf = new StringBuilder();
+
+            buf.append(cur.getSymbol());
+            // add , separators
+            buf.append(Amount.padComma(Amount.numberToString(amount)));
+            buf.append(' ');
             if (active) {
-                value.append("<span color='" + LIGHTGRAY + "'>");
+                buf.append("<span color='" + LIGHTGRAY + "'>");
             } else {
-                value.append("<span color='" + DARKGRAY + "'>");
+                buf.append("<span color='" + DARKGRAY + "'>");
             }
-            value.append(fa.getCurrency().getCode());
-            value.append("</span>");
+            buf.append(cur.getCode());
+            buf.append("</span>");
 
-            amountBuffers.add(value);
+            amountBuffers.add(buf);
             entryObjects.add(entry);
 
             /*
-             * We sort the entires by their face value; number from Amount
-             * represents underlying home quantity.
+             * We sort the entires by their face value.
              */
-            final long num = Math.round(Double.parseDouble(fa.getForeignValue()) * 100);
             if (entry instanceof Debit) {
-                if (num > largestDebitNumber) {
-                    largestDebitNumber = num;
+                if (amount > largestDebitNumber) {
+                    largestDebitNumber = amount;
                 }
-                if (value.length() > widestDebitWidth) {
-                    widestDebitWidth = value.length();
+                if (buf.length() > widestDebitWidth) {
+                    widestDebitWidth = buf.length();
                 }
             } else if (entry instanceof Credit) {
-                if (num > largestCreditNumber) {
-                    largestCreditNumber = num;
+                if (amount > largestCreditNumber) {
+                    largestCreditNumber = amount;
                 }
-                if (value.length() > widestCreditWidth) {
-                    widestCreditWidth = value.length();
+                if (buf.length() > widestCreditWidth) {
+                    widestCreditWidth = buf.length();
                 }
             }
         }
@@ -536,8 +519,8 @@ public class TransactionListView extends TreeView implements UpdateListener
 
         final int num = entryObjects.size();
         for (int i = 0; i < num; i++) {
-            final Entry entry = (Entry) entryObjects.get(i);
-            final StringBuffer buf = (StringBuffer) amountBuffers.get(i);
+            final Entry entry = entryObjects.get(i);
+            final StringBuilder buf = amountBuffers.get(i);
 
             if (entry instanceof Debit) {
                 final int diff = widestDebitWidth - buf.length();
@@ -545,17 +528,17 @@ public class TransactionListView extends TreeView implements UpdateListener
                     buf.insert(0, ' ');
                 }
                 debitVal.append(buf);
-                debitVal.append("\n");
-                creditVal.append("\n");
+                debitVal.append('\n');
+                creditVal.append('\n');
 
             } else if (entry instanceof Credit) {
                 final int diff = widestCreditWidth - buf.length();
                 for (int j = 0; j < diff; j++) {
                     buf.insert(0, ' ');
                 }
-                debitVal.append("\n");
+                debitVal.append('\n');
                 creditVal.append(buf);
-                creditVal.append("\n");
+                creditVal.append('\n');
             }
         }
 
@@ -594,17 +577,19 @@ public class TransactionListView extends TreeView implements UpdateListener
      * Drop the existing Set of Transactions shown by this widget and replace
      * it with a new Set.
      */
-    public void setTransactions(List transactions) {
+    public void setTransactions(Transaction[] transactions) {
         model.clear();
         populate(transactions);
     }
 
-    public void redisplayObject(long id) {
+    /*
+     * TODO reimplement
+     */
+    public void redisplayTransaction(long transactionId) {
         final Transaction t;
         final TreeIter pointer;
 
-        t = (Transaction) db.fetchByID(id);
-        db.reload(t);
+        t = data.lookupTransaction(transactionId);
 
         pointer = model.getIterFirst();
         if (pointer == null) {
@@ -612,8 +597,6 @@ public class TransactionListView extends TreeView implements UpdateListener
         }
         do {
             if (model.getValue(pointer, transactionObject_DataColumn) == t) {
-                Debug.print("listeners", "redisplayObject(" + id + ") called; repopulating TreeIter "
-                        + pointer);
                 populate(pointer);
                 return;
             }
