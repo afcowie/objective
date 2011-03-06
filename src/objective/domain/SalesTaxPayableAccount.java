@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * A sales tax liability resulting from both collecting and paying a tax which
@@ -35,8 +35,8 @@ package accounts.domain;
 public class SalesTaxPayableAccount extends LiabilityAccount
 {
 
-    public SalesTaxPayableAccount() {
-        super();
+    public SalesTaxPayableAccount(long rowid) {
+        super(rowid);
     }
 
     /**
@@ -48,9 +48,8 @@ public class SalesTaxPayableAccount extends LiabilityAccount
      *            "GST"
      */
     public SalesTaxPayableAccount(String title) {
-        super(title);
-        addLedger(new CreditPositiveLedger("Collected"));
-        addLedger(new DebitPositiveLedger("Paid"));
+        super(0);
+        throw new UnsupportedOperationException();
     }
 
     public String getClassString() {

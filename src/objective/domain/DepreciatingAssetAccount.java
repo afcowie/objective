@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * A revenue account specific to consulting services. It has two built in
@@ -27,15 +27,12 @@ package accounts.domain;
  */
 public class DepreciatingAssetAccount extends AssetAccount
 {
-    public DepreciatingAssetAccount() {
-        super();
+    public DepreciatingAssetAccount(long rowid) {
+        super(rowid);
     }
 
-    public DepreciatingAssetAccount(String title) {
-        super(title);
-        addLedger(new DebitPositiveLedger("At Cost"));
-        addLedger(new CreditPositiveLedger("Accumulated Depreciation"));
-    }
+    // addLedger(new DebitPositiveLedger("At Cost"));
+    // addLedger(new CreditPositiveLedger("Accumulated Depreciation"));
 
     public String getClassString() {
         return "Depreciating Asset";

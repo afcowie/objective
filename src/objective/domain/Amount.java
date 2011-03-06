@@ -344,16 +344,19 @@ public class Amount implements Comparable<Amount>, Leaf
      *            ie, the result of getValue()) to be formatted.
      * @return a String that has had thousands commas inserted
      */
-    protected String padComma(String str) {
-        int len = str.length();
-        int period = str.indexOf('.');
+    public static String padComma(String str) {
+        int len, period;
+        StringBuilder buf;
+
+        len = str.length();
+        period = str.indexOf('.');
 
         if ((len == 0) || (period == -1)) {
             throw new NumberFormatException(
-                    "You shouldn't call this on an arbitrary string - only on a two digit decimal String as returned by Amount.getValue()");
+                    "You shouldn't call this on an arbitrary string - only on a two digit decimal String as returned by Amount.numberToString()");
         }
 
-        StringBuffer buf = new StringBuffer(str);
+        buf = new StringBuilder(str);
 
         for (int i = period - 3; i > 0; i -= 3) {
             buf.insert(i, ',');
