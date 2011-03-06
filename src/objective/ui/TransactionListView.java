@@ -21,12 +21,9 @@ package objective.ui;
 import generic.client.Master;
 import generic.ui.Text;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import objective.domain.Account;
@@ -40,6 +37,7 @@ import objective.domain.Transaction;
 import objective.persistence.DataStore;
 import objective.services.TransactionOperations;
 
+import org.gnome.glib.Glib;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnBoolean;
@@ -376,9 +374,9 @@ public class TransactionListView extends TreeView
     private void populate(final TreeIter pointer) {
         final Transaction t;
         final boolean active;
-        final StringBuffer creditVal;
-        final List<StringBuilder> amountBuffers;
-        final List<Entry> entryObjects;
+        final StringBuilder debitVal, creditVal;
+        final Set<Entry> ordered;
+        final Iterator<Entry> eI;
 
         t = model.getValue(pointer, transactionObject_DataColumn);
         active = model.getValue(pointer, active_DataColumn);
@@ -407,24 +405,23 @@ public class TransactionListView extends TreeView
         titleName.append(t.getDescription());
         titleName.append(CLOSE);
 
-        final StringBuffer debitVal = new StringBuffer();
+        debitVal = new StringBuilder();
         debitVal.append(OPEN);
         debitVal.append(' ');
         debitVal.append(CLOSE);
         debitVal.append('\n');
 
-        creditVal = new StringBuffer(debitVal);
+        creditVal = new StringBuilder();
+        creditVal.append(OPEN);
+        creditVal.append(' ');
+        creditVal.append(CLOSE);
+        creditVal.append('\n');
 
         /* ... in this Transaction */
         long largestDebitNumber = 0;
         long largestCreditNumber = 0;
-        int widestDebitWidth = 0;
-        int widestCreditWidth = 0;
 
-        amountBuffers = new ArrayList<StringBuilder>(3);
-        entryObjects = new ArrayList<Entry>(3);
-
-        final Set<Entry> ordered = new TreeSet<Entry>(new EntryComparator(t));
+        ordered = new TreeSet<Entry>(new EntryComparator(t));
 
         TransactionOperations transactions;
         Entry[] entries;
@@ -436,9 +433,10 @@ public class TransactionListView extends TreeView
             ordered.add(e);
         }
 
-        final Iterator eI = ordered.iterator();
+        eI = ordered.iterator();
         while (eI.hasNext()) {
-            final Entry entry = (Entry) eI.next();
+            final Entry entry = eI.next();
+
             final Ledger ledger = entry.getParentLedger();
             final Account account = ledger.getParentAccount();
 
@@ -447,8 +445,7 @@ public class TransactionListView extends TreeView
             titleName.append("<span color='");
             titleName.append(account.getColor(active));
             titleName.append("'>");
-            final Matcher ma = regexAmp.matcher(account.getTitle());
-            titleName.append(ma.replaceAll("&amp;"));
+            titleName.append(Glib.markupEscapeText(account.getTitle()));
             titleName.append("</span>");
             /*
              * We use » \u00bb. Other possibilities: ∞ \u221e, and ⑆ \u2446.
@@ -464,13 +461,11 @@ public class TransactionListView extends TreeView
             titleName.append("<span color='");
             titleName.append(ledger.getColor(active));
             titleName.append("'>");
-            final Matcher ml = regexAmp.matcher(ledger.getName());
-            titleName.append(ml.replaceAll("&amp;"));
+            titleName.append(Glib.markupEscapeText(ledger.getName()));
             titleName.append("</span>");
 
             long amount = entry.getAmount();
             Currency cur = entry.getCurrency();
-            long value = entry.getValue();
 
             final StringBuilder buf = new StringBuilder();
 
@@ -486,75 +481,42 @@ public class TransactionListView extends TreeView
             buf.append(cur.getCode());
             buf.append("</span>");
 
-            amountBuffers.add(buf);
-            entryObjects.add(entry);
-
             /*
              * We sort the entires by their face value.
              */
+
             if (entry instanceof Debit) {
                 if (amount > largestDebitNumber) {
                     largestDebitNumber = amount;
-                }
-                if (buf.length() > widestDebitWidth) {
-                    widestDebitWidth = buf.length();
                 }
             } else if (entry instanceof Credit) {
                 if (amount > largestCreditNumber) {
                     largestCreditNumber = amount;
                 }
-                if (buf.length() > widestCreditWidth) {
-                    widestCreditWidth = buf.length();
-                }
             }
-        }
 
-        /*
-         * Now we iterate over the Entries again, this time applying the max
-         * width to square the Strings, and then copying them to the
-         * appropriate left/right credit/debit buffer.
-         */
-
-        final int num = entryObjects.size();
-        for (int i = 0; i < num; i++) {
-            final Entry entry = entryObjects.get(i);
-            final StringBuilder buf = amountBuffers.get(i);
+            /*
+             * And set it monospaced (though not terminal - is there a better
+             * attribute to set?)
+             */
 
             if (entry instanceof Debit) {
-                final int diff = widestDebitWidth - buf.length();
-                for (int j = 0; j < diff; j++) {
-                }
+                debitVal.insert(0, "<span font_desc='mono' color='"
+                        + (active ? Debit.COLOR_ACTIVE : Debit.COLOR_NORMAL) + "'>");
                 debitVal.append(buf);
-                debitVal.append('\n');
-                creditVal.append('\n');
-
+                debitVal.append("</span>");
             } else if (entry instanceof Credit) {
-                final int diff = widestCreditWidth - buf.length();
-                for (int j = 0; j < diff; j++) {
-                }
-                debitVal.append('\n');
+                creditVal.insert(0, "<span font_desc='mono' color='"
+                        + (active ? Credit.COLOR_ACTIVE : Credit.COLOR_NORMAL) + "'>");
                 creditVal.append(buf);
+                creditVal.append("</span>");
+            }
+
+            if (eI.hasNext()) {
+                debitVal.append('\n');
                 creditVal.append('\n');
             }
         }
-
-        /*
-         * Trim the trailing newline (otherwise we get a blank line in the
-         * row)
-         */
-        debitVal.deleteCharAt(debitVal.length() - 1);
-        creditVal.deleteCharAt(creditVal.length() - 1);
-
-        /*
-         * And set it monospaced (though not terminal - is there a better
-         * attribute to set?)
-         */
-        debitVal.insert(0, "<span font_desc='mono' color='"
-                + (active ? Debit.COLOR_ACTIVE : Debit.COLOR_NORMAL) + "'>");
-        debitVal.append("</span>");
-        creditVal.insert(0, "<span font_desc='mono' color='"
-                + (active ? Credit.COLOR_ACTIVE : Credit.COLOR_NORMAL) + "'>");
-        creditVal.append("</span>");
 
         /*
          * Now add the data for the Entries related columns:
