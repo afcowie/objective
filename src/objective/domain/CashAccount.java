@@ -16,30 +16,44 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
- * Marks an account which only has one Ledger in it. In addition to a few
- * convenience methods (to be coded in implementing classes) for accessing the
- * single Ledger, this is a marker interface to allow appopriate UI
- * generation.
+ * An asset account, implemented with a single Ledger.
  * 
  * @author Andrew Cowie
  */
-public interface SingleLedger
+public class CashAccount extends AssetAccount
 {
     /**
-     * Add an entry to the single Ledger in this Account.
+     * This is a convenience only for use in single ledger accounts, ie, this
+     * one.
      */
-    public void addEntry(Entry entry);
+    private DebitPositiveLedger ledger = null;
 
     /**
-     * Get the [single] ledger associated with this account.
+     * [For creating search prototypes]
      */
-    public Ledger getLedger();
+    public CashAccount(long rowid) {
+        super(rowid);
+    }
 
-    /**
-     * Set the [sole] ledger associated with this account.
+    /*
+     * Getters and Setters --------------------------------
      */
-    public void setLedger(Ledger ledger);
+
+    public Ledger getLedger() {
+        return ledger;
+    }
+
+    public void setLedger(Ledger ledger) {
+        if (!(ledger instanceof DebitPositiveLedger)) {
+            throw new IllegalArgumentException("You must use a DebitPositiveLedger for a CashAccount");
+        }
+        this.ledger = (DebitPositiveLedger) ledger;
+    }
+
+    public String getClassString() {
+        return "Cash";
+    }
 }

@@ -18,68 +18,31 @@
  */
 package objective.domain;
 
-import accounts.domain.SingleLedger;
-
 /**
  * A bank account. This is more complicated than a simple cash account because
  * it implements a reconcilable ledger. Class description here.
  * 
  * @author Andrew Cowie
  */
-public class BankAccount extends AssetAccount implements SingleLedger
+public class BankAccount extends AssetAccount
 {
+    /**
+     * The name of the bank of financial institution carrying the account.
+     * Becomes Account title.
+     */
     // private String institution = null;
+
+    /**
+     * The type or name of the account, for instance "Current Account". Used
+     * as Ledger name.
+     */
     // private String name = null;
 
     /**
-     * This is a convenience only for use in single ledger accounts, ie, this
-     * one.
-     */
-    private DebitPositiveLedger ledger = null;
-
-    /**
-     * [For creating search prototypes]
+     * Construct a new BankAccount from database.
      */
     public BankAccount(long rowid) {
         super(rowid);
-    }
-
-    /**
-     * @param institution
-     *            the name of the bank of financial institution carrying the
-     *            account. Becomes Account title.
-     * @param name
-     *            the type or name of the account, for instance "Current
-     *            Account". Used as Ledger name.
-     */
-    public BankAccount(String institution, String name) {
-        super();
-        this.setTitle(institution);
-
-        ledger = new DebitPositiveLedger();
-        ledger.setName(name);
-        addLedger(ledger);
-    }
-
-    /**
-     * Add an entry to the (single) Ledger of this BankAccount. FIXME
-     */
-    public void addEntry(Entry entry) {
-        ledger.addEntry(entry);
-        entry.setParentLedger(ledger);
-        // TODO recalc account balance?
-    }
-
-    public Ledger getLedger() {
-        return ledger;
-    }
-
-    public void setLedger(Ledger ledger) {
-        if (ledger instanceof DebitPositiveLedger) {
-            this.ledger = (DebitPositiveLedger) ledger;
-        } else {
-            throw new IllegalArgumentException("ledger argument needs ot be DebitPositive");
-        }
     }
 
     public String getClassString() {

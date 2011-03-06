@@ -32,8 +32,4 @@ public class Credit extends Entry
     public Credit(long rowid) {
         super(rowid);
     }
-
-    public Credit(Amount value, Ledger parent) {
-        super(value, parent);
-    }
 }
