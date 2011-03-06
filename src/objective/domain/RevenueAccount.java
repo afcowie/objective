@@ -16,21 +16,17 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * A revenue account.
  * 
  * @author Andrew Cowie
  */
-public class RevenueAccount extends CreditPositiveAccount
+public abstract class RevenueAccount extends CreditPositiveAccount
 {
-    public RevenueAccount() {
-        super();
-    }
-
-    public RevenueAccount(String title) {
-        super(title);
+    protected RevenueAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {

@@ -28,7 +28,7 @@ package objective.domain;
  * send off what we owe them.
  * 
  * @author Andrew Cowie *
- * @see accounts.domain.PayrollTaxPayableAccount for the parallel account type
+ * @see objective.domain.PayrollTaxPayableAccount for the parallel account type
  *      used for collecting taxes that must simply be remitted to the Receiver
  *      General for that jurisdiction, such as PAYG.
  */

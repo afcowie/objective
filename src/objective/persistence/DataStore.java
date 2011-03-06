@@ -38,8 +38,10 @@ import objective.domain.GenericExpenseAccount;
 import objective.domain.GenericTransaction;
 import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
+import objective.domain.LoanPayableAccount;
 import objective.domain.OwnersEquityAccount;
 import objective.domain.PaymentTransaction;
+import objective.domain.PayrollTaxPayableAccount;
 import objective.domain.ProfessionalRevenueAccount;
 import objective.domain.ReimbursableExpensesPayableAccount;
 import objective.domain.SalesTaxPayableAccount;
@@ -375,6 +377,10 @@ public class DataStore
                 result = new ReimbursableExpensesPayableAccount(accountId);
             } else if (type.equals("objective.domain.SalesTaxPayableAccount")) {
                 result = new SalesTaxPayableAccount(accountId);
+            } else if (type.equals("objective.domain.PayrollTaxPayableAccount")) {
+                result = new PayrollTaxPayableAccount(accountId);
+            } else if (type.equals("objective.domain.LoanPayableAccount")) {
+                result = new LoanPayableAccount(accountId);
             } else if (type.equals("objective.domain.OwnersEquityAccount")) {
                 result = new OwnersEquityAccount(accountId);
             } else if (type.equals("objective.domain.ProfessionalRevenueAccount")) {

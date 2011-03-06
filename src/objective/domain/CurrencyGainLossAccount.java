@@ -19,19 +19,19 @@
 package objective.domain;
 
 /**
- * A revenue account specific to professional services such as consulting. It
- * [should have] two built in Ledgers: one for fee revenue, and one
- * representing received expense reimbursement payments.
+ * A single ledger account to record currency gains and losses. TODO It's not
+ * clear whether we actually need this. It's also possible that this should be
+ * a Ledger under AdjustmentsAccount or so.
  * 
  * @author Andrew Cowie
  */
-public class ProfessionalRevenueAccount extends RevenueAccount
+public class CurrencyGainLossAccount extends RevenueAccount
 {
-    public ProfessionalRevenueAccount(long rowid) {
+    public CurrencyGainLossAccount(long rowid) {
         super(rowid);
     }
 
     public String getClassString() {
-        return "Professional Services Revenue";
+        return "Currency Gain/Loss Account";
     }
 }

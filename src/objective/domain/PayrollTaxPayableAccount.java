@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
 /**
  * A tax liability, that we collect and then must remit. Has one automatically
@@ -25,28 +25,17 @@ package accounts.domain;
  * the withholdings collected and zero the liability as we send off the cheque
  * to ATO.
  * 
+ * Ledger should be "Collected". Account title should be the name of the tax,
+ * to be used as the account title, ie "PAYG"
+ * 
  * @author Andrew Cowie
- * @see accounts.domain.SalesTaxPayableAccount for the parallel account type
+ * @see objective.domain.SalesTaxPayableAccount for the parallel account type
  *      used for revolving (two sided) taxes such as GST.
  */
 public class PayrollTaxPayableAccount extends LiabilityAccount
 {
-
-    public PayrollTaxPayableAccount() {
-        super();
-    }
-
-    /**
-     * Creates a new Tax account with automatically created "Collected"
-     * ledger.
-     * 
-     * @param title
-     *            The name of the tax, to be used as the account title, ie
-     *            "PAYG"
-     */
-    public PayrollTaxPayableAccount(String title) {
-        super(title);
-        addLedger(new CreditPositiveLedger("Collected"));
+    public PayrollTaxPayableAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {

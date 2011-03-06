@@ -4,14 +4,21 @@ BEGIN;
 INSERT INTO types VALUES (1, 'objective.domain.BankAccount');
 INSERT INTO types VALUES (14, 'objective.domain.CashAccount');
 INSERT INTO types VALUES (2, 'objective.domain.AccountsReceivableAccount');
+INSERT INTO types VALUES (11, 'objective.domain.DepreciatingAssetAccount');
+
 INSERT INTO types VALUES (3, 'objective.domain.AccountsPayableAccount');
 INSERT INTO types VALUES (4, 'objective.domain.ReimbursableExpensesPayableAccount');
+INSERT INTO types VALUES (12, 'objective.domain.SalesTaxPayableAccount');
+INSERT INTO types VALUES (15, 'objective.domain.PayrollTaxPayableAccount');
+INSERT INTO types VALUES (16, 'objective.domain.LoanPayableAccount');
+
+INSERT INTO types VALUES (13, 'objective.domain.OwnersEquityAccount');
+
 INSERT INTO types VALUES (5, 'objective.domain.ProfessionalRevenueAccount');
 INSERT INTO types VALUES (6, 'objective.domain.CurrencyGainLossAccount');
-INSERT INTO types VALUES (11, 'objective.domain.DepreciatingAssetAccount');
-INSERT INTO types VALUES (12, 'objective.domain.SalesTaxPayableAccount');
-INSERT INTO types VALUES (13, 'objective.domain.OwnersEquityAccount');
+
 INSERT INTO types VALUES (7, 'objective.domain.GenericExpenseAccount');
+
 INSERT INTO types VALUES (8, 'objective.domain.GenericTransaction');
 INSERT INTO types VALUES (9, 'objective.domain.InvoiceTransaction');
 INSERT INTO types VALUES (10, 'objective.domain.PaymentTransaction');
