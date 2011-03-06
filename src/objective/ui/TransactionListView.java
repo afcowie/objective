@@ -232,10 +232,11 @@ public class TransactionListView extends TreeView
 
         renderer = new CellRendererText(vertical);
         renderer.setAlignment(RIGHT, TOP);
+        renderer.setAlignment(org.gnome.pango.Alignment.RIGHT);
         renderer.setMarkup(debitAmountsText_DataColumn);
 
-        vertical.setTitle("Debits       ");
-        vertical.setAlignment(1.0f);
+        vertical.setTitle("    Debits");
+        vertical.setAlignment(0.5f);
         vertical.setClickable(true);
         vertical.setSortColumn(debitAmountsSort_DataColumn);
 
@@ -248,14 +249,11 @@ public class TransactionListView extends TreeView
 
         renderer = new CellRendererText(vertical);
         renderer.setAlignment(RIGHT, TOP);
+        renderer.setAlignment(org.gnome.pango.Alignment.RIGHT);
         renderer.setMarkup(creditAmountsText_DataColumn);
 
-        vertical.setTitle("Credits    ");
-        // Label title = new Label("Credits <span font_desc='Mono'> </span>");
-        // title.setUseMarkup(true);
-        // creditAmounts_ViewColumn.setWidget(title);
-
-        vertical.setAlignment(1.0f);
+        vertical.setTitle("    Credits");
+        vertical.setAlignment(0.5f);
         vertical.setClickable(true);
         vertical.setSortColumn(creditAmountsSort_DataColumn);
 
@@ -525,7 +523,6 @@ public class TransactionListView extends TreeView
             if (entry instanceof Debit) {
                 final int diff = widestDebitWidth - buf.length();
                 for (int j = 0; j < diff; j++) {
-                    buf.insert(0, ' ');
                 }
                 debitVal.append(buf);
                 debitVal.append('\n');
@@ -534,7 +531,6 @@ public class TransactionListView extends TreeView
             } else if (entry instanceof Credit) {
                 final int diff = widestCreditWidth - buf.length();
                 for (int j = 0; j < diff; j++) {
-                    buf.insert(0, ' ');
                 }
                 debitVal.append('\n');
                 creditVal.append(buf);
