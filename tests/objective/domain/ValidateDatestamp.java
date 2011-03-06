@@ -22,9 +22,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import junit.framework.TestCase;
+import org.gnome.gtk.GraphicalTestCase;
 
-public class ValidateDatestamp extends TestCase
+public class ValidateDatestamp extends GraphicalTestCase
 {
     public final void testValidDatestampStringInput() {
         Datestamp stamp = new Datestamp();
