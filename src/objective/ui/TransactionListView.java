@@ -81,38 +81,38 @@ public class TransactionListView extends TreeView
 
     private final DataStore data;
 
-    private final DataColumnString typeMarkup_DataColumn;
+    private final DataColumnString typeTextColumn;
 
-    private final DataColumnString typeSort_DataColumn;
+    private final DataColumnString typeSortColumn;
 
-    private final DataColumnString dateText_DataColumn;
+    private final DataColumnString dateTextColumn;
 
-    private final DataColumnLong dateSort_DataColumn;
+    private final DataColumnLong dateSortColumn;
 
-    private final DataColumnString descriptionAccountLedgerText_DataColumn;
+    private final DataColumnString descriptionTextColumn;
 
-    private final DataColumnString descriptionSort_DataColumn;
+    private final DataColumnString descriptionSortColumn;
 
-    private final DataColumnString debitAmountsText_DataColumn;
+    private final DataColumnString debitsTextColumn;
 
-    private final DataColumnLong debitAmountsSort_DataColumn;
+    private final DataColumnLong debitsSortColumn;
 
-    private final DataColumnString creditAmountsText_DataColumn;
+    private final DataColumnString creditsTextColumn;
 
-    private final DataColumnLong creditAmountsSort_DataColumn;
+    private final DataColumnLong creditsSortColumn;
 
     /**
      * The Transaction object that this row represents. This must be set
      * before calling {@link #populate(TreeIter)}
      */
-    private final DataColumnReference<Transaction> transactionObject_DataColumn;
+    private final DataColumnReference<Transaction> transactionObjectColumn;
 
     /**
      * Whether the row is to be rendered with bright colours. Set this as true
      * if the row is selected and you want it to show up in "reverse video",
      * otherwise use false for normal colouring.
      */
-    private final DataColumnBoolean active_DataColumn;
+    private final DataColumnBoolean isActiveColumn;
 
     private final ListStore model;
 
@@ -137,32 +137,32 @@ public class TransactionListView extends TreeView
 
         home = null; // FIXME
 
-        typeMarkup_DataColumn = new DataColumnString();
-        typeSort_DataColumn = new DataColumnString();
-        dateText_DataColumn = new DataColumnString();
-        dateSort_DataColumn = new DataColumnLong();
-        descriptionAccountLedgerText_DataColumn = new DataColumnString();
-        descriptionSort_DataColumn = new DataColumnString();
-        debitAmountsText_DataColumn = new DataColumnString();
-        debitAmountsSort_DataColumn = new DataColumnLong();
-        creditAmountsText_DataColumn = new DataColumnString();
-        creditAmountsSort_DataColumn = new DataColumnLong();
-        transactionObject_DataColumn = new DataColumnReference<Transaction>();
-        active_DataColumn = new DataColumnBoolean();
+        typeTextColumn = new DataColumnString();
+        typeSortColumn = new DataColumnString();
+        dateTextColumn = new DataColumnString();
+        dateSortColumn = new DataColumnLong();
+        descriptionTextColumn = new DataColumnString();
+        descriptionSortColumn = new DataColumnString();
+        debitsTextColumn = new DataColumnString();
+        debitsSortColumn = new DataColumnLong();
+        creditsTextColumn = new DataColumnString();
+        creditsSortColumn = new DataColumnLong();
+        transactionObjectColumn = new DataColumnReference<Transaction>();
+        isActiveColumn = new DataColumnBoolean();
 
         model = new ListStore(new DataColumn[] {
-            typeMarkup_DataColumn,
-            typeSort_DataColumn,
-            dateText_DataColumn,
-            dateSort_DataColumn,
-            descriptionAccountLedgerText_DataColumn,
-            descriptionSort_DataColumn,
-            debitAmountsText_DataColumn,
-            debitAmountsSort_DataColumn,
-            creditAmountsText_DataColumn,
-            creditAmountsSort_DataColumn,
-            transactionObject_DataColumn,
-            active_DataColumn
+            typeTextColumn,
+            typeSortColumn,
+            dateTextColumn,
+            dateSortColumn,
+            descriptionTextColumn,
+            descriptionSortColumn,
+            debitsTextColumn,
+            debitsSortColumn,
+            creditsTextColumn,
+            creditsSortColumn,
+            transactionObjectColumn,
+            isActiveColumn
         });
 
         populate(transactions);
@@ -182,11 +182,11 @@ public class TransactionListView extends TreeView
 
         renderer = new CellRendererText(vertical);
         renderer.setAlignment(LEFT, TOP);
-        renderer.setMarkup(typeMarkup_DataColumn);
+        renderer.setMarkup(typeTextColumn);
 
         vertical.setTitle("Type");
         vertical.setClickable(true);
-        vertical.setSortColumn(typeSort_DataColumn);
+        vertical.setSortColumn(typeSortColumn);
 
         /*
          * Date
@@ -197,11 +197,11 @@ public class TransactionListView extends TreeView
 
         renderer = new CellRendererText(vertical);
         renderer.setAlignment(LEFT, TOP);
-        renderer.setMarkup(dateText_DataColumn);
+        renderer.setMarkup(dateTextColumn);
 
         vertical.setTitle("Date");
         vertical.setClickable(true);
-        vertical.setSortColumn(dateSort_DataColumn);
+        vertical.setSortColumn(dateSortColumn);
         vertical.emitClicked();
 
         /*
@@ -213,11 +213,11 @@ public class TransactionListView extends TreeView
         vertical.setExpand(true);
 
         renderer = new CellRendererText(vertical);
-        renderer.setMarkup(descriptionAccountLedgerText_DataColumn);
+        renderer.setMarkup(descriptionTextColumn);
 
         vertical.setTitle("Description");
         vertical.setClickable(true);
-        vertical.setSortColumn(descriptionSort_DataColumn);
+        vertical.setSortColumn(descriptionSortColumn);
 
         // TODO sort order AccountComparator, yo
 
@@ -231,12 +231,12 @@ public class TransactionListView extends TreeView
         renderer = new CellRendererText(vertical);
         renderer.setAlignment(RIGHT, TOP);
         renderer.setAlignment(org.gnome.pango.Alignment.RIGHT);
-        renderer.setMarkup(debitAmountsText_DataColumn);
+        renderer.setMarkup(debitsTextColumn);
 
         vertical.setTitle("    Debits");
         vertical.setAlignment(0.5f);
         vertical.setClickable(true);
-        vertical.setSortColumn(debitAmountsSort_DataColumn);
+        vertical.setSortColumn(debitsSortColumn);
 
         /*
          * Entries' Credit
@@ -248,12 +248,12 @@ public class TransactionListView extends TreeView
         renderer = new CellRendererText(vertical);
         renderer.setAlignment(RIGHT, TOP);
         renderer.setAlignment(org.gnome.pango.Alignment.RIGHT);
-        renderer.setMarkup(creditAmountsText_DataColumn);
+        renderer.setMarkup(creditsTextColumn);
 
         vertical.setTitle("    Credits");
         vertical.setAlignment(0.5f);
         vertical.setClickable(true);
-        vertical.setSortColumn(creditAmountsSort_DataColumn);
+        vertical.setSortColumn(creditsSortColumn);
 
         /*
          * overall properties
@@ -283,7 +283,7 @@ public class TransactionListView extends TreeView
         view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
                 final TreeIter pointer = model.getIter(path); // TODO CHECK
-                final Transaction t = model.getValue(pointer, transactionObject_DataColumn);
+                final Transaction t = model.getValue(pointer, transactionObjectColumn);
 
                 Master.ui.launchEditor(t);
             }
@@ -313,8 +313,8 @@ public class TransactionListView extends TreeView
              * the TransactionListView for the first time, set that DataColumn
              * before calling populate().
              */
-            model.setValue(pointer, transactionObject_DataColumn, t);
-            model.setValue(pointer, active_DataColumn, false);
+            model.setValue(pointer, transactionObjectColumn, t);
+            model.setValue(pointer, isActiveColumn, false);
 
             populate(pointer);
         }
@@ -342,7 +342,7 @@ public class TransactionListView extends TreeView
     private void showAsActive(TreeIter pointer) {
         final TreePath current;
 
-        model.setValue(pointer, active_DataColumn, true);
+        model.setValue(pointer, isActiveColumn, true);
         populate(pointer);
 
         current = model.getPath(pointer);
@@ -350,7 +350,7 @@ public class TransactionListView extends TreeView
         if (previous != null) {
             if (!(previous.getPath().equals(current))) {
                 pointer = model.getIter(previous.getPath());
-                model.setValue(pointer, active_DataColumn, false);
+                model.setValue(pointer, isActiveColumn, false);
                 populate(pointer);
             }
         }
@@ -361,7 +361,7 @@ public class TransactionListView extends TreeView
      * Populate a given row with data marked up for presentation and with meta
      * data normalized for sorting purposes.
      * 
-     * @param pointer
+     * @param row
      *            a TreeIter indicating which row you want to [re]populate.
      */
     /*
@@ -371,15 +371,15 @@ public class TransactionListView extends TreeView
      * Markup ones are where the pango mush goes (which is why we can't sort
      * on them - it'd sort by colour!)
      */
-    private void populate(final TreeIter pointer) {
+    private void populate(final TreeIter row) {
         final Transaction t;
         final boolean active;
         final StringBuilder debitVal, creditVal;
         final Set<Entry> ordered;
         final Iterator<Entry> eI;
 
-        t = model.getValue(pointer, transactionObject_DataColumn);
-        active = model.getValue(pointer, active_DataColumn);
+        t = model.getValue(row, transactionObjectColumn);
+        active = model.getValue(row, isActiveColumn);
 
         final StringBuffer type = new StringBuffer();
 
@@ -391,12 +391,12 @@ public class TransactionListView extends TreeView
         type.append(Text.wrap(t.getClassString(), 5));
         type.append("</span>");
 
-        model.setValue(pointer, typeMarkup_DataColumn, type.toString());
-        model.setValue(pointer, typeSort_DataColumn, t.getClassString());
+        model.setValue(row, typeTextColumn, type.toString());
+        model.setValue(row, typeSortColumn, t.getClassString());
 
-        model.setValue(pointer, dateText_DataColumn, "<span font_desc='Mono'>" + t.getDate().toString()
+        model.setValue(row, dateTextColumn, "<span font_desc='Mono'>" + t.getDate().toString()
                 + "</span>");
-        model.setValue(pointer, dateSort_DataColumn, t.getDate().getInternalTimestamp());
+        model.setValue(row, dateSortColumn, t.getDate().getInternalTimestamp());
 
         final StringBuffer titleName = new StringBuffer();
         final String OPEN = "<b>";
@@ -521,14 +521,14 @@ public class TransactionListView extends TreeView
         /*
          * Now add the data for the Entries related columns:
          */
-        model.setValue(pointer, descriptionAccountLedgerText_DataColumn, titleName.toString());
-        model.setValue(pointer, descriptionSort_DataColumn, t.getDescription());
+        model.setValue(row, descriptionTextColumn, titleName.toString());
+        model.setValue(row, descriptionSortColumn, t.getDescription());
 
-        model.setValue(pointer, debitAmountsText_DataColumn, debitVal.toString());
-        model.setValue(pointer, debitAmountsSort_DataColumn, largestDebitNumber);
+        model.setValue(row, debitsTextColumn, debitVal.toString());
+        model.setValue(row, debitsSortColumn, largestDebitNumber);
 
-        model.setValue(pointer, creditAmountsText_DataColumn, creditVal.toString());
-        model.setValue(pointer, creditAmountsSort_DataColumn, largestCreditNumber);
+        model.setValue(row, creditsTextColumn, creditVal.toString());
+        model.setValue(row, creditsSortColumn, largestCreditNumber);
     }
 
     /**
@@ -554,7 +554,7 @@ public class TransactionListView extends TreeView
             return;
         }
         do {
-            if (model.getValue(pointer, transactionObject_DataColumn) == t) {
+            if (model.getValue(pointer, transactionObjectColumn) == t) {
                 populate(pointer);
                 return;
             }
