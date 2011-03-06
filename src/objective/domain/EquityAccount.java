@@ -16,21 +16,18 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
+
 
 /**
  * An Equity Account.
  * 
  * @author Andrew Cowie
  */
-public class EquityAccount extends CreditPositiveAccount
+public abstract class EquityAccount extends CreditPositiveAccount
 {
-    public EquityAccount() {
-        super();
-    }
-
-    public EquityAccount(String title) {
-        super(title);
+    public EquityAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {

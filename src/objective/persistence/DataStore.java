@@ -25,20 +25,24 @@ import objective.domain.Account;
 import objective.domain.AccountsPayableAccount;
 import objective.domain.AccountsReceivableAccount;
 import objective.domain.BankAccount;
+import objective.domain.CashAccount;
 import objective.domain.Credit;
 import objective.domain.CreditPositiveLedger;
 import objective.domain.Currency;
 import objective.domain.Datestamp;
 import objective.domain.Debit;
 import objective.domain.DebitPositiveLedger;
+import objective.domain.DepreciatingAssetAccount;
 import objective.domain.Entry;
 import objective.domain.GenericExpenseAccount;
 import objective.domain.GenericTransaction;
 import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
+import objective.domain.OwnersEquityAccount;
 import objective.domain.PaymentTransaction;
 import objective.domain.ProfessionalRevenueAccount;
 import objective.domain.ReimbursableExpensesPayableAccount;
+import objective.domain.SalesTaxPayableAccount;
 import objective.domain.Transaction;
 
 import com.operationaldynamics.sqlite.Database;
@@ -353,8 +357,12 @@ public class DataStore
         if (direction == 1) {
             if (type.equals("objective.domain.BankAccount")) {
                 result = new BankAccount(accountId);
+            } else if (type.equals("objective.domain.CashAccount")) {
+                result = new CashAccount(accountId);
             } else if (type.equals("objective.domain.AccountsReceivableAccount")) {
                 result = new AccountsReceivableAccount(accountId);
+            } else if (type.equals("objective.domain.DepreciatingAssetAccount")) {
+                result = new DepreciatingAssetAccount(accountId);
             } else if (type.equals("objective.domain.GenericExpenseAccount")) {
                 result = new GenericExpenseAccount(accountId);
             } else {
@@ -365,6 +373,10 @@ public class DataStore
                 result = new AccountsPayableAccount(accountId);
             } else if (type.equals("objective.domain.ReimbursableExpensesPayableAccount")) {
                 result = new ReimbursableExpensesPayableAccount(accountId);
+            } else if (type.equals("objective.domain.SalesTaxPayableAccount")) {
+                result = new SalesTaxPayableAccount(accountId);
+            } else if (type.equals("objective.domain.OwnersEquityAccount")) {
+                result = new OwnersEquityAccount(accountId);
             } else if (type.equals("objective.domain.ProfessionalRevenueAccount")) {
                 result = new ProfessionalRevenueAccount(accountId);
             } else if (type.equals("objective.domain.CurrencyGainLossAccount")) {

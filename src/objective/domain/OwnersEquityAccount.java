@@ -16,7 +16,8 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
+
 
 /**
  * A single ledger account for use in sole proprietorships. (ie, we use this
@@ -24,47 +25,13 @@ package accounts.domain;
  * 
  * @author Andrew Cowie
  */
-public class OwnersEquityAccount extends EquityAccount implements SingleLedger
+public class OwnersEquityAccount extends EquityAccount
 {
-    private CreditPositiveLedger ledger = null;
-
     /**
      * 
      */
-    public OwnersEquityAccount() {
-        super();
-    }
-
-    /**
-     * @param accountTitle
-     * @param ledgerName
-     */
-    public OwnersEquityAccount(String accountTitle, String ledgerName) {
-        super(accountTitle);
-        ledger = new CreditPositiveLedger();
-        ledger.setName(ledgerName);
-        addLedger(ledger);
-    }
-
-    /**
-     * Add an entry to the single Ledger in this Account.
-     */
-    public void addEntry(Entry entry) {
-        ledger.addEntry(entry);
-        entry.setParentLedger(ledger);
-        // TODO recalc account balance?
-    }
-
-    public Ledger getLedger() {
-        return ledger;
-    }
-
-    public void setLedger(Ledger ledger) {
-        if (!(ledger instanceof CreditPositiveLedger)) {
-            throw new IllegalArgumentException(
-                    "You must use a CreditPositiveLedger for an OwnersEquityAccount");
-        }
-        this.ledger = (CreditPositiveLedger) ledger;
+    public OwnersEquityAccount(long rowid) {
+        super(rowid);
     }
 
     public String getClassString() {
