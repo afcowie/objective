@@ -30,16 +30,14 @@ public class DemoWindowRunner
         DataStore data = null;
         Window window;
 
-        try {
-            Gtk.init(args);
+        Gtk.init(args);
 
-            data = new DataStore("schema/accounts.db");
-            window = new TransactionListViewHolder(data);
-            window.present();
+        data = new DataStore("schema/accounts.db");
+        window = new TransactionListViewHolder(data);
+        window.present();
 
-            Gtk.main();
-        } finally {
-            data.close();
-        }
+        Gtk.main();
+
+        data.close();
     }
 }
