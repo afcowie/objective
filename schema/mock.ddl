@@ -71,6 +71,12 @@ INSERT INTO accounts VALUES (12, 31, 'Owner''s Equity', -1);
 INSERT INTO ledgers VALUES (18, 12, 'Andrew Cowie', NULL, -1);
 
 --
+-- Mock Workers
+--
+
+INSERT INTO workers VALUES (1, 'Andrew Cowie', 11);
+
+--
 -- Mock Transactions
 --
 

@@ -70,6 +70,13 @@ CREATE TABLE entries
 	direction INTEGER REFERENCES directions
 );
 
+CREATE TABLE workers
+(
+	worker_id INTEGER PRIMARY KEY,
+	name TEXT,
+	ledger_id INTEGER REFERENCES ledgers
+);
+
 --
 
 CREATE VIEW balances AS
