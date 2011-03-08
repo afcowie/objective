@@ -20,6 +20,12 @@ package accounts.domain;
 
 import java.util.Set;
 
+import objective.domain.Credit;
+import objective.domain.CreditPositiveLedger;
+import objective.domain.Debit;
+import objective.domain.DebitPositiveLedger;
+import objective.domain.Ledger;
+
 import junit.framework.TestCase;
 
 /**

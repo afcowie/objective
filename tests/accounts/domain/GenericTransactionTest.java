@@ -22,6 +22,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import objective.domain.Credit;
+import objective.domain.Datestamp;
+import objective.domain.Debit;
+import objective.domain.Entry;
+import objective.domain.GenericTransaction;
+
 import junit.framework.TestCase;
 
 /**

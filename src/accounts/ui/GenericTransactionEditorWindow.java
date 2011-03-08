@@ -25,6 +25,15 @@ import generic.ui.TwoColumnTable;
 
 import java.util.Iterator;
 
+import objective.domain.Credit;
+import objective.domain.CreditPositiveLedger;
+import objective.domain.Currency;
+import objective.domain.Debit;
+import objective.domain.DebitPositiveLedger;
+import objective.domain.Entry;
+import objective.domain.ForeignAmount;
+import objective.domain.GenericTransaction;
+
 import org.gnome.gtk.Button;
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.HBox;
@@ -40,14 +49,6 @@ import org.gnome.gtk.Widget;
 
 import accounts.domain.Amount;
 import accounts.domain.Books;
-import accounts.domain.Credit;
-import accounts.domain.CreditPositiveLedger;
-import accounts.domain.Currency;
-import accounts.domain.Debit;
-import accounts.domain.DebitPositiveLedger;
-import accounts.domain.Entry;
-import accounts.domain.ForeignAmount;
-import accounts.domain.GenericTransaction;
 
 /**
  * Create or Edit a GenericTransaction (often known in other accounting
@@ -55,7 +56,7 @@ import accounts.domain.GenericTransaction;
  * of Entries, Credit or Debit as specified by the user, against arbitrarily
  * specified accounts.
  * 
- * @see accounts.domain.GenericTransaction
+ * @see objective.domain.GenericTransaction
  * @author Andrew Cowie
  */
 /*

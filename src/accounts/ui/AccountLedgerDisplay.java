@@ -23,14 +23,15 @@ import generic.ui.Text;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import objective.domain.Account;
+import objective.domain.Ledger;
+
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.Requisition;
 import org.gnome.gtk.Widget;
 
-import accounts.domain.Account;
-import accounts.domain.Ledger;
 
 /**
  * Display the title and name of an Account / Ledger pair. This widget wraps

@@ -20,6 +20,10 @@ package accounts.domain;
 
 import java.util.Set;
 
+import objective.domain.Datestamp;
+import objective.domain.EquityAccount;
+import objective.domain.GenericTransaction;
+
 /**
  * The transaction used to import a set of existing accounts. In essence it's
  * just a big general ledger entry, but a single GL transaction UI is really

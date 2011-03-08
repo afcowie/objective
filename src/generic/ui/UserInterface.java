@@ -20,7 +20,6 @@ package generic.ui;
 
 import generic.client.Hooks;
 import generic.client.Master;
-import generic.domain.DomainObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +27,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import objective.persistence.DomainObject;
 
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.CursorType;

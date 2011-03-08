@@ -22,8 +22,9 @@ import generic.persistence.DataClient;
 
 import java.util.Set;
 
+import objective.domain.Currency;
+
 import accounts.domain.Books;
-import accounts.domain.Currency;
 
 /**
  * Add a Currency object to this set of books

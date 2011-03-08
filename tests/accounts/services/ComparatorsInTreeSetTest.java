@@ -22,21 +22,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import accounts.domain.Account;
+import objective.domain.Account;
+import objective.domain.BankAccount;
+import objective.domain.CashAccount;
+import objective.domain.Credit;
+import objective.domain.Currency;
+import objective.domain.Datestamp;
+import objective.domain.Debit;
+import objective.domain.DepreciatingAssetAccount;
+import objective.domain.Entry;
+import objective.domain.GenericTransaction;
+import objective.domain.Ledger;
+import objective.domain.OwnersEquityAccount;
+import objective.domain.SalesTaxPayableAccount;
+import objective.domain.Transaction;
+import objective.services.AccountComparator;
+import objective.services.EntryComparator;
+
 import accounts.domain.Amount;
-import accounts.domain.BankAccount;
-import accounts.domain.CashAccount;
-import accounts.domain.Credit;
-import accounts.domain.Currency;
-import accounts.domain.Datestamp;
-import accounts.domain.Debit;
-import accounts.domain.DepreciatingAssetAccount;
-import accounts.domain.Entry;
-import accounts.domain.GenericTransaction;
-import accounts.domain.Ledger;
-import accounts.domain.OwnersEquityAccount;
-import accounts.domain.SalesTaxPayableAccount;
-import accounts.domain.Transaction;
 import accounts.persistence.BlankDatafileTestCase;
 
 /**

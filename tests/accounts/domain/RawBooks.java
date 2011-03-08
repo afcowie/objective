@@ -20,6 +20,8 @@ package accounts.domain;
 
 import java.util.LinkedHashSet;
 
+import objective.domain.CurrencyGainLossAccount;
+
 /**
  * Establish a set of raw books suitable for test cases.
  * 

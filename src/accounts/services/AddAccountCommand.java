@@ -22,7 +22,8 @@ import generic.persistence.DataClient;
 
 import java.util.Set;
 
-import accounts.domain.Account;
+import objective.domain.Account;
+
 import accounts.domain.Books;
 
 /**

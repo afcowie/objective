@@ -18,6 +18,7 @@
  */
 package accounts.domain;
 
+import objective.domain.Datestamp;
 import junit.framework.TestCase;
 
 public class BasicLoanTest extends TestCase

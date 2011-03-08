@@ -18,14 +18,14 @@
  */
 package accounts.ui;
 
+import objective.domain.Currency;
+import objective.domain.GenericTransaction;
+import objective.domain.Transaction;
 import generic.ui.EditorWindow;
 import generic.ui.PrimaryWindow;
 import generic.ui.UserInterface;
-import accounts.domain.Currency;
-import accounts.domain.GenericTransaction;
 import accounts.domain.PayrollTransaction;
 import accounts.domain.ReimbursableExpensesTransaction;
-import accounts.domain.Transaction;
 import country.au.ui.AustralianPayrollEditorWindow;
 
 /**

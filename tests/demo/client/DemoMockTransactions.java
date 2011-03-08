@@ -25,26 +25,25 @@ import generic.util.Debug;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import country.au.domain.AustralianPayrollTaxIdentifier;
-import country.au.services.AustralianPayrollTaxConstants;
-
-import accounts.domain.Amount;
+import objective.domain.Amount;
+import objective.domain.Credit;
+import objective.domain.Currency;
+import objective.domain.Datestamp;
+import objective.domain.Debit;
+import objective.domain.Entry;
+import objective.domain.ForeignAmount;
+import objective.domain.GenericTransaction;
+import objective.domain.Ledger;
+import objective.domain.Transaction;
 import accounts.domain.Books;
-import accounts.domain.Credit;
-import accounts.domain.Currency;
-import accounts.domain.Datestamp;
-import accounts.domain.Debit;
 import accounts.domain.Employee;
-import accounts.domain.Entry;
-import accounts.domain.ForeignAmount;
-import accounts.domain.GenericTransaction;
-import accounts.domain.Ledger;
 import accounts.domain.PayrollTransaction;
 import accounts.domain.ReimbursableExpensesTransaction;
-import accounts.domain.Transaction;
 import accounts.services.CommandNotReadyException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.SpecificLedgerFinder;
+import country.au.domain.AustralianPayrollTaxIdentifier;
+import country.au.services.AustralianPayrollTaxConstants;
 
 /**
  * Contains a prelinary main() method and program initialization (much of
@@ -174,7 +173,7 @@ public class DemoMockTransactions
             List result = rw.queryByExample(person);
             andrew = (Employee) result.get(0);
 
-            person = new Employee("Katrina Ross");
+            person = new Employee("Judy Richardson");
             result = rw.queryByExample(person);
             katrina = (Employee) result.get(0);
 

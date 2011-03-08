@@ -18,6 +18,9 @@
  */
 package accounts.domain;
 
+import objective.domain.CreditPositiveLedger;
+import objective.domain.Ledger;
+
 /**
  * Base class of employees and subcontractors. A Worker is someone we pay
  * money to - periodically or otherwise.

@@ -23,8 +23,9 @@ import generic.util.DebugException;
 import java.util.Iterator;
 import java.util.Set;
 
-import accounts.domain.Entry;
-import accounts.domain.Transaction;
+import objective.domain.Entry;
+import objective.domain.Transaction;
+
 
 /**
  * Validate a Transaction for persistence to the database. This abstract class

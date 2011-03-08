@@ -20,7 +20,8 @@ package accounts.services;
 
 import java.text.ParseException;
 
-import accounts.domain.Datestamp;
+import objective.domain.Datestamp;
+
 import junit.framework.TestCase;
 
 public class RangeCalculatorTest extends TestCase

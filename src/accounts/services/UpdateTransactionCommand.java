@@ -28,9 +28,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import accounts.domain.Entry;
-import accounts.domain.Ledger;
-import accounts.domain.Transaction;
+import objective.domain.Entry;
+import objective.domain.Ledger;
+import objective.domain.Transaction;
+
 
 /**
  * Update an existing Transaction already stored in the database. This is a

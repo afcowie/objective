@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import objective.domain.Amount;
+import objective.domain.Currency;
+import objective.domain.ForeignAmount;
+
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.ComboBox;
@@ -38,10 +42,7 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.StateType;
 import org.gnome.gtk.Widget;
 
-import accounts.domain.Amount;
 import accounts.domain.Books;
-import accounts.domain.Currency;
-import accounts.domain.ForeignAmount;
 
 public class ForeignAmountEntryBox extends HBox
 {
@@ -51,7 +52,7 @@ public class ForeignAmountEntryBox extends HBox
 
     private Currency lastCurrency;
 
-    private List grayWidgets;
+    private List<Widget> grayWidgets;
 
     private AmountEntry faceValue_AmountEntry;
 
@@ -82,12 +83,12 @@ public class ForeignAmountEntryBox extends HBox
             lastCurrency = home;
         }
 
-        grayWidgets = new ArrayList();
+        grayWidgets = new ArrayList<Widget>();
 
         foreignAmount = new ForeignAmount("0.00", lastCurrency, "1.0");
 
         faceValue_AmountEntry = new AmountEntry();
-        faceValue_AmountEntry.setAmount(new Amount()); // dummy
+        faceValue_AmountEntry.setAmount(new Amount(0)); // dummy
         packStart(faceValue_AmountEntry, true, true, 0);
 
         foreign_CurrencySelector = new CurrencySelector(store);

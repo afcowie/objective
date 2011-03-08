@@ -23,10 +23,11 @@ import generic.ui.EditorWindow;
 import generic.util.Debug;
 import generic.util.DebugException;
 
+import objective.domain.Transaction;
+
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
 
-import accounts.domain.Transaction;
 import accounts.services.Command;
 import accounts.services.CommandNotReadyException;
 import accounts.services.PostTransactionCommand;

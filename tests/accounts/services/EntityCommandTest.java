@@ -20,12 +20,14 @@ package accounts.services;
 
 import java.util.List;
 
-import accounts.domain.AccountsPayable;
-import accounts.domain.AccountsReceivable;
+import objective.domain.AccountsPayableAccount;
+import objective.domain.AccountsReceivableAccount;
+import objective.domain.Currency;
+import objective.domain.Ledger;
+import objective.services.NotFoundException;
+
 import accounts.domain.Client;
 import accounts.domain.ClientLedger;
-import accounts.domain.Currency;
-import accounts.domain.Ledger;
 import accounts.domain.Supplier;
 import accounts.domain.SupplierLedger;
 import accounts.persistence.BlankDatafileTestCase;
@@ -56,10 +58,10 @@ public class EntityCommandTest extends BlankDatafileTestCase
         assertNotNull(cl);
 
         /*
-         * needs an AccountsReceivable stored for the command to run properly.
+         * needs an AccountsReceivableAccount stored for the command to run properly.
          */
 
-        AccountsReceivable ar = new AccountsReceivable("Accounts Receivable");
+        AccountsReceivableAccount ar = new AccountsReceivableAccount("Accounts Receivable");
 
         try {
             Currency home = new Currency("APF", "Antarctic Penguin Fish Token", "%");
@@ -180,10 +182,10 @@ public class EntityCommandTest extends BlankDatafileTestCase
         assertNotNull(sl);
 
         /*
-         * needs an AccountsPayable stored for the command to run properly.
+         * needs an AccountsPayableAccount stored for the command to run properly.
          */
 
-        AccountsPayable ap = new AccountsPayable("Accounts Payable");
+        AccountsPayableAccount ap = new AccountsPayableAccount("Accounts Payable");
 
         try {
             // already a Books object

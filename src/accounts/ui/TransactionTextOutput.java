@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import accounts.domain.Transaction;
+import objective.domain.Transaction;
+
 import accounts.services.TransactionComparator;
 
 /**

@@ -18,9 +18,10 @@
  */
 package accounts.services;
 
-import accounts.domain.Account;
-import accounts.domain.Currency;
-import accounts.domain.SalesTaxPayableAccount;
+import objective.domain.Account;
+import objective.domain.Currency;
+import objective.domain.SalesTaxPayableAccount;
+import objective.services.NotFoundException;
 import accounts.persistence.BlankDatafileTestCase;
 
 public class BasicFinderTest extends BlankDatafileTestCase

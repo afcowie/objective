@@ -23,9 +23,10 @@ import generic.persistence.Engine;
 
 import java.util.NoSuchElementException;
 
-import accounts.domain.Account;
+import objective.domain.Account;
+import objective.domain.Currency;
+
 import accounts.domain.Books;
-import accounts.domain.Currency;
 import accounts.persistence.BlankDatafileTestCase;
 
 public class BooksSetByCommandsTest extends BlankDatafileTestCase

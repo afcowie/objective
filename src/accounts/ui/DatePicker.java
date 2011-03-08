@@ -22,6 +22,8 @@ import generic.ui.ChangeListener;
 
 import java.text.ParseException;
 
+import objective.domain.Datestamp;
+
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
@@ -38,7 +40,6 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WindowPosition;
 
-import accounts.domain.Datestamp;
 
 import static org.freedesktop.bindings.Time.makeTime;
 

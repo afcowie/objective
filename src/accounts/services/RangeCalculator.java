@@ -18,7 +18,7 @@
  */
 package accounts.services;
 
-import accounts.domain.Datestamp;
+import objective.domain.Datestamp;
 
 /**
  * Work out various characteristics about the range between two Datestamps.

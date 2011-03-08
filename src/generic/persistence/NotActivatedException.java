@@ -23,7 +23,7 @@ package generic.persistence;
  * depth. Not ever supposed to happen, of course, but some classes have
  * markers which make it obvious when we have breached max activation depth.
  * 
- * @see accounts.domain.Datestamp for an example.
+ * @see objective.domain.Datestamp for an example.
  * @author Andrew Cowie
  */
 public class NotActivatedException extends RuntimeException

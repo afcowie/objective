@@ -18,7 +18,7 @@
  */
 package accounts.services;
 
-import accounts.domain.Datestamp;
+import objective.domain.Datestamp;
 
 /**
  * Calculate taxes owing. Use cases include working out payroll tax and income

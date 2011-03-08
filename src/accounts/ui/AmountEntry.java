@@ -20,6 +20,7 @@ package accounts.ui;
 
 import generic.ui.ChangeListener;
 import generic.util.Debug;
+import objective.domain.Amount;
 
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
@@ -28,8 +29,6 @@ import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.StateType;
 import org.gnome.gtk.Widget;
-
-import accounts.domain.Amount;
 
 /**
  * A tiny little Entry Widget to properly read in Amount fields. It is
@@ -217,7 +216,7 @@ public class AmountEntry extends HBox
      * string of the passed Amount differs from what is displayed, thus
      * avoiding triple taps on the <code>CHANGED</code> signal).
      */
-    public void setAmount(Amount a) {
+    public void setAmount(objective.domain.Amount a) {
         if (a == null) {
             throw new IllegalArgumentException();
         }

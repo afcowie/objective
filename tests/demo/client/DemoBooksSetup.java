@@ -24,27 +24,28 @@ import generic.util.Debug;
 
 import java.io.File;
 
-import accounts.domain.Account;
-import accounts.domain.AccountsPayable;
-import accounts.domain.AccountsReceivable;
-import accounts.domain.BankAccount;
+import objective.domain.Account;
+import objective.domain.AccountsPayableAccount;
+import objective.domain.AccountsReceivableAccount;
+import objective.domain.BankAccount;
+import objective.domain.CashAccount;
+import objective.domain.Currency;
+import objective.domain.DebitPositiveLedger;
+import objective.domain.DepreciatingAssetAccount;
+import objective.domain.GenericExpenseAccount;
+import objective.domain.Ledger;
+import objective.domain.LoanPayableAccount;
+import objective.domain.OwnersEquityAccount;
+import objective.domain.PayrollTaxPayableAccount;
+import objective.domain.ProfessionalRevenueAccount;
+import objective.domain.ReimbursableExpensesPayableAccount;
+import objective.domain.SalesTaxPayableAccount;
+
 import accounts.domain.Books;
-import accounts.domain.CashAccount;
 import accounts.domain.Client;
-import accounts.domain.Currency;
-import accounts.domain.DebitPositiveLedger;
-import accounts.domain.DepreciatingAssetAccount;
 import accounts.domain.Employee;
 import accounts.domain.Entity;
-import accounts.domain.GenericExpenseAccount;
-import accounts.domain.Ledger;
 import accounts.domain.LoanLedger;
-import accounts.domain.LoanPayableAccount;
-import accounts.domain.OwnersEquityAccount;
-import accounts.domain.PayrollTaxPayableAccount;
-import accounts.domain.ProfessionalRevenueAccount;
-import accounts.domain.ReimbursableExpensesPayableAccount;
-import accounts.domain.SalesTaxPayableAccount;
 import accounts.domain.Supplier;
 import accounts.services.AddAccountCommand;
 import accounts.services.AddCurrencyCommand;
@@ -103,12 +104,12 @@ public class DemoBooksSetup
                 new CashAccount("Petty Cash", "Manly Office"),
                 new BankAccount("ANZ", "Current Account"),
                 new BankAccount("Citibank", "Chequing Account"),
-                new AccountsReceivable("Trade Debtors"),
+                new AccountsReceivableAccount("Trade Debtors"),
                 new DepreciatingAssetAccount("Computer Equipment"),
                 new DepreciatingAssetAccount("Office Equipment"),
                 new DepreciatingAssetAccount("Furniture"),
 
-                new AccountsPayable("Trade Creditors"),
+                new AccountsPayableAccount("Trade Creditors"),
                 new SalesTaxPayableAccount("GST"),
                 new PayrollTaxPayableAccount("PAYG Withholding"),
                 new ReimbursableExpensesPayableAccount("Expenses Payable"),

@@ -18,6 +18,8 @@
  */
 package accounts.ui;
 
+import objective.domain.Datestamp;
+
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 
@@ -25,7 +27,6 @@ import generic.ui.Align;
 import generic.ui.ChangeListener;
 import generic.ui.TwoColumnTable;
 
-import accounts.domain.Datestamp;
 import accounts.services.RangeCalculator;
 
 /**

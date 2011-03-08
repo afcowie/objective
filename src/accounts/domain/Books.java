@@ -24,6 +24,12 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import objective.domain.Account;
+import objective.domain.Currency;
+import objective.domain.Datestamp;
+import objective.domain.EquityAccount;
+import objective.domain.RevenueAccount;
+
 import accounts.services.AddCurrencyCommand;
 import accounts.services.InitBooksCommand;
 

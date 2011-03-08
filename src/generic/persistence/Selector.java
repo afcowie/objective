@@ -18,7 +18,7 @@
  */
 package generic.persistence;
 
-import generic.domain.DomainObject;
+import objective.persistence.DomainObject;
 
 import com.db4o.query.Predicate;
 

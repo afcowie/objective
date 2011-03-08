@@ -24,7 +24,9 @@ import generic.util.DebugException;
 
 import java.util.List;
 
-import accounts.domain.Ledger;
+import objective.domain.Ledger;
+import objective.services.NotFoundException;
+
 
 /**
  * A simple Finder to lookup a specific Ledger given all or part of an Account

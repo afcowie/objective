@@ -20,6 +20,8 @@ package accounts.domain;
 
 import java.util.Set;
 
+import objective.domain.DebitPositiveLedger;
+
 public class ClientLedger extends DebitPositiveLedger implements ItemsLedger
 {
     private Client client;

@@ -24,7 +24,6 @@ import generic.ui.Text;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import objective.domain.Account;
 import objective.domain.Amount;
@@ -35,6 +34,7 @@ import objective.domain.Entry;
 import objective.domain.Ledger;
 import objective.domain.Transaction;
 import objective.persistence.DataStore;
+import objective.services.EntryComparator;
 import objective.services.TransactionOperations;
 
 import org.gnome.glib.Glib;
@@ -53,7 +53,6 @@ import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
 
-import accounts.services.EntryComparator;
 import accounts.ui.TransactionEditorWindow;
 
 import static org.gnome.gtk.Alignment.LEFT;
@@ -289,8 +288,6 @@ public class TransactionListView extends TreeView
             }
         });
     }
-
-    private static final Pattern regexAmp = Pattern.compile("&");
 
     private static final String DARKGRAY = "darkgray";
 

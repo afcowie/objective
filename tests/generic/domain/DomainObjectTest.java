@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import objective.persistence.DomainObject;
+
 import junit.framework.TestCase;
 
 /**

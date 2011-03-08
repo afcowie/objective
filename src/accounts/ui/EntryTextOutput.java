@@ -28,12 +28,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import accounts.domain.Credit;
-import accounts.domain.Debit;
-import accounts.domain.Entry;
-import accounts.domain.Ledger;
-import accounts.domain.Transaction;
-import accounts.services.EntryComparator;
+import objective.domain.Credit;
+import objective.domain.Debit;
+import objective.domain.Entry;
+import objective.domain.Ledger;
+import objective.domain.Transaction;
+import objective.services.EntryComparator;
+
 
 /**
  * Output the contents of a Transaction in a human readable text form.

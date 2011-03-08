@@ -20,6 +20,8 @@ package accounts.domain;
 
 import java.text.ParseException;
 
+import objective.domain.Datestamp;
+
 /**
  * An individual loan traunch. Especially in the case of Shareholder's Loans
  * under Australian law each transaction creates a new loan which has an

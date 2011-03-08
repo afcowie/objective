@@ -23,13 +23,14 @@ import generic.util.DebugException;
 
 import java.util.List;
 
-import accounts.domain.Account;
-import accounts.domain.AccountsPayable;
-import accounts.domain.AccountsReceivable;
+import objective.domain.Account;
+import objective.domain.AccountsPayableAccount;
+import objective.domain.AccountsReceivableAccount;
+import objective.domain.Ledger;
+
 import accounts.domain.Client;
 import accounts.domain.ClientLedger;
 import accounts.domain.Entity;
-import accounts.domain.Ledger;
 import accounts.domain.Supplier;
 import accounts.domain.SupplierLedger;
 import accounts.persistence.IdentifierAlreadyExistsException;
@@ -107,9 +108,9 @@ public class AddEntityCommand extends Command
          */
 
         if (entity instanceof Client) {
-            found = store.queryByExample(AccountsReceivable.class);
+            found = store.queryByExample(AccountsReceivableAccount.class);
         } else if (entity instanceof Supplier) {
-            found = store.queryByExample(AccountsPayable.class);
+            found = store.queryByExample(AccountsPayableAccount.class);
         } else {
             throw new DebugException(
                     "Huh? How did this AddEntityCommmand come to have neither Client nor Supplier as its candidate Entity?");

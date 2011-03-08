@@ -21,14 +21,15 @@ package accounts.ui;
 import generic.ui.AbstractWindow;
 import generic.util.Debug;
 
+import objective.domain.Account;
+import objective.domain.AssetAccount;
+import objective.domain.BankAccount;
+import objective.domain.CashAccount;
+
 import org.gnome.gtk.Button;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.RadioButton;
 
-import accounts.domain.Account;
-import accounts.domain.AssetAccount;
-import accounts.domain.BankAccount;
-import accounts.domain.CashAccount;
 
 /**
  * A popup question dialog to find out what kind of new account is to be
@@ -90,7 +91,7 @@ class AccountTypeSelectorDialog extends AbstractWindow
             } else if (type instanceof CashAccount) {
                 activate = "cashaccount_rb";
             }
-            // else if (type instanceof AccountsReceivable) {
+            // else if (type instanceof AccountsReceivableAccount) {
 
             // }
             // } else if (type instanceof LiabilityAccount) {

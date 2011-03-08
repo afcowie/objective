@@ -20,7 +20,8 @@ package accounts.services;
 
 import java.util.Comparator;
 
-import accounts.domain.Transaction;
+import objective.domain.Transaction;
+
 
 /**
  * Impose ordering on two Transaction objects.

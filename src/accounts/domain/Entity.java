@@ -18,6 +18,8 @@
  */
 package accounts.domain;
 
+import objective.domain.Transaction;
+
 /**
  * An entity we do business with. Can be an individual, business or
  * organization; both suppliers/vendors and clients are subclasses.

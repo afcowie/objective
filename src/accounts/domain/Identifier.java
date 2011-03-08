@@ -18,7 +18,7 @@
  */
 package accounts.domain;
 
-import generic.domain.DomainObject;
+import objective.persistence.DomainObject;
 import generic.domain.Leaf;
 
 /**

@@ -23,6 +23,8 @@ import generic.persistence.Engine;
 
 import java.util.List;
 
+import objective.services.NotFoundException;
+
 /**
  * As Commands are the place to put the logic for constructing, valdidating
  * and storing things to the database, Finders are the place to put predefined

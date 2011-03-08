@@ -18,9 +18,9 @@
  */
 package country.au.domain;
 
+import objective.domain.Datestamp;
 import generic.domain.Cascade;
 import generic.util.DebugException;
-import accounts.domain.Datestamp;
 
 /**
  * A simple table to store Australian Tax Office Pay-As-You-Go tax data.

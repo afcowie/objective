@@ -23,8 +23,9 @@ import generic.persistence.DataClient;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import objective.domain.Currency;
+
 import accounts.domain.Books;
-import accounts.domain.Currency;
 
 /**
  * Create a new set of company books. Obvisouly, this is the first command,

@@ -22,10 +22,11 @@ import static org.freedesktop.bindings.Time.makeTime;
 
 import java.text.ParseException;
 
+import objective.domain.Datestamp;
+
 import org.gnome.gtk.Calendar;
 import org.gnome.gtk.Gtk;
 
-import accounts.domain.Datestamp;
 
 import junit.framework.TestCase;
 

@@ -18,6 +18,11 @@
  */
 package accounts.domain;
 
+import objective.domain.Credit;
+import objective.domain.Datestamp;
+import objective.domain.Debit;
+import objective.domain.Entry;
+import objective.domain.Transaction;
 import junit.framework.TestCase;
 
 /**

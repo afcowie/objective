@@ -18,6 +18,10 @@
  */
 package accounts.domain;
 
+import objective.domain.Datestamp;
+import objective.domain.Entry;
+import objective.domain.Transaction;
+
 /**
  * Expenses reimbursable to an Worker
  * 

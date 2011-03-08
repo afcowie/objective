@@ -25,6 +25,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import objective.domain.Account;
+import objective.domain.Ledger;
+
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
@@ -56,9 +59,7 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
-import accounts.domain.Account;
 import accounts.domain.Books;
-import accounts.domain.Ledger;
 
 import static org.gnome.gtk.Alignment.CENTER;
 import static org.gnome.gtk.Alignment.LEFT;

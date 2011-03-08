@@ -18,7 +18,6 @@
  */
 package generic.persistence;
 
-import generic.domain.DomainObject;
 import generic.domain.Root;
 
 import java.util.Iterator;
@@ -26,6 +25,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import objective.persistence.DomainObject;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;

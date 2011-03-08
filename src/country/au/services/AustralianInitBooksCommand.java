@@ -18,8 +18,8 @@
  */
 package country.au.services;
 
+import objective.domain.Currency;
 import generic.persistence.DataClient;
-import accounts.domain.Currency;
 import accounts.domain.IdentifierGroup;
 import accounts.services.CommandNotReadyException;
 import accounts.services.InitBooksCommand;

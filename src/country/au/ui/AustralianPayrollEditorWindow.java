@@ -26,6 +26,13 @@ import generic.util.Debug;
 
 import java.util.List;
 
+import objective.domain.Credit;
+import objective.domain.Datestamp;
+import objective.domain.Debit;
+import objective.domain.Entry;
+import objective.domain.Ledger;
+import objective.services.NotFoundException;
+
 import org.gnome.gtk.ComboBox;
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
@@ -36,16 +43,10 @@ import org.gnome.gtk.WarningMessageDialog;
 import org.gnome.gtk.Widget;
 
 import accounts.domain.Amount;
-import accounts.domain.Credit;
-import accounts.domain.Datestamp;
-import accounts.domain.Debit;
 import accounts.domain.Employee;
-import accounts.domain.Entry;
 import accounts.domain.IdentifierGroup;
-import accounts.domain.Ledger;
 import accounts.domain.PayrollTransaction;
 import accounts.services.CommandNotReadyException;
-import accounts.services.NotFoundException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.RangeCalculator;
 import accounts.services.SpecificLedgerFinder;

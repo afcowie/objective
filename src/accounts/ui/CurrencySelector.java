@@ -23,6 +23,8 @@ import generic.persistence.DataClient;
 import java.util.Iterator;
 import java.util.Set;
 
+import objective.domain.Currency;
+
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.ComboBox;
 import org.gnome.gtk.DataColumn;
@@ -32,7 +34,6 @@ import org.gnome.gtk.ListStore;
 import org.gnome.gtk.TreeIter;
 
 import accounts.domain.Books;
-import accounts.domain.Currency;
 
 /**
  * A ComboBox which allows you to pick a Currency from the internal list of

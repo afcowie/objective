@@ -25,6 +25,11 @@ import generic.util.Debug;
 import java.util.Iterator;
 import java.util.Set;
 
+import objective.domain.Credit;
+import objective.domain.Debit;
+import objective.domain.ForeignAmount;
+import objective.domain.Ledger;
+
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.ErrorMessageDialog;
@@ -32,11 +37,7 @@ import org.gnome.gtk.Table;
 import org.gnome.gtk.WarningMessageDialog;
 
 import accounts.domain.Amount;
-import accounts.domain.Credit;
-import accounts.domain.Debit;
 import accounts.domain.Employee;
-import accounts.domain.ForeignAmount;
-import accounts.domain.Ledger;
 import accounts.domain.ReimbursableExpensesTransaction;
 import accounts.domain.Worker;
 import accounts.services.CommandNotReadyException;
@@ -113,7 +114,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
             Set entries = t.getEntries();
             Iterator iter = entries.iterator();
             while (iter.hasNext()) {
-                accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
+                objective.domain.Entry e = (objective.domain.Entry) iter.next();
                 Ledger l = e.getParentLedger();
                 if (l == t.getWorker().getExpensesPayable()) {
                     // FIXME
@@ -201,7 +202,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
                         Set entries = t.getEntries();
                         Iterator iter = entries.iterator();
                         while (iter.hasNext()) {
-                            accounts.domain.Entry e = (accounts.domain.Entry) iter.next();
+                            objective.domain.Entry e = (objective.domain.Entry) iter.next();
                             Ledger l = e.getParentLedger();
                             ForeignAmount fa = amountEntryBox.getForeignAmount();
 

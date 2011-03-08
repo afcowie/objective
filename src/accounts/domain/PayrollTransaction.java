@@ -18,6 +18,10 @@
  */
 package accounts.domain;
 
+import objective.domain.Datestamp;
+import objective.domain.Entry;
+import objective.domain.Transaction;
+
 /**
  * A Transaction representing pay to an Employee.
  * 

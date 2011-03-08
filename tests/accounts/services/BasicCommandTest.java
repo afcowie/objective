@@ -23,12 +23,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import accounts.domain.Account;
+import objective.domain.Account;
+import objective.domain.CashAccount;
+import objective.domain.Currency;
+import objective.domain.Datestamp;
+import objective.domain.Ledger;
+
 import accounts.domain.Books;
-import accounts.domain.CashAccount;
-import accounts.domain.Currency;
-import accounts.domain.Datestamp;
-import accounts.domain.Ledger;
 import accounts.persistence.BlankDatafileTestCase;
 
 public class BasicCommandTest extends BlankDatafileTestCase

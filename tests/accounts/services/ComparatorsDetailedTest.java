@@ -18,11 +18,12 @@
  */
 package accounts.services;
 
-import accounts.domain.Account;
-import accounts.domain.AccountsPayable;
-import accounts.domain.CashAccount;
-import accounts.domain.CreditPositiveAccount;
-import accounts.domain.DebitPositiveAccount;
+import objective.domain.Account;
+import objective.domain.AccountsPayableAccount;
+import objective.domain.CashAccount;
+import objective.domain.CreditPositiveAccount;
+import objective.domain.DebitPositiveAccount;
+import objective.services.AccountComparator;
 import junit.framework.TestCase;
 
 /**
@@ -63,7 +64,7 @@ public class ComparatorsDetailedTest extends TestCase
 
         assertTrue(cmp.compare(a1, a2) > 0);
 
-        a1 = new AccountsPayable("Trade Creditors");
+        a1 = new AccountsPayableAccount("Trade Creditors");
         a2 = new CashAccount("Petty Cash", "Beach Kisok");
 
         /*
