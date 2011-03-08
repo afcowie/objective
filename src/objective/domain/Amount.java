@@ -129,12 +129,48 @@ public class Amount implements Comparable<Amount>, Leaf
      * @throws NumberFormatException
      *             if BigDecimal can't parse str
      */
-    protected long stringToNumber(String str) {
+    public static long stringToNumber(String str) {
+        final StringBuilder buf;
+        final String cents;
+        final int len;
+        int i;
+
         if (str.equals("") || str.equals("0")) {
             return 0L;
         }
-        BigDecimal rawNumber = new BigDecimal(str);
-        return bigToNumber(rawNumber);
+
+        len = str.length();
+        buf = new StringBuilder(str);
+
+        i = str.indexOf('.');
+        if (i == -1) {
+            // no decimal point
+            // ×100
+            buf.append('0');
+            buf.append('0');
+        } else if (i + 1 == len) {
+            // stupid case: trailing decimal point
+            buf.deleteCharAt(i);
+            // ×100
+            buf.append('0');
+            buf.append('0');
+        } else if (i + 1 == len - 1) {
+            // single decimal place
+            buf.deleteCharAt(i);
+            // ×10
+            buf.append('0');
+        } else if (i + 1 == len - 2) {
+            // two decimal places
+            buf.deleteCharAt(i);
+        } else {
+            // two decimal places
+            buf.deleteCharAt(i);
+            // trim trailing garbage
+            buf.delete(i + 2, len);
+        }
+
+        cents = buf.toString();
+        return Long.parseLong(cents, 10);
     }
 
     /**

@@ -16,24 +16,24 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.ui;
+package objective.ui;
 
-import generic.ui.ChangeListener;
 import objective.domain.Amount;
 
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
-import org.gnome.gtk.HBox;
 import org.gnome.gtk.StateType;
 import org.gnome.gtk.Widget;
 
 /**
  * A tiny little Entry Widget to properly read in Amount fields. It is
  * delegates to and wraps an Entry.
+ * 
  * <p>
  * Features of this Widget:
+ * 
  * <ul>
  * <li>Turns the text red if there is an illegal argument.
  * </ul>
@@ -41,19 +41,19 @@ import org.gnome.gtk.Widget;
  * @author Andrew Cowie
  * @see accounts.ui.AmountDisplay the complementary display widget.
  */
-public class AmountEntry extends HBox
+public class AmountEntry extends Entry
 {
+    private Entry entry;
 
-    private transient Amount amount;
-
-    private Entry amount_Entry;
+    // cache
+    private long amount;
 
     /**
      * No need to have a Set of these; only one GUI Window owns the parent
      * relationship to this Widget, and the whole point is to only have one
      * invokation of the callback to that Window's code.
      */
-    private ChangeListener changeListener = null;
+    private AmountEntry.Updated handler = null;
 
     /**
      * Construct a new AmountEntry. Use setAmount() if you want to pass in a
@@ -61,23 +61,18 @@ public class AmountEntry extends HBox
      */
     public AmountEntry() {
         /*
-         * This class is a Box subclass only so the Entry doesn't swell
-         * unnessarily if set in a Table or similar widget. Otherwise, the box
-         * nature is transparent.
-         */
-        super(false, 0);
-
-        /*
          * zero is a nice default ;)
          */
-        amount = new Amount(0);
+        super("0.00");
 
-        amount_Entry = new Entry();
-        amount_Entry.setWidthChars(10);
-        amount_Entry.setAlignment(1.0f);
+        entry = this;
+        entry.setWidthChars(10);
+        entry.setAlignment(1.0f);
 
-        amount_Entry.connect(new Entry.Changed() {
+        entry.connect(new Entry.Changed() {
             public void onChanged(Editable source) {
+                final String text;
+
                 /*
                  * "changed" signals will come in as a result of either user
                  * action or setText() on the Widget. In either case, after
@@ -85,9 +80,7 @@ public class AmountEntry extends HBox
                  * our Amount object.
                  */
 
-                final String text = amount_Entry.getText();
-
-                if (!amount_Entry.getHasFocus()) {
+                if (!entry.getHasFocus()) {
                     /*
                      * Then the change wasn't the result of a user action in
                      * this Widget, but rather as a result of some other logic
@@ -96,145 +89,111 @@ public class AmountEntry extends HBox
                      */
                     return;
                 }
+
+                text = entry.getText();
+
                 if (text.equals("")) {
                     /*
                      * If we have an empty field, then don't do anything to
                      * the Amount we represent (leaving it at whatever was
                      * set). This also covers the case where changing the
-                     * value results in a CHANGED event where the text is
-                     * blank right before a CHANGED event where the text is
-                     * the new value.
+                     * value 1results in a Entry.Changed event where the text
+                     * is blank right before a event where the text is the new
+                     * value.
                      */
                     return;
                 }
 
                 try {
-                    amount.setValue(text);
-                    amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
+                    amount = Amount.stringToNumber(text);
+                    entry.modifyText(StateType.NORMAL, Color.BLACK);
                 } catch (NumberFormatException nfe) {
                     /*
                      * if the user input is invalid, then ignore it. The
                      * Amount will stay as previously set.
                      */
-                    amount_Entry.modifyText(StateType.NORMAL, Color.RED);
+                    entry.modifyText(StateType.NORMAL, Color.RED);
                     return;
                 }
 
-                if (changeListener != null) {
-                    changeListener.userChangedData();
+                if (handler != null) {
+                    handler.onUpdated(amount);
                 }
             }
         });
 
-        amount_Entry.connect(new Entry.Activate() {
+        entry.connect(new Entry.Activate() {
             public void onActivate(Entry source) {
                 /*
                  * Ensure the Entry shows the properly formatted Amount.
                  */
-                final String text = amount.getValue();
-                amount_Entry.setText(text);
-                amount_Entry.setPosition(text.length());
+                final String text = Amount.numberToString(amount);
+                entry.setText(text);
+                entry.setPosition(text.length());
             }
         });
 
-        amount_Entry.connect(new Widget.FocusOutEvent() {
+        entry.connect(new Widget.FocusOutEvent() {
             public boolean onFocusOutEvent(Widget source, EventFocus event) {
                 /*
                  * Ensure the Entry shows the properly formatted Amount.
                  */
-                final String text = amount.getValue();
-                amount_Entry.setText(text);
+                final String text = Amount.numberToString(amount);
+                entry.setText(text);
                 /*
                  * It looks really stupid if a subset (or even all) of the
                  * characters are selected when focus leaves; it grays out and
                  * there is no reason to keep the visual reminder of the
                  * selection.
                  */
-                amount_Entry.selectRegion(0, 0);
-                amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
+                entry.selectRegion(0, 0);
+                entry.modifyText(StateType.NORMAL, Color.BLACK);
 
                 return false;
             };
         });
-
-        this.packStart(amount_Entry, false, false, 0);
     }
 
     /**
      * Add a use case specific listener to the Entry that underlies the
-     * AmountEntry Widget. AmountEntry is largely built around an internal
-     * EntryListener; however, this is not exposed as if you try to hookup
-     * extra signals to its <code>CHANGED</code> event you'll have to
-     * reimplement all its self-protection and anti-duplication logic.
+     * AmountEntry Widget. AmountEntry internally connects to Entry.Changed so
+     * we can't really ask outside code to also connect to that signal.
      * 
-     * <pre>
-     * AmountEntry salaryDisplay;
-     * Amount salary;
-     * 
-     * salaryDisplay.addListener(new ChangeListener() {
-     *     public void userChangedData() {
-     *         Amount a = salaryDisplay().getAmount();
-     *         doSomething(a);
-     *         // or if the object you constructed the Widget with is a instance field, just
-     *         doSomething(salary);
-     *     }
-     * });
-     * </pre>
-     * 
+     * <p>
      * Note that you can only call this once; only one GUI Window owns the
      * parent relationship to this Widget, and the whole point is to only have
      * one invokation of the callback to that Window's code.
      */
-    public void addListener(ChangeListener listener) {
-        if (changeListener != null) {
-            throw new IllegalStateException(
-                    "You can't have more than one ChangeListener on a Display Widget");
+    public void connect(AmountEntry.Updated handler) {
+        if (this.handler != null) {
+            throw new IllegalStateException("You can't have more than one AmountEntry.Update");
         }
-        changeListener = listener;
+        this.handler = handler;
+    }
+
+    interface Updated
+    {
+        void onUpdated(long amount);
     }
 
     /**
      * @return the Amount as currently held by this Display Widget. Note this
      *         is a live reference, not a copy!
      */
-    public Amount getAmount() {
+    public long getAmount() {
         return amount;
     }
 
     /**
-     * Set the Amount object this Display Widget is representing. Note that
-     * this really is the object you want to disaply and edit, not just the
-     * value of the Amount. Updates the displayed value (but only if the value
-     * string of the passed Amount differs from what is displayed, thus
-     * avoiding triple taps on the <code>CHANGED</code> signal).
+     * Set the Amount object this Display Widget is representing
      */
-    public void setAmount(objective.domain.Amount a) {
-        if (a == null) {
-            throw new IllegalArgumentException();
-        }
-        this.amount = a;
-        final String str = a.getValue();
-        if (!amount_Entry.getText().equals(str)) {
-            amount_Entry.setText(str);
-            amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
-        }
-    }
+    public void setAmount(long amount) {
+        final String str;
 
-    /**
-     * If you have a String that you want to use as the argument to
-     * Amount.setValue(), pass it here.
-     * 
-     * @param value
-     *            an Amount value in string form (ie, "120.99"). Will be
-     *            validated by Amount.
-     */
-    public void setValue(String value) {
-        amount.setValue(value);
+        str = Amount.numberToString(amount);
 
-        if (!amount_Entry.getText().equals(value)) {
-            amount_Entry.setText(value);
-            amount_Entry.modifyText(StateType.NORMAL, Color.BLACK);
-        }
+        entry.setText(str);
+        entry.modifyText(StateType.NORMAL, Color.BLACK);
     }
 
     /*
@@ -242,6 +201,6 @@ public class AmountEntry extends HBox
      */
 
     public void grabFocus() {
-        amount_Entry.grabFocus();
+        entry.grabFocus();
     }
 }

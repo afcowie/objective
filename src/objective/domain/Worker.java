@@ -70,4 +70,8 @@ public abstract class Worker extends DomainObject
     public void setExpensesPayable(Ledger ledger) {
         this.expensesPayable = (CreditPositiveLedger) ledger;
     }
+
+    public String toString() {
+        return name + " (" + getID() + ")";
+    }
 }

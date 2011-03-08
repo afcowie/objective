@@ -47,7 +47,7 @@ import static org.gnome.gtk.StateType.NORMAL;
  */
 public class WorkerPicker extends ComboBoxEntry
 {
-    private transient Worker worker;
+    private Worker worker;
 
     private DataColumnString nameDisplayColumn;
 
@@ -57,12 +57,10 @@ public class WorkerPicker extends ComboBoxEntry
 
     private ComboBoxEntry combo;
 
+    private WorkerPicker.Updated handler = null;
+
     /**
      * Construct a WorkerPicker.
-     * 
-     * @param proto
-     *            a prototype to constrain the search for candidate Workers to
-     *            include in the dropdown.
      */
     public WorkerPicker(DataStore data) {
         /*
@@ -127,9 +125,14 @@ public class WorkerPicker extends ComboBoxEntry
 
                 if (worker == null) {
                     entry.modifyText(NORMAL, RED);
+                    return;
                 } else {
                     entry.modifyText(NORMAL, BLACK);
                 }
+                if (handler != null) {
+                    handler.onUpdated(worker);
+                }
+
             }
         });
     }
@@ -182,7 +185,21 @@ public class WorkerPicker extends ComboBoxEntry
                 "How did you manage to ask to activate a Worker object that isn't in the set of Workers represented by this picker?");
     }
 
-    public void refresh() {
-    // BUG FIXME ?
+    /**
+     * Hook up a WorkedPicker.Updated handler.
+     */
+    /*
+     * This was set up in testing; not really clear if we need this for real.
+     */
+    public void connect(WorkerPicker.Updated handler) {
+        if (this.handler != null) {
+            throw new IllegalStateException("You can't have more than one WorkerPicker.Update");
+        }
+        this.handler = handler;
+    }
+
+    interface Updated
+    {
+        void onUpdated(Worker worker);
     }
 }
