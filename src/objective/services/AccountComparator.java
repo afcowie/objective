@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.services;
+package objective.services;
 
 import generic.util.DebugException;
 
@@ -30,20 +30,20 @@ import objective.domain.AssetAccount;
 import objective.domain.BankAccount;
 import objective.domain.CashAccount;
 import objective.domain.CreditPositiveAccount;
+import objective.domain.CurrencyGainLossAccount;
 import objective.domain.DebitPositiveAccount;
 import objective.domain.DepreciatingAssetAccount;
 import objective.domain.EquityAccount;
 import objective.domain.ExpenseAccount;
 import objective.domain.GenericExpenseAccount;
 import objective.domain.LiabilityAccount;
+import objective.domain.LoanPayableAccount;
 import objective.domain.OwnersEquityAccount;
+import objective.domain.PayrollTaxPayableAccount;
 import objective.domain.ProfessionalRevenueAccount;
 import objective.domain.ReimbursableExpensesPayableAccount;
+import objective.domain.RevenueAccount;
 import objective.domain.SalesTaxPayableAccount;
-import accounts.domain.CurrencyGainLossAccount;
-import accounts.domain.LoanPayableAccount;
-import accounts.domain.PayrollTaxPayableAccount;
-import accounts.domain.RevenueAccount;
 
 /**
  * Sort Accounts to match our version of accounting order. Accounts, as
