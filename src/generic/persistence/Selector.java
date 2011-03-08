@@ -36,6 +36,7 @@ import com.db4o.query.Predicate;
  * 
  * @author Andrew Cowie
  * @see generic.persistence.DataClient#nativeQuery(Selector)
+ * @deprecated
  */
 public abstract class Selector<T> extends Predicate<T>
 {

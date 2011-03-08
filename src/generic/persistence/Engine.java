@@ -58,6 +58,7 @@ import java.util.Date;
  * transparent, other than your having to ensure you shutdown safely.
  * 
  * @author Andrew Cowie
+ * @deprecated
  */
 /*
  * This class is separate from the accounts.client.ObjectiveAccounts primary

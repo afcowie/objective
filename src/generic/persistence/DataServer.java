@@ -56,6 +56,7 @@ import com.db4o.ext.ExtObjectContainer;
  * there to use its static server reference to obtain clients.
  * 
  * @author Andrew Cowie
+ * @deprecated
  */
 public final class DataServer
 {

@@ -52,6 +52,7 @@ import com.db4o.ext.ObjectInfo;
  * abstraction point.
  * 
  * @author Andrew Cowie
+ * @deprecated
  */
 public final class DataClient
 {

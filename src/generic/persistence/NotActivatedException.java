@@ -25,6 +25,7 @@ package generic.persistence;
  * 
  * @see objective.domain.Datestamp for an example.
  * @author Andrew Cowie
+ * @deprecated
  */
 public class NotActivatedException extends RuntimeException
 {
