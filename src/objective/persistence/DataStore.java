@@ -19,6 +19,7 @@
 package objective.persistence;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import objective.domain.Account;
@@ -33,6 +34,7 @@ import objective.domain.Datestamp;
 import objective.domain.Debit;
 import objective.domain.DebitPositiveLedger;
 import objective.domain.DepreciatingAssetAccount;
+import objective.domain.Employee;
 import objective.domain.Entry;
 import objective.domain.GenericExpenseAccount;
 import objective.domain.GenericTransaction;
@@ -45,7 +47,9 @@ import objective.domain.PayrollTaxPayableAccount;
 import objective.domain.ProfessionalRevenueAccount;
 import objective.domain.ReimbursableExpensesPayableAccount;
 import objective.domain.SalesTaxPayableAccount;
+import objective.domain.Subcontractor;
 import objective.domain.Transaction;
+import objective.domain.Worker;
 
 import com.operationaldynamics.sqlite.Database;
 import com.operationaldynamics.sqlite.Statement;
@@ -67,6 +71,7 @@ public class DataStore
         loadCurrencies();
         loadAccounts();
         loadLedgers();
+        loadWorkers();
         loadTransactions();
     }
 
@@ -140,12 +145,19 @@ public class DataStore
         currencies.put(c.getCode(), c);
     }
 
+    private HashMap<Long, Worker> workers;
+
+    private void cache(Worker w) {
+        workers.put(w.getID(), w);
+    }
+
     private void setupCaches() {
         accounts = new HashMap<Long, Account>();
         ledgers = new HashMap<Long, Ledger>();
         transactions = new HashMap<Long, Transaction>();
         entries = new HashMap<Long, Entry>();
         currencies = new HashMap<String, Currency>();
+        workers = new HashMap<Long, Worker>();
     }
 
     /**
@@ -479,7 +491,7 @@ public class DataStore
         result = transactions.get(transactionId);
         if (result == null) {
             /*
-             * There's no reason we couldn't do lazy loading here.
+             * FUTURE There's no reason we couldn't do lazy loading here.
              */
             throw new IllegalStateException("\n" + "Transaction (" + transactionId + ") isn't loaded");
         }
@@ -487,6 +499,14 @@ public class DataStore
         return result;
     }
 
+    /**
+     * Get a list of all known Transactions.
+     */
+    /*
+     * FUTURE This currently implicilty relies on the Transactions all already
+     * being loaded; if we switch to lazy loading then, this will force all
+     * Transactions into memory, which would defeat the laziness.
+     */
     public Transaction[] listTransactions() {
         final Transaction[] result;
         final int num;
@@ -512,6 +532,28 @@ public class DataStore
             i++;
         }
         stmt.finish();
+
+        return result;
+    }
+
+    /**
+     * Get the list of all known Workers.
+     */
+    /*
+     * This short circuits the database, because they're already all loaded.
+     * If we need them in a certain order, then we should query. See
+     * implementation in listTransactions().
+     */
+    public Worker[] listWorkers() {
+        Worker[] result;
+        final int num;
+        Collection<Worker> list;
+
+        num = workers.size();
+        result = new Worker[num];
+
+        list = workers.values();
+        result = list.toArray(result);
 
         return result;
     }
@@ -786,5 +828,65 @@ public class DataStore
          */
 
         this.cache(e);
+    }
+
+    /**
+     * Load and cache all Ledgers from the database. Requires that Accounts
+     * and Currencies already be loaded.
+     */
+    private void loadWorkers() {
+        final Statement stmt;
+        long workerId, type, ledgerId;
+        String name;
+        Ledger ledger;
+        Worker worker;
+
+        stmt = db.prepare("SELECT w.worker_id, w.type, w.name, w.ledger_id FROM workers w");
+
+        while (stmt.step()) {
+            workerId = stmt.columnInteger(0);
+            type = stmt.columnInteger(1);
+            name = stmt.columnText(2);
+            ledgerId = stmt.columnInteger(3);
+
+            ledger = lookupLedger(ledgerId);
+
+            worker = makeWorker(workerId, type, name, ledger);
+
+            this.cache(worker);
+        }
+
+        stmt.finish();
+    }
+
+    private static Worker makeWorker(long workerId, long type, String name, Ledger ledger) {
+        final Worker result;
+
+        if (type == 1) {
+            result = new Employee(workerId);
+        } else if (type == 2) {
+            result = new Subcontractor(workerId);
+        } else {
+            throw new AssertionError();
+        }
+
+        result.setName(name);
+        result.setExpensesPayable(ledger);
+
+        return result;
+    }
+
+    /**
+     * Get the Worker object proxying the specified rowid.
+     */
+    public Worker lookupWorker(final long workerId) {
+        final Worker result;
+
+        result = workers.get(workerId);
+        if (result == null) {
+            throw new IllegalArgumentException("\n" + "Worker (" + workerId + ") isn't loaded");
+        }
+
+        return result;
     }
 }

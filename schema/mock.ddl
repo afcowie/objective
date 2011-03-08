@@ -24,7 +24,6 @@ INSERT INTO types VALUES (-8, 'GenericTransaction');
 INSERT INTO types VALUES (-9, 'InvoiceTransaction');
 INSERT INTO types VALUES (-10, 'PaymentTransaction');
 
-
 --
 -- Mock Accounts
 --
@@ -40,6 +39,7 @@ INSERT INTO ledgers VALUES (3, 3, 'Internode', 'AUD', -1);
 
 INSERT INTO accounts VALUES (4, 25, 'Expenses Payable', -1);
 INSERT INTO ledgers VALUES (11, 4, 'Andrew Cowie', 'AUD', -1);
+INSERT INTO ledgers VALUES (19, 4, 'Paul Drain', 'AUD', -1);
 
 INSERT INTO accounts VALUES (5, 41, 'Procedures', -1);
 INSERT INTO ledgers VALUES (4, 5, 'Fees', NULL, -1);
@@ -68,13 +68,14 @@ INSERT INTO accounts VALUES (11, 10, 'Petty Cash', 1);
 INSERT INTO ledgers VALUES (17, 11, 'Manly Office', 'AUD', 1);
 
 INSERT INTO accounts VALUES (12, 31, 'Owner''s Equity', -1);
-INSERT INTO ledgers VALUES (18, 12, 'Andrew Cowie', NULL, -1);
+INSERT INTO ledgers VALUES (18, 12, 'Andrew Cowie', 'AUD', -1);
 
 --
 -- Mock Workers
 --
 
-INSERT INTO workers VALUES (1, 'Andrew Cowie', 11);
+INSERT INTO workers VALUES (1, 1, 'Andrew Cowie', 11);
+INSERT INTO workers VALUES (2, 2, 'Paul Drain', 19);
 
 --
 -- Mock Transactions

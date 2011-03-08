@@ -16,9 +16,19 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
-public class Subcontractor extends Worker
+/**
+ * A regular employee who draws salary (periodically or otherwise).
+ * 
+ * @author Andrew Cowie
+ */
+public class Employee extends Worker
 {
-
+    /**
+     * Proper constructor; use UI to build up fields.
+     */
+    public Employee(long rowid) {
+        super(rowid);
+    }
 }

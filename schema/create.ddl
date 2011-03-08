@@ -73,6 +73,7 @@ CREATE TABLE entries
 CREATE TABLE workers
 (
 	worker_id INTEGER PRIMARY KEY,
+	type INTEGER,
 	name TEXT,
 	ledger_id INTEGER REFERENCES ledgers
 );

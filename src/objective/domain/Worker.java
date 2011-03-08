@@ -16,20 +16,23 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
-import objective.domain.CreditPositiveLedger;
-import objective.domain.Ledger;
+import objective.persistence.DomainObject;
 
 /**
  * Base class of employees and subcontractors. A Worker is someone we pay
  * money to - periodically or otherwise.
  */
-public class Worker
+public abstract class Worker extends DomainObject
 {
     private String name;
 
     private CreditPositiveLedger expensesPayable;
+
+    protected Worker(long rowid) {
+        super(rowid);
+    }
 
     /**
      * Get the [full] name of the person.
@@ -61,11 +64,10 @@ public class Worker
     }
 
     /**
-     * Set the ReimbursableExpensesPayableAccount that we want to have this
-     * Worker object point at. Obviously this is only to be called by
-     * AddWorkerCommand.
+     * Set ledger within the ReimbursableExpensesPayableAccount that holds
+     * this Worker's reimbursable expenses.
      */
-    public void setExpensesPayable(CreditPositiveLedger expensesPayable) {
-        this.expensesPayable = expensesPayable;
+    public void setExpensesPayable(Ledger ledger) {
+        this.expensesPayable = (CreditPositiveLedger) ledger;
     }
 }

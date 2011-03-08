@@ -16,21 +16,18 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
+package objective.domain;
 
-public class Employee extends Worker
+/**
+ * A staff member who acts through an intermediary. Strictly, subcontractors
+ * are external firms; we track expenses accrued to indiviuals working for
+ * that subcontractor who do tasks on our behalf.
+ * 
+ * @author Andrew Cowie
+ */
+public class Subcontractor extends Worker
 {
-    /**
-     * Proper constructor; use UI to build up fields.
-     */
-    public Employee() {}
-
-    /**
-     * Mockup constructor for use in unit tests and demos.
-     * 
-     * @see Worker#setName(String)
-     */
-    public Employee(String name) {
-        setName(name);
+    public Subcontractor(long rowid) {
+        super(rowid);
     }
 }
