@@ -28,6 +28,7 @@ import objective.domain.AccountsPayableAccount;
 import objective.domain.AccountsReceivableAccount;
 import objective.domain.AssetAccount;
 import objective.domain.BankAccount;
+import objective.domain.CardAccount;
 import objective.domain.CashAccount;
 import objective.domain.CreditPositiveAccount;
 import objective.domain.CurrencyGainLossAccount;
@@ -76,6 +77,7 @@ public class AccountComparator implements Comparator<Account>
 
             LiabilityAccount.class,
             AccountsPayableAccount.class,
+            CardAccount.class,
             SalesTaxPayableAccount.class,
             PayrollTaxPayableAccount.class,
             ReimbursableExpensesPayableAccount.class,

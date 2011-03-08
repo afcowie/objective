@@ -357,36 +357,36 @@ public class DataStore
         final Account result;
 
         if (direction == 1) {
-            if (type.equals("objective.domain.BankAccount")) {
+            if (type.equals("BankAccount")) {
                 result = new BankAccount(accountId);
-            } else if (type.equals("objective.domain.CashAccount")) {
+            } else if (type.equals("CashAccount")) {
                 result = new CashAccount(accountId);
-            } else if (type.equals("objective.domain.AccountsReceivableAccount")) {
+            } else if (type.equals("AccountsReceivableAccount")) {
                 result = new AccountsReceivableAccount(accountId);
-            } else if (type.equals("objective.domain.DepreciatingAssetAccount")) {
+            } else if (type.equals("DepreciatingAssetAccount")) {
                 result = new DepreciatingAssetAccount(accountId);
-            } else if (type.equals("objective.domain.GenericExpenseAccount")) {
+            } else if (type.equals("GenericExpenseAccount")) {
                 result = new GenericExpenseAccount(accountId);
             } else {
                 result = null;
             }
         } else if (direction == -1) {
-            if (type.equals("objective.domain.AccountsPayableAccount")) {
+            if (type.equals("AccountsPayableAccount")) {
                 result = new AccountsPayableAccount(accountId);
-            } else if (type.equals("objective.domain.ReimbursableExpensesPayableAccount")) {
+            } else if (type.equals("ReimbursableExpensesPayableAccount")) {
                 result = new ReimbursableExpensesPayableAccount(accountId);
-            } else if (type.equals("objective.domain.SalesTaxPayableAccount")) {
+            } else if (type.equals("SalesTaxPayableAccount")) {
                 result = new SalesTaxPayableAccount(accountId);
-            } else if (type.equals("objective.domain.PayrollTaxPayableAccount")) {
+            } else if (type.equals("PayrollTaxPayableAccount")) {
                 result = new PayrollTaxPayableAccount(accountId);
-            } else if (type.equals("objective.domain.LoanPayableAccount")) {
+            } else if (type.equals("LoanPayableAccount")) {
                 result = new LoanPayableAccount(accountId);
-            } else if (type.equals("objective.domain.OwnersEquityAccount")) {
+            } else if (type.equals("OwnersEquityAccount")) {
                 result = new OwnersEquityAccount(accountId);
-            } else if (type.equals("objective.domain.ProfessionalRevenueAccount")) {
+            } else if (type.equals("ProfessionalRevenueAccount")) {
                 result = new ProfessionalRevenueAccount(accountId);
-            } else if (type.equals("objective.domain.CurrencyGainLossAccount")) {
-                result = null; // REMOVE?
+            } else if (type.equals("CurrencyGainLossAccount")) {
+                throw new UnsupportedOperationException(); // well?
             } else {
                 result = null;
             }
@@ -541,11 +541,11 @@ public class DataStore
             String description, String reference) {
         final Transaction result;
 
-        if (type.equals("objective.domain.GenericTransaction")) {
+        if (type.equals("GenericTransaction")) {
             result = new GenericTransaction(transactionId);
-        } else if (type.equals("objective.domain.InvoiceTransaction")) {
+        } else if (type.equals("InvoiceTransaction")) {
             result = new InvoiceTransaction(transactionId);
-        } else if (type.equals("objective.domain.PaymentTransaction")) {
+        } else if (type.equals("PaymentTransaction")) {
             result = new PaymentTransaction(transactionId);
         } else {
             throw new IllegalStateException("\n" + "Unknown Account type " + type + " for ("
