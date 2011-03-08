@@ -19,7 +19,6 @@
 package accounts.ui;
 
 import generic.ui.ChangeListener;
-import generic.util.Debug;
 import objective.domain.Amount;
 
 import org.gnome.gdk.Color;
@@ -88,8 +87,6 @@ public class AmountEntry extends HBox
 
                 final String text = amount_Entry.getText();
 
-                Debug.print("listeners", "in AmountEntry, Entry CHANGED, text: " + text);
-
                 if (!amount_Entry.getHasFocus()) {
                     /*
                      * Then the change wasn't the result of a user action in
@@ -97,7 +94,6 @@ public class AmountEntry extends HBox
                      * element calling setText(). So, ignore the event by
                      * returning immediately.
                      */
-                    Debug.print("listeners", "in AmountEntry, Entry CHANGED, ignoring not focused");
                     return;
                 }
                 if (text.equals("")) {
@@ -109,11 +105,8 @@ public class AmountEntry extends HBox
                      * blank right before a CHANGED event where the text is
                      * the new value.
                      */
-                    Debug.print("listeners", "in AmountEntry, Entry CHANGED, ignoring blank");
                     return;
                 }
-
-                Debug.print("listeners", "in AmountEntry, Entry CHANGED, parsing");
 
                 try {
                     amount.setValue(text);
@@ -128,7 +121,6 @@ public class AmountEntry extends HBox
                 }
 
                 if (changeListener != null) {
-                    Debug.print("listeners", "in AmountEntry, Entry CHANGED, firing ChangeListener");
                     changeListener.userChangedData();
                 }
             }

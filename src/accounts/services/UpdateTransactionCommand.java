@@ -20,7 +20,6 @@ package accounts.services;
 
 import generic.persistence.DataClient;
 import generic.persistence.Selector;
-import generic.util.Debug;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -31,7 +30,6 @@ import java.util.Set;
 import objective.domain.Entry;
 import objective.domain.Ledger;
 import objective.domain.Transaction;
-
 
 /**
  * Update an existing Transaction already stored in the database. This is a
@@ -120,8 +118,6 @@ public class UpdateTransactionCommand extends TransactionCommand
 
             if (ledgerContainingEntry != null) {
                 Entry committed = (Entry) store.peek(c);
-                Debug.print("debug", "Removing " + committed.toString() + " from Ledger \""
-                        + ledgerContainingEntry.getName() + "\"");
 
                 long revised = c.getAmount().getNumber();
                 c.getAmount().setValue(committed.getAmount());
@@ -153,7 +149,6 @@ public class UpdateTransactionCommand extends TransactionCommand
             Entry e = (Entry) eI.next();
             Ledger l = e.getParentLedger();
 
-            Debug.print("debug", "Adding " + e.toString() + " to Ledger \"" + l.getName() + "\"");
             l.addEntry(e);
 
             affectedLedgers.add(l);
@@ -189,7 +184,6 @@ public class UpdateTransactionCommand extends TransactionCommand
             Entry c = (Entry) cI.next();
             if (!(liveEntries.contains(c))) {
 
-                Debug.print("debug", "Deleting " + c.toString());
                 store.delete(c);
                 // FIXME and delete Amount?
             }

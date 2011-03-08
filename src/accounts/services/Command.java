@@ -20,7 +20,6 @@ package accounts.services;
 
 import generic.persistence.DataClient;
 import generic.persistence.Engine;
-import generic.util.Debug;
 
 /**
  * The top of the command hierarchy. These classes are the distinct operations
@@ -109,7 +108,6 @@ public abstract class Command
          * Callback: Execute the code to actually save the results of the
          * Command in the DataClient. Throws CommandNotReadyException.
          */
-        Debug.print("command", "executing " + getClassString());
         action(store);
 
         executed = true;
@@ -140,7 +138,6 @@ public abstract class Command
             throw new IllegalStateException("Can't undo a Command that hasn't been executed");
         }
 
-        Debug.print("command", "undoing " + getClassString());
         reverse(store);
 
         executed = false; // ?

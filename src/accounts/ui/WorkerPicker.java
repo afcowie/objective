@@ -18,10 +18,9 @@
  */
 package accounts.ui;
 
-import generic.persistence.DataClient;
-
-import java.util.Iterator;
-import java.util.List;
+import objective.domain.Employee;
+import objective.domain.Worker;
+import objective.persistence.DataStore;
 
 import org.gnome.gtk.ComboBox;
 import org.gnome.gtk.ComboBoxEntry;
@@ -33,8 +32,6 @@ import org.gnome.gtk.HBox;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.TreeIter;
 
-import accounts.domain.Employee;
-import accounts.domain.Worker;
 
 import static org.gnome.gdk.Color.BLACK;
 import static org.gnome.gdk.Color.RED;
@@ -55,13 +52,13 @@ public class WorkerPicker extends HBox
 {
     private transient Worker worker;
 
-    private DataColumnString nameDisplay_DataColumn;
+    private DataColumnString nameDisplayColumn;
 
-    private DataColumnReference workerObject_DataColumn;
+    private DataColumnReference<Worker> workerObjectColumn;
 
     private ListStore listStore;
 
-    private ComboBoxEntry worker_ComboBoxEntry;
+    private ComboBoxEntry workerCombo;
 
     /**
      * Construct a WorkerPicker.
@@ -70,7 +67,7 @@ public class WorkerPicker extends HBox
      *            a prototype to constrain the search for candidate Workers to
      *            include in the dropdown.
      */
-    public WorkerPicker(DataClient store, Object proto) {
+    public WorkerPicker(DataStore data) {
         /*
          * This class is a Box subclass only so the Entry doesn't swell
          * unnessarily if set in a Table or similar widget. Otherwise, the box
@@ -78,20 +75,16 @@ public class WorkerPicker extends HBox
          */
         super(false, 0);
 
-        if (!((proto instanceof Worker) || (proto instanceof Class))) {
-            throw new IllegalArgumentException();
-        }
-
         /*
          * We go to the considerable effort of having a TreeModel here so that
          * we can store a reference to the Worker object that is being picked.
          */
-        nameDisplay_DataColumn = new DataColumnString();
-        workerObject_DataColumn = new DataColumnReference();
+        nameDisplayColumn = new DataColumnString();
+        workerObjectColumn = new DataColumnReference<Worker>();
 
         DataColumn[] workerPicker_DataColumnArray = {
-            nameDisplay_DataColumn,
-            workerObject_DataColumn
+            nameDisplayColumn,
+            workerObjectColumn
         };
 
         listStore = new ListStore(workerPicker_DataColumnArray);
@@ -100,20 +93,16 @@ public class WorkerPicker extends HBox
          * Poppulate.
          */
 
-        List eL = store.queryByExample(proto);
+        // TODO
 
-        if (eL.size() == 0) {
-            // TODO replace with NotFoundException
-            throw new IllegalStateException(
-                    "You've managed to try and instantiate a WorkerPicker with a prototype which resulted in no results. This may well be a valid state, but the application is going to need to deal with this.");
-        }
+        Worker[] workers = new Worker[] {
+            new Employee("Andrew Cowie"),
+        };
 
-        Iterator eI = eL.iterator();
-        while (eI.hasNext()) {
-            Employee e = (Employee) eI.next();
+        for (Worker w : workers) {
             TreeIter pointer = listStore.appendRow();
-            listStore.setValue(pointer, nameDisplay_DataColumn, e.getName());
-            listStore.setValue(pointer, workerObject_DataColumn, e);
+            listStore.setValue(pointer, nameDisplayColumn, w.getName());
+            listStore.setValue(pointer, workerObjectColumn, w);
         }
 
         /*
@@ -122,20 +111,20 @@ public class WorkerPicker extends HBox
          * column.
          */
 
-        worker_ComboBoxEntry = new ComboBoxEntry(listStore, nameDisplay_DataColumn);
+        workerCombo = new ComboBoxEntry(listStore, nameDisplayColumn);
 
-        this.packStart(worker_ComboBoxEntry, false, false, 0);
+        this.packStart(workerCombo, false, false, 0);
 
         /*
          * Somewhat hardcoded, it turns out that GtkComboBoxEntry have only
          * one child, and it's a GtkEntry. Lovely. We can use that to play
          * games with the colour and what not.
          */
-        final Entry entry = (Entry) worker_ComboBoxEntry.getChild();
+        final Entry entry = (Entry) workerCombo.getChild();
 
-        worker_ComboBoxEntry.connect(new ComboBox.Changed() {
+        workerCombo.connect(new ComboBox.Changed() {
             public void onChanged(ComboBox source) {
-                worker_ComboBoxEntry.popup();
+                workerCombo.popup();
 
                 worker = getSelection();
 
@@ -156,11 +145,11 @@ public class WorkerPicker extends HBox
      *         isn't anything selected.
      */
     private Worker getSelection() {
-        TreeIter pointer = worker_ComboBoxEntry.getActiveIter();
+        TreeIter pointer = workerCombo.getActiveIter();
         if (pointer == null) {
             return null;
         }
-        return (Worker) listStore.getValue(pointer, workerObject_DataColumn);
+        return listStore.getValue(pointer, workerObjectColumn);
     }
 
     /**
@@ -186,8 +175,8 @@ public class WorkerPicker extends HBox
 
         pointer = listStore.getIterFirst();
         do {
-            if (listStore.getValue(pointer, workerObject_DataColumn) == worker) {
-                worker_ComboBoxEntry.setActiveIter(pointer);
+            if (listStore.getValue(pointer, workerObjectColumn) == worker) {
+                workerCombo.setActiveIter(pointer);
                 return;
             }
         } while (pointer.iterNext());

@@ -19,8 +19,6 @@
 package accounts.ui;
 
 import generic.ui.AbstractWindow;
-import generic.util.Debug;
-
 import objective.domain.Account;
 import objective.domain.AssetAccount;
 import objective.domain.BankAccount;
@@ -29,7 +27,6 @@ import objective.domain.CashAccount;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.RadioButton;
-
 
 /**
  * A popup question dialog to find out what kind of new account is to be
@@ -63,7 +60,6 @@ class AccountTypeSelectorDialog extends AbstractWindow
         Button ok = (Button) gladeParser.getWidget("ok_button");
         ok.connect(new Button.Clicked() {
             public void onClicked(Button source) {
-                Debug.print("listeners", "Ok Button click");
                 deleteHook();
             }
         });
@@ -71,7 +67,6 @@ class AccountTypeSelectorDialog extends AbstractWindow
         Button cancel = (Button) gladeParser.getWidget("cancel_button");
         cancel.connect(new Button.Clicked() {
             public void onClicked(Button source) {
-                Debug.print("listeners", "Cancel Button click");
                 deleteHook();
             }
         });

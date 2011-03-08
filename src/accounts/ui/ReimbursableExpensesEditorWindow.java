@@ -20,26 +20,32 @@ package accounts.ui;
 
 import generic.client.Master;
 import generic.ui.EditorWindow;
-import generic.util.Debug;
 
 import java.util.Iterator;
 import java.util.Set;
 
+import objective.domain.Amount;
 import objective.domain.Credit;
 import objective.domain.Debit;
+import objective.domain.Employee;
 import objective.domain.ForeignAmount;
 import objective.domain.Ledger;
+import objective.domain.Worker;
+import objective.persistence.DataStore;
+import objective.services.TransactionOperations;
 
+import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.ErrorMessageDialog;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.SizeGroup;
+import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.WarningMessageDialog;
 
-import accounts.domain.Amount;
-import accounts.domain.Employee;
 import accounts.domain.ReimbursableExpensesTransaction;
-import accounts.domain.Worker;
 import accounts.services.CommandNotReadyException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.UpdateTransactionCommand;
@@ -68,60 +74,119 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
     private ReimbursableExpensesTransaction existing = null;
 
-    private ReimbursableExpensesEditorWindow self;
-
     /**
-     * Construct a window to create a new ReimbursableExpensesTransaction.
-     * 
+     * Construct the Window.
      */
-    public ReimbursableExpensesEditorWindow() {
-        this(0);
-    }
+    public ReimbursableExpensesEditorWindow(DataStore data, long id) {
+        super();
+        final SizeGroup group;
+        Label label;
+        HBox box;
 
-    /**
-     * Construct the Window. Uses the table from the glade file extensively.
-     */
-    public ReimbursableExpensesEditorWindow(long id) {
-        super("reimbursable", "share/ReimbursableExpensesEditorWindow.glade");
+        window.setTitle("Enter your expenses");
 
-        self = this;
+        group = new SizeGroup(SizeGroupMode.HORIZONTAL);
+
+        /*
+         * Worker
+         */
+
+        box = new HBox(false, 6);
+
+        label = new Label("Expenses reimbursable to:");
+        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
+        box.packStart(label, false, false, 0);
+        group.add(label);
+
+        person_WorkerPicker = new WorkerPicker(data, Employee.class);
+        box.packStart(datePicker, false, false, 0);
+
+        top.packStart(box, false, false, 0);
+
+        /*
+         * Date
+         */
+
+        box = new HBox(false, 6);
+
+        label = new Label("To date:");
+        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
+        box.packStart(label, false, false, 0);
+        group.add(label);
 
         datePicker = new DatePicker();
+        box.packStart(datePicker, false, false, 0);
 
-        table = (Table) gladeParser.getWidget("general_table");
-        table.attach(datePicker, 1, 2, 1, 2);
+        top.packStart(box, false, false, 0);
+
+        /*
+         * Description
+         */
+
+        box = new HBox(false, 6);
+
+        label = new Label("Description:");
+        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
+        box.packStart(label, false, false, 0);
+        group.add(label);
 
         descriptionEntry = new Entry();
-        table.attach(descriptionEntry, 1, 2, 2, 3);
+        box.packStart(descriptionEntry, false, false, 0);
 
-        accountPicker = new AccountPicker(store);
+        top.packStart(box, false, false, 0);
 
-        table.attach(accountPicker, 1, 2, 3, 4);
+        /*
+         * Account
+         */
 
-        person_WorkerPicker = new WorkerPicker(store, Employee.class);
-        table.attach(person_WorkerPicker, 1, 2, 0, 1);
+        box = new HBox(false, 6);
 
-        amountEntryBox = new ForeignAmountEntryBox(store);
-        table.attach(amountEntryBox, 1, 2, 4, 5);
+        label = new Label("Account / Ledger:");
+        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
+        box.packStart(label, false, false, 0);
+        group.add(label);
+
+        accountPicker = new AccountPicker(data);
+        box.packStart(accountPicker, false, false, 0);
+
+        top.packStart(box, false, false, 0);
+
+        /*
+         * Amount
+         */
+
+        box = new HBox(false, 6);
+
+        label = new Label("Amount:");
+        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
+        box.packStart(label, false, false, 0);
+        group.add(label);
+
+        amountEntryBox = new ForeignAmountEntryBox(data);
+        box.packStart(amountEntryBox, false, false, 0);
+
+        top.packStart(box, false, false, 0);
 
         ReimbursableExpensesTransaction t;
         if (id == 0) {
-            t = new ReimbursableExpensesTransaction();
+            t = new ReimbursableExpensesTransaction(0);
         } else {
-            t = (ReimbursableExpensesTransaction) store.fetchByID(id);
+            TransactionOperations services;
+
+            services = new TransactionOperations(data);
+            t = (ReimbursableExpensesTransaction) services.findTransaction(id);
             datePicker.setDate(t.getDate());
             person_WorkerPicker.setWorker(t.getWorker());
-            Set entries = t.getEntries();
-            Iterator iter = entries.iterator();
-            while (iter.hasNext()) {
-                objective.domain.Entry e = (objective.domain.Entry) iter.next();
+            objective.domain.Entry[] entries = services.findEntries(t);
+
+            for (objective.domain.Entry e : entries) {
                 Ledger l = e.getParentLedger();
                 if (l == t.getWorker().getExpensesPayable()) {
                     // FIXME
                 } else {
                     accountPicker.setAccount(l.getParentAccount());
                     accountPicker.setLedger(l);
-                    amountEntryBox.setForeignAmount((ForeignAmount) e.getAmount());
+                    amountEntryBox.setAmount(e);
                 }
             }
             descriptionEntry.setText(t.getDescription());
@@ -134,7 +199,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
         if (person == null) {
             Dialog dialog;
-            dialog = new WarningMessageDialog(window, "Select someone!",
+            dialog = new WarningMessageDialog(this, "Select someone!",
                     "You need to select the person you're trying to pay first.");
             dialog.run();
             person_WorkerPicker.grabFocus();
@@ -173,7 +238,6 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
         new Thread() {
             public void run() {
-                Debug.print("threads", "Carrying out update");
                 try {
                     Ledger expensesPayable = person.getExpensesPayable();
 
@@ -224,8 +288,6 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
                     store.commit();
 
                 } catch (final CommandNotReadyException cnre) {
-                    Debug.print("events", "Command not ready: " + cnre.getMessage());
-
                     Dialog dialog = new ErrorMessageDialog(window, "Command Not Ready!",
                             cnre.getMessage());
                     dialog.run();

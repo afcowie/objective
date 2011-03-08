@@ -20,7 +20,6 @@ package accounts.ui;
 
 import generic.persistence.DataClient;
 import generic.ui.ChangeListener;
-import generic.util.Debug;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,6 +31,7 @@ import objective.domain.Amount;
 import objective.domain.Currency;
 import objective.domain.ForeignAmount;
 
+import org.freedesktop.bindings.Debug;
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.ComboBox;
@@ -210,8 +210,6 @@ public class ForeignAmountEntryBox extends HBox
 
         homeValue_AmountEntry.addListener(new ChangeListener() {
             public void userChangedData() {
-                Debug.print("listeners", "homeValueEntry CHANGED " + foreignAmount.getValue());
-
                 rate_Entry.setText(foreignAmount.getRate());
                 lastRates.put(foreign_CurrencySelector.getCurrency(), foreignAmount.getRate());
 

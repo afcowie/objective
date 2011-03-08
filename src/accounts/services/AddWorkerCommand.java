@@ -29,8 +29,8 @@ import objective.domain.Account;
 import objective.domain.CreditPositiveLedger;
 import objective.domain.Ledger;
 import objective.domain.ReimbursableExpensesPayableAccount;
+import objective.domain.Worker;
 
-import accounts.domain.Worker;
 import accounts.persistence.IdentifierAlreadyExistsException;
 
 /**

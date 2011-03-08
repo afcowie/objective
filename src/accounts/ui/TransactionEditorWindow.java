@@ -20,9 +20,7 @@ package accounts.ui;
 
 import generic.client.Master;
 import generic.ui.EditorWindow;
-import generic.util.Debug;
 import generic.util.DebugException;
-
 import objective.domain.Transaction;
 
 import org.gnome.gtk.Dialog;
@@ -127,7 +125,6 @@ public abstract class TransactionEditorWindow extends EditorWindow
 
         new Thread() {
             public void run() {
-                Debug.print("threads", "Carrying out update");
                 hide();
 
                 Command c = null;
@@ -148,7 +145,6 @@ public abstract class TransactionEditorWindow extends EditorWindow
                 } catch (final CommandNotReadyException cnre) {
                     final Dialog dialog;
 
-                    Debug.print("events", "Command not ready: " + cnre.getMessage());
                     Master.ui.showAsWorking(false);
 
                     dialog = new ErrorMessageDialog(
