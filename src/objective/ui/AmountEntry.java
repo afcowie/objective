@@ -39,11 +39,11 @@ import org.gnome.gtk.Widget;
  * </ul>
  * 
  * @author Andrew Cowie
- * @see accounts.ui.AmountDisplay the complementary display widget.
+ * @see objective.ui.AmountDisplay the complementary display widget.
  */
 public class AmountEntry extends Entry
 {
-    private Entry entry;
+    private final Entry entry;
 
     // cache
     private long amount;
@@ -53,7 +53,7 @@ public class AmountEntry extends Entry
      * relationship to this Widget, and the whole point is to only have one
      * invokation of the callback to that Window's code.
      */
-    private AmountEntry.Updated handler = null;
+    private AmountEntry.Updated handler;
 
     /**
      * Construct a new AmountEntry. Use setAmount() if you want to pass in a
@@ -152,6 +152,8 @@ public class AmountEntry extends Entry
                 return false;
             };
         });
+
+        handler = null;
     }
 
     /**
@@ -185,7 +187,9 @@ public class AmountEntry extends Entry
     }
 
     /**
-     * Set the Amount object this Display Widget is representing
+     * Set the Amount object this Display Widget is representing. Does
+     * <i>not</i> emit AmountEntry.Updated signal; if you need to manually
+     * fire it call {@link #emitUpdated()}.
      */
     public void setAmount(long amount) {
         final String str;
@@ -194,6 +198,10 @@ public class AmountEntry extends Entry
 
         entry.setText(str);
         entry.modifyText(StateType.NORMAL, Color.BLACK);
+    }
+
+    public void emitUpdated() {
+        handler.onUpdated(amount);
     }
 
     /*
