@@ -52,6 +52,7 @@ import org.gnome.gtk.TreeRowReference;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
+import org.gnome.pango.EllipsizeMode;
 
 import accounts.ui.TransactionEditorWindow;
 
@@ -213,6 +214,7 @@ public class TransactionListView extends TreeView
 
         renderer = new CellRendererText(vertical);
         renderer.setMarkup(descriptionTextColumn);
+        renderer.setEllipsize(EllipsizeMode.END);
 
         vertical.setTitle("Description");
         vertical.setClickable(true);
