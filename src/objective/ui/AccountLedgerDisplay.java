@@ -16,22 +16,18 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.ui;
+package objective.ui;
 
 import generic.ui.Text;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import objective.domain.Account;
 import objective.domain.Ledger;
 
 import org.gnome.gdk.EventExpose;
+import org.gnome.glib.Glib;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.Requisition;
 import org.gnome.gtk.Widget;
-
 
 /**
  * Display the title and name of an Account / Ledger pair. This widget wraps
@@ -50,7 +46,7 @@ import org.gnome.gtk.Widget;
  */
 public class AccountLedgerDisplay extends HBox
 {
-    private AccountLedgerDisplay self;
+    private final AccountLedgerDisplay box;
 
     private Ledger ledger;
 
@@ -69,20 +65,20 @@ public class AccountLedgerDisplay extends HBox
      */
     public AccountLedgerDisplay() {
         super(false, 0);
-        self = this;
+        box = this;
 
         label = new Label("");
         label.setUseMarkup(true);
         label.setAlignment(0.0f, 0.5f);
 
-        this.packStart(label, false, false, 0);
+        box.packStart(label, false, false, 0);
 
         /*
          * 60 works out to be just enough room for "A… » C…".
          */
-        this.setSizeRequest(60, -1);
+        box.setSizeRequest(60, -1);
 
-        this.connect(new Widget.ExposeEvent() {
+        box.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
                 resize();
                 return false;
@@ -100,8 +96,10 @@ public class AccountLedgerDisplay extends HBox
      *            a Ledger whose parentAccount is set.
      */
     public void setLedger(Ledger ledger) {
+        final Account account;
+
         this.ledger = ledger;
-        Account account = ledger.getParentAccount();
+        account = ledger.getParentAccount();
         if (account == null) {
             throw new IllegalArgumentException("The parent Account of the passed Ledger must be set");
         }
@@ -145,20 +143,13 @@ public class AccountLedgerDisplay extends HBox
         int labelAllocatedPixels;
         int labelRequestedPixels;
 
-        boxAllocatedPixels = self.getAllocation().getWidth();
+        boxAllocatedPixels = box.getAllocation().getWidth();
         labelAllocatedPixels = label.getAllocation().getWidth();
-
-        // Debug.print("debug", "resize() boxAllocated " + boxAllocatedPixels
-        // +
-        // ", lastAllocated "
-        // + lastAllocatedWidth + "; needed " + needed + ", width " + width);
 
         boolean wider = (boxAllocatedPixels > lastAllocatedWidth);
         lastAllocatedWidth = boxAllocatedPixels;
 
         if (wider) {
-            // Debug.print("debug", "wider!");
-
             if (width > needed) {
                 return;
             } else {
@@ -177,11 +168,6 @@ public class AccountLedgerDisplay extends HBox
             labelRequestedPixels = req.getWidth();
             labelRequestedPixels = 0;
 
-            // Debug.print("debug", " --> requisited " + labelRequestedPixels
-            // +
-            // ", allocated "
-            // + boxAllocatedPixels + "; width " + width);
-
             if (labelRequestedPixels <= boxAllocatedPixels) {
                 break;
             }
@@ -189,8 +175,6 @@ public class AccountLedgerDisplay extends HBox
             width--;
         } while (width > 4);
     }
-
-    private static final Pattern regexAmp = Pattern.compile("&");
 
     private static final String CHARCOAL = "#575757";
 
@@ -211,20 +195,23 @@ public class AccountLedgerDisplay extends HBox
      *            or down.
      */
     public static String markupTitleName(Ledger ledger, int width) {
+        final Account account;
+        final StringBuilder buf;
+        final String title, name;
+
         if (ledger == null) {
             return "";
         }
-        Account account = ledger.getParentAccount();
+        account = ledger.getParentAccount();
 
-        StringBuffer buf = new StringBuffer();
+        buf = new StringBuilder();
 
         buf.append("<span color='");
         buf.append(account.getColor(false));
         buf.append("'>");
-        String title = Text.chomp(account.getTitle(), width / 2);
+        title = Text.chomp(account.getTitle(), width / 2);
 
-        Matcher ma = regexAmp.matcher(title);
-        buf.append(ma.replaceAll("&amp;"));
+        buf.append(Glib.markupEscapeText(title));
         buf.append("</span>");
         /*
          * We use » \u00bb. Other possibilities: ∞ \u221e, and ⑆ \u2446.
@@ -238,9 +225,9 @@ public class AccountLedgerDisplay extends HBox
         buf.append(ledger.getColor(false));
         buf.append("'>");
 
-        String name = Text.chomp(ledger.getName(), width / 2);
-        Matcher ml = regexAmp.matcher(name);
-        buf.append(ml.replaceAll("&amp;"));
+        name = Text.chomp(ledger.getName(), width / 2);
+
+        buf.append(Glib.markupEscapeText(name));
         buf.append("</span>");
 
         return buf.toString();
