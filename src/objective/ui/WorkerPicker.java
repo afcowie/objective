@@ -16,9 +16,8 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.ui;
+package objective.ui;
 
-import objective.domain.Employee;
 import objective.domain.Worker;
 import objective.persistence.DataStore;
 
@@ -28,10 +27,8 @@ import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnReference;
 import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.Entry;
-import org.gnome.gtk.HBox;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.TreeIter;
-
 
 import static org.gnome.gdk.Color.BLACK;
 import static org.gnome.gdk.Color.RED;
@@ -48,7 +45,7 @@ import static org.gnome.gtk.StateType.NORMAL;
  * 
  * @author Andrew Cowie
  */
-public class WorkerPicker extends HBox
+public class WorkerPicker extends ComboBoxEntry
 {
     private transient Worker worker;
 
@@ -58,7 +55,7 @@ public class WorkerPicker extends HBox
 
     private ListStore listStore;
 
-    private ComboBoxEntry workerCombo;
+    private ComboBoxEntry combo;
 
     /**
      * Construct a WorkerPicker.
@@ -73,32 +70,31 @@ public class WorkerPicker extends HBox
          * unnessarily if set in a Table or similar widget. Otherwise, the box
          * nature is transparent.
          */
-        super(false, 0);
+        super();
+        final Worker[] workers;
+        final DataColumn[] columns;
+        final Entry entry;
 
         /*
          * We go to the considerable effort of having a TreeModel here so that
          * we can store a reference to the Worker object that is being picked.
          */
+
         nameDisplayColumn = new DataColumnString();
         workerObjectColumn = new DataColumnReference<Worker>();
 
-        DataColumn[] workerPicker_DataColumnArray = {
+        columns = new DataColumn[] {
             nameDisplayColumn,
             workerObjectColumn
         };
 
-        listStore = new ListStore(workerPicker_DataColumnArray);
+        listStore = new ListStore(columns);
 
         /*
          * Poppulate.
          */
 
-        // TODO
-
-        Worker[] workers = new Worker[] {
-            new Employee("Andrew Cowie"),
-        };
-
+        workers = data.listWorkers();
         for (Worker w : workers) {
             TreeIter pointer = listStore.appendRow();
             listStore.setValue(pointer, nameDisplayColumn, w.getName());
@@ -106,25 +102,26 @@ public class WorkerPicker extends HBox
         }
 
         /*
-         * Build the UI that this Widget represnts. ComboBoxEntry
+         * Build the UI that this Widget repreesnts. ComboBoxEntry
          * automatically hooks up and packs a CellRenderer for the nominated
          * column.
          */
 
-        workerCombo = new ComboBoxEntry(listStore, nameDisplayColumn);
-
-        this.packStart(workerCombo, false, false, 0);
+        combo = this;
+        combo.setModel(listStore);
+        combo.setTextColumn(nameDisplayColumn);
 
         /*
          * Somewhat hardcoded, it turns out that GtkComboBoxEntry have only
          * one child, and it's a GtkEntry. Lovely. We can use that to play
          * games with the colour and what not.
          */
-        final Entry entry = (Entry) workerCombo.getChild();
 
-        workerCombo.connect(new ComboBox.Changed() {
+        entry = (Entry) combo.getChild();
+
+        combo.connect(new ComboBox.Changed() {
             public void onChanged(ComboBox source) {
-                workerCombo.popup();
+                combo.popup();
 
                 worker = getSelection();
 
@@ -145,7 +142,7 @@ public class WorkerPicker extends HBox
      *         isn't anything selected.
      */
     private Worker getSelection() {
-        TreeIter pointer = workerCombo.getActiveIter();
+        TreeIter pointer = combo.getActiveIter();
         if (pointer == null) {
             return null;
         }
@@ -176,7 +173,7 @@ public class WorkerPicker extends HBox
         pointer = listStore.getIterFirst();
         do {
             if (listStore.getValue(pointer, workerObjectColumn) == worker) {
-                workerCombo.setActiveIter(pointer);
+                combo.setActiveIter(pointer);
                 return;
             }
         } while (pointer.iterNext());
