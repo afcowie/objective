@@ -558,6 +558,54 @@ public class DataStore
         return result;
     }
 
+    /*
+     * If we need this, do it along the lines of listLedgers().
+     */
+    public Account[] listAccounts() {
+        throw new UnsupportedOperationException();
+    }
+
+    private Ledger[] cache;
+
+    /**
+     * Get a list of Ledgers, internally ordered in an order suitable for
+     * display.
+     */
+    public Ledger[] listLedgers() {
+        Ledger[] result;
+        final Statement stmt;
+        final int num;
+        long ledgerId;
+        Ledger ledger;
+        int i;
+
+        if (cache == null) {
+            num = ledgers.size();
+            result = new Ledger[num];
+
+            /*
+             * We can make this more sophisticated if we have to, perhaps
+             * adding an optional [sub]ordering column to accounts and
+             * ledgers.
+             */
+
+            stmt = db.prepare("SELECT l.ledger_id FROM ledgers l, accounts a, types y WHERE l.account_id = a.account_id AND a.type_id = y.type_id ORDER BY y.type_id");
+
+            i = 0;
+            while (stmt.step()) {
+                ledgerId = stmt.columnInteger(0);
+                ledger = lookupLedger(ledgerId);
+                result[i] = ledger;
+                i++;
+            }
+            stmt.finish();
+
+            cache = result;
+        }
+
+        return cache;
+    }
+
     /**
      * Get the Entry object proxying the specified rowid.
      */
