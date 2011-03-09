@@ -55,7 +55,7 @@ public class AccountLedgerDisplay extends HBox
 
         box = this;
 
-        label = new Label("<i>Select Account</i>");
+        label = new Label("Select Account");
         label.setUseMarkup(true);
         label.setAlignment(Alignment.LEFT, Alignment.CENTER);
         label.setEllipsize(EllipsizeMode.END);

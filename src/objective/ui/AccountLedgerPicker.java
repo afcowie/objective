@@ -31,6 +31,7 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.glib.Glib;
 import org.gnome.gtk.Alignment;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
@@ -38,7 +39,6 @@ import org.gnome.gtk.DataColumnReference;
 import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
-import org.gnome.gtk.EventBox;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.PolicyType;
@@ -83,9 +83,13 @@ public class AccountLedgerPicker extends HBox
 
     private AccountPickerPopup popup = null;
 
-    private EventBox backing = null;
-
     private final DataStore data;
+
+    private static final Pattern regexAtoZ;
+
+    static {
+        regexAtoZ = Pattern.compile("[a-z0-9]");
+    }
 
     /**
      * Instantiate a new AccountLedgerPicker widget.
@@ -111,9 +115,6 @@ public class AccountLedgerPicker extends HBox
         wide.add(display);
         wide.setRelief(ReliefStyle.NORMAL);
 
-        backing = new EventBox();
-        backing.add(wide);
-
         popup = new AccountPickerPopup();
 
         wide.connect(new Button.Clicked() {
@@ -122,7 +123,7 @@ public class AccountLedgerPicker extends HBox
             }
         });
 
-        this.packStart(backing, true, true, 0);
+        this.packStart(wide, true, true, 0);
     }
 
     /**
@@ -171,11 +172,11 @@ public class AccountLedgerPicker extends HBox
 
         AccountPickerPopup() {
             super();
-
-            window = new Window();
-
+            final DataColumn[] columns;
             TreeViewColumn vertical;
             CellRendererText text;
+
+            window = new Window();
 
             /*
              * Setup the underlying TreeModel. Each viewable column has three
@@ -195,7 +196,7 @@ public class AccountLedgerPicker extends HBox
             ledgerTextColumn = new DataColumnString();
             ledgerObjectColumn = new DataColumnReference<Ledger>();
 
-            DataColumn[] accountsPicker_DataColumnsArray = new DataColumn[] {
+            columns = new DataColumn[] {
                 accountDisplayColumn,
                 accountTextColumn,
                 accountObjectColumn,
@@ -204,7 +205,7 @@ public class AccountLedgerPicker extends HBox
                 ledgerObjectColumn
             };
 
-            listStore = new ListStore(accountsPicker_DataColumnsArray);
+            listStore = new ListStore(columns);
 
             filteredStore = new TreeModelFilter(listStore, null);
 
@@ -438,16 +439,17 @@ public class AccountLedgerPicker extends HBox
                 }
             });
 
-            final Pattern regexAtoZ = Pattern.compile("[a-z]");
             view.connect(new Widget.KeyPressEvent() {
                 public boolean onKeyPressEvent(Widget source, EventKey event) {
                     final Keyval key;
+                    final char ch;
+                    final String str, orig;
 
                     key = event.getKeyval();
+                    ch = key.toUnicode();
+                    str = Character.toString(ch);
 
-                    String str = "" + key.toUnicode();
-
-                    String orig = search.getText();
+                    orig = search.getText();
                     int len = orig.length();
 
                     if (key == Keyval.BackSpace) {
@@ -470,6 +472,7 @@ public class AccountLedgerPicker extends HBox
                     } else if (regexAtoZ.matcher(str).matches()) {
                         search.grabFocus();
                         search.setText(search.getText() + str);
+                        search.setPosition(-1);
                         refilter();
                         return true;
                     } else {
@@ -579,16 +582,17 @@ public class AccountLedgerPicker extends HBox
          */
 
         void present() {
-            org.gnome.gdk.Window gdkWindow;
-            int x, y;
-            TreeIter selected;
-            TreePath path;
+            final org.gnome.gdk.Window underlying;
+            final Allocation alloc;
+            final int x, y;
+            final TreeIter selected;
+            final TreePath path;
 
-            gdkWindow = backing.getWindow();
+            underlying = wide.getWindow();
+            alloc = wide.getAllocation();
 
-            x = gdkWindow.getOriginX();
-            y = gdkWindow.getOriginY(); // +
-            // REMOVE gdkWindow.getHeight();
+            x = underlying.getPositionX() + alloc.getX();
+            y = underlying.getPositionY() + alloc.getY();
 
             window.move(x, y);
 
@@ -609,26 +613,6 @@ public class AccountLedgerPicker extends HBox
     /*
      * Getters and Setters --------------------------------
      */
-
-    /**
-     * @return the selected Account object which contains the selected
-     *         Legdger.
-     */
-    public Account getAccount() {
-        return selectedAccount;
-    }
-
-    /**
-     * Inform the AccountLedgerPicker which Account it is to be currently
-     * representing. Using {@link #setLedger(Ledger)} is probably easier.
-     */
-    public void setAccount(Account account) {
-        if (account == null) {
-            throw new IllegalArgumentException("null invalid argument for setAccount()");
-        }
-        selectedAccount = account;
-        setDisplayText();
-    }
 
     /**
      * @return the selected Ledger object whose parent is the selected
@@ -652,7 +636,7 @@ public class AccountLedgerPicker extends HBox
         if (a != null) {
             selectedAccount = a;
         }
-        setDisplayText();
+        this.setDisplayText();
         popup.setSelection(ledger);
     }
 
@@ -661,7 +645,7 @@ public class AccountLedgerPicker extends HBox
      * then it will format up a string for display in the Entry.
      */
     private void setDisplayText() {
-        if ((selectedAccount != null) && (selectedLedger != null)) {
+        if (selectedLedger != null) {
             display.setLedger(selectedLedger);
         }
     }
