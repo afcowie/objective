@@ -16,14 +16,10 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.ui;
-
-import generic.persistence.DataClient;
-
-import java.util.Iterator;
-import java.util.Set;
+package objective.ui;
 
 import objective.domain.Currency;
+import objective.persistence.DataStore;
 
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.ComboBox;
@@ -33,66 +29,69 @@ import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.TreeIter;
 
-import accounts.domain.Books;
-
 /**
  * A ComboBox which allows you to pick a Currency from the internal list of
  * initialized currencies. This is a ComboBox subclass; nicely, that means the
- * ComboBox addListener() methods are naturally exposed.
+ * ComboBox connect() methods are naturally exposed.
  * 
  * @author Andrew Cowie
  */
 public class CurrencySelector extends ComboBox
 {
-    private DataColumnString codeDisplay_DataColumn;
+    private DataColumnString codeDisplayColumn;
 
-    private DataColumnReference currencyObject_DataColumn;
+    private DataColumnReference<Currency> currencyObjectColumn;
 
     private ListStore listStore;
 
     /**
-     * Instantiate a new CurrencySelector, specifying an open
-     * {@link DataClient} from which the list of Currencies will be pulled.
+     * Instantiate a new CurrencySelector, specifying the open database from
+     * which the list of Currencies will be pulled.
      */
-    public CurrencySelector(DataClient store) {
+    public CurrencySelector(DataStore data) {
         super();
+
+        final Currency[] currencies;
+        TreeIter row;
+        DataColumn[] columns;
+        CellRendererText renderer;
 
         /*
          * We go to the considerable effort of having a TreeModel here so that
          * we can store a reference to the Currency object that is being
          * picked.
          */
-        codeDisplay_DataColumn = new DataColumnString();
-        currencyObject_DataColumn = new DataColumnReference();
 
-        DataColumn[] currencySelector_DataColumnArray = {
-            codeDisplay_DataColumn,
-            currencyObject_DataColumn
+        codeDisplayColumn = new DataColumnString();
+        currencyObjectColumn = new DataColumnReference<Currency>();
+
+        columns = new DataColumn[] {
+            codeDisplayColumn,
+            currencyObjectColumn
         };
 
-        listStore = new ListStore(currencySelector_DataColumnArray);
+        listStore = new ListStore(columns);
 
         /*
          * populate
          */
-        Books root = (Books) store.getRoot();
 
-        Set currencies = root.getCurrencySet();
-        Iterator iter = currencies.iterator();
-        while (iter.hasNext()) {
-            Currency cur = (Currency) iter.next();
-            TreeIter pointer = listStore.appendRow();
-            listStore.setValue(pointer, codeDisplay_DataColumn, cur.getCode());
-            listStore.setValue(pointer, currencyObject_DataColumn, cur);
+        currencies = data.listCurrencies();
+
+        for (Currency currency : currencies) {
+            row = listStore.appendRow();
+            listStore.setValue(row, codeDisplayColumn, currency.getCode());
+            listStore.setValue(row, currencyObjectColumn, currency);
         }
 
         /*
          * Now the UI
          */
+
         this.setModel(listStore);
 
-        CellRendererText code_CellRenderer = new CellRendererText(this);
-        code_CellRenderer.setText(codeDisplay_DataColumn);
+        renderer = new CellRendererText(this);
+        renderer.setText(codeDisplayColumn);
     }
 
     /**
@@ -100,35 +99,39 @@ public class CurrencySelector extends ComboBox
      *         selected. (TODO TEST!)
      */
     public Currency getCurrency() {
-        TreeIter pointer = this.getActiveIter();
-        if (pointer == null) {
+        final TreeIter row;
+
+        row = this.getActiveIter();
+        if (row == null) {
             return null;
         }
-        return (Currency) listStore.getValue(pointer, currencyObject_DataColumn);
+        return listStore.getValue(row, currencyObjectColumn);
     }
 
     /**
      * Set the specified currency as active.
      * 
-     * @param cur
+     * @param currency
      *            The Currency object to be set as active.
      * @throws IllegalArgumentException
      *             if you are so foolish as to tell it to select a Currency
      *             object which isn't in the system currency table.
      */
-    public void setCurrency(Currency cur) {
-        TreeIter pointer = listStore.getIterFirst();
+    public void setCurrency(Currency currency) {
+        final TreeIter row;
 
-        if (pointer == null) {
+        row = listStore.getIterFirst();
+
+        if (row == null) {
             throw new IllegalArgumentException(
                     "How did you manage to ask to activate a Currency object that isn't in the system?");
         }
 
         do {
-            if (listStore.getValue(pointer, currencyObject_DataColumn) == cur) {
-                this.setActiveIter(pointer);
+            if (listStore.getValue(row, currencyObjectColumn) == currency) {
+                this.setActiveIter(row);
                 return;
             }
-        } while (pointer.iterNext());
+        } while (row.iterNext());
     }
 }

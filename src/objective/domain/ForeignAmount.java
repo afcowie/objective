@@ -179,9 +179,28 @@ public class ForeignAmount extends Amount
         this.rate = reducedNumber.toString();
     }
 
-    /*
-     * Overrides ------------------------------------------
+    /**
+     * @throws NumberFormatException
+     *             if Double can't parse the rate as a decimal number
      */
+    public static double stringToRate(String str) {
+        double p, d, r;
+        double factor;
+
+        if (str.equals("")) {
+            return 1.0;
+        }
+
+        factor = 1e5;
+        p = Double.parseDouble(str);
+        d = p * factor;
+        r = Math.round(d);
+        return r / factor;
+    }
+
+    public static String rateToString(double rate) {
+        return String.format("%-7.5f", rate);
+    }
 
     /**
      * Overrides Amount's setValue() in order to cause recalculation of the

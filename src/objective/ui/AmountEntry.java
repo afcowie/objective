@@ -198,17 +198,11 @@ public class AmountEntry extends Entry
 
         entry.setText(str);
         entry.modifyText(StateType.NORMAL, Color.BLACK);
+
+        this.amount = amount;
     }
 
     public void emitUpdated() {
         handler.onUpdated(amount);
-    }
-
-    /*
-     * Override inherited methods -------------------------
-     */
-
-    public void grabFocus() {
-        entry.grabFocus();
     }
 }
