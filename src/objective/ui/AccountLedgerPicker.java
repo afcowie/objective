@@ -18,7 +18,6 @@
  */
 package objective.ui;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import objective.domain.Account;
@@ -154,6 +153,8 @@ public class AccountLedgerPicker extends HBox
 
         private DataColumnReference<Ledger> ledgerObjectColumn;
 
+        private DataColumnString combinedSortColumn;
+
         private final Window window;
 
         private final VBox top;
@@ -175,6 +176,10 @@ public class AccountLedgerPicker extends HBox
             final DataColumn[] columns;
             TreeViewColumn vertical;
             CellRendererText text;
+            final Ledger[] ledgers;
+            String str;
+            Account parent;
+            TreeIter row;
 
             window = new Window();
 
@@ -196,13 +201,16 @@ public class AccountLedgerPicker extends HBox
             ledgerTextColumn = new DataColumnString();
             ledgerObjectColumn = new DataColumnReference<Ledger>();
 
+            combinedSortColumn = new DataColumnString();
+
             columns = new DataColumn[] {
                 accountDisplayColumn,
                 accountTextColumn,
                 accountObjectColumn,
                 ledgerDisplayColumn,
                 ledgerTextColumn,
-                ledgerObjectColumn
+                ledgerObjectColumn,
+                combinedSortColumn
             };
 
             listStore = new ListStore(columns);
@@ -268,11 +276,6 @@ public class AccountLedgerPicker extends HBox
              * Populate
              */
 
-            final Ledger[] ledgers;
-            String str;
-            Account parent;
-            TreeIter row;
-
             ledgers = data.listLedgers();
 
             for (Ledger ledger : ledgers) {
@@ -301,6 +304,9 @@ public class AccountLedgerPicker extends HBox
                         + "</span>");
                 listStore.setValue(row, ledgerTextColumn, ledger.getName());
                 listStore.setValue(row, ledgerObjectColumn, ledger);
+
+                str = parent.getTitle().toLowerCase() + ledger.getName().toLowerCase();
+                listStore.setValue(row, combinedSortColumn, str);
             }
 
             /*
@@ -341,36 +347,13 @@ public class AccountLedgerPicker extends HBox
              */
 
             filteredStore.setVisibleCallback(new TreeModelFilter.Visible() {
-                private Pattern regex = null;
-
-                private String cached = "bleep";
-
                 public boolean onVisible(TreeModelFilter source, TreeModel model, TreeIter pointer) {
-                    Matcher m;
-                    String q, title, name;
+                    final String q, str;
 
-                    q = search.getText();
+                    q = search.getText().toLowerCase();
 
-                    /*
-                     * This is ugly, but since we had to do it this way to get
-                     * at a case insensitive regex, we get a way to cache the
-                     * pattern as compiling them is often expensive.
-                     */
-
-                    if (!cached.equals(q)) {
-                        regex = Pattern.compile(".*" + q + ".*", Pattern.CASE_INSENSITIVE);
-                        cached = q;
-                    }
-
-                    title = model.getValue(pointer, accountTextColumn);
-                    m = regex.matcher(title);
-                    if (m.matches()) {
-                        return true;
-                    }
-
-                    name = model.getValue(pointer, ledgerTextColumn);
-                    m = regex.matcher(name);
-                    if (m.matches()) {
+                    str = model.getValue(pointer, combinedSortColumn);
+                    if (str.contains(q)) {
                         return true;
                     }
 
