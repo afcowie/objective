@@ -55,10 +55,10 @@ public class ForeignAmountEntryBox extends HBox
 
     private ForeignAmountEntryBox.Updated handler;
 
-    private static final Map<Currency, Double> lastRates;
+    private static final Map<Currency, String> lastRates;
 
     static {
-        lastRates = new HashMap<Currency, Double>();
+        lastRates = new HashMap<Currency, String>();
     }
 
     public ForeignAmountEntryBox(DataStore data) {
@@ -134,31 +134,25 @@ public class ForeignAmountEntryBox extends HBox
             public void onChanged(ComboBox source) {
                 final Currency currency;
                 final long amount, value;
-                Double D;
-                double rate;
-                final String str;
+                final double rate;
+                String str;
 
                 currency = selector.getCurrency();
 
-                /*
-                 * Tricky; auto unboxing fails if there's no entry in the Map.
-                 * Use a Double object wrapper to get around that.
-                 */
-
-                D = lastRates.get(currency);
-                if (D == null) {
+                str = lastRates.get(currency);
+                if (str == null) {
                     rate = 1.0;
+                    str = ForeignAmount.rateToString(rate);
+                    lastRates.put(currency, str);
                 } else {
-                    rate = D.doubleValue();
+                    rate = ForeignAmount.stringToRate(str);
                 }
 
                 amount = foreign.getAmount();
 
-                str = ForeignAmount.rateToString(rate);
                 exchange.setText(str);
 
                 value = Math.round(rate * amount);
-
                 local.setAmount(value);
 
                 grayOut();
@@ -226,7 +220,7 @@ public class ForeignAmountEntryBox extends HBox
                 value = Math.round(amount * rate);
                 local.setAmount(value);
 
-                lastRates.put(currency, rate);
+                lastRates.put(currency, formatted);
 
                 exchange.setPosition(str.length());
                 exchange.selectRegion(0, 0);
@@ -265,11 +259,11 @@ public class ForeignAmountEntryBox extends HBox
 
                 currency = selector.getCurrency();
 
-                rate = (double) value / amount;
+                rate = (double) value / (double) amount;
                 str = ForeignAmount.rateToString(rate);
                 exchange.setText(str);
 
-                lastRates.put(currency, rate);
+                lastRates.put(currency, str);
 
                 if (handler != null) {
                     handler.onUpdated(amount, currency, value);
@@ -316,13 +310,19 @@ public class ForeignAmountEntryBox extends HBox
         return local.getAmount();
     }
 
-    public void setAmount(long amount, Currency currency, double rate, long value) {
+    public void setAmount(long amount, Currency currency, long value) {
+        final double rate;
+        final String str;
+
         foreign.setAmount(amount);
 
-        lastRates.put(currency, rate);
+        rate = (double) value / (double) amount;
+        str = ForeignAmount.rateToString(rate);
+        lastRates.put(currency, str);
+
         selector.setCurrency(currency);
 
-        exchange.setText(ForeignAmount.rateToString(rate));
+        exchange.setText(str);
 
         local.setAmount(value);
 
