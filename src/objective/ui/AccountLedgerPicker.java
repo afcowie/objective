@@ -16,22 +16,21 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.ui;
+package objective.ui;
 
-import generic.persistence.DataClient;
-
-import java.util.Iterator;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import objective.domain.Account;
 import objective.domain.Ledger;
+import objective.persistence.DataStore;
 
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
+import org.gnome.glib.Glib;
+import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
@@ -59,25 +58,20 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
-import accounts.domain.Books;
-
-import static org.gnome.gtk.Alignment.CENTER;
-import static org.gnome.gtk.Alignment.LEFT;
-
 /**
- * A widget to select an Account / Ledger combination. AccountPicker presents
- * itself as a button containing a Label presenting the Account and Ledger in
- * the appropriate Debit or Credit colour. When activated, a quick Window pops
- * up displaying full the list of Accounts and Ledgers, allowing the user to
- * select the one they are interested in. The user can narrowthe search with
- * any characters entered and the search text will be used to filter both
- * Account titles and Ledger names.
+ * A widget to select an Account / Ledger combination. AccountLedgerPicker
+ * presents itself as a button containing a Label presenting the Account and
+ * Ledger in the appropriate Debit or Credit colour. When activated, a quick
+ * Window pops up displaying full the list of Accounts and Ledgers, allowing
+ * the user to select the one they are interested in. The user can narrow the
+ * search with any characters entered and the search text will be used to
+ * filter both Account titles and Ledger names.
  * 
  * @author Andrew Cowie
- * @see accounts.ui.AccountLedgerDisplay which is used to render the label on
+ * @see objective.ui.AccountLedgerDisplay which is used to render the label on
  *      the main button indicating the selected Account/Ledger pair.
  */
-public class AccountPicker extends HBox
+public class AccountLedgerPicker extends HBox
 {
     private Account selectedAccount = null;
 
@@ -91,19 +85,19 @@ public class AccountPicker extends HBox
 
     private EventBox backing = null;
 
-    private DataClient db;
+    private final DataStore data;
 
     /**
-     * Instantiate a new AccountPicker widget.
+     * Instantiate a new AccountLedgerPicker widget.
      * 
      * @param store
      *            an open DataClient connection that will be used to pull the
      *            list Accounts and Ledgers.
      */
-    public AccountPicker(DataClient store) {
+    public AccountLedgerPicker(DataStore data) {
         super(false, 3);
 
-        db = store;
+        this.data = data;
 
         display = new AccountLedgerDisplay();
         display.setSizeRequest(240, -1);
@@ -134,7 +128,7 @@ public class AccountPicker extends HBox
     /**
      * A Window containing the list of Accounts and an Entry box, and
      * listeners to catch appropriate keystrokes. This is an inner class of
-     * AccountPicker.
+     * AccountLedgerPicker.
      */
     /*
      * It's a bit of a monster, this class.
@@ -147,17 +141,17 @@ public class AccountPicker extends HBox
 
         private TreeModelSort sortedStore;
 
-        private DataColumnString accountDisplay_DataColumn;
+        private DataColumnString accountDisplayColumn;
 
-        private DataColumnString accountTitle_DataColumn;
+        private DataColumnString accountTextColumn;
 
-        private DataColumnReference accountObject_DataColumn;
+        private DataColumnReference<Account> accountObjectColumn;
 
-        private DataColumnString ledgerDisplay_DataColumn;
+        private DataColumnString ledgerDisplayColumn;
 
-        private DataColumnString ledgerName_DataColumn;
+        private DataColumnString ledgerTextColumn;
 
-        private DataColumnReference ledgerObject_DataColumn;
+        private DataColumnReference<Ledger> ledgerObjectColumn;
 
         private final Window window;
 
@@ -187,26 +181,27 @@ public class AccountPicker extends HBox
              * Setup the underlying TreeModel. Each viewable column has three
              * DataColumn objects underlying it. The "Display" one holds an
              * extensively composite marked up version that is what is
-             * actually displayed. "Title" is the straight up String version
-             * of the data, and is used for sorting and filtering. And the
+             * actually displayed. "Text" is the straight up String version of
+             * the data, and is used for sorting and filtering. And the
              * "Object" is the reference back to our domain object model - the
              * thing we're actually trying to pick in the first place.
              */
-            accountDisplay_DataColumn = new DataColumnString();
-            accountTitle_DataColumn = new DataColumnString();
-            accountObject_DataColumn = new DataColumnReference();
 
-            ledgerDisplay_DataColumn = new DataColumnString();
-            ledgerName_DataColumn = new DataColumnString();
-            ledgerObject_DataColumn = new DataColumnReference();
+            accountDisplayColumn = new DataColumnString();
+            accountTextColumn = new DataColumnString();
+            accountObjectColumn = new DataColumnReference<Account>();
+
+            ledgerDisplayColumn = new DataColumnString();
+            ledgerTextColumn = new DataColumnString();
+            ledgerObjectColumn = new DataColumnReference<Ledger>();
 
             DataColumn[] accountsPicker_DataColumnsArray = new DataColumn[] {
-                accountDisplay_DataColumn,
-                accountTitle_DataColumn,
-                accountObject_DataColumn,
-                ledgerDisplay_DataColumn,
-                ledgerName_DataColumn,
-                ledgerObject_DataColumn
+                accountDisplayColumn,
+                accountTextColumn,
+                accountObjectColumn,
+                ledgerDisplayColumn,
+                ledgerTextColumn,
+                ledgerObjectColumn
             };
 
             listStore = new ListStore(accountsPicker_DataColumnsArray);
@@ -223,12 +218,11 @@ public class AccountPicker extends HBox
             vertical.setReorderable(false);
 
             text = new CellRendererText(vertical);
-            text.setMarkup(accountDisplay_DataColumn);
+            text.setMarkup(accountDisplayColumn);
 
             vertical.setTitle("Account");
             vertical.setClickable(true);
-            vertical.setSortColumn(accountTitle_DataColumn);
-            vertical.emitClicked();
+            vertical.setSortColumn(accountTextColumn);
 
             // Ledger column
             vertical = view.appendColumn();
@@ -236,58 +230,76 @@ public class AccountPicker extends HBox
             vertical.setReorderable(false);
 
             text = new CellRendererText(vertical);
-            text.setMarkup(ledgerDisplay_DataColumn);
+            text.setMarkup(ledgerDisplayColumn);
 
             vertical.setTitle("Ledger");
             vertical.setClickable(true);
-            vertical.setSortColumn(ledgerName_DataColumn);
+            vertical.setSortColumn(ledgerTextColumn);
 
             /*
              * overall properties
              */
+
             view.setRulesHint(false);
             view.setEnableSearch(false);
             view.setReorderable(false);
 
-            TreeSelection selection = view.getSelection();
+            final TreeSelection selection = view.getSelection();
             selection.setMode(SelectionMode.SINGLE);
+
+            view.connect(new Widget.FocusInEvent() {
+                public boolean onFocusInEvent(Widget source, EventFocus event) {
+                    TreeIter row;
+
+                    row = selection.getSelected();
+                    if (row == null) {
+                        row = sortedStore.getIterFirst();
+
+                        if (row != null) {
+                            selection.selectRow(row);
+                        }
+                    }
+                    return false;
+                }
+            });
 
             /*
              * Populate
              */
-            Books root = (Books) db.getRoot();
-            Set<Account> accounts = root.getAccountsSet();
-            Iterator<Account> acctIter = accounts.iterator();
 
-            final Pattern regexAmp = Pattern.compile("&");
-            while (acctIter.hasNext()) {
-                Account acct = acctIter.next();
-                Set<Ledger> ledgers = acct.getLedgers();
-                Iterator<Ledger> ledgersIter = ledgers.iterator();
-                while (ledgersIter.hasNext()) {
-                    TreeIter pointer = listStore.appendRow();
+            final Ledger[] ledgers;
+            String str;
+            Account parent;
+            TreeIter row;
 
-                    Ledger ledger = ledgersIter.next();
+            ledgers = data.listLedgers();
 
-                    /*
-                     * Eek! Deeply burried presentation code. Alas. Well, it's
-                     * important that you have the same size-ness for both
-                     * Account and Ledger.
-                     */
-                    final String size = "xx-small";
-                    Matcher m = regexAmp.matcher(acct.getTitle());
-                    listStore.setValue(pointer, accountDisplay_DataColumn, m.replaceAll("&amp;")
-                            + "\n<span size=\"" + size + "\" color=\"" + acct.getColor(false) + "\">"
-                            + acct.getClassString() + "</span>");
-                    listStore.setValue(pointer, accountTitle_DataColumn, acct.getTitle());
-                    listStore.setValue(pointer, accountObject_DataColumn, acct);
+            for (Ledger ledger : ledgers) {
+                row = listStore.appendRow();
 
-                    listStore.setValue(pointer, ledgerDisplay_DataColumn, ledger.getName()
-                            + "\n<span size=\"" + size + "\"color=\"" + ledger.getColor(false) + "\">"
-                            + ledger.getClassString() + "</span>");
-                    listStore.setValue(pointer, ledgerName_DataColumn, ledger.getName());
-                    listStore.setValue(pointer, ledgerObject_DataColumn, ledger);
-                }
+                /*
+                 * Eek! Deeply burried presentation code. Alas. Well, it's
+                 * important that you have the same size-ness for both Account
+                 * and Ledger.
+                 */
+                final String size = "xx-small";
+
+                parent = ledger.getParentAccount();
+                str = Glib.markupEscapeText(parent.getTitle());
+
+                listStore.setValue(row, accountDisplayColumn, str + "\n<span size=\"" + size
+                        + "\" color=\"" + parent.getColor(false) + "\">" + parent.getClassString()
+                        + "</span>");
+                listStore.setValue(row, accountTextColumn, parent.getTitle());
+                listStore.setValue(row, accountObjectColumn, parent);
+
+                str = Glib.markupEscapeText(ledger.getName());
+
+                listStore.setValue(row, ledgerDisplayColumn, str + "\n<span size=\"" + size
+                        + "\"color=\"" + ledger.getColor(false) + "\">" + ledger.getClassString()
+                        + "</span>");
+                listStore.setValue(row, ledgerTextColumn, ledger.getName());
+                listStore.setValue(row, ledgerObjectColumn, ledger);
             }
 
             /*
@@ -310,15 +322,15 @@ public class AccountPicker extends HBox
 
             top = new VBox(false, 0);
 
-            top.packStart(search);
+            top.packStart(search, false, false, 0);
 
             view.setSizeRequest(-1, 210);
             scroll = new ScrolledWindow();
             scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
             scroll.add(view);
-            top.packStart(scroll);
+            top.packStart(scroll, true, true, 0);
 
-            top.packEnd(status);
+            top.packEnd(status, false, false, 0);
 
             window.add(top);
             window.setDecorated(false);
@@ -333,28 +345,30 @@ public class AccountPicker extends HBox
                 private String cached = "bleep";
 
                 public boolean onVisible(TreeModelFilter source, TreeModel model, TreeIter pointer) {
-                    String q = search.getText();
+                    Matcher m;
+                    String q, title, name;
+
+                    q = search.getText();
 
                     /*
                      * This is ugly, but since we had to do it this way to get
                      * at a case insensitive regex, we get a way to cache the
-                     * pattern as compiling them is often quite resource
-                     * intensive.
+                     * pattern as compiling them is often expensive.
                      */
+
                     if (!cached.equals(q)) {
                         regex = Pattern.compile(".*" + q + ".*", Pattern.CASE_INSENSITIVE);
-                        cached = new String(q);
+                        cached = q;
                     }
-                    Matcher m;
 
-                    String accountTitle = model.getValue(pointer, accountTitle_DataColumn);
-                    m = regex.matcher(accountTitle);
+                    title = model.getValue(pointer, accountTextColumn);
+                    m = regex.matcher(title);
                     if (m.matches()) {
                         return true;
                     }
 
-                    String ledgerName = model.getValue(pointer, ledgerName_DataColumn);
-                    m = regex.matcher(ledgerName);
+                    name = model.getValue(pointer, ledgerTextColumn);
+                    m = regex.matcher(name);
                     if (m.matches()) {
                         return true;
                     }
@@ -497,30 +511,34 @@ public class AccountPicker extends HBox
          * 18 months.
          */
         private void refilter() {
-            TreeIter pointer;
+            TreeIter row;
             totalRows = 0;
 
-            pointer = listStore.getIterFirst();
-            do {
-                totalRows++;
-            } while (pointer.iterNext());
+            row = listStore.getIterFirst();
+            if (row != null) {
+                do {
+                    totalRows++;
+                } while (row.iterNext());
+            }
 
             filteredStore.refilter();
 
             visibleRows = 0;
 
-            pointer = filteredStore.getIterFirst();
-            do {
-                visibleRows++;
-            } while (pointer.iterNext());
+            row = filteredStore.getIterFirst();
+            if (row != null) {
+                do {
+                    visibleRows++;
+                } while (row.iterNext());
+            }
 
             status.setMessage(visibleRows + "/" + totalRows + " visible");
         }
 
-        private void applySelection(TreeIter pointer) {
+        private void applySelection(TreeIter row) {
             window.hide();
-            selectedAccount = (Account) sortedStore.getValue(pointer, accountObject_DataColumn);
-            selectedLedger = (Ledger) sortedStore.getValue(pointer, ledgerObject_DataColumn);
+            selectedAccount = sortedStore.getValue(row, accountObjectColumn);
+            selectedLedger = sortedStore.getValue(row, ledgerObjectColumn);
             setDisplayText();
         }
 
@@ -533,7 +551,7 @@ public class AccountPicker extends HBox
 
             pointer = sortedStore.getIterFirst();
             do {
-                Ledger l = (Ledger) sortedStore.getValue(pointer, ledgerObject_DataColumn);
+                Ledger l = sortedStore.getValue(pointer, ledgerObjectColumn);
 
                 if (ledger == l) {
                     view.getSelection().selectRow(pointer);
@@ -580,7 +598,7 @@ public class AccountPicker extends HBox
             selected = view.getSelection().getSelected();
             if (selected != null) {
                 path = sortedStore.getPath(selected);
-                view.scrollToCell(path, null, CENTER, LEFT);
+                view.scrollToCell(path, null, Alignment.CENTER, Alignment.LEFT);
             }
 
             search.grabFocus();
@@ -601,7 +619,7 @@ public class AccountPicker extends HBox
     }
 
     /**
-     * Inform the AccountPicker which Account it is to be currently
+     * Inform the AccountLedgerPicker which Account it is to be currently
      * representing. Using {@link #setLedger(Ledger)} is probably easier.
      */
     public void setAccount(Account account) {
@@ -621,7 +639,7 @@ public class AccountPicker extends HBox
     }
 
     /**
-     * Inform the AccountPicker which Ledger it is to be currently
+     * Inform the AccountLedgerPicker which Ledger it is to be currently
      * representing. If the Ledger's parentAccount is set, then that will be
      * used as the account which is currently selected.
      */
