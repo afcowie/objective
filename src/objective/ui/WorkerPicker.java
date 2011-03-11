@@ -171,6 +171,9 @@ public class WorkerPicker extends ComboBoxEntry
     public void setWorker(Worker worker) {
         TreeIter pointer;
 
+        if (worker == null) {
+            throw new IllegalArgumentException();
+        }
         this.worker = worker;
 
         pointer = listStore.getIterFirst();
@@ -181,8 +184,8 @@ public class WorkerPicker extends ComboBoxEntry
             }
         } while (pointer.iterNext());
 
-        throw new IllegalArgumentException(
-                "How did you manage to ask to activate a Worker object that isn't in the set of Workers represented by this picker?");
+        throw new IllegalArgumentException("\n" + "How did you manage to ask to activate Worker object "
+                + worker + " that" + "\n" + "isn't in the set of Workers represented by this picker?");
     }
 
     /**
@@ -198,8 +201,8 @@ public class WorkerPicker extends ComboBoxEntry
         this.handler = handler;
     }
 
-    interface Updated
+    public interface Updated
     {
-        void onUpdated(Worker worker);
+        public void onUpdated(Worker worker);
     }
 }

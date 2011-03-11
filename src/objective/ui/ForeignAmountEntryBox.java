@@ -329,9 +329,9 @@ public class ForeignAmountEntryBox extends HBox
         grayOut();
     }
 
-    interface Updated
+    public interface Updated
     {
-        void onUpdated(long amount, Currency currency, long value);
+        public void onUpdated(long amount, Currency currency, long value);
     }
 
     public void connect(ForeignAmountEntryBox.Updated handler) {

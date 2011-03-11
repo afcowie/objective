@@ -173,9 +173,9 @@ public class AmountEntry extends Entry
         this.handler = handler;
     }
 
-    interface Updated
+    public interface Updated
     {
-        void onUpdated(long amount);
+        public void onUpdated(long amount);
     }
 
     /**
