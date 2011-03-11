@@ -46,6 +46,7 @@ import objective.domain.PaymentTransaction;
 import objective.domain.PayrollTaxPayableAccount;
 import objective.domain.ProfessionalRevenueAccount;
 import objective.domain.ReimbursableExpensesPayableAccount;
+import objective.domain.ReimbursableTransaction;
 import objective.domain.SalesTaxPayableAccount;
 import objective.domain.Subcontractor;
 import objective.domain.Transaction;
@@ -371,33 +372,33 @@ public class DataStore
         if (direction == 1) {
             if (type.equals("BankAccount")) {
                 result = new BankAccount(accountId);
-            } else if (type.equals("CashAccount")) {
+            } else if (type.equals("Cash")) {
                 result = new CashAccount(accountId);
-            } else if (type.equals("AccountsReceivableAccount")) {
+            } else if (type.equals("AccountsReceivable")) {
                 result = new AccountsReceivableAccount(accountId);
-            } else if (type.equals("DepreciatingAssetAccount")) {
+            } else if (type.equals("DepreciatingAsset")) {
                 result = new DepreciatingAssetAccount(accountId);
-            } else if (type.equals("GenericExpenseAccount")) {
+            } else if (type.equals("GenericExpense")) {
                 result = new GenericExpenseAccount(accountId);
             } else {
                 result = null;
             }
         } else if (direction == -1) {
-            if (type.equals("AccountsPayableAccount")) {
+            if (type.equals("AccountsPayable")) {
                 result = new AccountsPayableAccount(accountId);
-            } else if (type.equals("ReimbursableExpensesPayableAccount")) {
+            } else if (type.equals("ReimbursableExpensesPayable")) {
                 result = new ReimbursableExpensesPayableAccount(accountId);
-            } else if (type.equals("SalesTaxPayableAccount")) {
+            } else if (type.equals("SalesTaxPayable")) {
                 result = new SalesTaxPayableAccount(accountId);
-            } else if (type.equals("PayrollTaxPayableAccount")) {
+            } else if (type.equals("PayrollTaxPayable")) {
                 result = new PayrollTaxPayableAccount(accountId);
-            } else if (type.equals("LoanPayableAccount")) {
+            } else if (type.equals("LoanPayable")) {
                 result = new LoanPayableAccount(accountId);
-            } else if (type.equals("OwnersEquityAccount")) {
+            } else if (type.equals("OwnersEquity")) {
                 result = new OwnersEquityAccount(accountId);
-            } else if (type.equals("ProfessionalRevenueAccount")) {
+            } else if (type.equals("ProfessionalRevenue")) {
                 result = new ProfessionalRevenueAccount(accountId);
-            } else if (type.equals("CurrencyGainLossAccount")) {
+            } else if (type.equals("CurrencyGainLoss")) {
                 throw new UnsupportedOperationException(); // well?
             } else {
                 result = null;
@@ -606,6 +607,20 @@ public class DataStore
         return cache;
     }
 
+    public Currency[] listCurrencies() {
+        Currency[] result;
+        final int num;
+        Collection<Currency> list;
+
+        num = workers.size();
+        result = new Currency[num];
+
+        list = currencies.values();
+        result = list.toArray(result);
+
+        return result;
+    }
+
     /**
      * Get the Entry object proxying the specified rowid.
      */
@@ -631,11 +646,14 @@ public class DataStore
             String description, String reference) {
         final Transaction result;
 
-        if (type.equals("GenericTransaction")) {
+        if (type.equals("Generic")) {
             result = new GenericTransaction(transactionId);
-        } else if (type.equals("InvoiceTransaction")) {
+        } else if (type.equals("Reimbursable")) {
+            result = new ReimbursableTransaction(transactionId);
+
+        } else if (type.equals("Invoice")) {
             result = new InvoiceTransaction(transactionId);
-        } else if (type.equals("PaymentTransaction")) {
+        } else if (type.equals("Payment")) {
             result = new PaymentTransaction(transactionId);
         } else {
             throw new IllegalStateException("\n" + "Unknown Account type " + type + " for ("

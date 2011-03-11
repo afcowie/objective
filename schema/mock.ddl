@@ -2,27 +2,28 @@ PRAGMA foreign_keys = ON;
 BEGIN;
 
 INSERT INTO types VALUES (10, 'BankAccount');
-INSERT INTO types VALUES (11, 'CashAccount');
-INSERT INTO types VALUES (12, 'AccountsReceivableAccount');
-INSERT INTO types VALUES (13, 'DepreciatingAssetAccount');
+INSERT INTO types VALUES (11, 'Cash');
+INSERT INTO types VALUES (12, 'AccountsReceivable');
+INSERT INTO types VALUES (13, 'DepreciatingAsset');
 
-INSERT INTO types VALUES (20, 'CardAccount');
-INSERT INTO types VALUES (22, 'AccountsPayableAccount');
-INSERT INTO types VALUES (23, 'SalesTaxPayableAccount');
-INSERT INTO types VALUES (24, 'PayrollTaxPayableAccount');
-INSERT INTO types VALUES (25, 'ReimbursableExpensesPayableAccount');
-INSERT INTO types VALUES (26, 'LoanPayableAccount');
+INSERT INTO types VALUES (20, 'Card');
+INSERT INTO types VALUES (22, 'AccountsPayable');
+INSERT INTO types VALUES (23, 'SalesTaxPayable');
+INSERT INTO types VALUES (24, 'PayrollTaxPayable');
+INSERT INTO types VALUES (25, 'ReimbursableExpensesPayable');
+INSERT INTO types VALUES (26, 'LoanPayable');
 
-INSERT INTO types VALUES (31, 'OwnersEquityAccount');
+INSERT INTO types VALUES (31, 'OwnersEquity');
 
-INSERT INTO types VALUES (41, 'ProfessionalRevenueAccount');
-INSERT INTO types VALUES (49, 'CurrencyGainLossAccount');
+INSERT INTO types VALUES (41, 'ProfessionalRevenue');
+INSERT INTO types VALUES (49, 'CurrencyGainLoss');
 
-INSERT INTO types VALUES (61, 'GenericExpenseAccount');
+INSERT INTO types VALUES (61, 'GenericExpense');
 
-INSERT INTO types VALUES (-8, 'GenericTransaction');
-INSERT INTO types VALUES (-9, 'InvoiceTransaction');
-INSERT INTO types VALUES (-10, 'PaymentTransaction');
+INSERT INTO types VALUES (-8, 'Generic');
+INSERT INTO types VALUES (-9, 'Invoice');
+INSERT INTO types VALUES (-10, 'Payment');
+INSERT INTO types VALUES (-11, 'Reimbursable');
 
 --
 -- Mock Accounts
@@ -51,7 +52,7 @@ INSERT INTO ledgers VALUES (7, 6, 'Flights', NULL, 1);
 INSERT INTO ledgers VALUES (8, 6, 'Meals', NULL, 1);
 
 INSERT INTO accounts VALUES (7, 61, 'Communications Expenses', 1);
-INSERT INTO ledgers VALUES (10, 7, 'Telephone', NULL, 1);
+INSERT INTO ledgers VALUES (10, 7, 'International Telephone Calling Card', NULL, 1);
 
 INSERT INTO accounts VALUES (8, 61, 'Fees', 1);
 INSERT INTO ledgers VALUES (12, 8, 'Foreign Exchange', NULL, 1);
@@ -92,7 +93,7 @@ INSERT INTO entries VALUES (NULL, 2, 2, 2250000, 'USD', 3381750, -1);
 INSERT INTO entries VALUES (NULL, 2, 4, 191250, 'AUD', 191250, -1);
 
 
-INSERT INTO transactions VALUES (3, -8, 1101040600, 'Phone Card', NULL);
+INSERT INTO transactions VALUES (3, -11, 1101040600, 'Phone Card', NULL);
 INSERT INTO entries VALUES (NULL, 3, 10, 4000, 'CAD', 4267, 1);
 INSERT INTO entries VALUES (NULL, 3, 11, 4267, 'AUD', 4267, -1);
 
