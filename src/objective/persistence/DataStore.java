@@ -730,14 +730,7 @@ public class DataStore
         final String name;
         final long typeId, rowId;
 
-        name = t.getClass().getName();
-
-        stmt = db.prepare("SELECT type_id FROM types WHERE class = ?");
-        stmt.bindText(1, name);
-        stmt.step();
-
-        typeId = stmt.columnInteger(0);
-        stmt.finish();
+        typeId = t.getType();
 
         stmt = db.prepare("INSERT INTO transactions VALUES (NULL, ?, -1, NULL, NULL)");
         stmt.bindInteger(1, typeId);

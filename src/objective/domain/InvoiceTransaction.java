@@ -32,4 +32,8 @@ public class InvoiceTransaction extends Transaction
     public String getClassString() {
         return "Invoice Transaction";
     }
+
+    public long getType() {
+        return -9;
+    }
 }

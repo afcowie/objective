@@ -29,6 +29,10 @@ public class Debit extends Entry
 
     public static final String COLOR_ACTIVE = "#32fdff";
 
+    public Debit() {
+        super(0);
+    }
+
     public Debit(long rowid) {
         super(rowid);
     }

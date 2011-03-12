@@ -29,6 +29,10 @@ public class Credit extends Entry
 
     public static final String COLOR_ACTIVE = "#a0ff97";
 
+    public Credit() {
+        super(0);
+    }
+
     public Credit(long rowid) {
         super(rowid);
     }

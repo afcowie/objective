@@ -24,10 +24,11 @@ import objective.persistence.DomainObject;
  * Base class of the Transaction hierarchy. Transactions are operations which
  * are balanced double-entry accounting events. That also means that, per
  * GAAP, they have to have a source document somewhere.
+ * 
  * <p>
  * We override {@link #equals(Object)} so this can't be naturally used in
  * TreeSets, which is fine; see
- * {@link accounts.services.TransactionComparator} if you need a SortedSet of
+ * {@link objective.services.TransactionComparator} if you need a SortedSet of
  * Transactions.
  * 
  * @author Andrew Cowie

@@ -36,6 +36,10 @@ public abstract class DomainObject
         return databaseId;
     }
 
+    public long getType() {
+        return 0;
+    }
+
     /**
      * Compare two domain objects by database ID, rather than referential
      * identity, as is used by Object.equals(). Use this in native queries

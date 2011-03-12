@@ -16,36 +16,26 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.domain;
-
-import objective.domain.Datestamp;
-import objective.domain.Entry;
-import objective.domain.Transaction;
+package objective.domain;
 
 /**
- * Expenses reimbursable to an Worker
+ * Expenses reimbursable to a Worker who incurred them.
  * 
  * @author Andrew Cowie
  */
-public class ReimbursableExpensesTransaction extends Transaction
+public class ReimbursableTransaction extends Transaction
 {
     /**
      * The person who the expenses are reimbursable to.
      */
     private Worker worker;
 
-    // FUTURE maybe a "main" Entry? Common case; if we need it, push it up to
-    // a
-    // superclass.
-
-    public ReimbursableExpensesTransaction() {
-        super();
+    public ReimbursableTransaction() {
+        this(0);
     }
 
-    public ReimbursableExpensesTransaction(Worker person, String description, Datestamp date,
-            Entry[] entries) {
-        super(description, date, entries);
-        setWorker(person);
+    public ReimbursableTransaction(long rowid) {
+        super(rowid);
     }
 
     public Worker getWorker() {
@@ -57,12 +47,16 @@ public class ReimbursableExpensesTransaction extends Transaction
      */
     public void setWorker(Worker worker) {
         if (worker == null) {
-            throw new IllegalArgumentException("Can't set null as the Worker you're reimbursing");
+            throw new IllegalArgumentException("\n" + "Can't set null as the Worker you're reimbursing");
         }
         this.worker = worker;
     }
 
     public String getClassString() {
         return "Reimbursable Expenses";
+    }
+
+    public long getType() {
+        return -11;
     }
 }
