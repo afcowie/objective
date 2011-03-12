@@ -340,4 +340,8 @@ public class ForeignAmountEntryBox extends HBox
         }
         this.handler = handler;
     }
+
+    public Currency getCurrency() {
+        return selector.getCurrency();
+    }
 }

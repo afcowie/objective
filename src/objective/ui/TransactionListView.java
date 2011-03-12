@@ -214,7 +214,7 @@ public class TransactionListView extends TreeView
 
         renderer = new CellRendererText(vertical);
         renderer.setMarkup(descriptionTextColumn);
-        renderer.setEllipsize(EllipsizeMode.END);
+        renderer.setEllipsize(EllipsizeMode.NONE);
 
         vertical.setTitle("Description");
         vertical.setClickable(true);
@@ -225,6 +225,7 @@ public class TransactionListView extends TreeView
         /*
          * Entries' Debit
          */
+
         vertical = view.appendColumn();
         vertical.setResizable(false);
         vertical.setReorderable(false);
@@ -242,6 +243,7 @@ public class TransactionListView extends TreeView
         /*
          * Entries' Credit
          */
+
         vertical = view.appendColumn();
         vertical.setResizable(false);
         vertical.setReorderable(false);
@@ -252,13 +254,14 @@ public class TransactionListView extends TreeView
         renderer.setMarkup(creditsTextColumn);
 
         vertical.setTitle("    Credits");
-        vertical.setAlignment(0.5f);
+        vertical.setAlignment(0.0f);
         vertical.setClickable(true);
         vertical.setSortColumn(creditsSortColumn);
 
         /*
          * overall properties
          */
+
         view.setRulesHint(true);
         view.setEnableSearch(false);
 
@@ -520,6 +523,7 @@ public class TransactionListView extends TreeView
         /*
          * Now add the data for the Entries related columns:
          */
+
         model.setValue(row, descriptionTextColumn, titleName.toString());
         model.setValue(row, descriptionSortColumn, t.getDescription());
 
