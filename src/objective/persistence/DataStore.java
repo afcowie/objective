@@ -30,7 +30,6 @@ import objective.domain.CashAccount;
 import objective.domain.Credit;
 import objective.domain.CreditPositiveLedger;
 import objective.domain.Currency;
-import objective.domain.Datestamp;
 import objective.domain.Debit;
 import objective.domain.DebitPositiveLedger;
 import objective.domain.DepreciatingAssetAccount;
@@ -185,6 +184,16 @@ public class DataStore
     }
 
     private static Currency makeCurrency(String code, String name, String symbol) {
+        if (code == null) {
+            throw new IllegalArgumentException();
+        }
+        if (name == null) {
+            throw new IllegalArgumentException();
+        }
+        if (symbol == null) {
+            throw new IllegalArgumentException();
+        }
+
         return new Currency(code, name, symbol);
     }
 
@@ -258,6 +267,10 @@ public class DataStore
             result = new CreditPositiveLedger(ledgerId);
         } else {
             throw new IllegalArgumentException("\n" + "Can't have directionless Entries");
+        }
+
+        if (name == null) {
+            throw new IllegalArgumentException();
         }
 
         result.setName(name);
@@ -412,6 +425,10 @@ public class DataStore
                     + accountId + ")");
         }
 
+        if (title == null) {
+            throw new IllegalArgumentException();
+        }
+
         result.setTitle(title);
         return result;
     }
@@ -426,7 +443,6 @@ public class DataStore
         String[] sql;
         long transactionId, timestamp, entryId, ledgerId, amount, value, direction;
         String type, description, reference, code;
-        Datestamp date;
         Transaction transaction;
         Ledger ledger;
         Entry entry;
@@ -447,8 +463,7 @@ public class DataStore
             description = stmt.columnText(3);
             reference = stmt.columnText(4);
 
-            date = new Datestamp(timestamp);
-            transaction = makeTransaction(transactionId, type, date, description, reference);
+            transaction = makeTransaction(transactionId, type, timestamp, description, reference);
 
             this.cache(transaction);
         }
@@ -642,7 +657,7 @@ public class DataStore
      * Again, could have used reflection but this is cleaner and much more
      * strongly typed.
      */
-    private static Transaction makeTransaction(long transactionId, String type, Datestamp date,
+    private static Transaction makeTransaction(long transactionId, String type, long datestamp,
             String description, String reference) {
         final Transaction result;
 
@@ -660,7 +675,14 @@ public class DataStore
                     + transactionId + ")");
         }
 
-        result.setDate(date);
+        if (description == null) {
+            description = "";
+        }
+        if (reference == null) {
+            reference = "";
+        }
+
+        result.setDate(datestamp);
         result.setDescription(description);
         result.setReference(reference);
 
@@ -727,7 +749,6 @@ public class DataStore
      */
     public void createTransaction(Transaction t) {
         Statement stmt;
-        final String name;
         final long typeId, rowId;
 
         typeId = t.getType();
@@ -752,14 +773,12 @@ public class DataStore
      */
     public void updateTransaction(Transaction t) {
         final Statement stmt;
-        final Datestamp date;
         final long transactionId, datestamp;
         final String description, reference;
 
         stmt = db.prepare("UPDATE transactions SET datestamp = ?, description = ?, reference = ? WHERE transaction_id = ?");
 
-        date = t.getDate();
-        datestamp = date.getInternalTimestamp();
+        datestamp = t.getDate();
         stmt.bindInteger(1, datestamp);
 
         description = t.getDescription();
@@ -927,6 +946,10 @@ public class DataStore
             result = new Subcontractor(workerId);
         } else {
             throw new AssertionError();
+        }
+
+        if (name == null) {
+            throw new IllegalArgumentException();
         }
 
         result.setName(name);
