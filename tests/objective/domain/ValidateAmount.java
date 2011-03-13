@@ -18,56 +18,37 @@
  */
 package objective.domain;
 
-import java.math.BigDecimal;
-
 import junit.framework.TestCase;
 
 /**
- * Unit test Amount class.
+ * Test utility functions in Amount class.
  * 
  * @see objective.domain.ValidateForeignCurrency
  * @author Andrew Cowie
  */
 public class ValidateAmount extends TestCase
 {
-    public final void testDefaultConstructor() {
-        final Amount a, b;
-
-        a = new Amount(0);
-        assertEquals("0.00", a.getValue());
-
-        b = new Amount("");
-        assertEquals("0.00", b.getValue());
-    }
 
     public final void testAmountZero() {
-        Amount a = new Amount("0");
+        final String str;
 
-        /*
-         * Tests two digit translation
-         */
-        assertEquals("0.00", a.getValue());
-
-        BigDecimal num = a.getBigDecimal();
-        assertNotNull(num);
-        assertEquals("0.00", num.toString());
-
-        assertTrue(a.isZero());
+        str = Amount.numberToString(0);
+        assertEquals("0.00", str);
     }
 
     public final void testSetValue() {
-        Amount a = new Amount("1.1");
-        assertEquals("1.10", a.getValue());
-        assertFalse(a.isZero());
+        long amount;
+        String str;
 
-        /*
-         * Make sure setValue overrides
-         */
-        a.setValue("5.6");
-        assertEquals("5.60", a.getValue());
+        amount = 110;
+
+        assertEquals("1.10", Amount.numberToString(amount));
+
+        amount = Amount.stringToNumber("5.6");
+        assertEquals("5.60", Amount.numberToString(amount));
 
         try {
-            a.setValue("blah"); // should throw
+            Amount.stringToNumber("blah"); // should throw
             fail("Amount setValue didn't throw on bad input");
         } catch (NumberFormatException nfe) {
             // supposed to throw this
@@ -76,191 +57,131 @@ public class ValidateAmount extends TestCase
         }
 
         /*
-         * Check rounding
+         * Check trimming. This used to be rounding.
          */
-        Amount b = new Amount("1.005");
-        assertEquals("1.01", b.getValue());
 
-        Amount c = new Amount("1.0049");
-        assertEquals("1.00", c.getValue());
+        amount = Amount.stringToNumber("1.005");
+        assertEquals(100, amount);
 
-        Amount d = new Amount("0.00499999999999999999999999999999999999");
-        assertEquals("0.00", d.getValue());
+        amount = Amount.stringToNumber("1.0049");
+        assertEquals(100, amount);
+
+        amount = Amount.stringToNumber("0.01499999999999999999999999999999999999");
+        assertEquals(1, amount);
 
         /*
-         * Check nuacnces of getValue
+         * Check nuacnces
          */
-        Amount e = new Amount(".01");
-        assertEquals("0.01", e.getValue());
 
-        Amount f = new Amount(".1");
-        assertEquals("0.10", f.getValue());
+        amount = Amount.stringToNumber(".01");
+        str = Amount.numberToString(amount);
+        assertEquals("0.01", str);
+
+        amount = Amount.stringToNumber(".1");
+        str = Amount.numberToString(amount);
+        assertEquals("0.10", str);
 
         /*
-         * 
+         * Normal
          */
 
-        Amount g = new Amount("49.95");
-        assertEquals("49.95", g.getValue());
-    }
-
-    public final void testEqualsAndClone() {
-        Amount a = new Amount("42");
-        assertTrue(a.equals(a));
-
-        Amount b = new Amount("42");
-        assertTrue(a.equals(b));
-        assertTrue(b.equals(a));
-
-        Amount c = new Amount("1");
-        assertFalse(a.equals(c));
-        assertFalse(c.equals(a));
-
-        Amount d = (Amount) c.clone();
-        assertFalse(d == c);
+        amount = Amount.stringToNumber("49.95");
+        assertEquals(4995, amount);
+        str = Amount.numberToString(amount);
+        assertEquals("49.95", str);
     }
 
     public final void testNegativeNumbers() {
-        Amount a = new Amount("-1");
-        assertEquals("-1.00", a.getValue());
+        long amount;
+        String str;
 
-        Amount b = new Amount("-1");
-        assertTrue(a.equals(b));
-        assertTrue(b.equals(a));
-
-        Amount c = new Amount("1");
-        assertFalse(a.equals(c));
-        assertFalse(c.equals(a));
+        amount = Amount.stringToNumber("-1");
+        assertEquals(-100, amount);
+        str = Amount.numberToString(amount);
+        assertEquals("-1.00", str);
 
         /*
-         * Check nuacnces of getValue
+         * Check nuacnces
          */
-        Amount e = new Amount("-0.01");
-        assertEquals("-0.01", e.getValue());
 
-        Amount f = new Amount("-0.1");
-        assertEquals("-0.10", f.getValue());
+        amount = Amount.stringToNumber("-0.01");
+        assertEquals(-1, amount);
+        str = Amount.numberToString(amount);
+        assertEquals("-0.01", str);
 
-        Amount g = new Amount("-.01");
-        assertEquals("-0.01", g.getValue());
+        amount = Amount.stringToNumber("-0.1");
+        assertEquals(-10, amount);
+        str = Amount.numberToString(amount);
+        assertEquals("-0.10", str);
 
-        Amount h = new Amount("-.1");
-        assertEquals("-0.10", h.getValue());
+        amount = Amount.stringToNumber("-.01");
+        assertEquals(-1, amount);
 
-    }
-
-    public final void testAddition() {
-        Amount a = new Amount("1");
-        Amount b = new Amount("2");
-
-        // 1 + 2 = 3 :)
-        a.incrementBy(b);
-
-        assertEquals("3.00", a.getValue());
-        assertTrue((new BigDecimal("3").compareTo(a.getBigDecimal())) == 0);
-
-        Amount c = new Amount("-3");
-        Amount d = new Amount("15");
-
-        c.incrementBy(d);
-
-        assertEquals("12.00", c.getValue());
-        assertTrue((new BigDecimal("12").compareTo(c.getBigDecimal())) == 0);
-    }
-
-    public final void testSubtraction() {
-        Amount a = new Amount("5.55");
-        Amount b = new Amount("3.33");
-
-        a.decrementBy(b);
-
-        assertEquals("2.22", a.getValue());
-
-        Amount c = new Amount("5");
-        Amount d = new Amount("-3");
-
-        c.decrementBy(d);
-        assertEquals("8.00", c.getValue());
-
-        c.decrementBy(c);
-        assertEquals("0.00", c.getValue());
-        c.decrementBy(b);
-        assertEquals("-3.33", c.getValue());
+        amount = Amount.stringToNumber("-.1");
+        assertEquals(-10, amount);
     }
 
     public void testPercentage() {
-        Amount a = new Amount("100.00");
+        long amount;
 
-        Amount b = a.percent(10);
+        amount = Amount.percent(10000, 10);
+        assertEquals(1000, amount);
 
-        assertEquals("10.00", b.getValue());
+        amount = Amount.percent(10000, 100);
+        assertEquals(10000, amount);
 
-        Amount c = a.percent(100);
-        assertEquals("100.00", c.getValue());
+        amount = Amount.percent(10000, 0);
+        assertEquals(0, amount);
 
-        Amount d = a.percent(1);
-        assertEquals("1.00", d.getValue());
+        amount = Amount.percent(10000, 1);
+        assertEquals(100, amount);
+
+        amount = Amount.percent(10000, 25);
+        assertEquals(2500, amount);
+
+        amount = Amount.percent(100, 33);
+        assertEquals(33, amount);
+
+        amount = Amount.percent(10, 33);
+        assertEquals(3, amount);
+
+        amount = Amount.percent(10, 66);
+        assertEquals(7, amount);
     }
 
-    public final void testToString() {
-        Amount a = new Amount("12345.67");
+    public final void testPadCommaAndToString() {
+        final String original;
+        long amount;
+        String str;
+
+        original = "12345.67";
+        amount = Amount.stringToNumber(original);
 
         try {
-            a.padComma("45");
+            Amount.padComma("45");
             fail("Should have thrown an exception as argument wasn't a x.xx form String");
         } catch (NumberFormatException nfe) {
         }
         try {
-            a.padComma("");
+            Amount.padComma("");
             fail("Should have thrown an exception as argument wasn't a x.xx form String");
         } catch (NumberFormatException nfe) {
         }
 
-        assertEquals("12,345.67", a.toString());
+        str = Amount.padComma(original);
+        assertEquals("12,345.67", str);
 
-        Amount b = new Amount("123");
-        assertEquals("123.00", b.toString());
+        amount = Amount.stringToNumber("123");
+        str = Amount.numberToString(amount);
+        assertEquals("123.00", str);
 
-        Amount c = new Amount("0.45");
-        assertEquals("0.45", c.toString());
+        amount = Amount.stringToNumber("0.45");
+        str = Amount.numberToString(amount);
+        assertEquals("0.45", str);
 
-        Amount d = new Amount("987654321.12");
-        assertEquals("987,654,321.12", d.toString());
-    }
-
-    public final void testCompareTo() {
-        Amount a = new Amount("10.00");
-        Amount b = new Amount("11.95");
-        Amount c = new Amount("11.95");
-
-        assertTrue(a.compareTo(b) < 0);
-        assertTrue(b.compareTo(a) > 0);
-
-        assertTrue(c.compareTo(c) == 0);
-        assertTrue(b.compareTo(c) == 0);
-        assertTrue(c.compareTo(b) == 0);
-
-        Amount d = new Amount(1195);
-        assertTrue(c.compareTo(d) == 0);
-        Amount e = new Amount(-1195);
-        assertTrue(e.compareTo(d) < 0);
-    }
-
-    /**
-     * At long last we finally have exposed methods to operate on the
-     * underlying long directly.
-     */
-    public final void testNumberMethods() {
-        final Amount a, b;
-
-        a = new Amount(0);
-        assertTrue(a.isZero());
-
-        b = new Amount(0);
-        b.setNumber(15634);
-        assertEquals("156.34", b.getValue());
-
-        a.setValue(b);
-        assertEquals("156.34", a.getValue());
+        amount = Amount.stringToNumber("987654321.12");
+        str = Amount.numberToString(amount);
+        str = Amount.padComma(str);
+        assertEquals("987,654,321.12", str);
     }
 }
