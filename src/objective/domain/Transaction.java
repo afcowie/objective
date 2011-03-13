@@ -44,7 +44,7 @@ public abstract class Transaction extends DomainObject
      */
     protected String reference = null;
 
-    protected Datestamp date = null;
+    protected long datestamp = -1L;
 
     protected Transaction(long rowid) {
         super(rowid);
@@ -123,15 +123,15 @@ public abstract class Transaction extends DomainObject
     /**
      * Get the date of this transaction
      */
-    public Datestamp getDate() {
-        return date;
+    public long getDate() {
+        return datestamp;
     }
 
     /**
      * Set the date of the transaction.
      */
-    public void setDate(Datestamp date) {
-        this.date = date;
+    public void setDate(long datestamp) {
+        this.datestamp = datestamp;
     }
 
     public String getClassString() {
@@ -139,7 +139,7 @@ public abstract class Transaction extends DomainObject
     }
 
     public String toString() {
-        return getClassString() + ": " + date + " " + description
+        return getClassString() + ": " + Datestamp.dateToString(datestamp) + " " + description
                 + (reference != null ? " [" + reference + "]" : "");
     }
 }

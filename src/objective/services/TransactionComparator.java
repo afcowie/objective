@@ -16,30 +16,26 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.services;
+package objective.services;
 
 import java.util.Comparator;
 
 import objective.domain.Transaction;
-
 
 /**
  * Impose ordering on two Transaction objects.
  * 
  * @author Andrew Cowie
  */
-public class TransactionComparator implements Comparator
+public class TransactionComparator implements Comparator<Transaction>
 {
-    public int compare(Object o1, Object o2) {
-        if ((!(o1 instanceof Transaction)) || (!(o2 instanceof Transaction))) {
-            throw new ClassCastException("This comparator only orders Entry objects");
-        }
+    public int compare(Transaction t1, Transaction t2) {
+        final long time1, time2;
+        final String ref1, ref2;
+        final int hash1, hash2;
 
-        Transaction t1 = (Transaction) o1;
-        Transaction t2 = (Transaction) o2;
-
-        long time1 = t1.getDate().getInternalTimestamp();
-        long time2 = t2.getDate().getInternalTimestamp();
+        time1 = t1.getDate().getInternalTimestamp();
+        time2 = t2.getDate().getInternalTimestamp();
 
         if (time1 < time2) {
             return -1;
@@ -52,8 +48,8 @@ public class TransactionComparator implements Comparator
              * unique or primary key) but if they're present on the same day
              * they should probably be in order (ie cheque numbers, etc)
              */
-            String ref1 = t1.getReference();
-            String ref2 = t2.getReference();
+            ref1 = t1.getReference();
+            ref2 = t2.getReference();
 
             int refCmp;
             if ((ref1 == null) || (ref2 == null)) {
@@ -71,8 +67,8 @@ public class TransactionComparator implements Comparator
                  * If they're the same date and reference, then it doesn't
                  * matter any further, so just order by hash
                  */
-                int hash1 = t1.hashCode();
-                int hash2 = t2.hashCode();
+                hash1 = t1.hashCode();
+                hash2 = t2.hashCode();
 
                 if (hash1 < hash2) {
                     return -1;
