@@ -18,139 +18,35 @@
  */
 package objective.domain;
 
-import generic.persistence.NotActivatedException;
-import generic.util.DebugException;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 import org.freedesktop.bindings.Time;
 
 /**
- * The date of a transaction.
+ * Utility functions for manipulating the date of a Transaction.
  * 
  * @author Andrew Cowie
  */
-public class Datestamp implements Comparable<Datestamp>
+public class Datestamp
 {
-    /**
-     * We use -1 for uninitialized, to guard against lacking activation, and
-     * to prevent the ubiquitous 1 Jan 1970 stupidiy.
-     */
-    private static final long UNSET = -1;
+    private Datestamp() {}
 
-    private long timestamp = UNSET;
-
-    /**
-     * Construct a new Datestamp. Leaves it "unset"
-     */
-    public Datestamp() {}
-
-    /**
-     * Store a given unix timestamp directly.
-     */
-    public Datestamp(long timestamp) {
-        if (timestamp < -1) {
-            throw new IllegalArgumentException();
-        }
-        this.timestamp = timestamp;
-    }
-
-    /**
-     * Construct a Datestamp object with user supplied input (which will be
-     * passed to setDate() for validation).
-     * 
-     * @param user
-     *            the String to parse
-     */
-    public Datestamp(String user) {
-        if (user == null) {
-            throw new IllegalArgumentException();
-        }
-        try {
-            setDate(user);
-        } catch (ParseException pe) {
-            throw new IllegalArgumentException("Hit ParseException trying to construct with " + user);
-        }
-    }
-
-    public Object clone() {
-        Datestamp twin = new Datestamp();
-        twin.timestamp = this.timestamp;
-        return twin;
-    }
-
-    /**
-     * Set the date stamp to be today
-     */
-    public void setAsToday() {
-        try {
-            setDate(System.currentTimeMillis() / 1000);
-        } catch (ParseException pe) {
-            throw new DebugException(
-                    "ParseException thrown when using setDate on System.currentTimeMillis()!");
-        }
-    }
-
-    /**
-     * Quickly assert whether or not this Datestamp object has been set to
-     * something.
-     */
-    public boolean isSet() {
-        if (timestamp == 0) {
-            throw new IllegalStateException();
-        }
-        return (!(timestamp == UNSET));
+    public static long getToday() {
+        return System.currentTimeMillis() / 1000;
     }
 
     /**
      * Outputs Datestamp in dd MMM yy (%e %b %y) form.
      */
-    public String toString() {
-        if (timestamp == UNSET) {
+    public static String dateToString(long datestamp) {
+        if (datestamp == 0) {
             return "  UNSET  ";
         }
 
-        return Time.formatTime("%e %b %y", timestamp);
-    }
-
-    /**
-     * A convenience method to allow you to quickly set the datestamp based on
-     * previously generated Calendar objet.
-     * 
-     * @param cal
-     *            a Calendar object (perhaps the result of having done a
-     *            selection with a Gtk{@link org.gnu.gtk.Calendar}) which is
-     *            aligned on date boundary.
-     */
-    public void setDate(Calendar cal) {
-        /*
-         * TODO validate that the cal object is in fact date aligned.
-         */
-        this.timestamp = cal.getTimeInMillis() / 1000;
-    }
-
-    /**
-     * 
-     * @param timestamp
-     *            a "milliseconds since" timestamp value. Must be a day,
-     *            exactly, or rather, it will be renderded down to one.
-     * @throws ParseException
-     *             if the timestamp passed in does't result in a date.
-     */
-    public void setDate(long timestamp) throws ParseException {
-        /*
-         * To validate (ie, reduce it down to a round day + 0 milliseconds),
-         * Get a Date, render it as in our string format (which has only day
-         * precision) and then parse the result back into a Datestamp.
-         */
-        Date roughDate = new Date(timestamp);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy");
-        String dayMonYear = sdf.format(roughDate);
-        setDate(dayMonYear);
+        return Time.formatTime("%e %b %y", datestamp);
     }
 
     /**
@@ -161,7 +57,11 @@ public class Datestamp implements Comparable<Datestamp>
      * @param user
      *            the String to parse into a Datestamp if possible.
      */
-    public void setDate(String user) throws ParseException {
+    public static long stringToDate(String user) throws ParseException {
+        return stringToDate(user, 0L);
+    }
+
+    public static long stringToDate(String user, long last) throws ParseException {
         SimpleDateFormat fullsdf = new SimpleDateFormat("dd MMM yy");
         java.util.Calendar cal = java.util.Calendar.getInstance();
         fullsdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -188,12 +88,11 @@ public class Datestamp implements Comparable<Datestamp>
              * exception will be thrown.
              */
 
-            if (timestamp == UNSET) {
+            if (last == 0) {
                 cal.setTime(new Date());
             } else {
-                cal.setTime(new Date(timestamp * 1000)); // use this
-                // Datestamp's
-                // year
+                // use this Datestamp's year
+                cal.setTime(new Date(last * 1000));
             }
 
             String assumedYear = Integer.toString(cal.get(java.util.Calendar.YEAR));
@@ -221,56 +120,6 @@ public class Datestamp implements Comparable<Datestamp>
             // rethrow, having avoided fallback ladder.
             throw new ParseException(iae.getMessage(), 0);
         }
-        this.timestamp = d.getTime() / 1000;
-    }
-
-    /**
-     * Returns a java.util.Date that is equivalent to this Datestamp.
-     */
-    public Date getDate() {
-        if (timestamp == 0) {
-            throw new NotActivatedException();
-        }
-        return new Date(timestamp);
-    }
-
-    /**
-     * Get the internal timestamp which backs this Datestamp object. Exposed
-     * only so things like sorting can be done more effectively.
-     * 
-     * @return a long value. Note that this class only works to day precision
-     *         - hours and seconds are (supposed to be) zero.
-     */
-    public long getInternalTimestamp() {
-        if (timestamp == 0) {
-            throw new NotActivatedException();
-        }
-        return timestamp;
-    }
-
-    /**
-     * Compare two Datestamp objects. [This method implements Comparable
-     * interface]
-     * 
-     * @return 1 if this one is greater (newer, more recent) than the argument
-     *         x, -1 if this Datestmap is less than (older) than x, and 0 if
-     *         they are the same.
-     */
-    public int compareTo(Datestamp x) {
-        if (x == null) {
-            throw new NullPointerException("Can't compareTo() against null");
-        }
-        if (timestamp == 0) {
-            throw new NotActivatedException();
-        }
-        Datestamp d = x;
-
-        if (this.timestamp > d.timestamp) {
-            return 1;
-        } else if (this.timestamp < d.timestamp) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return d.getTime() / 1000;
     }
 }

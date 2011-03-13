@@ -16,9 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted via http://research.operationaldynamics.com/projects/objective/.
  */
-package accounts.ui;
-
-import generic.ui.ChangeListener;
+package objective.ui;
 
 import java.text.ParseException;
 
@@ -40,7 +38,6 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WindowPosition;
 
-
 import static org.freedesktop.bindings.Time.makeTime;
 
 /**
@@ -52,13 +49,12 @@ import static org.freedesktop.bindings.Time.makeTime;
  */
 public class DatePicker extends HBox
 {
-    private Datestamp date = null;
+    private long datestamp;
 
-    private static Datestamp lastSelectedDate = null;
+    private static long lastSelectedDatestamp;
 
     static {
-        lastSelectedDate = new Datestamp();
-        lastSelectedDate.setAsToday();
+        lastSelectedDatestamp = Datestamp.getToday();
     }
 
     private Entry entry = null;
@@ -67,7 +63,7 @@ public class DatePicker extends HBox
 
     private DatePickerPopup popup = null;
 
-    private ChangeListener changeListener;
+    private DatePicker.Updated handler;
 
     /**
      * Instantiate a new DatePicker widget. The date will be (a clone of) the
@@ -76,11 +72,12 @@ public class DatePicker extends HBox
      */
     public DatePicker() {
         super(false, 3);
-        date = (Datestamp) lastSelectedDate.clone();
+
+        datestamp = lastSelectedDatestamp;
 
         entry = new Entry();
         entry.setWidthChars(9);
-        entry.setText(date.toString());
+        entry.setText(Datestamp.dateToString(datestamp));
 
         pick = new Button();
         Image icon = new Image(Stock.INDEX, IconSize.BUTTON);
@@ -105,8 +102,10 @@ public class DatePicker extends HBox
 
         entry.connect(new Editable.Changed() {
             public void onChanged(Editable source) {
+                final String str;
                 try {
-                    date.setDate(entry.getText());
+                    str = entry.getText();
+                    datestamp = Datestamp.stringToDate(str, lastSelectedDatestamp);
                 } catch (ParseException pe) {
                     return;
                 }
@@ -115,11 +114,16 @@ public class DatePicker extends HBox
 
         entry.connect(new Entry.Activate() {
             public void onActivate(Entry source) {
-                entry.setText(date.toString());
+                final String str;
+
+                str = Datestamp.dateToString(datestamp);
+                entry.setText(str);
                 entry.setPosition(9);
 
-                if (changeListener != null) {
-                    changeListener.userChangedData();
+                lastSelectedDatestamp = datestamp;
+
+                if (handler != null) {
+                    handler.onUpdated(datestamp);
                 }
             };
         });
@@ -164,7 +168,8 @@ public class DatePicker extends HBox
                         window.hide();
                         return true;
                     } else if ((key == Keyval.Home) || (key == Keyval.t)) {
-                        date.setAsToday();
+                        datestamp = Datestamp.getToday();
+                        setDate(datestamp);
                         present();
                         return true;
                     } else if (key == Keyval.Return) {
@@ -204,20 +209,28 @@ public class DatePicker extends HBox
 
         private void applySelection() {
             final long seconds;
+            final String str;
 
             window.hide();
 
             seconds = makeTime(calendar.getDateYear(), calendar.getDateMonth(), calendar.getDateDay(),
                     0, 0, 0);
-            try {
-                date.setDate(seconds * 1000);
-            } catch (ParseException pe) {
-                return;
-            }
-            entry.setText(date.toString());
 
-            if (changeListener != null) {
-                changeListener.userChangedData();
+            /*
+             * Do a round trip to ensure it's rounded to Zulu day
+             */
+
+            str = Datestamp.dateToString(seconds);
+            try {
+                datestamp = Datestamp.stringToDate(str);
+            } catch (ParseException e) {
+                throw new AssertionError();
+            }
+
+            entry.setText(str);
+
+            if (handler != null) {
+                handler.onUpdated(datestamp);
             }
         }
 
@@ -226,7 +239,7 @@ public class DatePicker extends HBox
              * TODO there a better way to do this?
              */
             java.util.Calendar cal = java.util.Calendar.getInstance();
-            cal.setTime(date.getDate());
+            cal.setTimeInMillis(datestamp * 1000);
 
             int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
             int month = cal.get(java.util.Calendar.MONTH) + 1;
@@ -244,28 +257,27 @@ public class DatePicker extends HBox
     }
 
     /**
-     * Attach a ChangeListener to this DatePicker.
-     * 
-     * @see AmountEntry#addListener(ChangeListener) for a full description
+     * Connect an DatePicker.Updated handler.
      */
-    public void addListener(ChangeListener listener) {
-        if (changeListener != null) {
-            throw new IllegalStateException(
-                    "You can't have more than one ChangeListener on a DatePicker");
+    public void connect(DatePicker.Updated handler) {
+        if (this.handler != null) {
+            throw new IllegalStateException("You can't have more than one Updated handler");
         }
-        changeListener = listener;
+        this.handler = handler;
     }
 
-    /*
-     * Getters and Setters --------------------------------
-     */
-    public Datestamp getDate() {
-        return date;
+    public long getDate() {
+        return datestamp;
     }
 
-    public void setDate(Datestamp date) {
-        this.date = date;
-        entry.setText(date.toString());
+    public void setDate(long datestamp) {
+        this.datestamp = datestamp;
+        entry.setText(Datestamp.dateToString(datestamp));
         entry.setPosition(9);
+    }
+
+    public interface Updated
+    {
+        public void onUpdated(long datestamp);
     }
 }
