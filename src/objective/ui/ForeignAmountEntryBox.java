@@ -75,6 +75,7 @@ public class ForeignAmountEntryBox extends HBox
 
         foreign = new AmountEntry();
         foreign.setAmount(0); // dummy
+        foreign.modifyText(StateType.NORMAL, Color.RED);
         packStart(foreign, false, false, 0);
 
         selector = new CurrencySelector(data);
@@ -88,6 +89,7 @@ public class ForeignAmountEntryBox extends HBox
 
         exchange = new Entry();
         exchange.setWidthChars(8);
+        exchange.setText("1.00000");
         packStart(exchange, false, false, 0);
         gray.add(exchange);
 
@@ -110,12 +112,18 @@ public class ForeignAmountEntryBox extends HBox
                 final double rate;
                 final long value;
 
+                if (amount == 0) {
+                    foreign.modifyText(StateType.NORMAL, Color.RED);
+                    return;
+                } else {
+                    foreign.modifyText(StateType.NORMAL, Color.BLACK);
+                }
+
                 currency = selector.getCurrency();
 
                 str = exchange.getText();
                 rate = ForeignAmount.stringToRate(str);
-
-                value = Math.round(amount * rate);
+                value = ForeignAmount.calculateValue(amount, rate);
 
                 /*
                  * When you change the foreign amount, you just change the
@@ -152,8 +160,11 @@ public class ForeignAmountEntryBox extends HBox
 
                 exchange.setText(str);
 
-                value = Math.round(rate * amount);
+                value = ForeignAmount.calculateValue(amount, rate);
                 local.setAmount(value);
+                if (value == 0) {
+                    local.modifyText(StateType.NORMAL, Color.RED);
+                }
 
                 grayOut();
 
@@ -189,7 +200,7 @@ public class ForeignAmountEntryBox extends HBox
                 }
 
                 amount = foreign.getAmount();
-                value = Math.round(amount * rate);
+                value = ForeignAmount.calculateValue(amount, rate);
                 local.setAmount(value);
             }
         });
@@ -217,7 +228,7 @@ public class ForeignAmountEntryBox extends HBox
 
                 currency = selector.getCurrency();
 
-                value = Math.round(amount * rate);
+                value = ForeignAmount.calculateValue(amount, rate);
                 local.setAmount(value);
 
                 lastRates.put(currency, formatted);
@@ -252,6 +263,13 @@ public class ForeignAmountEntryBox extends HBox
 
                 amount = foreign.getAmount();
 
+                if (value == 0) {
+                    local.modifyText(StateType.NORMAL, Color.RED);
+                    return;
+                } else {
+                    local.modifyText(StateType.NORMAL, Color.BLACK);
+                }
+
                 /*
                  * No need to set faceValue - after all, changing the home
                  * value manually only imacts the effective exchange rate.
@@ -259,15 +277,26 @@ public class ForeignAmountEntryBox extends HBox
 
                 currency = selector.getCurrency();
 
-                rate = (double) value / (double) amount;
+                rate = ForeignAmount.calculateRate(amount, value);
                 str = ForeignAmount.rateToString(rate);
                 exchange.setText(str);
-
                 lastRates.put(currency, str);
 
                 if (handler != null) {
                     handler.onUpdated(amount, currency, value);
                 }
+            }
+        });
+
+        local.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                long value;
+
+                value = local.getAmount();
+                if (value == 0) {
+                    local.modifyText(StateType.NORMAL, Color.RED);
+                }
+                return false;
             }
         });
 
@@ -311,19 +340,24 @@ public class ForeignAmountEntryBox extends HBox
     }
 
     public void setAmount(long amount, Currency currency, long value) {
-        final double rate;
+        double rate;
         final String str;
 
         foreign.setAmount(amount);
 
-        rate = (double) value / (double) amount;
+        if (amount == 0) {
+            foreign.modifyText(StateType.NORMAL, Color.RED);
+            rate = 1.0;
+        } else {
+            rate = ForeignAmount.calculateRate(amount, value);
+        }
+
         str = ForeignAmount.rateToString(rate);
+
         lastRates.put(currency, str);
 
         selector.setCurrency(currency);
-
         exchange.setText(str);
-
         local.setAmount(value);
 
         grayOut();
