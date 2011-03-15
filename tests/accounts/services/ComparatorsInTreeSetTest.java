@@ -38,6 +38,7 @@ import objective.domain.SalesTaxPayableAccount;
 import objective.domain.Transaction;
 import objective.services.AccountComparator;
 import objective.services.EntryComparator;
+import objective.services.TransactionComparator;
 
 import accounts.domain.Amount;
 import accounts.persistence.BlankDatafileTestCase;

@@ -29,8 +29,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import objective.domain.Transaction;
+import objective.services.TransactionComparator;
 
-import accounts.services.TransactionComparator;
 
 /**
  * Output the contents of a Transaction in a human readable text form.

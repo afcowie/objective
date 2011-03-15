@@ -20,12 +20,13 @@ package accounts.ui;
 
 import objective.domain.Currency;
 import objective.domain.GenericTransaction;
+import objective.domain.ReimbursableTransaction;
 import objective.domain.Transaction;
-import generic.ui.EditorWindow;
+import objective.ui.EditorWindow;
+import objective.ui.ReimbursableExpensesEditorWindow;
 import generic.ui.PrimaryWindow;
 import generic.ui.UserInterface;
 import accounts.domain.PayrollTransaction;
-import accounts.domain.ReimbursableExpensesTransaction;
 import country.au.ui.AustralianPayrollEditorWindow;
 
 /**
@@ -72,7 +73,7 @@ public class ObjectiveUserInterface extends UserInterface
 
             if (target instanceof PayrollTransaction) {
                 editor = new AustralianPayrollEditorWindow(id);
-            } else if (target instanceof ReimbursableExpensesTransaction) {
+            } else if (target instanceof ReimbursableTransaction) {
                 editor = new ReimbursableExpensesEditorWindow(id);
             } else if (target instanceof GenericTransaction) {
                 editor = new GenericTransactionEditorWindow(id);

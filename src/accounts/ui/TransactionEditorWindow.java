@@ -19,9 +19,9 @@
 package accounts.ui;
 
 import generic.client.Master;
-import generic.ui.EditorWindow;
 import generic.util.DebugException;
 import objective.domain.Transaction;
+import objective.ui.EditorWindow;
 
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;

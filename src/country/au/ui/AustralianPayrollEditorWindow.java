@@ -19,20 +19,25 @@
 package country.au.ui;
 
 import generic.ui.Align;
-import generic.ui.ChangeListener;
-import generic.ui.EditorWindow;
 import generic.ui.TwoColumnTable;
-import generic.util.Debug;
 
 import java.util.List;
 
+import objective.domain.Amount;
 import objective.domain.Credit;
 import objective.domain.Datestamp;
 import objective.domain.Debit;
+import objective.domain.Employee;
 import objective.domain.Entry;
 import objective.domain.Ledger;
 import objective.services.NotFoundException;
+import objective.ui.AmountDisplay;
+import objective.ui.AmountEntry;
+import objective.ui.DatePicker;
+import objective.ui.EditorWindow;
+import objective.ui.WorkerPicker;
 
+import org.freedesktop.bindings.Debug;
 import org.gnome.gtk.ComboBox;
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
@@ -42,21 +47,14 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.WarningMessageDialog;
 import org.gnome.gtk.Widget;
 
-import accounts.domain.Amount;
-import accounts.domain.Employee;
 import accounts.domain.IdentifierGroup;
 import accounts.domain.PayrollTransaction;
-import accounts.services.CommandNotReadyException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.RangeCalculator;
 import accounts.services.SpecificLedgerFinder;
 import accounts.services.UpdateTransactionCommand;
-import accounts.ui.AmountDisplay;
-import accounts.ui.AmountEntry;
-import accounts.ui.DatePicker;
 import accounts.ui.IdentifierSelector;
 import accounts.ui.RangePicker;
-import accounts.ui.WorkerPicker;
 import country.au.domain.AustralianPayrollTaxIdentifier;
 import country.au.services.AustralianPayrollTaxCalculator;
 
@@ -363,7 +361,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
          * salary or paycheck entry fields.
          */
 
-        salary_AmountEntry.addListener(new ChangeListener() {
+        salary_AmountEntry.connect(new ChangeListener() {
             public void userChangedData() {
 
                 Debug.print("listeners", me + " in salary_AmountEntry's changed(), salary now "
@@ -391,7 +389,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
         /*
          * Now paycheck... mirror image of salary case above.
          */
-        paycheck_AmountEntry.addListener(new ChangeListener() {
+        paycheck_AmountEntry.connect(new ChangeListener() {
             public void userChangedData() {
 
                 Debug.print("listeners", me + " in paycheck_AmountEntry's changed(), paycheck now "

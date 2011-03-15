@@ -33,6 +33,10 @@ import objective.domain.DebitPositiveLedger;
 import objective.domain.Entry;
 import objective.domain.ForeignAmount;
 import objective.domain.GenericTransaction;
+import objective.ui.AccountLedgerPicker;
+import objective.ui.AmountDisplay;
+import objective.ui.DatePicker;
+import objective.ui.ForeignAmountEntryBox;
 
 import org.gnome.gtk.Button;
 import org.gnome.gtk.Dialog;
@@ -309,7 +313,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
          * UI elements
          */
 
-        private AccountPicker accountPicker = null;
+        private AccountLedgerPicker accountPicker = null;
 
         private ForeignAmountEntryBox amountEntry = null;
 
@@ -350,7 +354,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
 
             box = this;
 
-            accountPicker = new AccountPicker(store);
+            accountPicker = new AccountLedgerPicker(store);
             try {
                 accountPicker.setLedger(e.getParentLedger());
             } catch (IllegalArgumentException iae) {

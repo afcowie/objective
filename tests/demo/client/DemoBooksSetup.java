@@ -20,7 +20,6 @@ package demo.client;
 
 import generic.persistence.DataClient;
 import generic.persistence.Engine;
-import generic.util.Debug;
 
 import java.io.File;
 
@@ -32,6 +31,7 @@ import objective.domain.CashAccount;
 import objective.domain.Currency;
 import objective.domain.DebitPositiveLedger;
 import objective.domain.DepreciatingAssetAccount;
+import objective.domain.Employee;
 import objective.domain.GenericExpenseAccount;
 import objective.domain.Ledger;
 import objective.domain.LoanPayableAccount;
@@ -40,12 +40,9 @@ import objective.domain.PayrollTaxPayableAccount;
 import objective.domain.ProfessionalRevenueAccount;
 import objective.domain.ReimbursableExpensesPayableAccount;
 import objective.domain.SalesTaxPayableAccount;
-
 import accounts.domain.Books;
 import accounts.domain.Client;
-import accounts.domain.Employee;
 import accounts.domain.Entity;
-import accounts.domain.LoanLedger;
 import accounts.domain.Supplier;
 import accounts.services.AddAccountCommand;
 import accounts.services.AddCurrencyCommand;
@@ -76,22 +73,12 @@ public class DemoBooksSetup
     public final static String DEMO_DATABASE = "tmp/demo.yap";
 
     public static void main(String[] args) {
-        Debug.setProgname("setup");
-        Debug.register("main");
-        Debug.register("command");
-        Debug.register("memory");
-
-        args = Debug.init(args);
-        Debug.print("main", "Starting OprDynBooksSetup");
-
         new File(DEMO_DATABASE).delete();
 
-        Debug.print("main", "Creating database " + DEMO_DATABASE);
         Engine.newDatafile(DEMO_DATABASE, Books.class);
 
         DataClient rw = Engine.gainClient();
 
-        Debug.print("main", "Running commands...");
         try {
             InitBooksCommand initBooks = new AustralianInitBooksCommand();
             initBooks.execute(rw);
@@ -158,8 +145,6 @@ public class DemoBooksSetup
                 }),
             };
 
-            Debug.print("main", "Create a whole ton of accounts");
-
             for (int i = 0; i < realAccounts.length; i++) {
                 Account a = realAccounts[i];
 
@@ -182,13 +167,11 @@ public class DemoBooksSetup
                 aac.execute(rw);
             }
 
-            Debug.print("main", "Committing.");
             rw.commit();
 
             /*
              * Now setup some other currencies
              */
-            Debug.print("main", "Set up some currencies");
 
             Currency[] currencies = {
                 new Currency("CAD", "Canadian Dollar", "$"),
@@ -207,13 +190,11 @@ public class DemoBooksSetup
                 acc.execute(rw);
             }
 
-            Debug.print("main", "Committing.");
             rw.commit();
 
             /*
              * Add a few notional business relations
              */
-            Debug.print("main", "Add a few Clients and Suppliers");
 
             Entity[] entities = {
                 new Client("ACME, Inc"),
@@ -225,13 +206,11 @@ public class DemoBooksSetup
                 aec.execute(rw);
             }
 
-            Debug.print("main", "Committing.");
             rw.commit();
 
             /*
              * Add some Workers
              */
-            Debug.print("main", "Add some Employees");
 
             Employee[] staff = {
                 new Employee("Andrew Cowie"),
@@ -243,7 +222,6 @@ public class DemoBooksSetup
                 awc.execute(rw);
             }
 
-            Debug.print("main", "Committing.");
             rw.commit();
         } catch (CommandNotReadyException cnre) {
             rw.rollback();
@@ -257,6 +235,5 @@ public class DemoBooksSetup
         Engine.releaseClient(rw);
         Engine.shutdown();
 
-        Debug.print("main", "Done.");
     }
 }

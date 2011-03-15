@@ -30,15 +30,15 @@ import objective.domain.Credit;
 import objective.domain.Currency;
 import objective.domain.Datestamp;
 import objective.domain.Debit;
+import objective.domain.Employee;
 import objective.domain.Entry;
 import objective.domain.ForeignAmount;
 import objective.domain.GenericTransaction;
 import objective.domain.Ledger;
+import objective.domain.ReimbursableTransaction;
 import objective.domain.Transaction;
 import accounts.domain.Books;
-import accounts.domain.Employee;
 import accounts.domain.PayrollTransaction;
-import accounts.domain.ReimbursableExpensesTransaction;
 import accounts.services.CommandNotReadyException;
 import accounts.services.PostTransactionCommand;
 import accounts.services.SpecificLedgerFinder;
@@ -235,22 +235,22 @@ public class DemoMockTransactions
                             new Credit(new Amount("19545.45"), consultingRevenue),
                             new Credit(new Amount("1954.55"), gstCollected),
                         }),
-                new ReimbursableExpensesTransaction(andrew, "Dinner during WSIS", new Datestamp(
+                new ReimbursableTransaction(andrew, "Dinner during WSIS", new Datestamp(
                         "11 Dec 03"), new Entry[] {
                     new Debit(new ForeignAmount("67.00", chf, "1.0657"), travelMeals),
                     new Credit(new Amount("71.40"), andrew.getExpensesPayable()),
                 }),
-                new ReimbursableExpensesTransaction(andrew, "Dorcheseter Hotel London", new Datestamp(
+                new ReimbursableTransaction(andrew, "Dorcheseter Hotel London", new Datestamp(
                         "14 Sep 04"), new Entry[] {
                     new Debit(new ForeignAmount("242.16", gbp, "2.5606"), hotels),
                     new Credit(new Amount("620.07"), andrew.getExpensesPayable()),
                 }),
-                new ReimbursableExpensesTransaction(andrew, "Taxi from CDG to Paris", new Datestamp(
+                new ReimbursableTransaction(andrew, "Taxi from CDG to Paris", new Datestamp(
                         "27 Mar 05"), new Entry[] {
                     new Credit(new Amount("16.77"), andrew.getExpensesPayable()),
                     new Debit(new ForeignAmount("9.99", eur, "1.67819"), groundTransport),
                 }),
-                new ReimbursableExpensesTransaction(katrina, "Coffee at Bacino", new Datestamp(
+                new ReimbursableTransaction(katrina, "Coffee at Bacino", new Datestamp(
                         "4 May 06"), new Entry[] {
                     new Credit(new Amount("11.50"), katrina.getExpensesPayable()),
                     new Debit(new Amount("10.45"), staffMeetings),

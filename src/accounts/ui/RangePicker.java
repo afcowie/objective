@@ -19,6 +19,7 @@
 package accounts.ui;
 
 import objective.domain.Datestamp;
+import objective.ui.DatePicker;
 
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;

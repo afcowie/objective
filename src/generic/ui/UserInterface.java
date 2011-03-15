@@ -18,10 +18,6 @@
  */
 package generic.ui;
 
-import generic.client.Hooks;
-import generic.client.Master;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -29,10 +25,10 @@ import java.util.Map;
 import java.util.Set;
 
 import objective.persistence.DomainObject;
+import objective.ui.EditorWindow;
 
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.CursorType;
-import org.gnome.gtk.Gtk;
 
 /**
  * Central touch point to cause user interface wide actions to occur. An
@@ -60,31 +56,6 @@ public abstract class UserInterface
     private Cursor workingPointer;
 
     /**
-     * Register a window as ready for display to the user. While one of our
-     * Window subclasses can, of course, call present on itself perfectly
-     * well, we delegate here so that global state such as the list of open
-     * windows is maintained.
-     * 
-     * @param w
-     */
-    protected void regsiterWindow(PrimaryWindow w) {
-        windows.add(w);
-    }
-
-    protected void deregisterWindow(PrimaryWindow w) {
-        windows.remove(w);
-
-        if (w instanceof EditorWindow) {
-            if (editorsToIds.containsKey(w)) {
-                Long ID = (Long) editorsToIds.remove(w);
-                idsToEditors.remove(ID);
-
-                propegateUpdate(ID.longValue());
-            }
-        }
-    }
-
-    /**
      * Register a Hooks callback which cleanly dismisses any open
      * PrimaryWindows on shutdown.
      */
@@ -93,45 +64,6 @@ public abstract class UserInterface
         editorsToIds = new HashMap();
 
         updateListeners = new LinkedHashSet();
-
-        Master.registerCallback(new Hooks() {
-            public void shutdown() {
-                try {
-                    /*
-                     * EditorWindows, in normal circumstances, politely
-                     * deregister themselves when being deleted. This causes
-                     * the windows Set to change, which would result in
-                     * ConcurrentModificationException while we're working
-                     * through via the iterators, so we just quickly copy the
-                     * Set into a List and work through that instead.
-                     */
-                    ArrayList deadmeat = new ArrayList(windows);
-                    Iterator iter;
-
-                    iter = deadmeat.iterator();
-                    while (iter.hasNext()) {
-                        PrimaryWindow w = (PrimaryWindow) iter.next();
-                        w.hide();
-                    }
-
-                    iter = deadmeat.iterator();
-                    while (iter.hasNext()) {
-                        PrimaryWindow w = (PrimaryWindow) iter.next();
-                        w.deleteHook();
-                    }
-                } catch (Exception e) {
-                }
-
-                /*
-                 * Give the everything else a change to settle, ie for the
-                 * DataClients released to Engine to be cleaned up.
-                 */
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                }
-            }
-        });
 
         normalPointer = new Cursor(CursorType.LEFT_PTR);
         workingPointer = new Cursor(CursorType.WATCH);

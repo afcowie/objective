@@ -19,7 +19,6 @@
 package generic.persistence;
 
 import generic.domain.Root;
-import generic.util.Debug;
 import generic.util.DebugException;
 
 import java.io.File;
@@ -77,9 +76,6 @@ public final class DataServer
      * use of the Db4o classs, so here it is.
      */
     static {
-        Debug.register("db4o");
-        Debug.register("pool");
-
         Configuration config = Db4o.configure();
         // config.messageLevel(3);
         config.callbacks(true);
@@ -208,7 +204,6 @@ public final class DataServer
         DataClient client = null;
         synchronized (poolInUse) {
             if (poolAvailable.size() > 0) {
-                Debug.print("pool", "Getting client from pool");
                 client = poolAvailable.removeLast();
                 if (client.getUnderlyingContainer().isClosed()) {
                     throw new IllegalStateException("Client retrieved from pool is closed!");
@@ -218,7 +213,6 @@ public final class DataServer
                             "How can it pull null as a DataClient from the available pool?");
                 }
             } else {
-                Debug.print("pool", "Opening new client");
 
                 ObjectContainer container;
                 try {
@@ -270,7 +264,6 @@ public final class DataServer
         client.clearCachedReferences();
 
         synchronized (poolInUse) {
-            Debug.print("pool", "Returning client to pool");
             poolAvailable.addLast(client);
         }
         poolStatus();
@@ -286,7 +279,6 @@ public final class DataServer
     void close() {
         synchronized (poolInUse) {
             if (poolInUse.size() > 0) {
-                Debug.print("pool", "WARNING: There are still released connections!");
             }
 
             for (DataClient client : poolInUse) {
@@ -355,8 +347,6 @@ public final class DataServer
 
     final void poolStatus() {
         synchronized (poolInUse) {
-            Debug.print("pool", "status: " + poolInUse.size() + " in use, " + poolAvailable.size()
-                    + " available");
         }
     }
 
