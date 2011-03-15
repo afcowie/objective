@@ -782,10 +782,14 @@ public class DataStore
         stmt.bindInteger(1, datestamp);
 
         description = t.getDescription();
-        stmt.bindText(2, description);
+        if ((description == null) || (description.equals(""))) {
+            stmt.bindNull(2);
+        } else {
+            stmt.bindText(2, description);
+        }
 
         reference = t.getReference();
-        if (reference == null) {
+        if ((reference == null) || (reference.equals(""))) {
             stmt.bindNull(3);
         } else {
             stmt.bindText(3, reference);

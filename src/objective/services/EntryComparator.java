@@ -61,8 +61,8 @@ public class EntryComparator implements Comparator<Entry>
             /*
              * First off, sort by date.
              */
-            time1 = e1.getParentTransaction().getDate().getInternalTimestamp();
-            time2 = e2.getParentTransaction().getDate().getInternalTimestamp();
+            time1 = e1.getParentTransaction().getDate();
+            time2 = e2.getParentTransaction().getDate();
 
             if (time1 < time2) {
                 return -1;

@@ -20,8 +20,11 @@ package objective.services;
 
 import java.util.ArrayList;
 
+import objective.domain.Currency;
 import objective.domain.Entry;
+import objective.domain.Ledger;
 import objective.domain.Transaction;
+import objective.domain.Worker;
 import objective.persistence.DataStore;
 import objective.persistence.Operation;
 
@@ -49,26 +52,77 @@ public class TransactionOperations extends Operation
         }
     }
 
-    public void postTransaction(Transaction t, Entry... entries) {
+    public void postTransaction(Transaction transaction, Entry... entries) {
         int i;
         final int I;
-        Entry e;
-
-        if (t.getID() == 0) {
-            data.createTransaction(t);
-        }
-
-        data.updateTransaction(t);
+        Entry entry;
 
         I = entries.length;
 
-        for (i = 0; i < I; i++) {
-            e = entries[i];
+        /*
+         * Validate
+         */
 
-            if (e.getID() == 0) {
-                data.createEntry(e);
+        validate(transaction);
+
+        for (i = 0; i < I; i++) {
+            entry = entries[i];
+            validate(entry);
+        }
+
+        /*
+         * Post
+         */
+
+        try {
+            data.begin();
+
+            if (transaction.getID() == 0) {
+                data.createTransaction(transaction);
             }
-            data.updateEntry(e);
+            data.updateTransaction(transaction);
+
+            for (i = 0; i < I; i++) {
+                entry = entries[i];
+
+                if (entry.getID() == 0) {
+                    data.createEntry(entry);
+                }
+                data.updateEntry(entry);
+            }
+
+            data.commit();
+        } catch (RuntimeException re) {
+            data.rollback();
+            throw re;
+        }
+    }
+
+    /**
+     * Ensure the Transaction is in proper form.
+     */
+    /*
+     * We assume our code can get this right, so failing validity is a
+     * programmer error, not a user one. Hence unchecked exceptions.
+     */
+    private static void validate(Transaction t) {
+        if (t.getDate() == 0L) {
+            throw new IllegalStateException("\n" + "Date must be set before you can post a Transaction");
+        }
+    }
+
+    /**
+     * Ensure the Entry is in proper form.
+     */
+    private static void validate(Entry e) {
+        if (e.getAmount() == 0L) {
+            throw new IllegalStateException("\n" + "Entry amount can't be 0");
+        }
+        if (e.getValue() == 0L) {
+            throw new IllegalStateException("\n" + "Entry value can't be 0");
+        }
+        if (e.getCurrency() == null) {
+            throw new IllegalStateException("\n" + "Entry Currency must be set");
         }
     }
 
@@ -118,5 +172,36 @@ public class TransactionOperations extends Operation
         result = list.toArray(result);
 
         return result;
+    }
+
+    /**
+     * Find the Worker that owns a given ReimbursableExpensesLiabilityAccount
+     * » Ledger.
+     */
+    /*
+     * Assumes that this Ledger corresponds to a Worker's expenses payable,
+     * which is rather unsafe!
+     */
+    public Worker findWorker(Ledger l) {
+        final Statement stmt;
+        final long ledgerId, workerId;
+        final Worker worker;
+
+        stmt = db.prepare("SELECT worker_id FROM workers w, ledgers l WHERE l.ledger_id = ? AND w.ledger_id = l.ledger_id");
+
+        ledgerId = l.getID();
+        stmt.bindInteger(1, ledgerId);
+
+        stmt.step();
+        workerId = stmt.columnInteger(0);
+        worker = data.lookupWorker(workerId);
+
+        stmt.finish();
+
+        return worker;
+    }
+
+    public Currency findCurrencyHome() {
+        return data.lookupCurrency("AUD");
     }
 }
