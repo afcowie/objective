@@ -27,94 +27,79 @@ import org.gnome.gtk.GraphicalTestCase;
 public class ValidateDatestamp extends GraphicalTestCase
 {
     public final void testValidDatestampStringInput() {
-        Datestamp stamp = new Datestamp();
+        long date;
+
+        date = -1L;
 
         try {
-            stamp.setDate("28 Dec 73");
+            date = Datestamp.stringToDate("28 Dec 73");
         } catch (ParseException pe) {
             fail("Shouldn't have thrown ParseException" + pe.getMessage());
         }
-        assertEquals("First test failed", "28 Dec 73", stamp.toString());
+        assertEquals("First test failed", 125884800, date);
 
         /*
          * Implicit year should feed off of the existing stamp, whatever it is
          */
+
         try {
-            stamp.setDate("28 Dec");
+            date = Datestamp.stringToDate("28 Dec", 94694401);
         } catch (ParseException pe) {
             fail("Shouldn't have thrown ParseException" + pe.getMessage());
         }
-        assertEquals("Assumed existing year test failed", "28 Dec 73", stamp.toString());
+        assertEquals("Assumed existing year test failed", 125884800, date);
 
         /*
          * Now test the default of using the current year.
          */
-        stamp = new Datestamp();
+
         try {
-            stamp.setDate("28 Dec");
+            date = Datestamp.stringToDate("28 Dec", 0L);
         } catch (ParseException pe) {
             fail("Shouldn't have thrown ParseException" + pe.getMessage());
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yy");
         String expectedYear = sdf.format(new Date());
-        assertEquals("Current year failed", "28 Dec " + expectedYear, stamp.toString());
+        assertEquals("Current year failed", "28 Dec " + expectedYear, Datestamp.dateToString(date));
 
         /*
          * Now test the input with only a day
          */
-        stamp = new Datestamp();
+
         try {
-            stamp.setDate("15");
+            date = Datestamp.stringToDate("15", 0L);
         } catch (ParseException pe) {
             fail("'15' shouldn't have thrown ParseException" + pe.getMessage());
         }
         sdf = new SimpleDateFormat("MMM");
         String expectedMonth = sdf.format(new Date());
-        assertEquals("Day only failed", "15 " + expectedMonth + " " + expectedYear, stamp.toString());
+        assertEquals("Day only failed", "15 " + expectedMonth + " " + expectedYear,
+                Datestamp.dateToString(date));
     }
 
     public final void testInvalidDatestampStringInput() {
-        Datestamp stamp;
-
-        stamp = new Datestamp();
         try {
-            stamp.setDate("15 Janvier 2005");
+            Datestamp.stringToDate("15 Janvier 2005");
             fail("Should have thrown exception");
         } catch (ParseException pe) {
         }
 
-        stamp = new Datestamp();
         try {
-            stamp.setDate("15 Fev");
+            Datestamp.stringToDate("15 Fev");
             fail("Should have thrown exception");
         } catch (ParseException pe) {
         }
 
-        stamp = new Datestamp();
         try {
-            stamp.setDate("15 Jan 1907");
-            fail("Should have parsed as " + stamp.toString());
+            Datestamp.stringToDate("15 Jan 1907");
         } catch (ParseException pe) {
         }
     }
 
-    public final void testCompareTo() {
-        final Datestamp one, two;
+    public final void testUnbiasedByTimezones() throws ParseException {
+        final long internal;
 
-        one = new Datestamp("28 Dec 73");
-        two = new Datestamp("18 Mar 74");
-
-        assertTrue(one.compareTo(two) == -1);
-        assertTrue(two.compareTo(one) == 1);
-        assertTrue(one.compareTo(one) == 0);
-    }
-
-    public final void testUnbiasedByTimezones() {
-        final Datestamp one;
-
-        one = new Datestamp("1 Jul 05");
-
-        long internal = one.getInternalTimestamp();
+        internal = Datestamp.stringToDate("1 Jul 05");
 
         double hours = ((double) internal) / 3600;
         assertTrue(Math.round(hours) == hours);
