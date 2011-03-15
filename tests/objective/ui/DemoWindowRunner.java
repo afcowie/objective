@@ -26,7 +26,6 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WindowPosition;
 
-
 public class DemoWindowRunner
 {
     public static void main(String[] args) {
@@ -40,7 +39,7 @@ public class DemoWindowRunner
 
         holder = new TemporaryHolder(data);
 
-        editor = new ReimbursableExpensesEditorWindow(data, 0);
+        editor = new ReimbursableExpensesEditorWindow(data, null);
         editor.setPosition(WindowPosition.CENTER_ALWAYS);
 
         editor.connect(new Window.DeleteEvent() {

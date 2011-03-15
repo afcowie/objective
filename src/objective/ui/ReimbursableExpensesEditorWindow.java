@@ -41,7 +41,6 @@ import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.WarningMessageDialog;
 
-
 /**
  * A Window where the expenses incurred by a Worker.
  * 
@@ -73,7 +72,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
     /**
      * Construct the Window.
      */
-    public ReimbursableExpensesEditorWindow(final DataStore data, final long rowid) {
+    public ReimbursableExpensesEditorWindow(final DataStore data, final ReimbursableTransaction t) {
         super();
         final SizeGroup group;
         Label label;
@@ -168,15 +167,12 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
         top.packStart(box, false, false, 0);
 
-        ReimbursableTransaction t;
-        if (rowid == 0) {
-            t = new ReimbursableTransaction();
-
+        if (t == null) {
             left = new Debit();
             right = new Credit();
-        } else {
-            t = (ReimbursableTransaction) services.findTransaction(rowid);
 
+            existing = new ReimbursableTransaction();
+        } else {
             datePicker.setDate(t.getDate());
             entries = services.findEntries(t);
 
@@ -196,8 +192,9 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
             }
             str = t.getDescription();
             descriptionEntry.setText(str);
+
+            existing = t;
         }
-        existing = t;
 
         window.showAll();
     }

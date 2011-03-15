@@ -18,7 +18,6 @@
  */
 package objective.ui;
 
-import generic.client.Master;
 import generic.ui.Text;
 
 import java.util.Iterator;
@@ -33,6 +32,7 @@ import objective.domain.Datestamp;
 import objective.domain.Debit;
 import objective.domain.Entry;
 import objective.domain.Ledger;
+import objective.domain.ReimbursableTransaction;
 import objective.domain.Transaction;
 import objective.persistence.DataStore;
 import objective.services.EntryComparator;
@@ -53,6 +53,7 @@ import org.gnome.gtk.TreeRowReference;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
+import org.gnome.gtk.Window;
 import org.gnome.pango.EllipsizeMode;
 
 import accounts.ui.TransactionEditorWindow;
@@ -283,12 +284,32 @@ public class TransactionListView extends TreeView
 
         view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
-                final TreeIter pointer = model.getIter(path); // TODO CHECK
-                final Transaction t = model.getValue(pointer, transactionObjectColumn);
+                final TreeIter row;
+                final Transaction t;
 
-                Master.ui.launchEditor(t);
+                row = model.getIter(path);
+                t = model.getValue(row, transactionObjectColumn);
+
+                launchEditor(t);
             }
         });
+    }
+
+    /*
+     * This used to live in a central place; perhaps it should go back one.
+     */
+    private void launchEditor(Transaction t) {
+        final ReimbursableTransaction rt;
+        final Window window;
+
+        if (t instanceof ReimbursableTransaction) {
+            rt = (ReimbursableTransaction) t;
+            window = new ReimbursableExpensesEditorWindow(data, rt);
+        } else {
+            return;
+        }
+
+        window.present();
     }
 
     private static final String DARKGRAY = "darkgray";
