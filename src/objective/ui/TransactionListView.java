@@ -29,6 +29,7 @@ import objective.domain.Account;
 import objective.domain.Amount;
 import objective.domain.Credit;
 import objective.domain.Currency;
+import objective.domain.Datestamp;
 import objective.domain.Debit;
 import objective.domain.Entry;
 import objective.domain.Ledger;
@@ -77,8 +78,6 @@ import static org.gnome.gtk.Alignment.TOP;
  */
 public class TransactionListView extends TreeView
 {
-    private transient Currency home = null;
-
     private final DataStore data;
 
     private final DataColumnString typeTextColumn;
@@ -134,8 +133,6 @@ public class TransactionListView extends TreeView
         CellRendererText renderer;
 
         this.data = data;
-
-        home = null; // FIXME
 
         typeTextColumn = new DataColumnString();
         typeSortColumn = new DataColumnString();
@@ -396,9 +393,9 @@ public class TransactionListView extends TreeView
         model.setValue(row, typeTextColumn, type.toString());
         model.setValue(row, typeSortColumn, t.getClassString());
 
-        model.setValue(row, dateTextColumn, "<span font_desc='Mono'>" + t.getDate().toString()
-                + "</span>");
-        model.setValue(row, dateSortColumn, t.getDate().getInternalTimestamp());
+        model.setValue(row, dateTextColumn, "<span font_desc='Mono'>"
+                + Datestamp.dateToString(t.getDate()) + "</span>");
+        model.setValue(row, dateSortColumn, t.getDate());
 
         final StringBuffer titleName = new StringBuffer();
         final String OPEN = "<b>";

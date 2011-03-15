@@ -18,10 +18,8 @@
  */
 package objective.ui;
 
-import generic.ui.EditorWindow;
 import objective.domain.Credit;
 import objective.domain.Currency;
-import objective.domain.Datestamp;
 import objective.domain.Debit;
 import objective.domain.Entry;
 import objective.domain.Ledger;
@@ -43,7 +41,6 @@ import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.WarningMessageDialog;
 
-import accounts.ui.DatePicker;
 
 /**
  * A Window where the expenses incurred by a Worker.
@@ -214,7 +211,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
         Transaction transaction;
         long amount, value;
         Currency currency;
-        Datestamp date;
+        long datestamp;
 
         worker = personPicker.getWorker();
         if (worker == null) {
@@ -298,8 +295,8 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
          * Transaction
          */
 
-        date = datePicker.getDate();
-        transaction.setDate(date);
+        datestamp = datePicker.getDate();
+        transaction.setDate(datestamp);
         transaction.setDescription(str);
 
         services.postTransaction(transaction, left, right);
