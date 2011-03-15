@@ -53,7 +53,6 @@ import org.gnome.gtk.TreeRowReference;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
-import org.gnome.gtk.Window;
 import org.gnome.pango.EllipsizeMode;
 
 import accounts.ui.TransactionEditorWindow;
@@ -300,7 +299,7 @@ public class TransactionListView extends TreeView
      */
     private void launchEditor(Transaction t) {
         final ReimbursableTransaction rt;
-        final Window window;
+        final EditorWindow window;
 
         if (t instanceof ReimbursableTransaction) {
             rt = (ReimbursableTransaction) t;
@@ -310,6 +309,24 @@ public class TransactionListView extends TreeView
         }
 
         window.present();
+
+        window.connect(new EditorWindow.Updated() {
+            public void onUpdated(Transaction updated) {
+                TreeIter row;
+                Transaction t;
+
+                row = model.getIterFirst();
+                do {
+                    t = model.getValue(row, transactionObjectColumn);
+                    if (updated == t) {
+                        populate(row);
+                        return;
+                    }
+                } while (row.iterNext());
+
+                throw new AssertionError();
+            }
+        });
     }
 
     private static final String DARKGRAY = "darkgray";

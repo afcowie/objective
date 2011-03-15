@@ -18,6 +18,8 @@
  */
 package objective.ui;
 
+import objective.domain.Transaction;
+
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonBoxStyle;
 import org.gnome.gtk.HButtonBox;
@@ -47,9 +49,13 @@ public abstract class EditorWindow extends Window
 
     private Button ok;
 
+    private EditorWindow.Updated handler;
+
+    private Transaction operand;
+
     /**
-     * Basic form of EditorWindow. Calls PrimaryWindow's constructor, then
-     * adds the button box with ok and close.
+     * Basic form of EditorWindow, for editing Transactions. Adds the button
+     * box with ok and close.
      */
     protected EditorWindow() {
         super();
@@ -72,7 +78,7 @@ public abstract class EditorWindow extends Window
         cancel = new Button(Stock.CANCEL);
         cancel.connect(new Button.Clicked() {
             public void onClicked(Button source) {
-                cancel();
+                handleCancel();
             }
         });
         buttonbox.add(cancel);
@@ -80,7 +86,7 @@ public abstract class EditorWindow extends Window
         ok = new Button(Stock.OK);
         ok.connect(new Button.Clicked() {
             public void onClicked(Button source) {
-                ok();
+                handleOk();
             }
         });
         buttonbox.add(ok);
@@ -90,10 +96,56 @@ public abstract class EditorWindow extends Window
         top.packEnd(separator, false, false, 3);
     }
 
-    protected void cancel() {
+    protected final void handleCancel() {
         window.hide();
         window.destroy();
     }
 
-    protected void ok() {}
+    private final void handleOk() {
+        /*
+         * Execute subclass's posting logic
+         */
+
+        ok();
+
+        /*
+         * Notify parent.
+         */
+
+        if (handler != null) {
+            handler.onUpdated(operand);
+        }
+    }
+
+    /**
+     * Override this method to carry out editor specific posting logic.
+     */
+    protected void ok() {
+        throw new UnsupportedOperationException("You must implement ok()");
+    }
+
+    /**
+     * The object of this EditorWindow's affection has changed, and been
+     * committed to the database.
+     * 
+     * @author Andrew Cowie
+     */
+    public interface Updated
+    {
+        public void onUpdated(Transaction t);
+    }
+
+    public void connect(EditorWindow.Updated handler) {
+        if (this.handler != null) {
+            throw new AssertionError();
+        }
+        this.handler = handler;
+    }
+
+    public void setOperand(Transaction t) {
+        if (t == null) {
+            throw new AssertionError();
+        }
+        this.operand = t;
+    }
 }

@@ -115,10 +115,11 @@ public class TransactionOperations extends Operation
         Entry entry;
         long debits, credits;
 
+        I = entries.length;
         debits = 0;
         credits = 0;
 
-        for (i = 0; i < entries.length; i++) {
+        for (i = 0; i < I; i++) {
             entry = entries[i];
             validate(entry);
 

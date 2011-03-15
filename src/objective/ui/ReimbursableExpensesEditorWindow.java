@@ -195,6 +195,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
             existing = t;
         }
+        super.setOperand(existing);
 
         window.showAll();
     }
