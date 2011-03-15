@@ -249,19 +249,28 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
             return;
         }
 
+        amount = amountEntryBox.getAmount();
+        value = amountEntryBox.getValue();
+
+        if (value == 0) {
+            dialog = new ErrorMessageDialog(window, "Enter amount!",
+                    "Sorry, but you can't post a transaction with zero value.");
+            dialog.run();
+            dialog.hide();
+
+            amountEntryBox.grabFocus();
+            return;
+        }
+
         /*
          * Guards passed.
          */
 
         window.hide();
-        // Master.ui.showAsWorking(true);
 
         transaction = existing;
 
         payable = worker.getExpensesPayable();
-
-        amount = amountEntryBox.getAmount();
-        value = amountEntryBox.getValue();
 
         /*
          * Debit expense

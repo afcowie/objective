@@ -20,7 +20,9 @@ package objective.services;
 
 import java.util.ArrayList;
 
+import objective.domain.Credit;
 import objective.domain.Currency;
+import objective.domain.Debit;
 import objective.domain.Entry;
 import objective.domain.Ledger;
 import objective.domain.Transaction;
@@ -64,11 +66,7 @@ public class TransactionOperations extends Operation
          */
 
         validate(transaction);
-
-        for (i = 0; i < I; i++) {
-            entry = entries[i];
-            validate(entry);
-        }
+        validate(entries);
 
         /*
          * Post
@@ -108,6 +106,31 @@ public class TransactionOperations extends Operation
     private static void validate(Transaction t) {
         if (t.getDate() == 0L) {
             throw new IllegalStateException("\n" + "Date must be set before you can post a Transaction");
+        }
+    }
+
+    private static void validate(Entry[] entries) {
+        int i;
+        final int I;
+        Entry entry;
+        long debits, credits;
+
+        debits = 0;
+        credits = 0;
+
+        for (i = 0; i < entries.length; i++) {
+            entry = entries[i];
+            validate(entry);
+
+            if (entry instanceof Debit) {
+                debits += entry.getValue();
+            } else if (entry instanceof Credit) {
+                credits += entry.getValue();
+            }
+        }
+
+        if (debits != credits) {
+            throw new IllegalStateException("\n" + "Transaction Not Balanced!");
         }
     }
 
