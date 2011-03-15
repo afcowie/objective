@@ -41,8 +41,10 @@ class TransactionListViewHolder extends Window
         transactions = data.listTransactions();
 
         view = new TransactionListView(data, transactions);
+
         window.add(view);
         window.setTitle("Transaction List");
+        window.setDefaultSize(700, 500);
         window.showAll();
 
         window.connect(new Window.DeleteEvent() {
