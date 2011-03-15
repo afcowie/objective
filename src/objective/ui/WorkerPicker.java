@@ -21,18 +21,13 @@ package objective.ui;
 import objective.domain.Worker;
 import objective.persistence.DataStore;
 
+import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.ComboBox;
-import org.gnome.gtk.ComboBoxEntry;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnReference;
 import org.gnome.gtk.DataColumnString;
-import org.gnome.gtk.Entry;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.TreeIter;
-
-import static org.gnome.gdk.Color.BLACK;
-import static org.gnome.gdk.Color.RED;
-import static org.gnome.gtk.StateType.NORMAL;
 
 /**
  * A picker allowing you to choose from a list of Workers. This delegates to
@@ -45,7 +40,7 @@ import static org.gnome.gtk.StateType.NORMAL;
  * 
  * @author Andrew Cowie
  */
-public class WorkerPicker extends ComboBoxEntry
+public class WorkerPicker extends ComboBox
 {
     private Worker worker;
 
@@ -55,7 +50,7 @@ public class WorkerPicker extends ComboBoxEntry
 
     private ListStore listStore;
 
-    private ComboBoxEntry combo;
+    private ComboBox combo;
 
     private WorkerPicker.Updated handler = null;
 
@@ -71,7 +66,7 @@ public class WorkerPicker extends ComboBoxEntry
         super();
         final Worker[] workers;
         final DataColumn[] columns;
-        final Entry entry;
+        final CellRendererText renderer;
 
         /*
          * We go to the considerable effort of having a TreeModel here so that
@@ -107,7 +102,12 @@ public class WorkerPicker extends ComboBoxEntry
 
         combo = this;
         combo.setModel(listStore);
-        combo.setTextColumn(nameDisplayColumn);
+
+        renderer = new CellRendererText(combo);
+        renderer.setText(nameDisplayColumn);
+
+        combo.setActive(0);
+        worker = getSelection();
 
         /*
          * Somewhat hardcoded, it turns out that GtkComboBoxEntry have only
@@ -115,24 +115,15 @@ public class WorkerPicker extends ComboBoxEntry
          * games with the colour and what not.
          */
 
-        entry = (Entry) combo.getChild();
-
         combo.connect(new ComboBox.Changed() {
             public void onChanged(ComboBox source) {
                 combo.popup();
 
                 worker = getSelection();
 
-                if (worker == null) {
-                    entry.modifyText(NORMAL, RED);
-                    return;
-                } else {
-                    entry.modifyText(NORMAL, BLACK);
-                }
                 if (handler != null) {
                     handler.onUpdated(worker);
                 }
-
             }
         });
     }
