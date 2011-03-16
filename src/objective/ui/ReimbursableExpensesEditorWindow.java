@@ -138,11 +138,11 @@ public class ReimbursableExpensesEditorWindow extends TransactionEditorWindow
                 if (l.getParentAccount() instanceof ReimbursableExpensesPayableAccount) {
                     worker = services.findWorker(l);
                     personPicker.setWorker(worker);
-                    left = e;
+                    right = e;
                 } else {
                     accountPicker.setLedger(l);
                     amountEntryBox.setAmount(e.getAmount(), e.getCurrency(), e.getValue());
-                    right = e;
+                    left = e;
                 }
             }
             str = t.getDescription();
