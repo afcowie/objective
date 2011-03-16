@@ -18,10 +18,12 @@
  */
 package objective.ui;
 
+import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonBoxStyle;
 import org.gnome.gtk.HButtonBox;
 import org.gnome.gtk.HSeparator;
+import org.gnome.gtk.Label;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Window;
@@ -51,15 +53,25 @@ public abstract class EditorWindow extends Window
      * Basic form of EditorWindow, for editing Transactions. Adds the button
      * box with ok and close.
      */
-    protected EditorWindow() {
+    protected EditorWindow(final String heading) {
         super();
 
         window = this;
         top = new VBox(false, 3);
 
+        addHeading(heading);
         addButtons();
 
         window.add(top);
+    }
+
+    private void addHeading(final String heading) {
+        final Label label;
+
+        label = new Label("<big><b>" + heading + "</b></big>");
+        label.setUseMarkup(true);
+        label.setAlignment(Alignment.LEFT, Alignment.CENTER);
+        top.packStart(label, false, false, 3);
     }
 
     private void addButtons() {

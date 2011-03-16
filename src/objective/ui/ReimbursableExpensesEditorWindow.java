@@ -63,7 +63,7 @@ public class ReimbursableExpensesEditorWindow extends TransactionEditorWindow
      * Construct the Window.
      */
     public ReimbursableExpensesEditorWindow(final DataStore data, final ReimbursableTransaction t) {
-        super(data);
+        super(data, "Reimbursable Expenses");
         Label label;
         HBox box;
         Entry[] entries;

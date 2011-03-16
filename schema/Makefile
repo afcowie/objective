@@ -7,7 +7,7 @@ endif
 
 .PHONY: clean load reload run extension
 
-reload: clean load run
+reload: clean load
 
 clean:
 	@echo "RM accounts.db"

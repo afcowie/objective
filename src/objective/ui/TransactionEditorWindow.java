@@ -49,8 +49,8 @@ public abstract class TransactionEditorWindow extends EditorWindow
      * Construct the top portion of the window with Date, Description, and
      * Reference fields.
      */
-    public TransactionEditorWindow(final DataStore data) {
-        super();
+    public TransactionEditorWindow(final DataStore data, String heading) {
+        super(heading);
         Label label;
         HBox box;
         final HSeparator separator;
