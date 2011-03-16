@@ -75,7 +75,7 @@ public class TaxSelector extends ComboBox
         codes = new Tax[] {
             new Tax("GST", "Goods and Services Tax", 0.1),
             new Tax("N/A", "Not Applicable", 0.0),
-            new Tax("Cap", "Capital Expenditure", 0.0),
+            new Tax("Cap", "Capital Expenditure", 0.1),
             new Tax("Exp", "Export", 0.0),
             new Tax("Fre", "Tax Free", 0.0),
         };

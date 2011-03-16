@@ -168,6 +168,17 @@ public class ReimbursableExpensesEditorWindow extends TransactionEditorWindow
 
         top.packStart(box, false, false, 0);
 
+        amountEntryBox.connect(new ForeignAmountEntryBox.Updated() {
+            public void onUpdated(long amount, Currency currency, long value) {
+                if (currency.getCode().equals("AUD")) {
+                    taxEntryBox.setTax("GST", 0);
+                    taxEntryBox.setAmount(value);
+                } else {
+                    taxEntryBox.setTax("N/A", 0);
+                }
+            }
+        });
+
         window.showAll();
     }
 
