@@ -453,7 +453,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
         last = salary_AmountEntry;
     }
 
-    protected void ok() {
+    protected void doUpdate() {
         employee = (Employee) employee_WorkerPicker.getWorker();
 
         /*
@@ -546,7 +546,7 @@ public class AustralianPayrollEditorWindow extends EditorWindow
                 utc.execute(store);
             }
             store.commit();
-            super.ok();
+            super.doUpdate();
         } catch (NotFoundException nfe) {
             Debug.print("events", "Can't find Ledger " + nfe.getMessage());
         } catch (CommandNotReadyException cnre) {

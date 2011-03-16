@@ -489,7 +489,7 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
         }
     }
 
-    protected void ok() {
+    protected void doUpdate() {
         /*
          * Basic data guards.
          */
@@ -565,6 +565,6 @@ public class GenericTransactionEditorWindow extends TransactionEditorWindow
         /*
          * Carry on:
          */
-        super.ok();
+        super.doUpdate();
     }
 }

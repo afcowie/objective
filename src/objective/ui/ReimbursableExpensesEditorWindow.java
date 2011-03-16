@@ -36,8 +36,6 @@ import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.ResponseType;
-import org.gnome.gtk.SizeGroup;
-import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.WarningMessageDialog;
 
 /**
@@ -45,15 +43,11 @@ import org.gnome.gtk.WarningMessageDialog;
  * 
  * @author Andrew Cowie
  */
-public class ReimbursableExpensesEditorWindow extends EditorWindow
+public class ReimbursableExpensesEditorWindow extends TransactionEditorWindow
 {
     private final WorkerPicker personPicker;
 
-    private final DatePicker datePicker;
-
     private final AccountLedgerPicker accountPicker;
-
-    private final DescriptionEntry descriptionEntry;
 
     private final ForeignAmountEntryBox amountEntryBox;
 
@@ -69,8 +63,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
      * Construct the Window.
      */
     public ReimbursableExpensesEditorWindow(final DataStore data, final ReimbursableTransaction t) {
-        super();
-        final SizeGroup group;
+        super(data);
         Label label;
         HBox box;
         Entry[] entries;
@@ -80,8 +73,6 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
         services = new TransactionOperations(data);
 
         window.setTitle("Enter your expenses");
-
-        group = new SizeGroup(SizeGroupMode.HORIZONTAL);
 
         /*
          * Worker
@@ -96,38 +87,6 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
         personPicker = new WorkerPicker(data);
         box.packStart(personPicker, false, false, 0);
-
-        top.packStart(box, false, false, 0);
-
-        /*
-         * Date
-         */
-
-        box = new HBox(false, 6);
-
-        label = new Label("To date:");
-        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
-        box.packStart(label, false, false, 0);
-        group.add(label);
-
-        datePicker = new DatePicker();
-        box.packStart(datePicker, false, false, 0);
-
-        top.packStart(box, false, false, 0);
-
-        /*
-         * Description
-         */
-
-        box = new HBox(false, 6);
-
-        label = new Label("Description:");
-        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
-        box.packStart(label, false, false, 0);
-        group.add(label);
-
-        descriptionEntry = new DescriptionEntry();
-        box.packStart(descriptionEntry, false, false, 0);
 
         top.packStart(box, false, false, 0);
 
@@ -169,7 +128,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
 
             existing = new ReimbursableTransaction();
         } else {
-            datePicker.setDate(t.getDate());
+            date.setDate(t.getDate());
             entries = services.findEntries(t);
 
             for (Entry e : entries) {
@@ -187,7 +146,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
                 }
             }
             str = t.getDescription();
-            descriptionEntry.setText(str);
+            description.setText(str);
 
             existing = t;
         }
@@ -212,7 +171,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
         window.showAll();
     }
 
-    protected void ok() {
+    protected void doUpdate() {
         final Worker worker;
         MessageDialog dialog;
         ResponseType response;
@@ -233,7 +192,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
             return;
         }
 
-        str = descriptionEntry.getText();
+        str = description.getText();
         if (str.equals("")) {
             dialog = new WarningMessageDialog(
                     window,
@@ -246,7 +205,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
             dialog.hide();
 
             if (response == ResponseType.CANCEL) {
-                descriptionEntry.grabFocus();
+                description.grabFocus();
                 return;
             }
         }
@@ -313,7 +272,7 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
          * Transaction
          */
 
-        datestamp = datePicker.getDate();
+        datestamp = date.getDate();
         transaction.setDate(datestamp);
         transaction.setDescription(str);
 

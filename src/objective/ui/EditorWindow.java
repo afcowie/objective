@@ -18,8 +18,6 @@
  */
 package objective.ui;
 
-import objective.domain.Transaction;
-
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonBoxStyle;
 import org.gnome.gtk.HButtonBox;
@@ -48,10 +46,6 @@ public abstract class EditorWindow extends Window
     private Button cancel;
 
     private Button ok;
-
-    private EditorWindow.Updated handler;
-
-    private Transaction operand;
 
     /**
      * Basic form of EditorWindow, for editing Transactions. Adds the button
@@ -101,51 +95,40 @@ public abstract class EditorWindow extends Window
         window.destroy();
     }
 
-    private final void handleOk() {
+    protected final void handleOk() {
         /*
          * Execute subclass's posting logic
          */
 
-        ok();
+        doUpdate();
 
         /*
          * Notify parent.
          */
 
-        if (handler != null) {
-            handler.onUpdated(operand);
-        }
+        emitUpdated();
     }
 
     /**
+     * Notify parent UI that changes to the operand of this Editor have been
+     * executed.
+     */
+    /*
+     * Override this with the whatever calls handler.onUpdated()
+     */
+    protected void emitUpdated() {
+        throw new UnsupportedOperationException("Abstract subclass must implement emitUpdated()");
+    }
+
+    /**
+     * Validate the user input and then execute the database [create and]
+     * update as necessary.
+     */
+    /*
      * Override this method to carry out editor specific posting logic.
      */
-    protected void ok() {
-        throw new UnsupportedOperationException("You must implement ok()");
-    }
-
-    /**
-     * The object of this EditorWindow's affection has changed, and been
-     * committed to the database.
-     * 
-     * @author Andrew Cowie
-     */
-    public interface Updated
-    {
-        public void onUpdated(Transaction t);
-    }
-
-    public void connect(EditorWindow.Updated handler) {
-        if (this.handler != null) {
-            throw new AssertionError();
-        }
-        this.handler = handler;
-    }
-
-    public void setOperand(Transaction t) {
-        if (t == null) {
-            throw new AssertionError();
-        }
-        this.operand = t;
+    protected void doUpdate() {
+        throw new UnsupportedOperationException(
+                "Concrete subclass must implement ok() with posting logic");
     }
 }

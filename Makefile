@@ -12,7 +12,7 @@ ifdef D
 DEBUG=--debug=all
 endif
 
-.PHONY: all run test clean distclean pop debug
+.PHONY: all run test clean distclean pop debug doc
 
 # --------------------------------------------------------------------
 # Variable setup. You may want to set your editor to wrap to see the
@@ -220,7 +220,6 @@ build/dirs-javadoc:
 	-test -d doc/api || mkdir -p doc/api
 	touch $@
 
-doc: build/javadoc
 build/javadoc: build/classes-dist build/dirs-javadoc \
 		tmp/javadoc/classpath/package-list \
 		tmp/javadoc/java-gnome/package-list \
@@ -365,3 +364,12 @@ tarball: clean
 	@echo "TAR       backup tarball"
 	tar cjf objective-$(VERSION)-snapshot-`date +%y%m%d`.tar.bz2 --exclude '*.tar.*' .
 
+
+doc:
+	$(JAVADOC) \
+		-docletpath /home/andrew/workspace/doclet/tmp/classes \
+		-doclet com.operationaldynamics.doclet.ExploreDoclet \
+		-private \
+		-classpath tmp/classes:/home/andrew/workspace/java-gnome/tmp/gtk-4.0.jar:/home/andrew/workspace/sqlite/tmp/classes:/home/andrew/workspace/doclet/tmp/classes \
+		-sourcepath src \
+		-subpackages objective

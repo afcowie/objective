@@ -55,8 +55,6 @@ import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
 import org.gnome.pango.EllipsizeMode;
 
-import accounts.ui.TransactionEditorWindow;
-
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.RIGHT;
 import static org.gnome.gtk.Alignment.TOP;
@@ -299,7 +297,7 @@ public class TransactionListView extends TreeView
      */
     private void launchEditor(Transaction t) {
         final ReimbursableTransaction rt;
-        final EditorWindow window;
+        final TransactionEditorWindow window;
 
         if (t instanceof ReimbursableTransaction) {
             rt = (ReimbursableTransaction) t;
@@ -310,7 +308,7 @@ public class TransactionListView extends TreeView
 
         window.present();
 
-        window.connect(new EditorWindow.Updated() {
+        window.connect(new TransactionEditorWindow.Updated() {
             public void onUpdated(Transaction updated) {
                 TreeIter row;
                 Transaction t;
