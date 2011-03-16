@@ -34,8 +34,8 @@ public class TransactionComparator implements Comparator<Transaction>
         final String ref1, ref2;
         final int hash1, hash2;
 
-        time1 = t1.getDate().getInternalTimestamp();
-        time2 = t2.getDate().getInternalTimestamp();
+        time1 = t1.getDate();
+        time2 = t2.getDate();
 
         if (time1 < time2) {
             return -1;

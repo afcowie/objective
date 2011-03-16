@@ -61,7 +61,7 @@ public abstract class EditorWindow extends Window
         super();
 
         window = this;
-        top = new VBox(false, 0);
+        top = new VBox(false, 3);
 
         addButtons();
 

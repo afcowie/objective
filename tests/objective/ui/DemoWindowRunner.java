@@ -20,34 +20,30 @@ package objective.ui;
 
 import objective.persistence.DataStore;
 
-import org.gnome.gdk.Event;
 import org.gnome.gtk.Gtk;
-import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
-import org.gnome.gtk.WindowPosition;
 
 public class DemoWindowRunner
 {
     public static void main(String[] args) {
         final DataStore data;
-        final Window window, holder, editor;
+        final Window window, editor;
 
         Gtk.init(args);
 
         data = new DataStore("schema/accounts.db");
         window = new TransactionListViewHolder(data);
 
-        holder = new TemporaryHolder(data);
+        // editor = new ReimbursableExpensesEditorWindow(data, null);
+        // editor = new InvoiceEditorWindow(data, null);
+        // editor.setPosition(WindowPosition.CENTER_ALWAYS);
 
-        editor = new ReimbursableExpensesEditorWindow(data, null);
-        editor.setPosition(WindowPosition.CENTER_ALWAYS);
-
-        editor.connect(new Window.DeleteEvent() {
-            public boolean onDeleteEvent(Widget source, Event event) {
-                Gtk.mainQuit();
-                return false;
-            }
-        });
+        // editor.connect(new Window.DeleteEvent() {
+        // public boolean onDeleteEvent(Widget source, Event event) {
+        // Gtk.mainQuit();
+        // return false;
+        // }
+        // });
 
         window.present();
         Gtk.main();

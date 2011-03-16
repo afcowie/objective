@@ -100,5 +100,4 @@ public class Currency
 
         this.symbol = symbol;
     }
-
 }

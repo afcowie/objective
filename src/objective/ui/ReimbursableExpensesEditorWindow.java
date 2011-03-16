@@ -38,30 +38,26 @@ import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
-import org.gnome.gtk.Table;
 import org.gnome.gtk.WarningMessageDialog;
 
 /**
- * A Window where the expenses incurred by a Worker.
+ * Enter or edit expenses incurred by and reimbursable to a Worker.
  * 
  * @author Andrew Cowie
  */
 public class ReimbursableExpensesEditorWindow extends EditorWindow
 {
-    /*
-     * Cached widgets
-     */
-    protected Table table;
+    private final WorkerPicker personPicker;
 
-    protected final WorkerPicker personPicker;
+    private final DatePicker datePicker;
 
-    protected final DatePicker datePicker;
+    private final AccountLedgerPicker accountPicker;
 
-    protected final AccountLedgerPicker accountPicker;
+    private final DescriptionEntry descriptionEntry;
 
-    protected final DescriptionEntry descriptionEntry;
+    private final ForeignAmountEntryBox amountEntryBox;
 
-    protected final ForeignAmountEntryBox amountEntryBox;
+    private final TaxEntryBox taxEntryBox;
 
     private ReimbursableTransaction existing = null;
 
@@ -197,6 +193,22 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
         }
         super.setOperand(existing);
 
+        /*
+         * Tax
+         */
+
+        box = new HBox(false, 6);
+
+        label = new Label("Tax:");
+        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
+        box.packStart(label, false, false, 0);
+        group.add(label);
+
+        taxEntryBox = new TaxEntryBox(data);
+        box.packStart(taxEntryBox, false, false, 0);
+
+        top.packStart(box, false, false, 0);
+
         window.showAll();
     }
 
@@ -205,11 +217,11 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
         MessageDialog dialog;
         ResponseType response;
         String str;
-        Ledger expense, payable;
-        Transaction transaction;
-        long amount, value;
+        final Ledger expense, payable;
+        final Transaction transaction;
+        final long amount, value;
         Currency currency;
-        long datestamp;
+        final long datestamp;
 
         worker = personPicker.getWorker();
         if (worker == null) {
@@ -277,7 +289,6 @@ public class ReimbursableExpensesEditorWindow extends EditorWindow
          * Debit expense
          */
 
-        expense = accountPicker.getLedger();
         left.setParentLedger(expense);
         left.setParentTransaction(transaction);
         left.setAmount(amount);

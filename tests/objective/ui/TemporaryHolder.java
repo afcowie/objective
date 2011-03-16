@@ -21,6 +21,7 @@ package objective.ui;
 import objective.domain.Amount;
 import objective.domain.Currency;
 import objective.domain.Ledger;
+import objective.domain.Tax;
 import objective.domain.Worker;
 import objective.persistence.DataStore;
 
@@ -44,6 +45,7 @@ class TemporaryHolder extends Window
         final AmountDisplay ad;
         final CurrencySelector cs;
         final ForeignAmountEntryBox faeb;
+        final TaxEntryBox teb;
         final DescriptionEntry de;
         final Worker worker;
         final Ledger ledger;
@@ -152,6 +154,24 @@ class TemporaryHolder extends Window
         });
 
         /*
+         * TaxEntryBox
+         */
+
+        teb = new TaxEntryBox(data);
+        teb.setTax("N/A", 0L);
+        teb.setAmount(faeb.getValue());
+
+        box = new HBox(false, 0);
+        box.packStart(teb, false, false, 0);
+        top.packStart(box, false, false, 0);
+
+        teb.connect(new TaxEntryBox.Updated() {
+            public void onUpdated(Tax tag, long value) {
+                System.out.println(tag.getCode() + " " + Amount.numberToString(value));
+            }
+        });
+
+        /*
          * DesecriptionEntry
          */
 
@@ -181,4 +201,21 @@ class TemporaryHolder extends Window
             }
         });
     }
+
+    public static void main(String[] args) {
+        final DataStore data;
+        final Window holder;
+
+        Gtk.init(args);
+
+        data = new DataStore("schema/accounts.db");
+
+        holder = new TemporaryHolder(data);
+
+        holder.present();
+        Gtk.main();
+
+        data.close();
+    }
+
 }
