@@ -41,18 +41,15 @@ CC=/usr/bin/gcc-4.4 -g -O2 -Wall -fPIC -Wno-int-to-pointer-cast -Wno-pointer-to-
 
 extension: dirs ../tmp/native/amount.so
 
-../tmp/native/amount.so: ../tmp/native/amount.o
-	@echo "LINK\t amount.so"
-	$(LINK) -lsqlite3 -lglib-2.0 -o $@ $<
-
 dirs: ../tmp/native
 
-ifdef $(dir ../tmp/native)
-else
 ../tmp/native:
 	@echo "MKDIR\t ../tmp/native"
 	mkdir ../tmp/native/
-endif
+
+../tmp/native/amount.so: ../tmp/native/amount.o
+	@echo "LINK\t amount.so"
+	$(LINK) -lsqlite3 -lglib-2.0 -o $@ $<
 
 ../tmp/native/amount.o: amount.c
 	@echo "CC\t amount.o"
