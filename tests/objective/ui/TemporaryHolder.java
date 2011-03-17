@@ -143,7 +143,7 @@ class TemporaryHolder extends Window
         faeb.setAmount(24216, gbp, 62007);
 
         box = new HBox(false, 0);
-        box.packStart(faeb, false, false, 0);
+        box.packStart(faeb, true, true, 0);
         top.packStart(box, false, false, 0);
 
         faeb.connect(new ForeignAmountEntryBox.Updated() {
@@ -162,7 +162,7 @@ class TemporaryHolder extends Window
         teb.setAmount(faeb.getValue());
 
         box = new HBox(false, 0);
-        box.packStart(teb, false, false, 0);
+        box.packStart(teb, true, true, 0);
         top.packStart(box, false, false, 0);
 
         teb.connect(new TaxEntryBox.Updated() {

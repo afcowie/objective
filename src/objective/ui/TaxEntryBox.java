@@ -71,9 +71,9 @@ public class TaxEntryBox extends HBox
 
         gray.add(home);
 
-        super.packStart(tax, false, false, 0);
-        super.packStart(home, false, false, 3);
-        super.packStart(selector, false, false, 3);
+        super.packStart(selector, false, false, 0);
+        super.packEnd(home, false, false, 0);
+        super.packEnd(tax, false, false, 0);
 
         tax.connect(new AmountEntry.Updated() {
             public void onUpdated(final long amount) {

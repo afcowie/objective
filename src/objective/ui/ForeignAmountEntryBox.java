@@ -76,34 +76,35 @@ public class ForeignAmountEntryBox extends HBox
         foreign = new AmountEntry();
         foreign.setAmount(0); // dummy
         foreign.modifyText(StateType.NORMAL, Color.RED);
-        packStart(foreign, false, false, 0);
 
         selector = new CurrencySelector(data);
         selector.setCurrency(lastCurrency);
-        packStart(selector, false, false, 0);
 
         // \u00d7 is ×
         x_Label = new Label("\u00d7");
-        packStart(x_Label, false, false, 0);
         gray.add(x_Label);
 
         exchange = new Entry();
         exchange.setWidthChars(8);
         exchange.setText("1.00000");
-        packStart(exchange, false, false, 0);
         gray.add(exchange);
 
         equals_Label = new Label("=");
-        packStart(equals_Label, false, false, 0);
         gray.add(equals_Label);
 
         local = new AmountEntry();
-        packStart(local, false, false, 0);
         gray.add(local);
 
         homeCode_Label = new Label(home.getCode());
-        packStart(homeCode_Label, false, false, 0);
         gray.add(homeCode_Label);
+
+        super.packStart(foreign, false, false, 0);
+        super.packStart(selector, false, false, 0);
+        super.packStart(x_Label, false, false, 0);
+        super.packStart(exchange, false, false, 0);
+        super.packStart(equals_Label, false, false, 0);
+        super.packEnd(homeCode_Label, false, false, 0);
+        super.packEnd(local, false, false, 0);
 
         foreign.connect(new AmountEntry.Updated() {
             public void onUpdated(final long amount) {

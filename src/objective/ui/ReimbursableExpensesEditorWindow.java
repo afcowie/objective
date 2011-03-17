@@ -118,7 +118,7 @@ public class ReimbursableExpensesEditorWindow extends TransactionEditorWindow
         group.add(label);
 
         amountEntryBox = new ForeignAmountEntryBox(data);
-        box.packStart(amountEntryBox, false, false, 0);
+        box.packStart(amountEntryBox, true, true, 0);
 
         top.packStart(box, false, false, 0);
 
@@ -164,7 +164,7 @@ public class ReimbursableExpensesEditorWindow extends TransactionEditorWindow
         group.add(label);
 
         taxEntryBox = new TaxEntryBox(data);
-        box.packStart(taxEntryBox, false, false, 0);
+        box.packStart(taxEntryBox, true, true, 0);
 
         top.packStart(box, false, false, 0);
 
