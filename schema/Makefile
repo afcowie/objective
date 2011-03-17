@@ -1,4 +1,4 @@
-all: load run
+all: load extension
 
 ifdef V
 else
@@ -10,24 +10,24 @@ endif
 reload: clean load
 
 clean:
-	@echo "RM accounts.db"
+	@echo "RM\t accounts.db"
 	rm -f accounts.db
-	@echo "RM shared library"
-	rm -f ../tmp/native/account.o
-	rm -f ../tmp/native/account.so
+	@echo "RM\t shared library"
+	rm -f ../tmp/native/amount.o
+	rm -f ../tmp/native/amount.so
 
 
 load: accounts.db
 accounts.db: create.ddl mock.ddl debug.ddl
 	rm -f accounts.db.tmp
-	@echo "SQLITE create.ddl"
+	@echo "SQLITE\t create.ddl"
 	sqlite3 -bail accounts.db.tmp < create.ddl
-	@echo "SQLITE mock.ddl"
+	@echo "SQLITE\t mock.ddl"
 	sqlite3 -bail accounts.db.tmp < mock.ddl
 	mv accounts.db.tmp accounts.db
 
 run: accounts.db ../tmp/native/amount.so
-	@echo "SQLITE debug.ddl"
+	@echo "SQLITE\t debug.ddl"
 	-sqlite3 -init debug.ddl -interactive accounts.db
 
 
@@ -39,18 +39,23 @@ LINK=/usr/bin/gcc-4.4 -g -shared -Wall -fPIC
 CC=/usr/bin/gcc-4.4 -g -O2 -Wall -fPIC -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast  -Werror-implicit-function-declaration -Wfatal-errors
 
 
-extension: ../tmp/native/amount.so
+extension: dirs ../tmp/native/amount.so
 
 ../tmp/native/amount.so: ../tmp/native/amount.o
-	@echo "LINK amount.so"
+	@echo "LINK\t amount.so"
 	$(LINK) -lsqlite3 -lglib-2.0 -o $@ $<
 
-../tmp/native:
-	@echo "MKDIR ../tmp/native"
-	mkdir $@
+dirs: ../tmp/native
 
-../tmp/native/amount.o: ../tmp/native amount.c
-	@echo "CC amount.so"
+ifdef $(dir ../tmp/native)
+else
+../tmp/native:
+	@echo "MKDIR\t ../tmp/native"
+	mkdir ../tmp/native/
+endif
+
+../tmp/native/amount.o: amount.c
+	@echo "CC\t amount.o"
 	$(CC) -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include \
 		-o ../tmp/native/amount.o -c amount.c
 	
