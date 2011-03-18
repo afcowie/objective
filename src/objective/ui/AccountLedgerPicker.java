@@ -100,6 +100,8 @@ public class AccountLedgerPicker extends HBox
     public AccountLedgerPicker(DataStore data) {
         super(false, 3);
 
+        final Window window;
+
         this.data = data;
 
         display = new AccountLedgerDisplay();
@@ -118,7 +120,11 @@ public class AccountLedgerPicker extends HBox
 
         wide.connect(new Button.Clicked() {
             public void onClicked(Button source) {
-                popup.present();
+                Window window;
+
+                window = (Window) source.getToplevel();
+
+                popup.present(window);
             }
         });
 
@@ -133,7 +139,7 @@ public class AccountLedgerPicker extends HBox
     /*
      * It's a bit of a monster, this class.
      */
-    class AccountPickerPopup
+    class AccountPickerPopup extends Window
     {
         private ListStore listStore;
 
@@ -181,7 +187,7 @@ public class AccountLedgerPicker extends HBox
             Account parent;
             TreeIter row;
 
-            window = new Window();
+            window = this;
 
             /*
              * Setup the underlying TreeModel. Each viewable column has three
@@ -564,7 +570,7 @@ public class AccountLedgerPicker extends HBox
          * Overrides of inherited methods -----------------
          */
 
-        void present() {
+        void present(Window parent) {
             final org.gnome.gdk.Window underlying;
             final Allocation alloc;
             final int x, y;
@@ -577,6 +583,7 @@ public class AccountLedgerPicker extends HBox
             x = underlying.getPositionX() + alloc.getX();
             y = underlying.getPositionY() + alloc.getY();
 
+            window.setTransientFor(parent);
             window.move(x, y);
 
             window.showAll();

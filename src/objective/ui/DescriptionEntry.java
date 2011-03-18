@@ -42,6 +42,7 @@ public class DescriptionEntry extends Entry
     public DescriptionEntry() {
         super();
         cache = "";
+        super.setSizeRequest(250, -1);
     }
 
     public void setText(String str) {

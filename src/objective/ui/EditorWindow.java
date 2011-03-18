@@ -103,6 +103,8 @@ public abstract class EditorWindow extends Window
     }
 
     protected final void handleCancel() {
+        doCancel();
+
         window.hide();
         window.destroy();
     }
@@ -143,4 +145,9 @@ public abstract class EditorWindow extends Window
         throw new UnsupportedOperationException(
                 "Concrete subclass must implement ok() with posting logic");
     }
+
+    /*
+     * This, on the other hand, is entirely optional and mostly for testing
+     */
+    protected void doCancel() {}
 }
