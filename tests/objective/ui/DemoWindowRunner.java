@@ -35,7 +35,7 @@ public class DemoWindowRunner
         window = new TransactionListViewHolder(data);
 
         // editor = new ReimbursableExpensesEditorWindow(data, null);
-        // editor = new InvoiceEditorWindow(data, null);
+        // editor = new InvoiceTransactionEditorWindow(data, null);
         // editor.setPosition(WindowPosition.CENTER_ALWAYS);
 
         // editor.connect(new Window.DeleteEvent() {

@@ -20,6 +20,7 @@ package objective.ui;
 
 import objective.domain.Transaction;
 import objective.persistence.DataStore;
+import objective.services.TransactionOperations;
 
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.HBox;
@@ -27,6 +28,7 @@ import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
+import org.gnome.gtk.Widget;
 
 /**
  * Enter or edit expenses incurred by and reimbursable to a Worker.
@@ -41,6 +43,8 @@ public abstract class TransactionEditorWindow extends EditorWindow
 
     protected final SizeGroup group;
 
+    protected final TransactionOperations services;
+
     private TransactionEditorWindow.Updated handler;
 
     private Transaction operand;
@@ -51,50 +55,48 @@ public abstract class TransactionEditorWindow extends EditorWindow
      */
     public TransactionEditorWindow(final DataStore data, String heading) {
         super(heading);
-        Label label;
-        HBox box;
         final HSeparator separator;
 
         group = new SizeGroup(SizeGroupMode.HORIZONTAL);
+
+        services = new TransactionOperations(data);
 
         /*
          * Date
          */
 
-        box = new HBox(false, 6);
-
-        label = new Label("To date:");
-        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
-        box.packStart(label, false, false, 0);
-        group.add(label);
-
         date = new DatePicker();
-        box.packStart(date, false, false, 0);
-
-        top.packStart(box, false, false, 0);
+        this.addField("To date:", date);
 
         /*
          * Description
          */
 
-        box = new HBox(false, 6);
-
-        label = new Label("Description:");
-        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
-        box.packStart(label, false, false, 0);
-        group.add(label);
-
         description = new DescriptionEntry();
-        box.packStart(description, false, false, 0);
-
-        top.packStart(box, false, false, 0);
+        this.addField("Description:", description);
 
         /*
-         * Visual separation
+         * ----
          */
 
         separator = new HSeparator();
         top.packStart(separator, false, false, 3);
+    }
+
+    protected void addField(String title, Widget widget) {
+        final Label label;
+        final HBox box;
+
+        box = new HBox(false, 6);
+
+        label = new Label(title);
+        label.setAlignment(Alignment.RIGHT, Alignment.CENTER);
+        box.packStart(label, false, false, 0);
+        group.add(label);
+
+        box.packStart(widget, false, false, 0);
+
+        top.packStart(box, false, false, 0);
     }
 
     /*
@@ -129,5 +131,9 @@ public abstract class TransactionEditorWindow extends EditorWindow
             throw new AssertionError();
         }
         this.operand = t;
+    }
+
+    protected Transaction getOperand() {
+        return operand;
     }
 }

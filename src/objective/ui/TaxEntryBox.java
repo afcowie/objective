@@ -164,7 +164,7 @@ public class TaxEntryBox extends HBox
 
         price.setAmount(amount);
 
-        tag = this.getTax();
+        tag = this.getTag();
         rate = tag.getRate();
         value = ForeignAmount.calculateValue(amount, rate);
 
@@ -188,7 +188,11 @@ public class TaxEntryBox extends HBox
         this.handler = handler;
     }
 
-    public Tax getTax() {
+    public Tax getTag() {
         return selector.getCode();
+    }
+
+    public long getTax() {
+        return tax.getAmount();
     }
 }

@@ -87,8 +87,8 @@ public class TransactionOperations extends Operation
                     data.createEntry(entry);
                 }
                 data.updateEntry(entry);
-            }
 
+            }
             data.commit();
         } catch (RuntimeException re) {
             data.rollback();
@@ -227,5 +227,43 @@ public class TransactionOperations extends Operation
 
     public Currency findCurrencyHome() {
         return data.lookupCurrency("AUD");
+    }
+
+    /**
+     * Retrieve the Ledger corresponding to the supplied title and name. If
+     * they're not unique throws IllegalArgumentException.
+     */
+    public Ledger findLedger(final String title, final String name) {
+        final Statement stmt;
+        final String[] sql;
+        final long ledgerId;
+        final Ledger result;
+
+        sql = new String[] {
+            "SELECT l.ledger_id",
+            "FROM ledgers l, accounts a",
+            "WHERE l.name = ? AND l.account_id = a.account_id AND a.title = ?"
+        };
+
+        stmt = db.prepare(combine(sql));
+
+        stmt.bindText(1, name);
+        stmt.bindText(2, title);
+
+        if (stmt.step()) {
+            ledgerId = stmt.columnInteger(0);
+        } else {
+            throw new IllegalArgumentException();
+        }
+        if (stmt.step()) {
+            /*
+             * Retrieved more than one Ledger, and we assume unary.
+             */
+            throw new IllegalArgumentException();
+        }
+        stmt.finish();
+
+        result = data.lookupLedger(ledgerId);
+        return result;
     }
 }

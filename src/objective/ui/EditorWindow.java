@@ -98,6 +98,11 @@ public abstract class EditorWindow extends Window
         buttonbox.add(ok);
 
         top.packEnd(buttonbox, false, false, 3);
+
+        /*
+         * ----
+         */
+
         separator = new HSeparator();
         top.packEnd(separator, false, false, 3);
     }

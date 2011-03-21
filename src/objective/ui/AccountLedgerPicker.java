@@ -100,8 +100,6 @@ public class AccountLedgerPicker extends HBox
     public AccountLedgerPicker(DataStore data) {
         super(false, 3);
 
-        final Window window;
-
         this.data = data;
 
         display = new AccountLedgerDisplay();

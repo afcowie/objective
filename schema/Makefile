@@ -5,13 +5,15 @@ else
 MAKEFLAGS=-s
 endif
 
-.PHONY: clean load reload run extension
+.PHONY: clean nuke load reload debug extension
 
-reload: clean load
+reload: nuke load
 
-clean:
+nuke:
 	@echo "RM\t accounts.db"
 	rm -f accounts.db
+
+clean: nuke
 	@echo "RM\t shared library"
 	rm -f ../tmp/native/amount.o
 	rm -f ../tmp/native/amount.so
@@ -26,7 +28,7 @@ accounts.db: create.ddl mock.ddl debug.ddl
 	sqlite3 -bail accounts.db.tmp < mock.ddl
 	mv accounts.db.tmp accounts.db
 
-run: accounts.db ../tmp/native/amount.so
+debug: accounts.db ../tmp/native/amount.so
 	@echo "SQLITE\t debug.ddl"
 	-sqlite3 -init debug.ddl -interactive accounts.db
 
