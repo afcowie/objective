@@ -25,6 +25,7 @@ import objective.domain.Debit;
 import objective.domain.Entry;
 import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
+import objective.domain.RevenueAccount;
 import objective.domain.SalesTaxPayableAccount;
 import objective.persistence.DataStore;
 
@@ -43,6 +44,21 @@ import org.gnome.gtk.Window;
 public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEditorWindow
 {
     private InvoiceTransaction invoice = null;
+
+    /**
+     * The people we have charged a fee to, or that we owe money to.
+     */
+    private Entry entity;
+
+    /**
+     * The revenue or expense account, as appropriate.
+     */
+    private Entry income;
+
+    /**
+     * GST collected or paid, if applicable.
+     */
+    private Entry friction;
 
     /**
      * Construct the Window. Pass <code>null</code> to create a new
@@ -84,15 +100,10 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
             Entry e;
 
             e = new Debit();
-            super.setEntryEntity(e);
+            this.entity = e;
 
             e = new Credit();
-            super.setEntryIncome(e);
-
-            e = new Credit();
-            gst = services.findLedger("GST", "Collected");
-            e.setParentLedger(gst);
-            super.setEntryTax(e);
+            this.income = e;
 
             invoice = new InvoiceTransaction();
         } else {
@@ -106,26 +117,56 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
                 l = e.getParentLedger();
                 a = l.getParentAccount();
                 if (a instanceof AccountsReceivableAccount) {
-                    super.setEntryEntity(e);
+                    super.setOrigin(e);
+                    this.entity = e;
                 } else if (a instanceof SalesTaxPayableAccount) {
-                    super.setEntryTax(e);
+                    super.setTaxation(e);
+                    this.friction = e;
+                } else if (a instanceof RevenueAccount) {
+                    super.setDestination(e);
+                    this.income = e;
                 } else {
-                    super.setEntryIncome(e);
+                    throw new IllegalStateException();
                 }
             }
+
             str = t.getDescription();
             description.setText(str);
 
             invoice = t;
         }
+        if (friction == null) {
+            Entry e;
+
+            e = new Credit();
+            gst = services.findLedger("GST", "Collected");
+            e.setParentLedger(gst);
+            this.friction = e;
+        }
+
         super.setOperand(invoice);
 
         window.showAll();
     }
 
-    // REMOVE
-    protected void doCancel() {
-        Gtk.mainQuit();
+    /*
+     * These are called by super InvoiceTransactionEditorWindow to supply the
+     * corresponding Entry objects.
+     */
+
+    protected Entry getEntity() {
+        return entity;
+    }
+
+    protected Entry getIncome() {
+        return income;
+    }
+
+    protected Entry getFriction() {
+        if (friction == null) {
+            friction = new Credit();
+        }
+        return friction;
     }
 
     public static void main(String[] args) {
@@ -149,5 +190,10 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
         Gtk.main();
 
         data.close();
+    }
+
+    // REMOVE
+    protected void doCancel() {
+        Gtk.mainQuit();
     }
 }
