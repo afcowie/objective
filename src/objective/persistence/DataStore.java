@@ -865,6 +865,25 @@ public class DataStore
         stmt.finish();
     }
 
+    public void deleteEntry(Entry e) {
+        final String[] sql;
+        final Statement stmt;
+        final long entryId;
+
+        sql = new String[] {
+            "DELETE FROM entries",
+            "WHERE entry_id = ?"
+        };
+
+        stmt = db.prepare(combine(sql));
+
+        entryId = e.getID();
+        stmt.bindInteger(1, entryId);
+
+        stmt.step();
+        stmt.finish();
+    }
+
     /**
      * Insert the given newly constructed Entry into the database.
      */

@@ -84,10 +84,34 @@ public class TransactionOperations extends Operation
                 entry = entries[i];
 
                 if (entry.getID() == 0) {
+                    /*
+                     * If we're passed a new object which has no value, just
+                     * carry on gracefully. This is the case when posting a
+                     * transaction with foreign currency.
+                     */
+                    if (entry.getValue() == 0) {
+                        continue;
+                    }
+                    /*
+                     * This is a new Entry object, so we need to create it.
+                     * That code path only creates the row; then update is
+                     * called to populate it.
+                     */
                     data.createEntry(entry);
+                    data.updateEntry(entry);
+                } else if (entry.getValue() == 0) {
+                    /*
+                     * If you reduce an existing entry to 0 value, it means
+                     * you want rid of it. The common case of this is a
+                     * transaction that previously had GST but no longer does.
+                     */
+                    data.deleteEntry(entry);
+                } else {
+                    /*
+                     * Otherwise this is a normal update.
+                     */
+                    data.updateEntry(entry);
                 }
-                data.updateEntry(entry);
-
             }
             data.commit();
         } catch (RuntimeException re) {
@@ -121,12 +145,14 @@ public class TransactionOperations extends Operation
 
         for (i = 0; i < I; i++) {
             entry = entries[i];
-            validate(entry);
+            // validate(entry);
 
             if (entry instanceof Debit) {
                 debits += entry.getValue();
             } else if (entry instanceof Credit) {
                 credits += entry.getValue();
+            } else {
+                throw new AssertionError();
             }
         }
 
