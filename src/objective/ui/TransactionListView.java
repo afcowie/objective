@@ -31,6 +31,7 @@ import objective.domain.Currency;
 import objective.domain.Datestamp;
 import objective.domain.Debit;
 import objective.domain.Entry;
+import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
 import objective.domain.ReimbursableTransaction;
 import objective.domain.Transaction;
@@ -297,11 +298,16 @@ public class TransactionListView extends TreeView
      */
     private void launchEditor(Transaction t) {
         final ReimbursableTransaction rt;
+        final InvoiceTransaction it;
         final TransactionEditorWindow window;
 
         if (t instanceof ReimbursableTransaction) {
             rt = (ReimbursableTransaction) t;
             window = new ReimbursableExpensesEditorWindow(data, rt);
+        } else if (t instanceof InvoiceTransaction) {
+            it = (InvoiceTransaction) t;
+            window = new SalesInvoiceTransactionEditorWindow(data, it);
+
         } else {
             return;
         }
@@ -409,14 +415,17 @@ public class TransactionListView extends TreeView
     private void populate(final TreeIter row) {
         final Transaction t;
         final boolean active;
+        final StringBuilder type, titleName;
         final StringBuilder debitVal, creditVal;
         final Set<Entry> ordered;
         final Iterator<Entry> eI;
+        TransactionOperations services;
+        Entry[] entries;
 
         t = model.getValue(row, transactionObjectColumn);
         active = model.getValue(row, isActiveColumn);
 
-        final StringBuffer type = new StringBuffer();
+        type = new StringBuilder();
 
         if (active) {
             type.append("<span color='" + LIGHTGRAY + "'>");
@@ -433,7 +442,7 @@ public class TransactionListView extends TreeView
                 + Datestamp.dateToString(t.getDate()) + "</span>");
         model.setValue(row, dateSortColumn, t.getDate());
 
-        final StringBuffer titleName = new StringBuffer();
+        titleName = new StringBuilder();
         final String OPEN = "<b>";
         final String CLOSE = "</b>";
         titleName.append(OPEN);
@@ -458,11 +467,8 @@ public class TransactionListView extends TreeView
 
         ordered = new TreeSet<Entry>(new EntryComparator(t));
 
-        TransactionOperations transactions;
-        Entry[] entries;
-
-        transactions = new TransactionOperations(data);
-        entries = transactions.findEntries(t);
+        services = new TransactionOperations(data);
+        entries = services.findEntries(t);
 
         for (Entry e : entries) {
             ordered.add(e);
@@ -470,10 +476,17 @@ public class TransactionListView extends TreeView
 
         eI = ordered.iterator();
         while (eI.hasNext()) {
-            final Entry entry = eI.next();
+            final StringBuilder buf;
+            final Entry entry;
+            final Ledger ledger;
+            final Account account;
+            final long amount;
+            final Currency cur;
 
-            final Ledger ledger = entry.getParentLedger();
-            final Account account = ledger.getParentAccount();
+            entry = eI.next();
+
+            ledger = entry.getParentLedger();
+            account = ledger.getParentAccount();
 
             titleName.append("\n");
 
@@ -499,10 +512,10 @@ public class TransactionListView extends TreeView
             titleName.append(Glib.markupEscapeText(ledger.getName()));
             titleName.append("</span>");
 
-            long amount = entry.getAmount();
-            Currency cur = entry.getCurrency();
+            amount = entry.getAmount();
+            cur = entry.getCurrency();
 
-            final StringBuilder buf = new StringBuilder();
+            buf = new StringBuilder();
 
             buf.append(cur.getSymbol());
             // add , separators
