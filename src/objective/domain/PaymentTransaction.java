@@ -32,7 +32,7 @@ public class PaymentTransaction extends Transaction
     }
 
     public String getClassString() {
-        return "Payment Transaction";
+        return "Payment";
     }
 
     public long getType() {

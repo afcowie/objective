@@ -38,7 +38,7 @@ public class GenericTransaction extends Transaction
     }
 
     public String getClassString() {
-        return "Generic Transaction";
+        return "Generic";
     }
 
     public long getType() {

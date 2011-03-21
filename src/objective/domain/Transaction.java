@@ -135,7 +135,7 @@ public abstract class Transaction extends DomainObject
     }
 
     public String getClassString() {
-        return "Transaction";
+        throw new UnsupportedOperationException();
     }
 
     public String toString() {
