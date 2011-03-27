@@ -40,7 +40,6 @@ import org.gnome.gtk.Window;
  * 
  * @author Andrew Cowie
  */
-// cloned from ReimbursableExpensesEditorWindow
 public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEditorWindow
 {
     private InvoiceTransaction invoice = null;
@@ -75,26 +74,6 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
         } else {
             window.setTitle("Edit Invoice");
         }
-
-        /*
-         * Client
-         */
-
-        /*
-         * Account
-         */
-
-        /*
-         * Amount
-         */
-
-        /*
-         * Tax
-         */
-
-        /*
-         * Entries
-         */
 
         if (t == null) {
             Entry e;
@@ -194,6 +173,12 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
 
     // REMOVE
     protected void doCancel() {
+        Gtk.mainQuit();
+    }
+
+    // REMOVE
+    protected void doUpdate() {
+        super.doUpdate();
         Gtk.mainQuit();
     }
 }
