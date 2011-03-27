@@ -81,8 +81,8 @@ INSERT INTO entries VALUES (NULL, 4, 1, 329999, 'AUD', 329999, -1);
 
 INSERT INTO transactions VALUES (5, -8, 1104969600, 'Chair for office', NULL);
 INSERT INTO entries VALUES (NULL, 5, 1, 72500, 'AUD', 72500, -1);
-INSERT INTO entries VALUES (NULL, 5, 15, 65910, 'AUD', 65910, 1);
-INSERT INTO entries VALUES (NULL, 5, 14, 6590, 'AUD', 6590, 1);
+INSERT INTO entries VALUES (NULL, 5, 15, 65909, 'AUD', 65909, 1);
+INSERT INTO entries VALUES (NULL, 5, 14, 6591, 'AUD', 6591, 1);
 
 
 INSERT INTO transactions VALUES (6, -8, 1040256000, 'Initial Capitalization', NULL);
