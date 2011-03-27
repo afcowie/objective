@@ -97,7 +97,7 @@ public class TaxEntryBox extends HBox
 
                 rate = tag.getRate();
 
-                value = ForeignAmount.calculateValue(amount, rate);
+                value = ForeignAmount.calculateTax(amount, rate);
                 tax.setAmount(value);
 
                 grayOut();
@@ -166,7 +166,7 @@ public class TaxEntryBox extends HBox
 
         tag = this.getTag();
         rate = tag.getRate();
-        value = ForeignAmount.calculateValue(amount, rate);
+        value = ForeignAmount.calculateTax(amount, rate);
 
         tax.setAmount(value);
     }

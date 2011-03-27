@@ -71,6 +71,14 @@ public class ForeignAmount
     }
 
     /**
+     * Given a VAT tax included rate, calculate the actual tax amount. In
+     * Australia, 10% GST gives " / 11".
+     */
+    public static long calculateTax(long value, double rate) {
+        return Math.round((value * rate) / (1.0 + rate));
+    }
+
+    /**
      * Returns Infinity on divide by zero, of course. You'll need to cater for
      * that - preferably by not calling this with 0 amount.
      */
