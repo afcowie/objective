@@ -25,18 +25,9 @@ package objective.domain;
  * @author Andrew Cowie
  * @see InvoiceTransaction
  */
-public class PaymentTransaction extends Transaction
+public abstract class PaymentTransaction extends Transaction
 {
-    public PaymentTransaction(long rowid) {
+    protected PaymentTransaction(long rowid) {
         super(rowid);
     }
-
-    public String getClassString() {
-        return "Payment";
-    }
-
-    public long getType() {
-        return -10;
-    }
-
 }

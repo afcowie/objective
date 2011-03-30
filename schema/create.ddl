@@ -50,10 +50,13 @@ INSERT INTO types VALUES (49, 'CurrencyGainLoss');
 
 INSERT INTO types VALUES (61, 'GenericExpense');
 
-INSERT INTO types VALUES (-8, 'Generic');
-INSERT INTO types VALUES (-9, 'Invoice');
-INSERT INTO types VALUES (-10, 'Payment');
-INSERT INTO types VALUES (-11, 'Reimbursable');
+INSERT INTO types VALUES (-30, 'Generic');
+INSERT INTO types VALUES (-40, 'SalesInvoice');
+INSERT INTO types VALUES (-12, 'SalesPayment');
+INSERT INTO types VALUES (-60, 'BillInvoice');
+INSERT INTO types VALUES (-22, 'BillPayment');
+INSERT INTO types VALUES (-25, 'Reimbursable');
+
 
 CREATE TABLE directions
 (

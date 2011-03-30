@@ -26,6 +26,8 @@ import objective.domain.Account;
 import objective.domain.AccountsPayableAccount;
 import objective.domain.AccountsReceivableAccount;
 import objective.domain.BankAccount;
+import objective.domain.BillInvoiceTransaction;
+import objective.domain.BillPaymentTransaction;
 import objective.domain.CashAccount;
 import objective.domain.Credit;
 import objective.domain.CreditPositiveLedger;
@@ -37,15 +39,15 @@ import objective.domain.Employee;
 import objective.domain.Entry;
 import objective.domain.GenericExpenseAccount;
 import objective.domain.GenericTransaction;
-import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
 import objective.domain.LoanPayableAccount;
 import objective.domain.OwnersEquityAccount;
-import objective.domain.PaymentTransaction;
 import objective.domain.PayrollTaxPayableAccount;
 import objective.domain.ProfessionalRevenueAccount;
 import objective.domain.ReimbursableExpensesPayableAccount;
 import objective.domain.ReimbursableTransaction;
+import objective.domain.SalesInvoiceTransaction;
+import objective.domain.SalesPaymentTransaction;
 import objective.domain.SalesTaxPayableAccount;
 import objective.domain.Subcontractor;
 import objective.domain.Transaction;
@@ -666,10 +668,14 @@ public class DataStore
         } else if (type.equals("Reimbursable")) {
             result = new ReimbursableTransaction(transactionId);
 
-        } else if (type.equals("Invoice")) {
-            result = new InvoiceTransaction(transactionId);
-        } else if (type.equals("Payment")) {
-            result = new PaymentTransaction(transactionId);
+        } else if (type.equals("SalesInvoice")) {
+            result = new SalesInvoiceTransaction(transactionId);
+        } else if (type.equals("SalesPayment")) {
+            result = new SalesPaymentTransaction(transactionId);
+        } else if (type.equals("BillInvoice")) {
+            result = new BillInvoiceTransaction(transactionId);
+        } else if (type.equals("BillPayment")) {
+            result = new BillPaymentTransaction(transactionId);
         } else {
             throw new IllegalStateException("\n" + "Unknown Account type " + type + " for ("
                     + transactionId + ")");

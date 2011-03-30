@@ -20,7 +20,6 @@ package objective.ui;
 
 import objective.domain.Currency;
 import objective.domain.Entry;
-import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
 import objective.domain.Transaction;
 import objective.persistence.DataStore;
@@ -48,15 +47,8 @@ public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWi
      * Construct the Window. Pass <code>null</code> to create a new
      * Transaction.
      */
-    public InvoiceTransactionEditorWindow(final DataStore data, final InvoiceTransaction t,
-            final String heading) {
+    public InvoiceTransactionEditorWindow(final DataStore data, final String heading) {
         super(data, heading);
-
-        if (t == null) {
-            window.setTitle("Enter new Invoice");
-        } else {
-            window.setTitle("Edit Invoice");
-        }
 
         /*
          * Client or Supplier

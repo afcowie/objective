@@ -23,21 +23,9 @@ package objective.domain;
  * 
  * @author Andrew Cowie
  */
-public class InvoiceTransaction extends Transaction
+public abstract class InvoiceTransaction extends Transaction
 {
-    public InvoiceTransaction() {
-        super(0);
-    }
-
-    public InvoiceTransaction(long rowid) {
+    protected InvoiceTransaction(long rowid) {
         super(rowid);
-    }
-
-    public String getClassString() {
-        return "Invoice";
-    }
-
-    public long getType() {
-        return -9;
     }
 }

@@ -19,14 +19,14 @@
 package objective.ui;
 
 import objective.domain.Account;
-import objective.domain.AccountsReceivableAccount;
+import objective.domain.AccountsPayableAccount;
+import objective.domain.BillInvoiceTransaction;
 import objective.domain.Credit;
 import objective.domain.Debit;
 import objective.domain.Entry;
+import objective.domain.ExpenseAccount;
 import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
-import objective.domain.RevenueAccount;
-import objective.domain.SalesInvoiceTransaction;
 import objective.domain.SalesTaxPayableAccount;
 import objective.persistence.DataStore;
 
@@ -41,19 +41,19 @@ import org.gnome.gtk.Window;
  * 
  * @author Andrew Cowie
  */
-public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEditorWindow
+public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditorWindow
 {
     private InvoiceTransaction invoice = null;
 
     /**
      * The people we have charged a fee to, or that we owe money to.
      */
-    private Entry entity;
+    private Entry payable;
 
     /**
      * The revenue or expense account, as appropriate.
      */
-    private Entry income;
+    private Entry expense;
 
     /**
      * GST collected or paid, if applicable.
@@ -64,8 +64,8 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
      * Construct the Window. Pass <code>null</code> to create a new
      * Transaction.
      */
-    public SalesInvoiceTransactionEditorWindow(final DataStore data, final InvoiceTransaction t) {
-        super(data, "Sales Invoice");
+    public BillInvoiceTransactionEditorWindow(final DataStore data, final InvoiceTransaction t) {
+        super(data, "Bill Invoice");
         Entry[] entries;
         String str;
         Ledger gst;
@@ -79,13 +79,13 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
         if (t == null) {
             Entry e;
 
-            e = new Debit();
-            this.entity = e;
-
             e = new Credit();
-            this.income = e;
+            this.payable = e;
 
-            invoice = new SalesInvoiceTransaction();
+            e = new Debit();
+            this.expense = e;
+
+            invoice = new BillInvoiceTransaction();
         } else {
             date.setDate(t.getDate());
             entries = services.findEntries(t);
@@ -96,15 +96,15 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
 
                 l = e.getParentLedger();
                 a = l.getParentAccount();
-                if (a instanceof AccountsReceivableAccount) {
+                if (a instanceof AccountsPayableAccount) {
                     super.setOrigin(e);
-                    this.entity = e;
+                    this.payable = e;
                 } else if (a instanceof SalesTaxPayableAccount) {
                     super.setTaxation(e);
                     this.friction = e;
-                } else if (a instanceof RevenueAccount) {
+                } else if (a instanceof ExpenseAccount) {
                     super.setDestination(e);
-                    this.income = e;
+                    this.expense = e;
                 } else {
                     throw new IllegalStateException();
                 }
@@ -118,8 +118,8 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
         if (friction == null) {
             Entry e;
 
-            e = new Credit();
-            gst = services.findLedger("GST", "Collected");
+            e = new Debit();
+            gst = services.findLedger("GST", "Paid");
             e.setParentLedger(gst);
             this.friction = e;
         }
@@ -135,11 +135,11 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
      */
 
     protected Entry getEntity() {
-        return entity;
+        return payable;
     }
 
     protected Entry getIncome() {
-        return income;
+        return expense;
     }
 
     protected Entry getFriction() {
@@ -157,7 +157,7 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
 
         data = new DataStore("schema/accounts.db");
 
-        window = new SalesInvoiceTransactionEditorWindow(data, null);
+        window = new BillInvoiceTransactionEditorWindow(data, null);
         window.present();
 
         window.connect(new Window.DeleteEvent() {

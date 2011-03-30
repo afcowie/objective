@@ -1,7 +1,7 @@
 /*
  * ObjectiveAccounts, accounting for small professional services firms.
  *
- * Copyright © 2005-2011 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -19,29 +19,25 @@
 package objective.domain;
 
 /**
- * A generic transaction in the "general ledger" as traditional accounting
- * systems would call it. Simply consists of a balanced set of Entries, and
- * does not link to any special user interface.
- * 
- * <p>
- * This would have been called GeneralLedgerTransaction but ther was potential
- * for naming confustion as we have modelled the actual ledger(s) in any given
- * account with the Ledger class. This is most assuredly an accounting
- * Transaction.
+ * A transaction that is introduced by receiving a bill.
  * 
  * @author Andrew Cowie
  */
-public class GenericTransaction extends Transaction
+public class BillInvoiceTransaction extends InvoiceTransaction
 {
-    public GenericTransaction(long rowid) {
+    public BillInvoiceTransaction() {
+        super(0);
+    }
+
+    public BillInvoiceTransaction(long rowid) {
         super(rowid);
     }
 
     public String getClassString() {
-        return "Generic";
+        return "Bill Invoice";
     }
 
     public long getType() {
-        return -30;
+        return -60;
     }
 }
