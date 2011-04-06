@@ -26,6 +26,10 @@ package objective.domain;
  */
 public class BillPaymentTransaction extends PaymentTransaction
 {
+    public BillPaymentTransaction() {
+        super(0);
+    }
+
     public BillPaymentTransaction(long rowid) {
         super(rowid);
     }

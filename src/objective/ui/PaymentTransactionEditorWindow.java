@@ -33,35 +33,33 @@ import org.gnome.gtk.MessageDialog;
  * 
  * @author Andrew Cowie
  */
-public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWindow
+public abstract class PaymentTransactionEditorWindow extends TransactionEditorWindow
 {
-    private final AccountLedgerPicker origin;
+    private final AccountLedgerPicker owing;
 
-    private final AccountLedgerPicker destination;
+    private final AccountLedgerPicker payment;
 
     private final ForeignAmountEntryBox money;
-
-    private final TaxEntryBox taxation;
 
     /**
      * Construct the Window.
      */
-    public InvoiceTransactionEditorWindow(final DataStore data, final String heading) {
+    public PaymentTransactionEditorWindow(final DataStore data, final String heading) {
         super(data, heading);
 
         /*
          * Client or Supplier
          */
 
-        origin = new AccountLedgerPicker(data);
-        this.addField("Client | Supplier:", origin);
+        owing = new AccountLedgerPicker(data);
+        this.addField("Client | Supplier:", owing);
 
         /*
-         * Account
+         * Payment Source
          */
 
-        destination = new AccountLedgerPicker(data);
-        super.addField("Account » Ledger:", destination);
+        payment = new AccountLedgerPicker(data);
+        super.addField("Account » Ledger:", payment);
 
         /*
          * Amount
@@ -70,26 +68,7 @@ public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWi
         money = new ForeignAmountEntryBox(data);
         super.addField("Amount:", money);
 
-        /*
-         * Tax
-         */
-
-        taxation = new TaxEntryBox(data);
-        taxation.setTax("GST", 0);
-        super.addField("Tax:", taxation);
-
         window.showAll();
-
-        money.connect(new ForeignAmountEntryBox.Updated() {
-            public void onUpdated(long amount, Currency currency, long value) {
-                if (currency.getCode().equals("AUD")) {
-                    taxation.setTax("GST", 0);
-                    taxation.setAmount(value);
-                } else {
-                    taxation.setTax("N/A", 0);
-                }
-            }
-        });
     }
 
     /**
@@ -104,7 +83,7 @@ public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWi
 
         l = e.getParentLedger();
 
-        origin.setLedger(l);
+        owing.setLedger(l);
 
         amount = e.getAmount();
         currency = e.getCurrency();
@@ -114,30 +93,14 @@ public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWi
     }
 
     /**
-     * Specify which revenue or expense account this entry will be made to.
+     * Specify which account this bill will be paid payment (to).
      */
-    protected void setDestination(final Entry e) {
+    protected void setPayment(final Entry e) {
         final Ledger l;
 
         l = e.getParentLedger();
 
-        destination.setLedger(l);
-    }
-
-    /**
-     * @param e
-     */
-    protected void setTaxation(Entry e) {
-        final long value;
-        final String code;
-
-        value = e.getValue();
-        if (value == 0) {
-            return;
-        }
-        code = "GST";
-
-        taxation.setTax(code, value);
+        payment.setLedger(l);
     }
 
     /**
@@ -146,50 +109,44 @@ public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWi
     protected abstract Entry getEntity();
 
     /**
-     * The revenue or expense account, as appropriate.
+     * The bank account, credit card, or expenses payable, as appropriate.
      */
-    protected abstract Entry getIncome();
-
-    /**
-     * GST collected or paid, if applicable.
-     */
-    protected abstract Entry getFriction();
+    protected abstract Entry getPayment();
 
     protected void doUpdate() {
         MessageDialog dialog;
         String str;
         final Ledger expense, payable;
         final Transaction transaction;
-        final long amount, value, tax;
+        final long amount, value;
         Currency currency, home;
         final long datestamp;
         Entry entry;
 
-        payable = origin.getLedger();
+        payable = owing.getLedger();
         if (payable == null) {
             dialog = new ErrorMessageDialog(window, "Select an Account!",
-                    "You need to select the Client or Supplier to which this invoice applies.");
+                    "You need to select the Client or Supplier to which this payment applies.");
             dialog.run();
             dialog.hide();
 
-            origin.grabFocus();
+            owing.grabFocus();
             return;
         }
 
-        expense = destination.getLedger();
+        expense = payment.getLedger();
         if (expense == null) {
             dialog = new ErrorMessageDialog(window, "Select an Account!",
-                    "You need to select the account to which this revenue was earned, or to which these expenses apply.");
+                    "You need to select the account which this payment is going from or to.");
             dialog.run();
             dialog.hide();
 
-            destination.grabFocus();
+            payment.grabFocus();
             return;
         }
 
         amount = money.getAmount();
         value = money.getValue();
-        tax = taxation.getTax();
 
         if (value == 0) {
             dialog = new ErrorMessageDialog(window, "Enter amount!",
@@ -210,10 +167,10 @@ public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWi
         transaction = super.getOperand();
 
         /*
-         * accounts receivable or payable
+         * Accounts Receivable or Accounts Payable
          */
 
-        Entry e1, e2, e3;
+        Entry e1, e2;
 
         entry = this.getEntity();
 
@@ -227,35 +184,25 @@ public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWi
         e1 = entry;
 
         /*
-         * revenue or expense
+         * Bank account etc
          */
 
-        entry = this.getIncome();
+        entry = this.getPayment();
 
         entry.setParentLedger(expense);
         entry.setParentTransaction(transaction);
 
-        entry.setAmount(amount - tax);
+        entry.setAmount(amount);
         entry.setCurrency(currency);
-        entry.setValue(value - tax);
+        entry.setValue(value);
 
         e2 = entry;
 
         /*
-         * taxation collected or paid, if applicable
+         * Currency gain/loss
          */
 
-        entry = this.getFriction();
-
-        entry.setParentTransaction(transaction);
-        entry.setAmount(amount);
-
-        entry.setAmount(tax);
-        home = services.findCurrencyHome();
-        entry.setCurrency(home);
-        entry.setValue(tax);
-
-        e3 = entry;
+        // TODO
 
         /*
          * Transaction
@@ -266,6 +213,6 @@ public abstract class InvoiceTransactionEditorWindow extends TransactionEditorWi
         str = description.getText();
         transaction.setDescription(str);
 
-        services.postTransaction(transaction, e1, e2, e3);
+        services.postTransaction(transaction, e1, e2);
     }
 }

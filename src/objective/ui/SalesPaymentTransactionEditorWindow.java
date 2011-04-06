@@ -19,15 +19,16 @@
 package objective.ui;
 
 import objective.domain.Account;
-import objective.domain.AccountsPayableAccount;
-import objective.domain.BillInvoiceTransaction;
+import objective.domain.AccountsReceivableAccount;
+import objective.domain.BankAccount;
+import objective.domain.BillPaymentTransaction;
+import objective.domain.CardAccount;
 import objective.domain.Credit;
 import objective.domain.Debit;
 import objective.domain.Entry;
-import objective.domain.ExpenseAccount;
-import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
-import objective.domain.SalesTaxPayableAccount;
+import objective.domain.PaymentTransaction;
+import objective.domain.ReimbursableExpensesPayableAccount;
 import objective.persistence.DataStore;
 
 import org.gnome.gdk.Event;
@@ -36,55 +37,49 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
 /**
- * Enter or edit an invoice, initiating money we owe to a supplier.
+ * Enter or edit a payment made to a supplier.
  * 
  * @author Andrew Cowie
  */
-public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditorWindow
+public class SalesPaymentTransactionEditorWindow extends PaymentTransactionEditorWindow
 {
-    private InvoiceTransaction invoice = null;
+    private PaymentTransaction payment = null;
 
     /**
-     * The people that we owe money to.
+     * The people who owe us money.
      */
-    private Entry payable;
+    private Entry receivable;
 
     /**
-     * The expense account
+     * Account the payment is made to.
      */
-    private Entry expense;
-
-    /**
-     * GST collected or paid, if applicable.
-     */
-    private Entry friction;
+    private Entry to;
 
     /**
      * Construct the Window. Pass <code>null</code> to create a new
      * Transaction.
      */
-    public BillInvoiceTransactionEditorWindow(final DataStore data, final InvoiceTransaction t) {
-        super(data, "Bill Invoice");
+    public SalesPaymentTransactionEditorWindow(final DataStore data, final PaymentTransaction t) {
+        super(data, "Sales Receipt");
         Entry[] entries;
         String str;
-        Ledger gst;
 
         if (t == null) {
-            window.setTitle("Enter new Invoice");
+            window.setTitle("Enter new Receipt");
         } else {
-            window.setTitle("Edit Invoice");
+            window.setTitle("Edit Receipt");
         }
 
         if (t == null) {
             Entry e;
 
             e = new Credit();
-            this.payable = e;
+            this.receivable = e;
 
             e = new Debit();
-            this.expense = e;
+            this.to = e;
 
-            invoice = new BillInvoiceTransaction();
+            payment = new BillPaymentTransaction();
         } else {
             date.setDate(t.getDate());
             entries = services.findEntries(t);
@@ -95,15 +90,13 @@ public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditor
 
                 l = e.getParentLedger();
                 a = l.getParentAccount();
-                if (a instanceof AccountsPayableAccount) {
+                if (a instanceof AccountsReceivableAccount) {
                     super.setOrigin(e);
-                    this.payable = e;
-                } else if (a instanceof SalesTaxPayableAccount) {
-                    super.setTaxation(e);
-                    this.friction = e;
-                } else if (a instanceof ExpenseAccount) {
-                    super.setDestination(e);
-                    this.expense = e;
+                    this.receivable = e;
+                } else if ((a instanceof BankAccount) || (a instanceof CardAccount)
+                        || (a instanceof ReimbursableExpensesPayableAccount)) {
+                    super.setPayment(e);
+                    this.to = e;
                 } else {
                     throw new IllegalStateException();
                 }
@@ -112,40 +105,21 @@ public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditor
             str = t.getDescription();
             description.setText(str);
 
-            invoice = t;
+            payment = t;
         }
-        if (friction == null) {
-            Entry e;
+        // TODO Currency gain/loss
 
-            e = new Debit();
-            gst = services.findLedger("GST", "Paid");
-            e.setParentLedger(gst);
-            this.friction = e;
-        }
-
-        super.setOperand(invoice);
+        super.setOperand(payment);
 
         window.showAll();
     }
 
-    /*
-     * These are called by super InvoiceTransactionEditorWindow to supply the
-     * corresponding Entry objects.
-     */
-
     protected Entry getEntity() {
-        return payable;
+        return receivable;
     }
 
-    protected Entry getIncome() {
-        return expense;
-    }
-
-    protected Entry getFriction() {
-        if (friction == null) {
-            throw new AssertionError();
-        }
-        return friction;
+    protected Entry getPayment() {
+        return to;
     }
 
     public static void main(String[] args) {
@@ -156,7 +130,7 @@ public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditor
 
         data = new DataStore("schema/accounts.db");
 
-        window = new BillInvoiceTransactionEditorWindow(data, null);
+        window = new SalesPaymentTransactionEditorWindow(data, null);
         window.present();
 
         window.connect(new Window.DeleteEvent() {
