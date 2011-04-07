@@ -564,9 +564,10 @@ public class AccountLedgerPicker extends HBox
             search.setText("");
         }
 
-        /*
-         * Overrides of inherited methods -----------------
+        /**
+         * Has this Window been linked to its parent?
          */
+        private boolean linked;
 
         void present(Window parent) {
             final org.gnome.gdk.Window underlying;
@@ -581,7 +582,6 @@ public class AccountLedgerPicker extends HBox
             x = underlying.getPositionX() + alloc.getX();
             y = underlying.getPositionY() + alloc.getY();
 
-            window.setTransientFor(parent);
             window.move(x, y);
 
             window.showAll();
@@ -595,12 +595,20 @@ public class AccountLedgerPicker extends HBox
 
             search.grabFocus();
             refilter();
+
+            if (!linked) {
+                window.setTransientFor(parent);
+
+                parent.connect(new Window.DeleteEvent() {
+                    public boolean onDeleteEvent(Widget source, Event event) {
+                        window.hide();
+                        return false;
+                    }
+                });
+                linked = true;
+            }
         }
     }
-
-    /*
-     * Getters and Setters --------------------------------
-     */
 
     /**
      * @return the selected Ledger object whose parent is the selected
