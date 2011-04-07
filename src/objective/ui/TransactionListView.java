@@ -26,6 +26,8 @@ import java.util.TreeSet;
 
 import objective.domain.Account;
 import objective.domain.Amount;
+import objective.domain.BillInvoiceTransaction;
+import objective.domain.BillPaymentTransaction;
 import objective.domain.Credit;
 import objective.domain.Currency;
 import objective.domain.Datestamp;
@@ -33,7 +35,10 @@ import objective.domain.Debit;
 import objective.domain.Entry;
 import objective.domain.InvoiceTransaction;
 import objective.domain.Ledger;
+import objective.domain.PaymentTransaction;
 import objective.domain.ReimbursableTransaction;
+import objective.domain.SalesInvoiceTransaction;
+import objective.domain.SalesPaymentTransaction;
 import objective.domain.Transaction;
 import objective.persistence.DataStore;
 import objective.services.EntryComparator;
@@ -299,15 +304,24 @@ public class TransactionListView extends TreeView
     private void launchEditor(Transaction t) {
         final ReimbursableTransaction rt;
         final InvoiceTransaction it;
+        final PaymentTransaction pt;
         final TransactionEditorWindow window;
 
         if (t instanceof ReimbursableTransaction) {
             rt = (ReimbursableTransaction) t;
             window = new ReimbursableExpensesEditorWindow(data, rt);
-        } else if (t instanceof InvoiceTransaction) {
+        } else if (t instanceof SalesInvoiceTransaction) {
             it = (InvoiceTransaction) t;
             window = new SalesInvoiceTransactionEditorWindow(data, it);
-
+        } else if (t instanceof BillInvoiceTransaction) {
+            it = (InvoiceTransaction) t;
+            window = new BillInvoiceTransactionEditorWindow(data, it);
+        } else if (t instanceof SalesPaymentTransaction) {
+            pt = (PaymentTransaction) t;
+            window = new SalesPaymentTransactionEditorWindow(data, pt);
+        } else if (t instanceof BillPaymentTransaction) {
+            pt = (PaymentTransaction) t;
+            window = new BillPaymentTransactionEditorWindow(data, pt);
         } else {
             return;
         }

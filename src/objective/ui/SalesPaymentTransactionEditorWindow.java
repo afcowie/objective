@@ -21,7 +21,6 @@ package objective.ui;
 import objective.domain.Account;
 import objective.domain.AccountsReceivableAccount;
 import objective.domain.BankAccount;
-import objective.domain.BillPaymentTransaction;
 import objective.domain.CardAccount;
 import objective.domain.Credit;
 import objective.domain.Debit;
@@ -29,6 +28,7 @@ import objective.domain.Entry;
 import objective.domain.Ledger;
 import objective.domain.PaymentTransaction;
 import objective.domain.ReimbursableExpensesPayableAccount;
+import objective.domain.SalesPaymentTransaction;
 import objective.persistence.DataStore;
 
 import org.gnome.gdk.Event;
@@ -48,19 +48,19 @@ public class SalesPaymentTransactionEditorWindow extends PaymentTransactionEdito
     /**
      * The people who owe us money.
      */
-    private Entry receivable;
+    private Credit receivable;
 
     /**
      * Account the payment is made to.
      */
-    private Entry to;
+    private Debit to;
 
     /**
      * Construct the Window. Pass <code>null</code> to create a new
      * Transaction.
      */
     public SalesPaymentTransactionEditorWindow(final DataStore data, final PaymentTransaction t) {
-        super(data, "Sales Receipt");
+        super(data, "Payment Received");
         Entry[] entries;
         String str;
 
@@ -71,15 +71,10 @@ public class SalesPaymentTransactionEditorWindow extends PaymentTransactionEdito
         }
 
         if (t == null) {
-            Entry e;
+            receivable = new Credit();
+            to = new Debit();
 
-            e = new Credit();
-            this.receivable = e;
-
-            e = new Debit();
-            this.to = e;
-
-            payment = new BillPaymentTransaction();
+            payment = new SalesPaymentTransaction();
         } else {
             date.setDate(t.getDate());
             entries = services.findEntries(t);
@@ -92,11 +87,11 @@ public class SalesPaymentTransactionEditorWindow extends PaymentTransactionEdito
                 a = l.getParentAccount();
                 if (a instanceof AccountsReceivableAccount) {
                     super.setOrigin(e);
-                    this.receivable = e;
+                    this.receivable = (Credit) e;
                 } else if ((a instanceof BankAccount) || (a instanceof CardAccount)
                         || (a instanceof ReimbursableExpensesPayableAccount)) {
                     super.setPayment(e);
-                    this.to = e;
+                    this.to = (Debit) e;
                 } else {
                     throw new IllegalStateException();
                 }

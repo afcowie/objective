@@ -46,14 +46,14 @@ public class BillPaymentTransactionEditorWindow extends PaymentTransactionEditor
     private PaymentTransaction payment = null;
 
     /**
-     * The people we have charged a fee to, or that we owe money to.
+     * The people we owe money to.
      */
-    private Entry payable;
+    private Debit payable;
 
     /**
      * Account the payment is made from.
      */
-    private Entry from;
+    private Credit from;
 
     /**
      * Construct the Window. Pass <code>null</code> to create a new
@@ -71,13 +71,9 @@ public class BillPaymentTransactionEditorWindow extends PaymentTransactionEditor
         }
 
         if (t == null) {
-            Entry e;
 
-            e = new Debit();
-            this.payable = e;
-
-            e = new Credit();
-            this.from = e;
+            this.payable = new Debit();
+            this.from = new Credit();
 
             payment = new BillPaymentTransaction();
         } else {
@@ -92,11 +88,11 @@ public class BillPaymentTransactionEditorWindow extends PaymentTransactionEditor
                 a = l.getParentAccount();
                 if (a instanceof AccountsPayableAccount) {
                     super.setOrigin(e);
-                    this.payable = e;
+                    this.payable = (Debit) e;
                 } else if ((a instanceof BankAccount) || (a instanceof CardAccount)
                         || (a instanceof ReimbursableExpensesPayableAccount)) {
                     super.setPayment(e);
-                    this.from = e;
+                    this.from = (Credit) e;
                 } else {
                     throw new IllegalStateException();
                 }

@@ -46,19 +46,19 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
     private InvoiceTransaction invoice = null;
 
     /**
-     * The people we have charged a fee to, or that we owe money to.
+     * The people we have charged a fee to
      */
-    private Entry entity;
+    private Debit entity;
 
     /**
-     * The revenue or expense account, as appropriate.
+     * The revenue account
      */
-    private Entry income;
+    private Credit income;
 
     /**
-     * GST collected or paid, if applicable.
+     * GST collected, if applicable.
      */
-    private Entry friction;
+    private Credit friction;
 
     /**
      * Construct the Window. Pass <code>null</code> to create a new
@@ -77,13 +77,8 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
         }
 
         if (t == null) {
-            Entry e;
-
-            e = new Debit();
-            this.entity = e;
-
-            e = new Credit();
-            this.income = e;
+            entity = new Debit();
+            income = new Credit();
 
             invoice = new SalesInvoiceTransaction();
         } else {
@@ -98,13 +93,13 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
                 a = l.getParentAccount();
                 if (a instanceof AccountsReceivableAccount) {
                     super.setOrigin(e);
-                    this.entity = e;
+                    entity = (Debit) e;
                 } else if (a instanceof SalesTaxPayableAccount) {
                     super.setTaxation(e);
-                    this.friction = e;
+                    friction = (Credit) e;
                 } else if (a instanceof RevenueAccount) {
                     super.setDestination(e);
-                    this.income = e;
+                    income = (Credit) e;
                 } else {
                     throw new IllegalStateException();
                 }
@@ -116,12 +111,10 @@ public class SalesInvoiceTransactionEditorWindow extends InvoiceTransactionEdito
             invoice = t;
         }
         if (friction == null) {
-            Entry e;
+            friction = new Credit();
 
-            e = new Credit();
             gst = services.findLedger("GST", "Collected");
-            e.setParentLedger(gst);
-            this.friction = e;
+            friction.setParentLedger(gst);
         }
 
         super.setOperand(invoice);

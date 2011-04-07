@@ -47,17 +47,17 @@ public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditor
     /**
      * The people that we owe money to.
      */
-    private Entry payable;
+    private Credit payable;
 
     /**
      * The expense account
      */
-    private Entry expense;
+    private Debit expense;
 
     /**
-     * GST collected or paid, if applicable.
+     * GST paid, if applicable.
      */
-    private Entry friction;
+    private Debit friction;
 
     /**
      * Construct the Window. Pass <code>null</code> to create a new
@@ -76,13 +76,8 @@ public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditor
         }
 
         if (t == null) {
-            Entry e;
-
-            e = new Credit();
-            this.payable = e;
-
-            e = new Debit();
-            this.expense = e;
+            payable = new Credit();
+            expense = new Debit();
 
             invoice = new BillInvoiceTransaction();
         } else {
@@ -97,13 +92,13 @@ public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditor
                 a = l.getParentAccount();
                 if (a instanceof AccountsPayableAccount) {
                     super.setOrigin(e);
-                    this.payable = e;
+                    payable = (Credit) e;
                 } else if (a instanceof SalesTaxPayableAccount) {
                     super.setTaxation(e);
-                    this.friction = e;
+                    friction = (Debit) e;
                 } else if (a instanceof ExpenseAccount) {
                     super.setDestination(e);
-                    this.expense = e;
+                    expense = (Debit) e;
                 } else {
                     throw new IllegalStateException();
                 }
@@ -115,12 +110,10 @@ public class BillInvoiceTransactionEditorWindow extends InvoiceTransactionEditor
             invoice = t;
         }
         if (friction == null) {
-            Entry e;
+            friction = new Debit();
 
-            e = new Debit();
             gst = services.findLedger("GST", "Paid");
-            e.setParentLedger(gst);
-            this.friction = e;
+            friction.setParentLedger(gst);
         }
 
         super.setOperand(invoice);
