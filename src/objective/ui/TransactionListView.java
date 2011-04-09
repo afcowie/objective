@@ -309,7 +309,7 @@ public class TransactionListView extends TreeView
 
         if (t instanceof ReimbursableTransaction) {
             rt = (ReimbursableTransaction) t;
-            window = new ReimbursableExpensesEditorWindow(data, rt);
+            window = new ReimbursableExpensesTransactionEditorWindow(data, rt);
         } else if (t instanceof SalesInvoiceTransaction) {
             it = (InvoiceTransaction) t;
             window = new SalesInvoiceTransactionEditorWindow(data, it);

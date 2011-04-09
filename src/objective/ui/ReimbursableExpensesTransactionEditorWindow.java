@@ -43,7 +43,7 @@ import org.gnome.gtk.WarningMessageDialog;
  * 
  * @author Andrew Cowie
  */
-public class ReimbursableExpensesEditorWindow extends TransactionEditorWindow
+public class ReimbursableExpensesTransactionEditorWindow extends TransactionEditorWindow
 {
     private final WorkerPicker personPicker;
 
@@ -62,7 +62,7 @@ public class ReimbursableExpensesEditorWindow extends TransactionEditorWindow
     /**
      * Construct the Window.
      */
-    public ReimbursableExpensesEditorWindow(final DataStore data, final ReimbursableTransaction t) {
+    public ReimbursableExpensesTransactionEditorWindow(final DataStore data, final ReimbursableTransaction t) {
         super(data, "Reimbursable Expenses");
         Label label;
         HBox box;
